@@ -1,12 +1,10 @@
 import time
 import os
+import json
 import subprocess
 
-# ==========================================
-# CONFIGURACIÓN DEL ENTORNO
-# ==========================================
 # Reemplaza con la ruta absoluta real de tu tracker
-TRACKER_PATH = r"D:\Paulo\Cursos\DMC\Amely Spa\files\tracker_bmad.md"
+TRACKER_PATH = r"D:\Paulo\Cursos\DMC\template-bmad\files\tracker_bmad.md"
 
 def guardar_historial(agente_id, instruccion):
     """Ejecuta un commit automático en Git para el control de cambios"""
@@ -24,39 +22,68 @@ def guardar_historial(agente_id, instruccion):
         # Falla silenciosamente si no hubo cambios reales en los archivos
         pass
 
+def obtener_pane_id(nombre_agente):
+    """Consulta Herdr dinámicamente y retorna el pane_id donde corre el agente."""
+    try:
+        resultado = subprocess.run(
+            "herdr agent list", shell=True, capture_output=True, text=True
+        )
+        if resultado.returncode != 0:
+            return None
+
+        datos = json.loads(resultado.stdout)
+        agentes = datos.get("result", {}).get("agents", [])
+
+        for agente in agentes:
+            if agente.get("name") == nombre_agente:
+                return agente.get("pane_id")
+
+        return None
+    except Exception as e:
+        print(f"⚠️ [Watcher] Error al consultar la lista de agentes: {e}")
+        return None
+
 def procesar_tracker(ultima_linea):
     linea = ultima_linea.strip()
-    
-    # Mapeo de las etiquetas con el ID exacto del agente en Herdr
+
+    # Mapeo limpio usando nombres semánticos
     agentes = {
-        "@BS:": "business-storyteller",     # Almacena la idea de usuario estructurada para la generación del product brief
-        "@PA:": "product-analyst",  # Almacena el product brief y las instrucciones de producto
-        "@PM:": "product-manager",  # Almacena el product backlog y las instrucciones de gestión de producto
-        "@BA:": "business-analyst",  # Almancena las historias de usuario y las instrucciones de negocio
-        "@QA:": "qa-documental",    # Almacenas las historias de usuario aprobadas y los feedbacks de QA
-        "@UX:": "designer-ux"   # Almacena las propuestas de diseño (wireframes) y las instrucciones de experiencia de usuario
+        "@BS:": "business-storyteller",
+        "@PA:": "product-analyst",
+        "@PM:": "product-manager",
+        "@BA:": "business-analyst",
+        "@QA:": "qa-documental",
+        "@UX:": "designer-ux"
     }
 
-    for etiqueta, agente_id in agentes.items():
+    for etiqueta, agente_nombre in agentes.items():
         if linea.startswith(etiqueta):
-            print(f"\n🚀 [Watcher] Evento detectado para '{agente_id}'.")
+            print(f"\n🚀 [Watcher] Evento detectado para '{agente_nombre}'.")
+
+            # 1. Resolución automática de nombre -> pane_id
+            pane_id = obtener_pane_id(agente_nombre)
+
+            if not pane_id:
+                print(f"❌ [Watcher] El agente '{agente_nombre}' no está registrado o activo en Herdr.")
+                return False
+
+            print(f"🎯 [Watcher] Agente '{agente_nombre}' localizado en panel '{pane_id}'.")
             print(f"   Enviando instrucción: {linea}")
-            
-            # Cambio clave: Usamos 'prompt' en lugar de 'start'
-            # Inyectamos la línea del tracker directamente como el mensaje
-            comando = f'herdr agent prompt {agente_id} "{linea}"'
-            
+
+            # 2. Inyección y ejecución atómica
+            linea_escapada = linea.replace('"', '\\"')
+            comando = f'herdr pane run {pane_id} "{linea_escapada}"'
+
             try:
-                # 1. El agente ejecuta su trabajo y sobrescribe los archivos
                 subprocess.run(comando, shell=True, check=True)
-                print(f"✅ [Watcher] Instrucción entregada exitosamente al agente '{agente_id}'.")
-                
-                # 2. El Watcher congela el historial
-                guardar_historial(agente_id, linea)
-                
+                print(f"✅ [Watcher] Instrucción entregada exitosamente a '{agente_nombre}' ({pane_id}).")
+
+                # 3. Registro histórico en Git
+                guardar_historial(agente_nombre, linea)
+
             except subprocess.CalledProcessError as e:
-                print(f"❌ [Watcher] Error al contactar al agente '{agente_id}'. Código: {e.returncode}")
-            
+                print(f"❌ [Watcher] Error al ejecutar comando en '{agente_nombre}'. Código: {e.returncode}")
+
             return True
 
     return False
@@ -76,7 +103,7 @@ def iniciar_watcher():
         ultima_fecha_mod = os.path.getmtime(TRACKER_PATH)
         
         # 2. Memoriza la última línea actual para no reprocesarla
-        with open(TRACKER_PATH, 'r', encoding='utf-8') as f:
+        with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
             lineas = [l for l in f.readlines() if l.strip()]
             if lineas:
                 ultima_linea_procesada = lineas[-1]
@@ -97,7 +124,7 @@ def iniciar_watcher():
                 if fecha_mod_actual != ultima_fecha_mod:
                     ultima_fecha_mod = fecha_mod_actual
                     
-                    with open(TRACKER_PATH, 'r', encoding='utf-8') as f:
+                    with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
                         lineas = [l for l in f.readlines() if l.strip()]
                         
                         if lineas:
