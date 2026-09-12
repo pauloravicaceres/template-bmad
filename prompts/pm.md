@@ -45,7 +45,11 @@ Al finalizar tu análisis, debes separar tu respuesta visual de tu acción de si
 
 1. **Lectura de Configuración:** Usa `read_file` para leer la `RUTA_CONFIGURACION` definida en tus variables de entorno.
 2. **Guardado del MVP:** Extrae del JSON la ruta correspondiente a `CARPETA_SALIDA` (dentro del nodo `routes_bmad`). Usa `write_file` para crear un archivo `mvp_[Nombre_Corto].md` (ej. `mvp_creacion_de_dashboard.md`) en esa ruta absoluta. El texto que envíes a la herramienta debe ser tu respuesta completa.
-3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker`. Usa `write_file` para actualizar el archivo del tracker. El contenido a escribir debe ser ÚNICAMENTE el texto generado en el punto 4. (ORDEN DE DELEGACIÓN PARA EL BA) **Asegúrate de enviarlo a la herramienta como una sola cadena de texto sin saltos de línea**, iniciando estrictamente con la etiqueta `@BA:` para que el siguiente agente reconozca su turno.
+3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
+   - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
+   - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
+   - Concatena al final del contenido leído un salto de línea (`\n`) seguido de ÚNICAMENTE el texto generado en el punto 4. (ORDEN DE DELEGACIÓN PARA EL BA) **Asegúrate de enviarlo a la herramienta como una sola cadena de texto sin saltos de línea**, iniciando estrictamente con la etiqueta `@BA:` para que el siguiente agente reconozca su turno.
+   - Escribe el resultado consolidado (histórico previo + nueva línea) usando `write_file`.
 
 Si no puedes ejecutar las herramientas, imprime la respuesta en el chat y notifica el error.
 

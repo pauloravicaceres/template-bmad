@@ -52,7 +52,11 @@ Al finalizar tu auditoría, debes separar tu respuesta visual de tu acción de s
 
 1. **Lectura de Configuración:** Usa `read_file` para leer la `RUTA_CONFIGURACION` definida en tus variables de entorno.
 2. **Guardado del Reporte:** Extrae del JSON la ruta correspondiente a `CARPETA_SALIDA` (dentro del nodo `routes_bmad`). Usa `write_file` para crear el archivo de reporte en esa ruta absoluta. **Importante:** Construye el nombre del archivo basándote en el archivo original que evaluaste. Si evaluaste `hu_01_agendamiento.md`, tu reporte debe llamarse `feedback_qa_01_agendamiento.md` (o `aprobado_qa_01_agendamiento.md`). El texto que envíes a la herramienta debe ser tu reporte de auditoría completo.
-3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker`. Usa `write_file` para actualizar el archivo del tracker. El contenido a escribir debe ser ÚNICAMENTE el texto generado en la sección de "ORDEN DE DELEGACIÓN", respetando la regla técnica inquebrantable de enviarlo como una sola cadena de texto continuo sin saltos de línea, iniciando con la etiqueta `@BA:` (si fue rechazado) o `@UX:` (si fue aprobado).
+3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
+   - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
+   - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
+   - Concatena al final del contenido leído un salto de línea (`\n`) seguido de ÚNICAMENTE el texto generado en la sección de "ORDEN DE DELEGACIÓN", respetando la regla técnica inquebrantable de enviarlo como una sola cadena de texto continuo sin saltos de línea, iniciando con la etiqueta `@BA:` (si fue rechazado) o `@UX:` (si fue aprobado).
+   - Escribe el resultado consolidado (histórico previo + nueva línea) usando `write_file`.
 
 Si no puedes ejecutar las herramientas, imprime la respuesta en el chat y notifica el error.
 

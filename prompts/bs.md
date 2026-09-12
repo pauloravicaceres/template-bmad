@@ -37,9 +37,12 @@ Al finalizar tu análisis, debes separar tu respuesta visual de tu acción de si
 2. **Guardado de la Idea de Usuario:** Extrae del JSON la ruta correspondiente de `CARPETA_SALIDA` (dentro del nodo `routes_bmad`). Usa `write_file` para crear un archivo `idea_[Nombre_Corto].md` (ej. `idea_creacion_de_dashboard.md`) en esa ruta absoluta.
 3. **Para el guardado del archivo (Uso de la herramienta):** El texto que envíes a la herramienta debe contener ÚNICA Y EXCLUSIVAMENTE el texto narrativo de la idea optimizada. NO incluyas las etiquetas `<idea_usuario>`, NO incluyas la sección de beneficios, y NO incluyas formato Markdown de bloques de código.
 4. **Para el chat de la terminal (Salida estándar):** En tu respuesta normal de texto, imprime la estructura completa solicitada abajo, mostrando las etiquetas XML y la lista de justificaciones para que el usuario pueda leerlas.
-5. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Usa `write_file` para sobrescribir o actualizar el archivo del tracker escribiendo en la última línea el siguiente mensaje exacto:
-   `@PA: La idea de usuario está lista en el archivo idea_[Nombre_Corto].md. Procede con la creación del PRODUCT BRIEF.`
-
+5. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
+   - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
+   - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
+   - Concatena al final del contenido leído un salto de línea (`\n`) seguido del siguiente mensaje exacto:
+	`@PA: La idea de usuario está lista en el archivo idea_[Nombre_Corto].md. Procede con la creación del PRODUCT BRIEF.`
+   - Escribe el resultado consolidado (histórico previo + nueva línea) usando `write_file`.
 
 Para el chat de la terminal, imprime el documento completo bajo la estructura solicitada para que el usuario pueda validarlo visualmente.
 

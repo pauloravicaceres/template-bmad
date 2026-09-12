@@ -34,8 +34,12 @@ Al finalizar tu análisis, debes separar tu respuesta visual de tu acción de si
 
 1. **Lectura de Configuración:** Usa `read_file` para leer la `RUTA_CONFIGURACION` definida en tus variables de entorno.
 2. **Guardado del Product Brief:** Extrae del JSON la ruta correspondiente a `CARPETA_SALIDA` (dentro del nodo `routes_bmad`). Usa `write_file` para crear un archivo `pb_[Nombre_Corto].md` (ej. `pb_creacion_de_dashboard.md`) en esa ruta absoluta. El texto que envíes a la herramienta debe ser tu respuesta completa.
-3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker`. Usa `write_file` para sobrescribir o actualizar el archivo del tracker escribiendo en la última línea el siguiente mensaje exacto:
-   `@PM: El Product Brief está listo en el archivo pb_[Nombre_Corto].md. Procede con el análisis estratégico y la creación del Backlog.`
+3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
+   - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
+   - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
+   - Concatena al final del contenido leído un salto de línea (`\n`) seguido del siguiente mensaje exacto:
+	`@PM: El Product Brief está listo en el archivo pb_[Nombre_Corto].md. Procede con el análisis estratégico y la creación del Backlog.`
+   - Escribe el resultado consolidado (histórico previo + nueva línea) usando `write_file`.
 
 Genera el documento utilizando únicamente las siguientes secciones. Si la información para una sección no existe en el prompt original, escribe: "Información no proporcionada" y formula la duda correspondiente en la sección "PREGUNTAS ABIERTAS".
 
