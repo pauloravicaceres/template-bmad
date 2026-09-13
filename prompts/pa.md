@@ -1,4 +1,4 @@
-
+****
 # VARIABLES DE ENTORNO GLOBALES
 
 RUTA_CONFIGURACION: "D:\Paulo\Cursos\DMC\template-bmad\config_bmad.json"

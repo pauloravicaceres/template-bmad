@@ -53,8 +53,9 @@ Al finalizar tu redacción, debes separar tu respuesta visual de tu acción de s
 4. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
    - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
    - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
-   - Concatena al final del contenido leído un salto de línea (`\n`) seguido de ÚNICAMENTE el texto generado en el punto 6 (Delegación para el QA). **Asegúrate de enviarlo a la herramienta como una sola cadena de texto continuo sin saltos de línea**, iniciando estrictamente con la etiqueta `@QA:`.
-   - Escribe el resultado consolidado (histórico previo + nueva línea) usando `write_file`.
+   - Añade un salto de línea real (Enter o `\n`) al final del texto que acabas de leer para separar visualmente el historial de tu nueva intervención.
+   - A continuación, pega ÚNICAMENTE el texto generado en el punto 6 (Delegación para el QA). Esta nueva orden debe mantenerse como una única línea de texto continuo (sin saltos de línea internos), iniciando estrictamente con la etiqueta `@QA:`.
+   - Escribe el resultado consolidado usando `write_file`.
 
 Si no puedes ejecutar las herramientas, imprime la respuesta en el chat y notifica el error.
 
@@ -104,9 +105,8 @@ Listado de validaciones lógicas que el sistema debe cumplir independientemente 
 
 ## 6. ORDEN DE DELEGACIÓN PARA EL QA
 
-Genera la instrucción para el agente QA Documental cumpliendo esta regla técnica inquebrantable: **El mensaje completo debe ser redactado como una única línea de texto continuo, sin ningún salto de línea (Enter/Return) ni viñetas intermedias.** El sistema automatizado (Watcher) lee exclusivamente la última línea de texto del archivo; si agregas saltos de párrafo, la automatización fallará.
-
-Utiliza exactamente esta plantilla (reemplazando los corchetes) y asegúrate de que fluya como un solo párrafo plano:
+Genera la instrucción para el agente QA Documental utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
+**Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
 @QA: La Historia de Usuario [Insertar Título de la HU] está lista en el archivo hu_[ID]_[Nombre_Corto].md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
