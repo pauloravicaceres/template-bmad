@@ -1,6 +1,5 @@
 
 
-
 @PA: La idea de usuario está lista en el archivo idea_landing_page_perfil_profesional.md. Procede con la creación del PRODUCT BRIEF.
 
 @PM: El Product Brief está listo en el archivo pb_landing_page_perfil_profesional.md. Procede con el análisis estratégico y la creación del Backlog.
@@ -17,3 +16,4 @@
 @QA: La Historia de Usuario Selección de servicios, cálculo de duración y reserva de horarios en tiempo real está lista en el archivo hu_01_reserva_disponibilidad.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 @BA: La Historia de Usuario Selección de servicios, cálculo de duración y reserva de horarios en tiempo real fue RECHAZADA. Revisa las observaciones puntuales en el archivo feedback_qa_01_reserva_disponibilidad.md, corrige la especificación para cubrir los flujos faltantes y vuelve a notificarme cuando esté lista.
 @QA: La Historia de Usuario Selección de servicios, cálculo de duración y reserva de horarios en tiempo real está lista en el archivo hu_01_reserva_disponibilidad.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
+@UX: La Historia de Usuario Selección de servicios, cálculo de duración y reserva de horarios en tiempo real ha sido auditada y APROBADA. Puedes encontrar la especificación final en el archivo hu_01_reserva_disponibilidad.md. Por favor, procede con el diseño de los wireframes basados en las fronteras y reglas de negocio aprobadas.
