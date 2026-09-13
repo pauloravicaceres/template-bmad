@@ -7,3 +7,5 @@
 @QA: La Historia de Usuario Agendamiento dinámico de citas podológicas multilista está lista en el archivo hu_01_motor_reservas.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 @BA: La Historia de Usuario Agendamiento dinámico de citas podológicas multilista fue RECHAZADA. Revisa las observaciones puntuales en el archivo feedback_qa_01_motor_reservas.md, corrige la especificación para cubrir los flujos faltantes y vuelve a notificarme cuando esté lista.
+
+@QA: La Historia de Usuario Agendamiento dinámico de citas podológicas multilista ha sido actualizada en el archivo hu_01_motor_reservas.md tras corregir las observaciones. Por favor, procede con la re-auditoría documental.
