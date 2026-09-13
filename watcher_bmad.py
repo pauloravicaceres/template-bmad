@@ -5,23 +5,18 @@ import subprocess
 
 TRACKER_PATH = r"D:\Paulo\Cursos\DMC\template-bmad\files\tracker_bmad.md"
 
-# Memoria en RAM para recordar qué se le envió a cada agente exitosamente
-memoria_envios = {}
-
 def guardar_historial(agente_id, instruccion):
-    """Ejecuta un commit automático en Git para el control de cambios"""
     try:
         subprocess.run("git add .", shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        mensaje_commit = f"BMAD Auto-Save: {agente_id} finalizó su tarea"
-        comando_commit = f'git commit -m "{mensaje_commit}" -m "Instrucción procesada: {instruccion}"'
+        mensaje_commit = f"BMAD Auto-Save: {agente_id} tarea despachada"
+        comando_commit = f'git commit -m "{mensaje_commit}" -m "Instrucción: {instruccion}"'
         subprocess.run(comando_commit, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(f"📦 [Control de Cambios] Historial guardado por {agente_id}.")
+        print(f"📦 [Control de Cambios] Commit automático para {agente_id}.")
     except subprocess.CalledProcessError:
         pass
 
 
 def obtener_info_agente(nombre_agente):
-    """Consulta Herdr dinámicamente y retorna el (pane_id, estado) del agente."""
     try:
         resultado = subprocess.run("herdr agent list", shell=True, capture_output=True, text=True)
         if resultado.returncode != 0:
@@ -40,132 +35,119 @@ def obtener_info_agente(nombre_agente):
         return None, None
 
 
-def extraer_instruccion(linea, etiqueta_objetivo, todas_las_etiquetas):
-    """Extrae solo el fragmento del mensaje destinado al agente objetivo."""
-    inicio = linea.find(etiqueta_objetivo)
-    if inicio == -1:
-        return None
-    
-    # Buscar cuál es la etiqueta más cercana que aparece después de la nuestra
-    fin = len(linea)
-    for otra_etiqueta in todas_las_etiquetas:
-        if otra_etiqueta != etiqueta_objetivo:
-            pos_otra = linea.find(otra_etiqueta, inicio + len(etiqueta_objetivo))
-            if pos_otra != -1 and pos_otra < fin:
-                fin = pos_otra
-                
-    # Retorna el texto limpio, ej: "@UX: Procede con los wireframes."
-    return linea[inicio:fin].strip()
-
-
-def procesar_tracker(linea_actual):
-    """
-    Retorna True SI Y SOLO SI todos los agentes requeridos en esta línea
-    recibieron su instrucción con éxito. Retorna False si alguno estaba ocupado.
-    """
-    linea = linea_actual.strip()
-    
+def extraer_instrucciones(linea):
+    """Parsea una línea y devuelve una lista de diccionarios con las tareas separadas"""
     agentes = {
         "@BS:": "business-storyteller",
         "@PA:": "product-analyst",
         "@PM:": "product-manager",
         "@BA:": "business-analyst",
         "@QA:": "qa-documental",
-        "@UX:": "designer-ux"
+        "@UX:": "designer-ux",
+        "@ARQ:": "arquitecto"
     }
-
-    todas_entregadas = True
-    al_menos_un_target = False
-
+    
+    tareas = []
     todas_las_etiquetas = list(agentes.keys())
-
+    
     for etiqueta, agente_nombre in agentes.items():
         if etiqueta in linea:
-            al_menos_un_target = True
+            inicio = linea.find(etiqueta)
+            fin = len(linea)
             
-            # Extraer solo la parte del mensaje que le corresponde a este agente
-            mensaje_especifico = extraer_instruccion(linea, etiqueta, todas_las_etiquetas)
+            for otra_etiqueta in todas_las_etiquetas:
+                if otra_etiqueta != etiqueta:
+                    pos_otra = linea.find(otra_etiqueta, inicio + len(etiqueta))
+                    if pos_otra != -1 and pos_otra < fin:
+                        fin = pos_otra
+                        
+            mensaje = linea[inicio:fin].strip()
+            tareas.append({'agente': agente_nombre, 'mensaje': mensaje})
             
-            # Usamos el mensaje específico para la memoria RAM
-            if memoria_envios.get(agente_nombre) == mensaje_especifico:
-                continue
-
-            pane_id, estado = obtener_info_agente(agente_nombre)
-
-            if not pane_id:
-                print(f"❌ [Watcher] Agente '{agente_nombre}' no encontrado.")
-                continue
-
-            if estado != "idle":
-                print(f"⏳ [Watcher] '{agente_nombre}' está {estado}. Esperando...")
-                todas_entregadas = False
-                continue 
-
-            print(f"\n🚀 [Watcher] Evento detectado para '{agente_nombre}'.")
-            
-            # INYECTAR SOLO EL MENSAJE ESPECÍFICO, NO LA LÍNEA COMPLETA
-            linea_escapada = mensaje_especifico.replace('"', '\\"')
-            comando = f'herdr pane run {pane_id} "{linea_escapada}"'
-
-            try:
-                subprocess.run(comando, shell=True, check=True)
-                print(f"✅ [Watcher] Instrucción entregada a '{agente_nombre}'.")
-                
-                memoria_envios[agente_nombre] = mensaje_especifico
-                guardar_historial(agente_nombre, mensaje_especifico)
-
-            except subprocess.CalledProcessError as e:
-                print(f"❌ [Watcher] Error de ejecución en '{agente_nombre}'. Código: {e.returncode}")
-                todas_entregadas = False
-
-    # Si la línea no tenía etiquetas de agentes, se considera "procesada" para descartarla
-    if not al_menos_un_target:
-        return True
-        
-    return todas_entregadas
+    return tareas
 
 
 def iniciar_watcher():
-    print(f"👁️ Watcher BMAD asíncrono iniciado.")
+    print(f"👁️ Watcher BMAD (Queue System) iniciado.")
     print(f"📂 Escuchando cambios en: {TRACKER_PATH}")
     
-    ultima_fecha_mod = 0
-    ultima_linea_procesada = ""
-    linea_pendiente = None
+    num_lineas_leidas = 0
+    cola_tareas = []
+    hash_tareas_historicas = set()
 
+    # Candado de Inicialización: Cuenta las líneas existentes para ignorar el pasado
     if os.path.exists(TRACKER_PATH):
-        ultima_fecha_mod = os.path.getmtime(TRACKER_PATH)
         with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
             lineas = [l for l in f.readlines() if l.strip()]
-            if lineas:
-                ultima_linea_procesada = lineas[-1]
-                
-        print("🔒 Candado activado: Ignorando el histórico. Esperando nuevas instrucciones...\n")
+            num_lineas_leidas = len(lineas)
+        print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
 
     while True:
         try:
-            # 1. Fase de Lectura: Detectar nuevas instrucciones
+            # ==========================================
+            # 1. FASE DE LECTURA Y ENCOLADO
+            # ==========================================
             if os.path.exists(TRACKER_PATH):
-                fecha_mod_actual = os.path.getmtime(TRACKER_PATH)
-                
-                if fecha_mod_actual != ultima_fecha_mod:
-                    ultima_fecha_mod = fecha_mod_actual
-                    with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
-                        lineas = [l for l in f.readlines() if l.strip()]
-                        if lineas:
-                            ultima_linea = lineas[-1]
-                            # Si es una línea completamente nueva, entra a la cola
-                            if ultima_linea != ultima_linea_procesada:
-                                linea_pendiente = ultima_linea
+                with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
+                    lineas = [l for l in f.readlines() if l.strip()]
+                    
+                    # Si el archivo creció, procesamos SOLO las líneas nuevas
+                    if len(lineas) > num_lineas_leidas:
+                        nuevas_lineas = lineas[num_lineas_leidas:]
+                        
+                        for linea in nuevas_lineas:
+                            nuevas_tareas = extraer_instrucciones(linea)
+                            for tarea in nuevas_tareas:
+                                # Creamos un ID único de la tarea para evitar duplicados en cola
+                                id_tarea = hash(tarea['agente'] + tarea['mensaje'])
+                                if id_tarea not in hash_tareas_historicas:
+                                    cola_tareas.append(tarea)
+                                    hash_tareas_historicas.add(id_tarea)
+                                    print(f"📥 [Cola] Tarea encolada para '{tarea['agente']}'.")
+                                    
+                        num_lineas_leidas = len(lineas)
+                        
+                    # Protección por si se borran líneas manualmente del archivo
+                    elif len(lineas) < num_lineas_leidas:
+                        num_lineas_leidas = len(lineas)
 
-            # 2. Fase de Ejecución: Bombardear hasta tener éxito
-            if linea_pendiente:
-                completado_para_todos = procesar_tracker(linea_pendiente)
+            # ==========================================
+            # 2. FASE DE INYECCIÓN (BACKPRESSURE)
+            # ==========================================
+            tareas_no_procesadas = []
+            
+            for tarea in cola_tareas:
+                agente = tarea['agente']
+                mensaje = tarea['mensaje']
                 
-                if completado_para_todos:
-                    # Solo cuando TODOS los agentes de esa línea recibieron su orden, la damos por muerta
-                    ultima_linea_procesada = linea_pendiente
-                    linea_pendiente = None
+                pane_id, estado = obtener_info_agente(agente)
+                
+                if not pane_id:
+                    print(f"❌ [Watcher] Agente '{agente}' no encontrado. Se mantendrá en cola.")
+                    tareas_no_procesadas.append(tarea)
+                    continue
+                    
+                if estado != "idle":
+                    print(f"⏳ [Watcher] '{agente}' está {estado}. Esperando turno...")
+                    tareas_no_procesadas.append(tarea)
+                    continue 
+
+                # Si está idle, disparamos
+                print(f"\n🚀 [Watcher] Inyectando tarea a '{agente}'...")
+                linea_escapada = mensaje.replace('"', '\\"')
+                comando = f'herdr pane run {pane_id} "{linea_escapada}"'
+
+                try:
+                    subprocess.run(comando, shell=True, check=True)
+                    print(f"✅ [Watcher] Éxito. Tarea despachada.")
+                    guardar_historial(agente, mensaje)
+                    # Al NO agregarla a tareas_no_procesadas, desaparece de la cola (éxito)
+                except subprocess.CalledProcessError as e:
+                    print(f"❌ [Watcher] Error de inyección en '{agente}'. Código: {e.returncode}")
+                    tareas_no_procesadas.append(tarea) # Falla la inyección, reintenta luego
+
+            # Sobrescribimos la cola solo con las tareas que no se pudieron entregar
+            cola_tareas = tareas_no_procesadas
                                 
         except KeyboardInterrupt:
             print("\n🛑 Watcher detenido por el usuario.")
