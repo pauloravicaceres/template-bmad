@@ -11,3 +11,5 @@
 @QA: La Historia de Usuario Agendamiento dinámico de citas podológicas multilista ha sido actualizada en el archivo hu_01_motor_reservas.md tras corregir las observaciones. Por favor, procede con la re-auditoría documental.
 
 @UX: La Historia de Usuario Agendamiento dinámico de citas podológicas multilista ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_01_motor_reservas.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
+
+@BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Sistema Integrado de Notificaciones vía WhatsApp. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely_spa.md.
