@@ -1,27 +1,28 @@
-Soy el dueño de Ámely - Spá Podológico. Actualmente enfrentamos ineficiencias en la reserva de citas y gestión de agendas de nuestros profesionales podólogos, lo que genera cruce de horarios, agendamientos manuales lentos y falta de confirmación inmediata con nuestros clientes. Necesitamos una solución web moderna, elegante, ligera y completamente responsiva (adaptable a PCs, laptops, tablets y smartphones) que centralice el flujo de reservas y optimice la experiencia del usuario.
+Soy el dueño de Ámely - Spá Podológico. Actualmente enfrentamos ineficiencias operativas y pérdidas de tiempo por agendamientos manuales de citas, cruces involuntarios en las agendas de los podólogos y falta de confirmaciones inmediatas, lo que genera ausencias o fricción en la atención al cliente. Necesitamos una plataforma web moderna, elegante, ligera y completamente responsiva (adaptada para PCs, laptops, tablets y smartphones) que centralice el flujo de reservas automatizadas, optimice la ocupación del tiempo de nuestros profesionales y profesionalice la comunicación mediante notificaciones automáticas por WhatsApp.
 
-El sistema debe atender a tres actores principales:
-1. Clientes: Quienes buscan informarse sobre nuestros profesionales y catálogo de servicios podológicos, agendar citas según su preferencia y disponibilidad real, recibir confirmaciones automáticas y poder anular citas si lo requieren.
-2. Profesionales Podólogos: Quienes necesitan visualizar su agenda individual organizada en un panel de gestión para hacer seguimiento a sus atenciones diarias y recibir notificaciones instantáneas de nuevas reservas o cancelaciones.
-3. Administración del Spa: Encargados de mantener actualizada la oferta del spa y la asignación de profesionales.
+El sistema debe atender a dos actores clave:
+1. Clientes finales: Que buscan conocer a nuestro equipo profesional, seleccionar los tratamientos requeridos, agendar de manera autónoma en horarios disponibles y gestionar o cancelar sus citas de forma sencilla.
+2. Profesionales Podólogos: Que requieren visualizar y gestionar su agenda diaria de atenciones en tiempo real, así como enterarse de forma instantánea de cada nueva reserva o cancelación.
 
-Para la primera versión (MVP), organizamos el aplicativo en los siguientes bloques funcionales:
+Para la primera versión del sistema (MVP), requerimos los siguientes módulos funcionales:
 
-- Módulo de Vitrina Digital y Equipo:
-  * Presentación visual elegante del spa, sus instalaciones e interfaz amigable.
-  * Perfiles de los profesionales podólogos que laboran en el spa.
-  * Catálogo de servicios podológicos ofertados, especificando detalladamente la duración o tiempo promedio de atención de cada servicio (los precios de los servicios se mantendrán ocultos al cliente en la vista pública).
+1. Vitrina Digital Institucional y Staff:
+   - Presentación del perfil y trayectoria de los profesionales podólogos que laboran en el spá.
+   - Catálogo detallado de servicios podológicos ofertados, especificando el tiempo promedio de atención de cada uno (NOTA: Por estrategia comercial, los precios de los servicios NO deben ser visibles al cliente en ninguna sección de la plataforma).
 
-- Motor Inteligente de Reservas y Gestión de Disponibilidad:
-  * Permite al cliente seleccionar uno o múltiples servicios podológicos y elegir su profesional de preferencia.
-  * Cálculo automático acumulativo del tiempo total estimado de atención basado en la suma de duraciones de los servicios seleccionados.
-  * Validación en tiempo real de la disponibilidad del profesional elegido, bloqueando en su agenda el bloque horario completo correspondiente a la suma calculada para evitar cruces con otros clientes.
+2. Motor Inteligente de Reservas y Agenda Dinámica:
+   - Selección multilista de uno o varios servicios por parte del cliente.
+   - Selección del profesional podólogo de su preferencia (o asignación disponible).
+   - Cálculo automático del tiempo total acumulado de atención según la combinación de servicios seleccionados.
+   - Algoritmo de validación de disponibilidad en tiempo real sobre la agenda del profesional, bloqueando automáticamente ese bloque de tiempo continuo para evitar solapamientos con otros clientes.
 
-- Sistema de Notificaciones Automatizadas por WhatsApp:
-  * Generación y envío de notificación automática vía WhatsApp al cliente al concretar exitosamente su reserva.
-  * Envío de notificación automática vía WhatsApp al profesional asignado notificándole los detalles de la nueva cita.
-  * Notificación automática al WhatsApp del profesional ante cualquier anulación realizada por el cliente.
+3. Sistema Integrado de Notificaciones vía WhatsApp:
+   - Envío de notificación/confirmación automática vía WhatsApp al cliente al concretar la reserva.
+   - Envío de notificación instantánea vía WhatsApp al podólogo seleccionado con los detalles de la nueva cita.
+   - Notificación automática vía WhatsApp al podólogo en caso de que el cliente realice la anulación de una cita desde la plataforma.
 
-- Gestión de Citas y Cancelaciones:
-  * Panel de gestión de citas con acceso para los profesionales, permitiéndoles revisar el cronograma de sus atenciones, estado de citas y seguimiento diario.
-  * Funcionalidad de anulación de cita accesible para el cliente (mediante código/enlace de reserva), que libera automáticamente el tiempo agendado en el calendario del profesional.
+4. Panel de Gestión de Citas (Portal del Profesional):
+   - Módulo privado donde cada podólogo visualiza su agenda de atenciones, el historial de clientes y realiza el seguimiento del estado de cada cita (confirmada, atendida, cancelada).
+
+5. Módulo de Gestión/Cancelación de Citas por el Cliente:
+   - Opción para que el cliente solicite la anulación de su cita previamente agendada, liberando inmediatamente el bloque de tiempo en la agenda del profesional y disparando la notificación correspondiente por WhatsApp.

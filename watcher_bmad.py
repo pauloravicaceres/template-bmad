@@ -74,6 +74,7 @@ def iniciar_watcher():
     num_lineas_leidas = 0
     cola_tareas = []
     hash_tareas_historicas = set()
+    tiempo_idle_agentes = {}  # <--- NUEVO: Registro de estabilización
 
     # Candado de Inicialización: Cuenta las líneas existentes para ignorar el pasado
     if os.path.exists(TRACKER_PATH):
@@ -116,17 +117,16 @@ def iniciar_watcher():
                         num_lineas_leidas = len(lineas)
 
             # ==========================================
-            # 2. FASE DE INYECCIÓN (BACKPRESSURE)
+            # 2. FASE DE INYECCIÓN (BACKPRESSURE + DEBOUNCER)
             # ==========================================
             tareas_no_procesadas = []
-            agentes_despachados_hoy = set()  # Candado temporal por ciclo
+            agentes_despachados_hoy = set()
             
             for tarea in cola_tareas:
                 agente = tarea['agente']
                 mensaje = tarea['mensaje']
                 
-                # REGLA DE ORO: Si ya le disparamos a este agente en este exacto segundo, 
-                # obligamos a la tarea a esperar al siguiente ciclo.
+                # Candado de doble despacho simultáneo
                 if agente in agentes_despachados_hoy:
                     tareas_no_procesadas.append(tarea)
                     continue
@@ -140,27 +140,45 @@ def iniciar_watcher():
                     
                 if estado != "idle":
                     print(f"⏳ [Watcher] '{agente}' está {estado}. Esperando turno...")
+                    # Si el agente parpadeó a working, fue un falso positivo. Reseteamos su reloj.
+                    if agente in tiempo_idle_agentes:
+                        del tiempo_idle_agentes[agente]
                     tareas_no_procesadas.append(tarea)
                     continue 
 
-                # Si está idle y no le hemos disparado aún en este ciclo, disparamos
+                # --- INICIO DEL DEBOUNCER (Filtro Anti-Parpadeo) ---
+                if agente not in tiempo_idle_agentes:
+                    # Inicia el cronómetro de 15 segundos
+                    tiempo_idle_agentes[agente] = time.time()
+                    print(f"⏱️ [Watcher] '{agente}' parece idle. Verificando estabilización (15s)...")
+                    tareas_no_procesadas.append(tarea)
+                    continue
+                else:
+                    tiempo_transcurrido = time.time() - tiempo_idle_agentes[agente]
+                    if tiempo_transcurrido < 15:
+                        # Sigue esperando en silencio hasta cumplir el tiempo
+                        tareas_no_procesadas.append(tarea)
+                        continue
+                # --- FIN DEL DEBOUNCER ---
+
+                # Si el código llega aquí, el agente superó la prueba de 15s ininterrumpidos en idle.
                 print(f"\n🚀 [Watcher] Inyectando tarea a '{agente}'...")
                 linea_escapada = mensaje.replace('"', '\\"')
                 comando = f'herdr pane run {pane_id} "{linea_escapada}"'
 
                 try:
                     subprocess.run(comando, shell=True, check=True)
-                    print(f"✅ [Watcher] Éxito. Tarea despachada.")
+                    print(f"✅ [Watcher] Éxito. Tarea despachada a {agente}.")
                     guardar_historial(agente, mensaje)
                     
-                    # ACTIVAMOS EL CANDADO para este agente
-                    agentes_despachados_hoy.add(agente) 
+                    agentes_despachados_hoy.add(agente)
+                    del tiempo_idle_agentes[agente]  # Limpiamos el contador tras éxito
                     
                 except subprocess.CalledProcessError as e:
                     print(f"❌ [Watcher] Error de inyección en '{agente}'. Código: {e.returncode}")
-                    tareas_no_procesadas.append(tarea) # Falla la inyección, reintenta luego
+                    tareas_no_procesadas.append(tarea)
 
-            # Sobrescribimos la cola solo con las tareas que no se pudieron entregar
+            # Sobrescribimos la cola
             cola_tareas = tareas_no_procesadas
                                 
         except KeyboardInterrupt:
