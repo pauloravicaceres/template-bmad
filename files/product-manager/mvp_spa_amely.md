@@ -1,42 +1,42 @@
+# PLAN DE GESTIÓN DE PRODUCTO Y BACKLOG MVP - ÁMELY SPÁ PODOLÓGICO
+
 ## 1. VISIÓN ESTRATÉGICA DEL MVP
 
-- **Foco de Gestión:** Construir el motor inteligente de reservas y agendamiento sin solapamientos, integrado a la vitrina digital de servicios y podólogos, para eliminar la gestión manual de citas y garantizar una asignación fluida de horarios.
-- **Criterio de Éxito Rector:** Lograr un 0% de solapamiento/cruces de citas en los horarios de los podólogos y reducir la tasa de inasistencias (no-shows) mediante notificaciones automáticas por WhatsApp y autogestión de cancelaciones.
+- **Foco de Gestión:** El foco prioritario de este MVP es construir el flujo principal de reserva multimodular y validación de disponibilidad en tiempo real, garantizando la eliminación absoluta de cruces de agenda entre podólogos y el cálculo preciso de duraciones sumadas de atención para Ámely - Spá Podológico.
+- **Criterio de Éxito Rector:** Lograr 0% de solapamiento de citas registradas en los horarios de atención de los podólogos y reducir la tasa de inasistencias (no-shows) mediante un flujo automatizado de confirmaciones por WhatsApp.
 
 
 ## 2. BACKLOG INICIAL (ÉPICAS FUNCIONALES)
 
-Organiza el alcance en grandes bloques de valor, ordenados por prioridad estricta de ejecución:
-
 - **[P1] Épica:** Motor Inteligente de Reservas y Disponibilidad
-  - *Justificación de Prioridad:* Constituye el núcleo operativo del producto. Sin la selección multimodular de servicios, el cálculo automático de duraciones y la validación en tiempo real para evitar solapamientos, el producto no cumple su propósito principal de resolver los cruces de agenda.
-  - *Trazabilidad:* Responde a la Sección 3 (Objetivos) y a la Sección 4.2 (Alcance Inicial: Motor Inteligente de Reservas y Disponibilidad del Product Brief).
+  - *Justificación de Prioridad:* Es la funcionalidad núcleo (Core) transaccional. Sin la lógica de validación de agenda en tiempo real, suma de duraciones y bloqueo de bloques horarios, no es posible resolver el problema principal del negocio ni habilitar la autogestión de citas.
+  - *Trazabilidad:* Responde a la sección "4. Alcance Inicial - Punto 2" y a las restricciones de integridad de agenda.
 - **[P2] Épica:** Vitrina Digital de Podólogos y Servicios
-  - *Justificación de Prioridad:* Permite a los clientes visualizar el catálogo de tratamientos con sus duraciones/precios y seleccionar al profesional de su preferencia, proporcionando los insumos necesarios para iniciar el flujo de reserva (P1).
-  - *Trazabilidad:* Responde a la Sección 4.1 (Alcance Inicial: Vitrina Digital de Podólogos y Servicios del Product Brief).
+  - *Justificación de Prioridad:* Es el prerrequisito del cliente para visualizar el catálogo de servicios podológicos (con duraciones y precios) y la plantilla de profesionales antes de proceder con el agendamiento.
+  - *Trazabilidad:* Responde a la sección "4. Alcance Inicial - Punto 1".
 - **[P3] Épica:** Notificaciones Automatizadas por WhatsApp
-  - *Justificación de Prioridad:* Requisito mandatorio para enviar confirmaciones inmediatas tras reservar y notificar cancelaciones, reduciendo la tasa de inasistencias e informando al podólogo oportunamente.
-  - *Trazabilidad:* Responde a la Sección 4.3 (Alcance Inicial: Notificaciones Automatizadas por WhatsApp) y Sección 5 (Restricciones).
+  - *Justificación de Prioridad:* Mecanismo clave para mitigar las inasistencias y notificar inmediatamente al podólogo ante cualquier modificación o cancelación en la agenda.
+  - *Trazabilidad:* Responde a la sección "4. Alcance Inicial - Punto 3" y a la restricción del canal mandatorio de WhatsApp.
 - **[P4] Épica:** Panel de Gestión para Podólogos
-  - *Justificación de Prioridad:* Proporciona al equipo médico una interfaz privada para monitorear y actualizar en tiempo real el estado de sus citas programadas, dependiendo directamente de las reservas generadas en P1.
-  - *Trazabilidad:* Responde a la Sección 4.4 (Alcance Inicial: Panel de Gestión para Podólogos) y Sección 2 (Usuarios: Podólogos).
+  - *Justificación de Prioridad:* Interfaz operativa interna que habilita a los podólogos la visualización y el seguimiento en tiempo real del estado de sus atenciones agendadas.
+  - *Trazabilidad:* Responde a la sección "4. Alcance Inicial - Punto 4".
 - **[P5] Épica:** Módulo de Auto-Gestión y Cancelación para Clientes
-  - *Justificación de Prioridad:* Facilita la anulación oportuna de citas por parte del cliente, permitiendo liberar espacios en la agenda y disparar notificaciones de cancelación (P3).
-  - *Trazabilidad:* Responde a la Sección 4.5 (Alcance Inicial: Módulo de Auto-Gestión y Cancelación para Clientes).
+  - *Justificación de Prioridad:* Permite a los clientes anular citas oportunamente, liberando espacios en la agenda para maximizar la ocupación del spá.
+  - *Trazabilidad:* Responde a la sección "4. Alcance Inicial - Punto 5".
 
 
 ## 3. RIESGOS, DEPENDENCIAS Y PUNTOS ABIERTOS
 
-- **Bloqueantes Potenciales:** 
-  - Dependencia técnica de la integración con un proveedor de API empresarial de WhatsApp (ej. Twilio o Meta Business API) para garantizar la transmisión efectiva de confirmaciones y alertas de cancelación.
-  - Margen de error en las duraciones estimadas por servicio, lo que podría desajustar la acumulación de tiempos en reservas multimodulares y generar retrasos presenciales.
-- **Ambigüedades de Negocio:** 
-  - Política de Cancelación: No se ha definido un tiempo límite mínimo de anticipación (ej. 2, 12 o 24 horas antes) para permitir la anulación en línea por parte del cliente.
-  - Autenticación del Cliente: Indefinición sobre si se requiere registro/inicio de sesión o si se agendará/cancelará mediante un identificador único (número telefónico o código de reserva).
-  - Modelo de Pago: Incertidumbre sobre si la reserva exige pago previo/seña en línea o si el cobro es 100% presencial.
-  - Estados del Panel del Podólogo: Falta precisar el listado oficial de estados de la atención (ej. Pendiente, En Atención, Completado, No Asistió) y si se registrarán observaciones clínicas.
+- **Bloqueantes Potenciales:**
+  - Dependencia directa de un proveedor/API de WhatsApp (ej. Twilio o Meta Business API); si la integración o las plantillas de notificaciones no están configuradas, se bloquea el envío automático de confirmaciones/anulaciones.
+  - Asunción de precisión en las duraciones estimadas por tratamiento podológico; variaciones significativas en la práctica real podrían descuadrar el bloque agendado.
+- **Ambigüedades de Negocio:**
+  - **Política de Cancelación:** No existe especificación sobre el tiempo límite mínimo (ej. 2h, 12h o 24h previas) para permitir la anulación sin penalidad por parte del cliente.
+  - **Mecanismo de Autenticación del Cliente:** El PRD no aclara si el cliente creará un usuario con contraseña o si utilizará un token/código de reserva junto a su número telefónico.
+  - **Modelo de Pago:** Falta definir si el cobro es presencial en el spá o si se requerirá un anticipo/seña digital para reservar.
+  - **Estados de Atención en Panel:** No se definen los estados exactos (ej. *Pendiente*, *En Atención*, *Completado*, *No Asistió*) ni si se registrarán notas clínicas/observaciones.
 
 
 ## 4. ORDEN DE DELEGACIÓN PARA EL BA
 
-@BA: El análisis estratégico está completo. Tu primera asignación es desglosar la Épica de Prioridad 1: Motor Inteligente de Reservas y Disponibilidad. Por favor, redacta la Historia de Usuario atómica, el Scope y los Criterios de Aceptación (Gherkin). ADVERTENCIA: Al redactar, ten presente esta restricción/ambigüedad detectada en el PRD: Identificar el mecanismo exacto de autenticación/identificación del cliente y no asumir políticas de pago o reglas de cancelación no delimitadas. Procederé a revisar tu entregable una vez pase por QA Documental.
+@BA: El análisis estratégico está completo en el archivo mvp_spa_amely.md. Tu primera asignación es leer ese documento y desglosar la Épica de Prioridad 1: Motor Inteligente de Reservas y Disponibilidad. Por favor, redacta la Historia de Usuario atómica, el Scope y los Criterios de Aceptación (Gherkin). ADVERTENCIA: Al redactar, ten presente esta restricción/ambigüedad detectada en el PRD: El mecanismo exacto de autenticación del cliente (por contraseña vs. código/teléfono) y las reglas/límites de tiempo para la cancelación no están definidos en el Product Brief. Decláralo en tu output, no lo inventes. Procederé a revisar tu entregable una vez pase por QA Documental.

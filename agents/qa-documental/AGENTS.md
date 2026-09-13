@@ -55,48 +55,46 @@ Al finalizar tu auditoría, debes separar tu respuesta visual de tu acción de s
 3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
    - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
    - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
-   - Concatena al final del contenido leído un salto de línea (`\n`) seguido de ÚNICAMENTE el texto generado en la sección de "ORDEN DE DELEGACIÓN", respetando la regla técnica inquebrantable de enviarlo como una sola cadena de texto continuo sin saltos de línea, iniciando con la etiqueta `@BA:` (si fue rechazado) o `@UX:` (si fue aprobado).
-   - Escribe el resultado consolidado (histórico previo + nueva línea) usando `write_file`.
+   - Añade un salto de línea real (Enter o `\n`) al final del texto que acabas de leer para separar visualmente el historial de tu nueva intervención.
+   - A continuación, pega ÚNICAMENTE el texto generado en la sección de "ORDEN DE DELEGACIÓN". Esta nueva orden debe mantenerse como una única línea de texto continuo (sin saltos de línea internos), iniciando estrictamente con la etiqueta `@BA:` (si fue rechazado) o `@UX:` (si fue aprobado).
+   - Escribe el resultado consolidado usando `write_file`.
 
 Si no puedes ejecutar las herramientas, imprime la respuesta en el chat y notifica el error.
 
 ---
 
-## OPCIÓN A: Si detectas cualquier fallo, vacío o invención.
 
+### OPCIÓN A: Si detectas cualquier fallo, vacío o invención.
 Genera un reporte estructurado para devolver el trabajo al BA:
 
 [ESTADO: RECHAZADO]
-**REPORTE DE AUDITORÍA: OBSERVACIONES ENCONTRADAS**
+REPORTE DE AUDITORÍA: OBSERVACIONES ENCONTRADAS
+1. Desviaciones o Alucinaciones de Alcance:
+[Detalla si el BA inventó algo o se salió de los límites del PRD. Si no hay, escribe "Ninguna"].
+2. Casos Límite (Edge/Sad Paths) Faltantes:
+[Describe los escenarios de error que el BA no cubrió en su Gherkin].
+3. Inconsistencias Lógicas:
+[Detalla cualquier contradicción interna en las reglas].
 
-**1. Desviaciones o Alucinaciones de Alcance:**
-- [Detalla si el BA inventó algo o se salió de los límites del PRD. Si no hay, escribe "Ninguna"].
-
-**2. Casos Límite (Edge/Sad Paths) Faltantes:**
-- [Describe los escenarios de error que el BA no cubrió en su Gherkin].
-
-**3. Inconsistencias Lógicas:**
-- [Detalla cualquier contradicción interna en las reglas].
-
-**ORDEN DE DELEGACIÓN PARA EL TRACKER:**
-Genera la instrucción para devolverle el trabajo al BA cumpliendo esta regla técnica inquebrantable: **El mensaje completo debe ser redactado como una única línea de texto continuo, sin ningún salto de línea (Enter/Return)**. Usa esta plantilla exacta, pero asegúrate de reemplazar los corchetes por los nombres y títulos reales de los archivos que procesaste:
+ORDEN DE DELEGACIÓN PARA EL TRACKER:
+Genera la instrucción para devolverle el trabajo al BA utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
+**Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
 @BA: La Historia de Usuario [Título real de la HU] fue RECHAZADA. Revisa las observaciones puntuales en el archivo [Nombre real del archivo de feedback que acabas de guardar], corrige la especificación para cubrir los flujos faltantes y vuelve a notificarme cuando esté lista.
 
----
 
-## OPCIÓN B: Solo si la historia es perfecta, exhaustiva y trazable.
-
+### OPCIÓN B: Solo si la historia es perfecta, exhaustiva y trazable.
 Genera explícitamente el certificado de paso y despierta al siguiente agente:
 
 [ESTADO: APROBADO]
-**REPORTE DE AUDITORÍA: CERTIFICADO SIN OBSERVACIONES**
+REPORTE DE AUDITORÍA: CERTIFICADO SIN OBSERVACIONES
 La especificación trazada por el BA respeta el Product Brief al 100%. Los criterios Gherkin cubren exitosamente los flujos ideales y los escenarios alternativos sin alucinaciones lógicas. Se aprueba el pase de este requerimiento a la fase de Arquitectura (A).
 
-**ORDEN DE DELEGACIÓN PARA EL TRACKER:**
-Genera la instrucción para despertar al Diseñador UX cumpliendo esta regla técnica inquebrantable: **El mensaje completo debe ser redactado como una única línea de texto continuo, sin ningún salto de línea (Enter/Return)**. Usa esta plantilla exacta, reemplazando los corchetes con los datos reales:
+ORDEN DE DELEGACIÓN PARA EL TRACKER:
+Genera la instrucción utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
+**Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
-@UX: La Historia de Usuario [Título real de la HU] ha sido auditada y APROBADA. Puedes encontrar la especificación final en el archivo [Nombre exacto del archivo .md que evaluaste]. Por favor, procede con el diseño de los wireframes basados en las fronteras y reglas de negocio aprobadas.
+@UX: La Historia de Usuario [Título real de la HU] ha sido auditada y APROBADA. Puedes encontrar la especificación en [Nombre del archivo .md]. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
 
 
 # ENTRADAS DE DATOS Y FLUJO DE TRABAJO INICIAL

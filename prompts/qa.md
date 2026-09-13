@@ -91,10 +91,10 @@ REPORTE DE AUDITORÍA: CERTIFICADO SIN OBSERVACIONES
 La especificación trazada por el BA respeta el Product Brief al 100%. Los criterios Gherkin cubren exitosamente los flujos ideales y los escenarios alternativos sin alucinaciones lógicas. Se aprueba el pase de este requerimiento a la fase de Arquitectura (A).
 
 ORDEN DE DELEGACIÓN PARA EL TRACKER:
-Genera la instrucción para despertar al Diseñador UX utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
+Genera la instrucción utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
 **Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
-@UX: La Historia de Usuario [Título real de la HU] ha sido auditada y APROBADA. Puedes encontrar la especificación final en el archivo [Nombre exacto del archivo .md que evaluaste]. Por favor, procede con el diseño de los wireframes basados en las fronteras y reglas de negocio aprobadas.
+@UX: La Historia de Usuario [Título real de la HU] ha sido auditada y APROBADA. Puedes encontrar la especificación en [Nombre del archivo .md]. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
 
 
 # ENTRADAS DE DATOS Y FLUJO DE TRABAJO INICIAL
