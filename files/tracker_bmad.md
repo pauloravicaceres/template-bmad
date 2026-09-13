@@ -23,3 +23,5 @@
 @UX: La Historia de Usuario Envío automático de notificaciones de confirmación y anulación de cita vía WhatsApp ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_03_notificaciones.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
 
 @BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Módulo de Anulación de Citas por el Cliente. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely_spa.md.
+
+@QA: La Historia de Usuario Anulación autónoma de cita por parte del cliente está lista en el archivo hu_04_anulacion.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
