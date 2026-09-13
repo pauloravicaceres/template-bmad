@@ -1,6 +1,7 @@
 
 
 
+
 @PA: La idea de usuario está lista en el archivo idea_landing_page_perfil_profesional.md. Procede con la creación del PRODUCT BRIEF.
 
 @PM: El Product Brief está listo en el archivo pb_landing_page_perfil_profesional.md. Procede con el análisis estratégico y la creación del Backlog.
@@ -31,3 +32,4 @@
 @BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Vitrina Digital de Podólogos y Servicios. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_spa_amely.md.
 @QA: La Historia de Usuario Visualización del catálogo de servicios podológicos y presentación del equipo de podólogos está lista en el archivo hu_02_vitrina_digital.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 @UX: La Historia de Usuario Visualización del catálogo de servicios podológicos y presentación del equipo de podólogos ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_02_vitrina_digital.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
+@BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Notificaciones Automatizadas por WhatsApp. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_spa_amely.md.
