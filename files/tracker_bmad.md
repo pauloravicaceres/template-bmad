@@ -18,7 +18,7 @@
 
 @QA: La Historia de Usuario Visualización de Agenda para Podólogos y Cancelación Autónoma de Citas por Clientes está lista en el archivo hu_03_dashboard_autogestion.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
-@UX: La Historia de Usuario Visualización de Agenda para Podólogos y Cancelación Autónoma de Citas por Clientes ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_03_dashboard_autogestion.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
+@UX: La Historia de Usuario Visualización de Agenda para Podólogos y Cancelación Autónoma de Citas por Clientes ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_03_dashboard_autogestion.md. Procede con los wireframes. @PM: La validación de la especificación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
 
 @BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Vitrina Digital e Identidad del Spá. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely.md.
 
@@ -29,3 +29,5 @@
 @PA: La idea de usuario está lista en el archivo idea_Amely_Spa_Podologico.md. Procede con la creación del PRODUCT BRIEF.
 
 @PM: El Product Brief está listo en el archivo pb_Amely_Spa_Podologico.md. Procede con el análisis estratégico y la creación del Backlog.
+
+@BA: El análisis estratégico está completo en el archivo mvp_amely_spa_podologico.md. Tu primera asignación es leer ese documento y desglosar la Épica de Prioridad 1: Motor de Reservas Inteligente y Validación de Disponibilidad. Por favor, redacta la Historia de Usuario atómica, el Scope y los Criterios de Aceptación (Gherkin). ADVERTENCIA: Al redactar, ten presente esta restricción/ambigüedad detectada en el PRD: Definir los datos personales mínimos requeridos para la reserva del cliente y establecer las reglas exactas para la validación síncrona de disponibilidad y cálculo de tiempos sin mostrar precios. Decláralo en tu output, no lo inventes. Procederé a revisar tu entregable una vez pase por QA Documental.
