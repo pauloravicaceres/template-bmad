@@ -3,3 +3,5 @@
 @PM: El Product Brief está listo en el archivo pb_amely.md. Procede con el análisis estratégico y la creación del Backlog.
 
 @BA: El análisis estratégico está completo en el archivo mvp_amely.md. Tu primera asignación es leer ese documento y desglosar la Épica de Prioridad 1: Motor de Reservas Inteligente y Control de Disponibilidad. Por favor, redacta la Historia de Usuario atómica, el Scope y los Criterios de Aceptación (Gherkin). ADVERTENCIA: Al redactar, ten presente esta restricción/ambigüedad detectada en el PRD: Definir los datos personales obligatorios solicitados al cliente y verificar cómo se valida la disponibilidad en tiempo real sin exponer precios ni permitir cruces de agenda. Decláralo en tu output, no lo inventes. Procederé a revisar tu entregable una vez pase por QA Documental.
+
+@QA: La Historia de Usuario Agendamiento de Cita Multiservicio con Selección de Podólogo y Bloqueo de Disponibilidad en Tiempo Real está lista en el archivo hu_01_reserva_citas.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
