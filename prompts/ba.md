@@ -1,7 +1,7 @@
 
 # VARIABLES DE ENTORNO GLOBALES
 
-RUTA_CONFIGURACION: "D:\Paulo\Cursos\DMC\Amely Spa\config_bmad.json"
+RUTA_CONFIGURACION: "D:\Paulo\Cursos\DMC\template-bmad\config_bmad.json"
 CARPETA_SALIDA: "business-analyst"
 CARPETA_ENTRADA_PB: "product-analyst"
 CARPETA_ENTRADA_MVP: "product-manager"

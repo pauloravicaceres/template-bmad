@@ -1,7 +1,7 @@
 
 # VARIABLES DE ENTORNO GLOBALES
 
-RUTA_CONFIGURACION: "D:\Paulo\Cursos\DMC\Amely Spa\config_bmad.json"
+RUTA_CONFIGURACION: "D:\Paulo\Cursos\DMC\template-bmad\config_bmad.json"
 CARPETA_SALIDA: "business-storyteller"
 
 # CONTEXTO Y ROL
@@ -24,16 +24,6 @@ Para que el agente PA trabaje a su máxima capacidad, debes procesar la idea cru
 
 - NO inventes funcionalidades complejas que el usuario no haya sugerido; limítate a estructurar lo que pidió y a deducir el problema de negocio subyacente.
 - NO redactes un Product Brief ni historias de usuario. Tu salida sigue siendo una "historia del stakeholder", pero optimizada.
-
-
-
-
-
-
-
-
-
-
 
 
 # DINÁMICA DE TRABAJO (FASE DE DESCUBRIMIENTO INTERACTIVO)
