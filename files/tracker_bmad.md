@@ -1,3 +1,5 @@
 @PA: La idea de usuario está lista en el archivo idea_amely_spa.md. Procede con la creación del PRODUCT BRIEF.
 
 @PM: El Product Brief está listo en el archivo pb_amely_spa.md. Procede con el análisis estratégico y la creación del Backlog.
+
+@BA: El análisis estratégico está completo en el archivo mvp_amely_spa.md. Tu primera asignación es leer ese documento y desglosar la Épica de Prioridad 1: Motor Inteligente de Reservas y Agenda Dinámica. Por favor, redacta la Historia de Usuario atómica, el Scope y los Criterios de Aceptación (Gherkin). ADVERTENCIA: Al redactar, ten presente esta restricción/ambigüedad detectada en el PRD: Definir cómo se manejará la asignación por defecto del podólogo cuando el usuario no seleccione uno explícitamente y cómo se validará en tiempo real el bloque continuo acumulado sin mostrar precios. Decláralo en tu output, no lo inventes. Procederé a revisar tu entregable una vez pase por QA Documental.
