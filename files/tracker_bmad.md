@@ -21,3 +21,5 @@
 @BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Panel de Gestión de Citas (Portal del Profesional). Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely_spa.md.
 
 @HUMANO: Los wireframes funcionales para la Historia de Usuario Envío automático e inmediato de notificaciones y alertas por WhatsApp están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo ux_02_notificaciones_whatsapp.md. El requerimiento está listo para el diseño de arquitectura y base de datos.
+
+@UX: La Historia de Usuario Visualización de agenda diaria y gestión del estado de citas por el podólogo ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_03_panel_profesional.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
