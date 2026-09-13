@@ -13,3 +13,5 @@
 @QA: La Historia de Usuario Envío Automático e Inmediato de Notificaciones por WhatsApp para Confirmación y Cancelación de Citas está lista en el archivo hu_02_notificaciones_whatsapp.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 @UX: La Historia de Usuario Envío Automático e Inmediato de Notificaciones por WhatsApp para Confirmación y Cancelación de Citas ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_02_notificaciones_whatsapp.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
+
+@BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Dashboard de Gestión para Podólogos y Autogestión de Citas para Clientes. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely.md.
