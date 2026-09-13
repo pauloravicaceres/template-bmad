@@ -95,11 +95,15 @@ def iniciar_watcher():
                     if len(lineas) > num_lineas_leidas:
                         nuevas_lineas = lineas[num_lineas_leidas:]
                         
-                        for linea in nuevas_lineas:
+                        # Usamos enumerate para saber en qué línea exacta estamos
+                        for idx, linea in enumerate(nuevas_lineas):
                             nuevas_tareas = extraer_instrucciones(linea)
+                            numero_linea_absoluta = num_lineas_leidas + idx
+                            
                             for tarea in nuevas_tareas:
-                                # Creamos un ID único de la tarea para evitar duplicados en cola
-                                id_tarea = hash(tarea['agente'] + tarea['mensaje'])
+                                # Inyectamos el número de línea en el hash para evitar falsos duplicados
+                                id_tarea = hash(f"{numero_linea_absoluta}_{tarea['agente']}_{tarea['mensaje']}")
+                                
                                 if id_tarea not in hash_tareas_historicas:
                                     cola_tareas.append(tarea)
                                     hash_tareas_historicas.add(id_tarea)

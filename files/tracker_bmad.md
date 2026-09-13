@@ -47,3 +47,5 @@
 @UX: La Historia de Usuario Visualización del catálogo podológico y especialistas disponibles ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_02_catalogo.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
 
 @HUMANO: Los wireframes funcionales para la Historia de Usuario Agendamiento de cita podológica y reserva de horario en tiempo real están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo ux_01_agendamiento.md. El requerimiento está listo para el diseño de arquitectura y base de datos.
+
+@BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Notificaciones Automáticas por WhatsApp. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely_spa.md.
