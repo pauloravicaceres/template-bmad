@@ -66,4 +66,4 @@
 
 @UX: La Historia de Usuario Visualización y seguimiento de citas agendadas en el Portal Profesional ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_05_portal_profesional.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
 
-@HUMANO: Todas las épicas del MVP han sido delegadas y aprobadas. El alcance ha concluido.
+@HUMANO: Los wireframes funcionales para la Historia de Usuario Envío automático de notificaciones de confirmación y anulación de cita vía WhatsApp están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo ux_03_notificaciones.md. El requerimiento está listo para el diseño de arquitectura y base de datos.
