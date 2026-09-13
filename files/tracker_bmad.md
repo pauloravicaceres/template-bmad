@@ -17,3 +17,5 @@
 @BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Dashboard de Gestión para Podólogos y Autogestión de Citas para Clientes. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely.md.
 
 @QA: La Historia de Usuario Visualización de Agenda para Podólogos y Cancelación Autónoma de Citas por Clientes está lista en el archivo hu_03_dashboard_autogestion.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
+
+@UX: La Historia de Usuario Visualización de Agenda para Podólogos y Cancelación Autónoma de Citas por Clientes ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_03_dashboard_autogestion.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
