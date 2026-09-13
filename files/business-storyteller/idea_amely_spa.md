@@ -1,22 +1,12 @@
-Soy el dueño de Ámely - Spá Podológico y actualmente enfrentamos ineficiencias operativas causadas por la gestión manual de citas. La falta de un sistema automatizado provoca solapamientos en las agendas de nuestros profesionales podólogos, imprecisiones al calcular la duración de atenciones combinadas y una atención al cliente lenta.
+Soy el propietario del Spa Podológico "Ámely - Spá Podológico" y actualmente enfrentamos ineficiencias operativas en la programación de atenciones, cruces eventuales de horarios en las agendas de los podólogos y pérdidas de tiempo en el seguimiento manual de citas. Necesitamos una solución digital móbil-first y responsiva (optimizada para PCs, laptops, tablets y móviles) con una interfaz moderna, elegante y ligera que profesionalice la atención y optimice la experiencia del usuario.
 
-Para solucionar estos problemas y brindar una experiencia de usuario moderna, elegante y ligera en cualquier dispositivo (PCs, laptops, tablets y móviles), necesitamos un aplicativo web automatizado estructurado en los siguientes módulos:
+Los actores principales del sistema serán:
+1. Clientes: Quienes accederán a la plataforma web para conocer al personal profesional, explorar los servicios ofrecidos, reservar citas seleccionando servicios y su profesional de preferencia, así como gestionar la anulación de sus reservas cuando lo requieran.
+2. Podólogos / Profesionales: Quienes contarán con un panel de gestión dedicado para revisar la agenda de sus atenciones asignadas y dar seguimiento a su estado.
 
-1. Catálogo Digital de Servicios y Especialistas:
-- Muestra del equipo de profesionales podólogos de la clínica.
-- Muestra de la oferta de servicios podológicos incluyendo su tiempo promedio de atención. Por políticas de negocio, NO se deben mostrar los precios de los servicios.
+El sistema debe estructurarse en los siguientes módulos funcionales:
 
-2. Motor de Reservas e Integración de Agenda:
-- Selección flexible de uno o varios servicios y elección del profesional de preferencia.
-- Cálculo dinámico y automático del tiempo total de atención sumando los tiempos de todos los servicios seleccionados por el cliente.
-- Reserva del bloque horario exacto en la agenda del profesional seleccionado y validación de disponibilidad en tiempo real para impedir reservas duplicadas o cruzadas.
-
-3. Notificaciones por WhatsApp:
-- Envío inmediato de notificación de confirmación de cita por WhatsApp al cliente y al profesional asignado.
-- Envío inmediato de notificación por WhatsApp al profesional cuando un cliente cancele una cita.
-
-4. Módulo de Anulación de Citas:
-- Permitir al cliente anular una cita previamente agendada de forma sencilla a través de la plataforma web.
-
-5. Panel de Gestión de Atenciones para Podólogos:
-- Panel de control o dashboard individual para que cada profesional visualice su agenda, revise los servicios requeridos por cliente y realice el seguimiento de sus atenciones programadas.
+- Módulo de Vitrina de Personal y Servicios: Presentar a los profesionales de la salud podológica y los servicios que ofrece el spa. Por decisión estratégica de negocio, los servicios deben mostrar únicamente el tiempo promedio de atención, omitiendo explícitamente los precios al público en la interfaz.
+- Motor de Reservas y Agenda Inteligente: Permitir al cliente seleccionar uno o más servicios y su profesional preferido. El aplicativo debe calcular automáticamente la duración total promedio sumando los tiempos de los servicios seleccionados y reservar ese bloque continuo en la agenda del profesional, validando en tiempo real la disponibilidad para evitar solapamientos con otros clientes.
+- Sistema de Notificaciones de WhatsApp: Enviar notificaciones automáticas vía WhatsApp al cliente y al profesional al momento de confirmarse una reserva. Asimismo, si un cliente anula su cita desde la web, debe enviarse una notificación inmediata de anulación al WhatsApp del profesional correspondiente.
+- Panel de Gestión de Atenciones (Portal Profesional): Interfaz simplificada para que cada profesional visualice, gestione y organice el seguimiento de sus citas programadas.

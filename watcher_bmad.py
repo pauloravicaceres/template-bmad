@@ -43,8 +43,8 @@ def extraer_instrucciones(linea):
         "@PM:": "product-manager",
         "@BA:": "business-analyst",
         "@QA:": "qa-documental",
-        "@UX:": "designer-ux",
-        "@ARQ:": "arquitecto"
+        "@UX:": "designer-ux"
+        # "@ARQ:": "arquitecto"
     }
     
     tareas = []

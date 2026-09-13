@@ -27,3 +27,7 @@
 @QA: La Historia de Usuario Anulación autónoma de cita por parte del cliente está lista en el archivo hu_04_anulacion.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 @UX: La Historia de Usuario Anulación autónoma de cita por parte del cliente ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_04_anulacion.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
+
+@ARQ: Los wireframes funcionales para la Historia de Usuario Envío automático de notificaciones de confirmación y anulación de cita vía WhatsApp están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo ux_03_notificaciones.md. El requerimiento está listo para el diseño de arquitectura y base de datos.
+
+@PA: La idea de usuario está lista en el archivo idea_amely_spa.md. Procede con la creación del PRODUCT BRIEF.

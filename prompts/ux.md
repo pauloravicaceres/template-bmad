@@ -100,8 +100,7 @@ Si no puedes ejecutar las herramientas de sistema de archivos, imprime la respue
 Genera la instrucción para notificar el fin del diseño utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
 **Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
-@ARQ: Los wireframes funcionales para la Historia de Usuario [Título real de la HU] están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo [Nombre exacto del archivo ux_*.md que acabas de guardar]. El requerimiento está listo para el diseño de arquitectura y base de datos.
-
+@HUMANO: Los wireframes funcionales para la Historia de Usuario [Título real de la HU] están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo [Nombre exacto del archivo ux_*.md que acabas de guardar]. El requerimiento está listo para el diseño de arquitectura y base de datos.
 
 
 # ENTRADAS DE DATOS Y FLUJO DE TRABAJO INICIAL

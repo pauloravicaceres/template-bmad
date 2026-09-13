@@ -54,8 +54,9 @@ Una vez que hayas finalizado la interacción con el servidor Stitch y tengas los
 3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
    - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
    - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
-   - Concatena al final del contenido leído un salto de línea (`\n`) seguido de ÚNICAMENTE el texto generado en la sección de "ORDEN DE DELEGACIÓN", respetando la regla técnica inquebrantable de enviarlo como una sola cadena de texto continuo sin saltos de línea.
-   - Escribe el resultado consolidado (histórico previo + nueva línea) usando `write_file`.
+   - Añade un salto de línea real (Enter o `\n`) al final del texto que acabas de leer para separar visualmente el historial de tu nueva intervención.
+   - A continuación, pega ÚNICAMENTE el texto generado en la sección de "ORDEN DE DELEGACIÓN". Esta nueva orden debe mantenerse como una única línea de texto continuo (sin saltos de línea internos).
+   - Escribe el resultado consolidado usando `write_file`.
 
 Si no puedes ejecutar las herramientas de sistema de archivos, imprime la respuesta en el chat y notifica el error.
 
@@ -93,11 +94,13 @@ Si no puedes ejecutar las herramientas de sistema de archivos, imprime la respue
 - **Heurísticas aplicadas:** [Decisiones de interfaz tomadas para mejorar la usabilidad sin alterar el negocio].
 - **Bloqueos o Consultas (Si aplican):** [Dudas técnicas para el BA o el Stakeholder].
 
+
 ## 4. ORDEN DE DELEGACIÓN PARA EL TRACKER
 
-Genera la instrucción para notificar el fin del diseño cumpliendo esta regla técnica inquebrantable: **El mensaje completo debe ser redactado como una única línea de texto continuo, sin ningún salto de línea (Enter/Return)**. Usa esta plantilla exacta, reemplazando los corchetes con los datos reales:
+Genera la instrucción para notificar el fin del diseño utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
+**Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
-@ARQ: Los wireframes funcionales para la Historia de Usuario [Título real de la HU] están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo [Nombre exacto del archivo ux_*.md que acabas de guardar]. El requerimiento está listo para el diseño de arquitectura y base de datos.
+@HUMANO: Los wireframes funcionales para la Historia de Usuario [Título real de la HU] están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo [Nombre exacto del archivo ux_*.md que acabas de guardar]. El requerimiento está listo para el diseño de arquitectura y base de datos.
 
 
 # ENTRADAS DE DATOS Y FLUJO DE TRABAJO INICIAL
