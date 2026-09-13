@@ -17,3 +17,5 @@
 @ARQ: Los wireframes funcionales para la Historia de Usuario Agendamiento de cita podológica y reserva de horario en tiempo real están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo ux_01_agendamiento.md. El requerimiento está listo para el diseño de arquitectura y base de datos.
 
 @BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Notificaciones Automáticas por WhatsApp. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely_spa.md.
+
+@QA: La Historia de Usuario Envío automático de notificaciones de confirmación y anulación de cita vía WhatsApp está lista en el archivo hu_03_notificaciones.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
