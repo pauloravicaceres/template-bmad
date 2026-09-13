@@ -40,6 +40,24 @@ def obtener_info_agente(nombre_agente):
         return None, None
 
 
+def extraer_instruccion(linea, etiqueta_objetivo, todas_las_etiquetas):
+    """Extrae solo el fragmento del mensaje destinado al agente objetivo."""
+    inicio = linea.find(etiqueta_objetivo)
+    if inicio == -1:
+        return None
+    
+    # Buscar cuál es la etiqueta más cercana que aparece después de la nuestra
+    fin = len(linea)
+    for otra_etiqueta in todas_las_etiquetas:
+        if otra_etiqueta != etiqueta_objetivo:
+            pos_otra = linea.find(otra_etiqueta, inicio + len(etiqueta_objetivo))
+            if pos_otra != -1 and pos_otra < fin:
+                fin = pos_otra
+                
+    # Retorna el texto limpio, ej: "@UX: Procede con los wireframes."
+    return linea[inicio:fin].strip()
+
+
 def procesar_tracker(linea_actual):
     """
     Retorna True SI Y SOLO SI todos los agentes requeridos en esta línea
@@ -59,40 +77,42 @@ def procesar_tracker(linea_actual):
     todas_entregadas = True
     al_menos_un_target = False
 
+    todas_las_etiquetas = list(agentes.keys())
+
     for etiqueta, agente_nombre in agentes.items():
         if etiqueta in linea:
             al_menos_un_target = True
             
-            # 1. Validar memoria: Si ya se la enviamos antes, saltamos a este agente
-            if memoria_envios.get(agente_nombre) == linea:
+            # Extraer solo la parte del mensaje que le corresponde a este agente
+            mensaje_especifico = extraer_instruccion(linea, etiqueta, todas_las_etiquetas)
+            
+            # Usamos el mensaje específico para la memoria RAM
+            if memoria_envios.get(agente_nombre) == mensaje_especifico:
                 continue
 
-            # 2. Consultar panel y estado
             pane_id, estado = obtener_info_agente(agente_nombre)
 
             if not pane_id:
                 print(f"❌ [Watcher] Agente '{agente_nombre}' no encontrado.")
-                # Lo marcamos como no entregado para que no borre la línea pendiente (opcional, podrías ignorarlo)
                 continue
 
-            # 3. BARRERA DE TRÁFICO
             if estado != "idle":
-                print(f"⏳ [Watcher] '{agente_nombre}' está {estado}. Esperando a que termine para inyectar...")
-                todas_entregadas = False  # Obliga al Watcher a reintentar en el futuro
+                print(f"⏳ [Watcher] '{agente_nombre}' está {estado}. Esperando...")
+                todas_entregadas = False
                 continue 
 
             print(f"\n🚀 [Watcher] Evento detectado para '{agente_nombre}'.")
             
-            linea_escapada = linea.replace('"', '\\"')
+            # INYECTAR SOLO EL MENSAJE ESPECÍFICO, NO LA LÍNEA COMPLETA
+            linea_escapada = mensaje_especifico.replace('"', '\\"')
             comando = f'herdr pane run {pane_id} "{linea_escapada}"'
 
             try:
                 subprocess.run(comando, shell=True, check=True)
-                print(f"✅ [Watcher] Instrucción entregada exitosamente a '{agente_nombre}'.")
+                print(f"✅ [Watcher] Instrucción entregada a '{agente_nombre}'.")
                 
-                # 4. Registrar en memoria RAM para no volver a enviársela en el próximo ciclo
-                memoria_envios[agente_nombre] = linea
-                guardar_historial(agente_nombre, linea)
+                memoria_envios[agente_nombre] = mensaje_especifico
+                guardar_historial(agente_nombre, mensaje_especifico)
 
             except subprocess.CalledProcessError as e:
                 print(f"❌ [Watcher] Error de ejecución en '{agente_nombre}'. Código: {e.returncode}")
