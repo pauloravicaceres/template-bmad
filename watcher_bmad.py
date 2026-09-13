@@ -115,18 +115,18 @@ def iniciar_watcher():
                     # Protección por si se borran líneas manualmente del archivo
                     elif len(lineas) < num_lineas_leidas:
                         num_lineas_leidas = len(lineas)
-
+                        
             # ==========================================
-            # 2. FASE DE INYECCIÓN (BACKPRESSURE + DEBOUNCER)
+            # 2. FASE DE INYECCIÓN (BACKPRESSURE PURA FIFO)
             # ==========================================
             tareas_no_procesadas = []
-            agentes_despachados_hoy = set()
+            agentes_despachados_hoy = set()  # Candado temporal por ciclo contra doble despacho
             
             for tarea in cola_tareas:
                 agente = tarea['agente']
                 mensaje = tarea['mensaje']
                 
-                # Candado de doble despacho simultáneo
+                # Si ya le despachamos a este agente en este ciclo, la tarea espera
                 if agente in agentes_despachados_hoy:
                     tareas_no_procesadas.append(tarea)
                     continue
@@ -138,30 +138,13 @@ def iniciar_watcher():
                     tareas_no_procesadas.append(tarea)
                     continue
                     
-                if estado != "idle":
+                # Aceptamos tanto "idle" como "done" como estados aptos
+                if estado not in ["idle", "done"]:
                     print(f"⏳ [Watcher] '{agente}' está {estado}. Esperando turno...")
-                    # Si el agente parpadeó a working, fue un falso positivo. Reseteamos su reloj.
-                    if agente in tiempo_idle_agentes:
-                        del tiempo_idle_agentes[agente]
                     tareas_no_procesadas.append(tarea)
                     continue 
 
-                # --- INICIO DEL DEBOUNCER (Filtro Anti-Parpadeo) ---
-                if agente not in tiempo_idle_agentes:
-                    # Inicia el cronómetro de 15 segundos
-                    tiempo_idle_agentes[agente] = time.time()
-                    print(f"⏱️ [Watcher] '{agente}' parece idle. Verificando estabilización (15s)...")
-                    tareas_no_procesadas.append(tarea)
-                    continue
-                else:
-                    tiempo_transcurrido = time.time() - tiempo_idle_agentes[agente]
-                    if tiempo_transcurrido < 15:
-                        # Sigue esperando en silencio hasta cumplir el tiempo
-                        tareas_no_procesadas.append(tarea)
-                        continue
-                # --- FIN DEL DEBOUNCER ---
-
-                # Si el código llega aquí, el agente superó la prueba de 15s ininterrumpidos en idle.
+                # Si está libre y es su turno exacto en la cola, despachamos sin demoras
                 print(f"\n🚀 [Watcher] Inyectando tarea a '{agente}'...")
                 linea_escapada = mensaje.replace('"', '\\"')
                 comando = f'herdr pane run {pane_id} "{linea_escapada}"'
@@ -171,14 +154,14 @@ def iniciar_watcher():
                     print(f"✅ [Watcher] Éxito. Tarea despachada a {agente}.")
                     guardar_historial(agente, mensaje)
                     
-                    agentes_despachados_hoy.add(agente)
-                    del tiempo_idle_agentes[agente]  # Limpiamos el contador tras éxito
+                    # Activamos el candado para este agente por lo que resta del ciclo
+                    agentes_despachados_hoy.add(agente) 
                     
                 except subprocess.CalledProcessError as e:
                     print(f"❌ [Watcher] Error de inyección en '{agente}'. Código: {e.returncode}")
                     tareas_no_procesadas.append(tarea)
 
-            # Sobrescribimos la cola
+            # Sobrescribimos la cola respetando estrictamente el orden original
             cola_tareas = tareas_no_procesadas
                                 
         except KeyboardInterrupt:
