@@ -546,7 +546,16 @@ El problema estalló en el milisegundo exacto en que el UX terminó su tarea y p
 
 Lo resolví implementando un "Candado de Ciclo" (*Cycle Lock*). Modifiqué el Watcher para que, en cada ciclo de revisión, lleve un registro temporal de a quién le ha disparado (un set llamado `agentes_despachados_hoy`). Ahora, si el Watcher le entrega la Épica 4 al UX, lo añade a esa lista de exclusión inmediata. Cuando el bucle evalúa la Épica 5 una fracción de segundo después, el candado se activa y obliga a retener esa tarea en la cola, saltándose la inyección. Esto le da al entorno el "respiro" necesario para que el agente cambie su estado a `working` de manera oficial, garantizando que los mensajes se procesen estrictamente de uno en uno sin saturar el búfer de entrada.
 
-### 19. Autonomía y Orquestación Descentralizada
+### 19. Latencia de Transición y Parpadeo de Estado (State Flapping)
+
+**Pregunta:** ¿Por qué un agente no empieza a procesar inmediatamente después de que su agente predecesor termina su tarea?
+
+**Tu respuesta:**
+La razón principal es la gestión de la asincronía y el fenómeno conocido como **Parpadeo de Estado** (*State Flapping*). Cuando un agente (por ejemplo, el Diseñador UX) está trabajando intensamente, realiza pausas breves entre el uso de diferentes herramientas (como leer o escribir archivos con MCP). En esos microsegundos de pausa analítica, la API del entorno (Herdr) puede reportar erróneamente al orquestador que el agente se encuentra libre (`idle`) cuando en realidad sigue ocupado procesando la tarea.
+
+Si el Watcher disparara una nueva instrucción en ese exacto instante de "parpadeo", interceptaría al agente a mitad de su trabajo, rompiendo su contexto y sobrescribiendo su búfer de terminal. Para prevenirlo, el orquestador desacopla la velocidad: aunque la tarea predecesora termine y se encole de inmediato, el Watcher actúa con contrapresión, esperando a que el agente demuestre un estado `idle` real y sostenido antes de inyectarle el siguiente requerimiento, garantizando una transición limpia y segura sin colisiones de búfer.
+
+### 20. Autonomía y Orquestación Descentralizada
 
 **Pregunta:** ¿Cómo hiciste para que todos los agentes trabajen de manera autónoma y orquestada?
 
