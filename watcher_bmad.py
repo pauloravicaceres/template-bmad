@@ -119,10 +119,17 @@ def iniciar_watcher():
             # 2. FASE DE INYECCIÓN (BACKPRESSURE)
             # ==========================================
             tareas_no_procesadas = []
+            agentes_despachados_hoy = set()  # Candado temporal por ciclo
             
             for tarea in cola_tareas:
                 agente = tarea['agente']
                 mensaje = tarea['mensaje']
+                
+                # REGLA DE ORO: Si ya le disparamos a este agente en este exacto segundo, 
+                # obligamos a la tarea a esperar al siguiente ciclo.
+                if agente in agentes_despachados_hoy:
+                    tareas_no_procesadas.append(tarea)
+                    continue
                 
                 pane_id, estado = obtener_info_agente(agente)
                 
@@ -136,7 +143,7 @@ def iniciar_watcher():
                     tareas_no_procesadas.append(tarea)
                     continue 
 
-                # Si está idle, disparamos
+                # Si está idle y no le hemos disparado aún en este ciclo, disparamos
                 print(f"\n🚀 [Watcher] Inyectando tarea a '{agente}'...")
                 linea_escapada = mensaje.replace('"', '\\"')
                 comando = f'herdr pane run {pane_id} "{linea_escapada}"'
@@ -145,7 +152,10 @@ def iniciar_watcher():
                     subprocess.run(comando, shell=True, check=True)
                     print(f"✅ [Watcher] Éxito. Tarea despachada.")
                     guardar_historial(agente, mensaje)
-                    # Al NO agregarla a tareas_no_procesadas, desaparece de la cola (éxito)
+                    
+                    # ACTIVAMOS EL CANDADO para este agente
+                    agentes_despachados_hoy.add(agente) 
+                    
                 except subprocess.CalledProcessError as e:
                     print(f"❌ [Watcher] Error de inyección en '{agente}'. Código: {e.returncode}")
                     tareas_no_procesadas.append(tarea) # Falla la inyección, reintenta luego

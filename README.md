@@ -526,8 +526,6 @@ Para asegurar que el QA es una barrera implacable y no un simple sello de goma, 
 
 Una vez que guardo estos archivos trampa, inyecto manualmente la etiqueta `@QA:` en el tracker. Mi prueba es exitosa únicamente si el QA detecta la trampa específica, genera la ramificación `[ESTADO: RECHAZADO]`, elabora el reporte de observaciones precisas y devuelve la tarea al `@BA:` para su corrección. Es la única forma de calibrar la severidad de su auditoría.
 
-Aquí tienes la pregunta y respuesta añadida a tu lista, explicando el concepto y la solución técnica que implementaste:
-
 ### 17. Prevención de Pérdida de Tareas (El "Asesinato" de la Memoria)
 
 **Pregunta:** El problema de pérdida de tareas en tránsito al que se llama "asesinato de la memoria". ¿Por qué ocurría exactamente esta fuga de información en el orquestador y cómo lograste controlarla para garantizar la entrega?
@@ -536,4 +534,26 @@ Aquí tienes la pregunta y respuesta añadida a tu lista, explicando el concepto
 Ocurría por una limitación en el diseño inicial del ciclo de lectura de mi orquestador. Al principio, el Watcher solo memorizaba la "última línea" del tracker en una única variable (`linea_pendiente`). Cuando el QA detonaba un Handoff múltiple (ej. una tarea para el UX y otra para el PM), el Watcher veía que el UX estaba ocupado y retenía su tarea, pero le entregaba la orden al PM (que estaba libre). El problema era que el PM procesaba su orden tan rápido que escribía una nueva línea en el tracker casi de inmediato. Mi script leía esa nueva línea y sobrescribía la variable en memoria, "asesinando" para siempre la tarea que el UX tenía pendiente, deteniendo toda la producción.
 
 Lo controlé refactorizando el motor del Watcher: migré de una variable de estado simple a una Cola de Tareas asíncrona (FIFO Queue). Ahora, el orquestador lee todas las líneas nuevas desde su última revisión, extrae cada instrucción por separado, les asigna un hash único (para evitar duplicados) y las apila en una lista (`cola_tareas`). Durante el ciclo de *backpressure*, las tareas solo se eliminan de esta lista si la inyección al panel del agente es exitosa. Si el UX está trabajando durante horas, su tarea sobrevivirá intacta en la memoria RAM del Watcher, sin importar cuántas decenas de líneas nuevas escriban los demás agentes en el archivo.
+
+### 18. Condición de Carrera de Doble Despacho (Double Dispatch Race Condition)
+
+**Pregunta:** ¿Tuviste el caso de Condición de Carrera de Doble Despacho (Double Dispatch Race Condition) y cómo lo resolviste?
+
+**Tu respuesta:**
+¡Sí, fue uno de los bugs de concurrencia más fascinantes que enfrenté! Me ocurrió cuando había un cuello de botella y la cola de tareas acumulaba múltiples requerimientos para un mismo agente. Por ejemplo, el equipo avanzó tan rápido que las Épicas 4 y 5 ya estaban aprobadas por el QA y encoladas en el Watcher, esperando a que el UX terminara de diseñar la Épica 3.
+
+El problema estalló en el milisegundo exacto en que el UX terminó su tarea y pasó a estado `idle`. Mi orquestador iteró sobre la cola: vio la Épica 4, verificó que el UX estaba libre, y se la inyectó. Pero como el bucle `for` de Python se ejecuta en microsegundos, inmediatamente evaluó la Épica 5. El fallo ocurrió porque el backend del panel (Herdr) tarda alrededor de 1 o 2 segundos en refrescar el estado del agente de `idle` a `working`. Al consultarlo tan rápido, el sistema le devolvió al Watcher un falso positivo de `idle`, provocando que inyectara la Épica 5 aplastando a la Épica 4 en la misma terminal. Como el orquestador creyó que entregó ambas con éxito, las borró de la RAM y ambas se perdieron en el limbo.
+
+Lo resolví implementando un "Candado de Ciclo" (*Cycle Lock*). Modifiqué el Watcher para que, en cada ciclo de revisión, lleve un registro temporal de a quién le ha disparado (un set llamado `agentes_despachados_hoy`). Ahora, si el Watcher le entrega la Épica 4 al UX, lo añade a esa lista de exclusión inmediata. Cuando el bucle evalúa la Épica 5 una fracción de segundo después, el candado se activa y obliga a retener esa tarea en la cola, saltándose la inyección. Esto le da al entorno el "respiro" necesario para que el agente cambie su estado a `working` de manera oficial, garantizando que los mensajes se procesen estrictamente de uno en uno sin saturar el búfer de entrada.
+
+### 19. Autonomía y Orquestación Descentralizada
+
+**Pregunta:** ¿Cómo hiciste para que todos los agentes trabajen de manera autónoma y orquestada?
+
+**Respuesta:**
+Construí un modelo de orquestación asíncrona basado en eventos, fusionando un archivo de texto plano (`tracker_bmad.md`) como nuestro "bus de mensajes" central y un script demonio en Python (`watcher_bmad.py`) como director de orquesta.
+
+El diseño se basa en la reactividad. Cada agente opera aislado en su propio panel de terminal (Herdr) enfocado en una tarea atómica. Cuando un agente termina su trabajo, utiliza el Model Context Protocol (MCP) para guardar su entregable en disco y anexa una orden de delegación estructurada (por ejemplo, `@UX: procede con los wireframes`) al final del tracker.
+
+La autonomía real ocurre gracias al Watcher. Este orquestador lee las nuevas líneas del tracker, fragmenta las órdenes y las apila en una cola interna (FIFO Queue). Luego, sondea en tiempo real el estado de cada agente; si el destinatario está libre (`idle`), inyecta la instrucción directamente en el búfer de su terminal usando comandos TTY (`herdr pane run`), despertándolo. De esta manera, el cierre documentado de un agente se convierte automática e instantáneamente en el *prompt* de inicio del siguiente, logrando una cadena de producción de software paralela, desatendida y capaz de regular su propio tráfico sin colisionar.
 ---
