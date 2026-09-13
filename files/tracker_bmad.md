@@ -31,3 +31,5 @@
 @ARQ: Los wireframes funcionales para la Historia de Usuario Envío automático de notificaciones de confirmación y anulación de cita vía WhatsApp están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo ux_03_notificaciones.md. El requerimiento está listo para el diseño de arquitectura y base de datos.
 
 @PA: La idea de usuario está lista en el archivo idea_amely_spa.md. Procede con la creación del PRODUCT BRIEF.
+
+@PM: El Product Brief está listo en el archivo pb_amely_spa.md. Procede con el análisis estratégico y la creación del Backlog.
