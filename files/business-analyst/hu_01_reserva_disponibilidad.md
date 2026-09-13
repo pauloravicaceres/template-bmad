@@ -28,10 +28,10 @@
 
 ## 3. REGLAS DE NEGOCIO
 
-- **RN-01:** El sistema no puede agendar ni permitir la selección de bloques de tiempo en el pasado o fuera del horario operativo.
+- **RN-01:** El sistema no puede agendar ni permitir la selección de bloques de tiempo en el pasado o fuera del horario operativo del spá.
 - **RN-02:** Integridad de Agenda: Bajo ninguna circunstancia el sistema debe permitir el solapamiento o reserva doble en un mismo bloque de tiempo para un profesional podólogo.
 - **RN-03:** Acumulación de Duración: La duración total de la reserva se calcula automáticamente sumando el tiempo estimado promedio de cada uno de los servicios seleccionados.
-- **RN-04:** Identificación del Cliente: La reserva se asocia a los datos básicos del cliente (nombre y número telefónico) proporcionados en el flujo, sin exigir creación previa de cuenta ni autenticación por contraseña.
+- **RN-04:** Identificación del Cliente: La reserva se asocia a los datos básicos obligatorios del cliente (nombre completo y número telefónico válido) proporcionados en el flujo, sin exigir creación previa de cuenta ni autenticación por contraseña.
 - **RN-05:** Neutralidad de Pagos y Políticas: El sistema confirmará la reserva directamente al completar la validación de horario sin requerir pagos en línea ni aplicar retenciones por cancelación.
 
 ## 4. CRITERIOS DE ACEPTACIÓN (Gherkin BDD)
@@ -64,10 +64,29 @@
 - **Cuando** el cliente ingresa su nombre y número de contacto y presiona confirmar
 - **Entonces** el sistema registra la reserva como confirmada inmediatamente sin solicitar credenciales de inicio de sesión ni solicitar un pago en línea
 
+**Escenario 5: Bloqueo de selección de horarios pasados o fuera del horario operativo (Validación RN-01)**
+- **Dado** que el horario operativo del spá es de "09:00 a 19:00" y la hora actual del sistema es "2026-09-12 15:00"
+- **Cuando** el cliente consulta la disponibilidad de horarios para la fecha "2026-09-12"
+- **Entonces** el sistema deshabilita u oculta todos los bloques de tiempo previos a las "15:00" del mismo día
+- **Y** excluye por completo los bloques fuera del rango operativo (posteriores a las "19:00" o anteriores a las "09:00")
+
+**Escenario 6: Intento de reserva con datos de contacto omisos o inválidos (Sad Path / Validación RN-04)**
+- **Dado** que el cliente ha seleccionado servicio, podólogo y un bloque de horario disponible
+- **Cuando** intenta confirmar la reserva dejando el campo de nombre vacío o ingresando un número de teléfono con formato inválido (ej. "123")
+- **Entonces** el sistema bloquea el registro de la cita
+- **Y** muestra un mensaje de error solicitando ingresar un nombre y un número telefónico válido de contacto
+
+**Escenario 7: Concurrencia simultánea en el mismo bloque de horario (Sad Path / Race Condition)**
+- **Dado** que el bloque de "16:00 a 16:30" figura disponible para el "Dr. Carlos Ruiz"
+- **Y** dos clientes (Cliente A y Cliente B) visualizan dicho bloque disponible al mismo tiempo
+- **Cuando** el Cliente A presiona confirmar un instante antes que el Cliente B
+- **Entonces** el sistema procesa exitosamente la reserva para el Cliente A
+- **Y** al procesar la solicitud del Cliente B, valida la disponibilidad en tiempo real, rechaza la transacción e informa al Cliente B que el bloque acaba de ser reservado por otro usuario, sugiriendo seleccionar un nuevo horario
+
 ## 5. PUNTOS ABIERTOS / DEPENDENCIAS
 
 - **Mecanismo de Autenticación / Identificación Definitivo:** En esta historia se asume la identificación mediante datos básicos (nombre y teléfono) sin credenciales/contraseña para priorizar el MVP. Se requiere que Arquitectura/Producto validen si en iteraciones futuras se requerirá verificación por OTP (código SMS/WhatsApp) para confirmar la titularidad del teléfono.
-- **Políticas de Pago e Inasistencia:** No existen reglas de cobro ni señas en el MVP. Si la tasa de *no-show* persiste, Producto deberá definir si se integrará una pasarela de pago o política de retención en futuras versiones.
+- **Políticas de Pago e Inasistencia:** No existen reglas de cobro ni señas en el MVP. Si la tasa de *no-show* persists, Producto deberá definir si se integrará una pasarela de pago o política de retención en futuras versiones.
 - **Reglas y Ventanas de Cancelación:** El tiempo límite de anulación queda pendiente de definición para el Módulo de Auto-Gestión y Cancelación (Épica P5).
 - **Dependencia de Catálogo (P2):** Requiere de la definición formal de la lista de servicios con sus duraciones estimadas estándar.
 
