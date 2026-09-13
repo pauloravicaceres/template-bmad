@@ -68,15 +68,16 @@ def extraer_instrucciones(linea):
 
 
 def iniciar_watcher():
-    print(f"👁️ Watcher BMAD (Queue System) iniciado.")
+    print(f"👁️ Watcher BMAD (State Machine) iniciado.")
     print(f"📂 Escuchando cambios en: {TRACKER_PATH}")
     
     num_lineas_leidas = 0
     cola_tareas = []
     hash_tareas_historicas = set()
-    tiempo_idle_agentes = {}  # <--- NUEVO: Registro de estabilización
+    
+    # NUEVO: Diccionario para obligar a Herdr a confirmar que recibió la orden
+    esperando_confirmacion = {} 
 
-    # Candado de Inicialización: Cuenta las líneas existentes para ignorar el pasado
     if os.path.exists(TRACKER_PATH):
         with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
             lineas = [l for l in f.readlines() if l.strip()]
@@ -92,44 +93,31 @@ def iniciar_watcher():
                 with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
                     lineas = [l for l in f.readlines() if l.strip()]
                     
-                    # Si el archivo creció, procesamos SOLO las líneas nuevas
                     if len(lineas) > num_lineas_leidas:
                         nuevas_lineas = lineas[num_lineas_leidas:]
-                        
-                        # Usamos enumerate para saber en qué línea exacta estamos
                         for idx, linea in enumerate(nuevas_lineas):
                             nuevas_tareas = extraer_instrucciones(linea)
                             numero_linea_absoluta = num_lineas_leidas + idx
                             
                             for tarea in nuevas_tareas:
-                                # Inyectamos el número de línea en el hash para evitar falsos duplicados
                                 id_tarea = hash(f"{numero_linea_absoluta}_{tarea['agente']}_{tarea['mensaje']}")
-                                
                                 if id_tarea not in hash_tareas_historicas:
                                     cola_tareas.append(tarea)
                                     hash_tareas_historicas.add(id_tarea)
                                     print(f"📥 [Cola] Tarea encolada para '{tarea['agente']}'.")
                                     
                         num_lineas_leidas = len(lineas)
-                        
-                    # Protección por si se borran líneas manualmente del archivo
                     elif len(lineas) < num_lineas_leidas:
                         num_lineas_leidas = len(lineas)
                         
             # ==========================================
-            # 2. FASE DE INYECCIÓN (BACKPRESSURE PURA FIFO)
+            # 2. FASE DE INYECCIÓN (STATE MACHINE)
             # ==========================================
             tareas_no_procesadas = []
-            agentes_despachados_hoy = set()  # Candado temporal por ciclo contra doble despacho
             
             for tarea in cola_tareas:
                 agente = tarea['agente']
                 mensaje = tarea['mensaje']
-                
-                # Si ya le despachamos a este agente en este ciclo, la tarea espera
-                if agente in agentes_despachados_hoy:
-                    tareas_no_procesadas.append(tarea)
-                    continue
                 
                 pane_id, estado = obtener_info_agente(agente)
                 
@@ -137,14 +125,24 @@ def iniciar_watcher():
                     print(f"❌ [Watcher] Agente '{agente}' no encontrado. Se mantendrá en cola.")
                     tareas_no_procesadas.append(tarea)
                     continue
+                
+                # REGLA DE ORO: Si le inyectamos una tarea, NO le damos otra hasta ver el estado "working"
+                if agente in esperando_confirmacion and esperando_confirmacion[agente]:
+                    if estado == "working":
+                        print(f"🔄 [Watcher] API confirmó recepción. '{agente}' está oficialmente trabajando.")
+                        esperando_confirmacion[agente] = False
+                    else:
+                        print(f"🔄 [Watcher] '{agente}' recibió tarea. Esperando actualización de API Herdr...")
                     
-                # Aceptamos tanto "idle" como "done" como estados aptos
+                    tareas_no_procesadas.append(tarea)
+                    continue
+
                 if estado not in ["idle", "done"]:
                     print(f"⏳ [Watcher] '{agente}' está {estado}. Esperando turno...")
                     tareas_no_procesadas.append(tarea)
                     continue 
 
-                # Si está libre y es su turno exacto en la cola, despachamos sin demoras
+                # Si está libre y NO estamos esperando confirmación, disparamos
                 print(f"\n🚀 [Watcher] Inyectando tarea a '{agente}'...")
                 linea_escapada = mensaje.replace('"', '\\"')
                 comando = f'herdr pane run {pane_id} "{linea_escapada}"'
@@ -154,14 +152,13 @@ def iniciar_watcher():
                     print(f"✅ [Watcher] Éxito. Tarea despachada a {agente}.")
                     guardar_historial(agente, mensaje)
                     
-                    # Activamos el candado para este agente por lo que resta del ciclo
-                    agentes_despachados_hoy.add(agente) 
+                    # ACTIVAMOS EL CANDADO DE CONFIRMACIÓN
+                    esperando_confirmacion[agente] = True 
                     
                 except subprocess.CalledProcessError as e:
                     print(f"❌ [Watcher] Error de inyección en '{agente}'. Código: {e.returncode}")
                     tareas_no_procesadas.append(tarea)
 
-            # Sobrescribimos la cola respetando estrictamente el orden original
             cola_tareas = tareas_no_procesadas
                                 
         except KeyboardInterrupt:
@@ -171,6 +168,7 @@ def iniciar_watcher():
             print(f"⚠️ [Watcher] Error general: {e}")
             
         time.sleep(2)
+
 
 if __name__ == "__main__":
     iniciar_watcher()
