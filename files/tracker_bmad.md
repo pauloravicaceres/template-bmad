@@ -9,3 +9,5 @@
 @UX: La Historia de Usuario Agendamiento de Cita Multiservicio con Selección de Podólogo y Bloqueo de Disponibilidad en Tiempo Real ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_01_reserva_citas.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
 
 @BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Notificaciones Automáticas e Inmediatas vía WhatsApp. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely.md.
+
+@QA: La Historia de Usuario Envío Automático e Inmediato de Notificaciones por WhatsApp para Confirmación y Cancelación de Citas está lista en el archivo hu_02_notificaciones_whatsapp.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
