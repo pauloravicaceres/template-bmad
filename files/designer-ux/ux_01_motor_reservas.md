@@ -1,45 +1,117 @@
 ## 1. RESUMEN DE DISEÑO
 
 - **Historia Base:** Reserva e Integración de Citas Podológicas en Tiempo Real
-- **Enfoque de Usabilidad:** Se implementó una interfaz limpia de flujo continuo en tres componentes principales: selección multivariable de tratamientos podológicos con cálculo dinámico de duración acumulada, selección de podólogo especializado y un selector de bloques horarios inteligentes en tiempo real que previene cruces y respeta estrictamente la regla inquebrantable de 0 precios visibles.
+- **Enfoque de Usabilidad:** Se diseñó un flujo de reserva ágil e intuitivo que calcula dinámicamente la duración total acumulada de los servicios podológicos seleccionados y valida la disponibilidad continua del especialista en tiempo real, omitiendo por completo cualquier costo o tarifa monetaria.
+
+
 
 ## 2. MAPA DE ESTADOS VISUALES
 
-### Estado 1: Selección de Servicios, Profesional y Disponibilidad (Happy Path)
+*Por cada escenario de la HU, documenta el entregable visual híbrido.*
 
+### Estado 1: Selección y Reserva Exitosa de Cita Podológica (Happy Path)
 **Escenario cubierto:** Escenario 1: Reserva exitosa de cita con profesional y múltiples servicios (Happy Path)
+**ID de Pantalla en Stitch:** `projects/12386224423209721294/screens/cd3635f99991499a91cfec626e4ad361`
+**Wireframe Estructural (ASCII):**
+```text
++-----------------------------------------------------------------------------------+
+|  [LOGO] SPA PODOLÓGICO ÁMELY      [Inicio]  [Servicios]  [Especialistas]  [Contacto] |
++-----------------------------------------------------------------------------------+
+|  RESERVA DE CITA PODOLÓGICA EN TIEMPO REAL                                        |
+|  [Pill: Reserva Directa - Atenciones Especializadas]                              |
+|                                                                                   |
+|  PASO 1: SELECCIONE SERVICIOS PODOLÓGICOS                                         |
+|  +-----------------------------------------------------------------------------+  |
+|  | [X] Quiropodia Completa                 | Duración estimada: 45 min           |  |
+|  | [X] Tratamiento Láser para Micosis      | Duración estimada: 30 min           |  |
+|  | [ ] Eval. Biomecánica de la Pisada      | Duración estimada: 45 min           |  |
+|  +-----------------------------------------------------------------------------+  |
+|  Duración Total Acumulada: [ 75 minutos ]                                         |
+|                                                                                   |
+|  PASO 2: SELECCIONE SU PODÓLOGO ESPECIALISTA                                      |
+|  (o) Lic. Carmen Silva (Podóloga Senior)   ( ) Lic. Roberto Gómez (Especialista)   |
+|                                                                                   |
+|  PASO 3: SELECCIONE FECHA Y BLOQUE DE TIEMPO CONTINUO DISPONIBLE (75 min)        |
+|  Fecha: [ 15/09/2026 v ]                                                          |
+|  +-------------------+  +-------------------+  +-------------------+              |
+|  | 09:00 - 10:15     |  | 10:15 - 11:30     |  | 14:00 - 15:15     |              |
+|  | [ SELECCIONADO ]  |  | [ DISPONIBLE ]    |  | [ DISPONIBLE ]    |              |
+|  +-------------------+  +-------------------+  +-------------------+              |
+|                                                                                   |
+|  DATOS DEL PACIENTE:                                                              |
+|  Nombre: [ Juan Pérez           ]  Teléfono/WhatsApp: [ +51 987654321        ]  |
+|  Correo: [ juan.perez@email.com ]                                                 |
+|                                                                                   |
+|  +-----------------------------------------------------------------------------+  |
+|  | [ CONFIRMAR Y BLOQUEAR MI CITA ]  (Sin costos ni cobros en línea)           |  |
+|  +-----------------------------------------------------------------------------+  |
++-----------------------------------------------------------------------------------+
+```
+**Nota de Interfaz:** El botón "CONFIRMAR Y BLOQUEAR MI CITA" permanece deshabilitado hasta que el cliente seleccione al menos un servicio, elija un profesional (o asignación automática) y marque un bloque horario continuo suficiente para cubrir la duración total acumulada (75 min). No se muestra ningún precio ni valor monetario en ningún paso.
 
-- **ID de Pantalla en Stitch:** `projects/13539032631391197448/screens/38474b96f8cc4f9c83b847767108cbc8`
-- **Proyecto Stitch:** `projects/13539032631391197448` (Motor de Reservas Spa Amely)
-
-**Nota de Interfaz:** El botón principal 'Confirmar Reserva' se mantiene deshabilitado dinámicamente hasta que el cliente seleccione al menos un servicio podológico y un bloque horario continuo suficiente para cubrir la duración total acumulada (ej: 45 min + 30 min = 75 min). Todas las tarjetas de servicio y resúmenes omiten absolutamente símbolos de moneda ($) o montos monetarios.
-
-### Estado 2: Detección de Solapamiento y Alerta de Cruce (Sad Path)
-
+### Estado 2: Intento de Reserva con Horario Solapado / Cruce de Agenda (Sad Path)
 **Escenario cubierto:** Escenario 2: Intento de reserva en un horario con cruce o solapamiento (Sad Path)
+**ID de Pantalla en Stitch:** `projects/12386224423209721294/screens/36c57b9bced7408d9bf9a7a461d028c6`
+**Wireframe Estructural (ASCII):**
+```text
++-----------------------------------------------------------------------------------+
+|  [LOGO] SPA PODOLÓGICO ÁMELY      [Interfaz de Fondo Atenuada por Overlay]        |
++-----------------------------------------------------------------------------------+
+|                                                                                   |
+|   +---------------------------------------------------------------------------+   |
+|   |  (!) ALERTA: CONFLICTO DE HORARIO EN TIEMPO REAL                          |   |
+|   |---------------------------------------------------------------------------|   |
+|   |  El bloque de tiempo seleccionado (10:30 - 11:45) se cruza con una cita   |   |
+|   |  previamente reservada en la agenda del Lic. Carmen Silva.               |   |
+|   |                                                                           |   |
+|   |  Estado: [ BLOQUEO DE SEGURIDAD ACTIVO - RECHAZADO ]                      |   |
+|   |                                                                           |   |
+|   |  Horarios continuos libres alternativos para hoy (75 min):               |   |
+|   |  [ Bloque 12:00 - 13:15 ]    [ Bloque 15:30 - 16:45 ]                    |   |
+|   |                                                                           |   |
+|   |  +-----------------------------------+   +----------------------------+   |   |
+|   |  | ELEGIR HORARIO ALTERNATIVO        |   | CAMBIAR DE ESPECIALISTA    |   |   |
+|   |  +-----------------------------------+   +----------------------------+   |   |
+|   +---------------------------------------------------------------------------+   |
+|                                                                                   |
++-----------------------------------------------------------------------------------+
+```
+**Nota de Interfaz:** Modal emergente con efecto backdrop-blur que bloquea la confirmación cuando el motor en tiempo real detecta un traslape de horarios con otra cita previa en la agenda del podólogo. Redirige al cliente a seleccionar un bloque libre continuo o cambiar de especialista.
 
-- **ID de Pantalla en Stitch:** `projects/13539032631391197448/screens/a06641df8a6a48329ec5980dae2e8179`
-- **Proyecto Stitch:** `projects/13539032631391197448` (Motor de Reservas Spa Amely)
-
-**Nota de Interfaz:** Cuando la agenda detecta un solapamiento en tiempo real con una cita previamente reservada para el mismo profesional (ej: Dra. Elena Ramos de 10:00 a 11:00 hrs), el sistema deshabilita la franja conflictiva e invoca un modal accesible con backdrop-blur. El modal explica el motivo del bloqueo (incluyendo buffer de ventilación/esterilización) y propone dos botones de selección directa con bloques continuos alternativos disponibles sin solapamientos (ej: 11:15 - 12:30 hrs o 15:15 - 16:30 hrs).
-
-### Estado 3: Verificación de Restricción Inquebrantable (No Precios)
-
+### Estado 3: Verificación de Restricción Inquebrantable de No Precios
 **Escenario cubierto:** Escenario 3: Verificación de Restricción Inquebrantable de No Precios
+**ID de Pantalla en Stitch:** `projects/12386224423209721294/screens/cd3635f99991499a91cfec626e4ad361`
+**Wireframe Estructural (ASCII):**
+```text
++-----------------------------------------------------------------------------------+
+|  RESUMEN DE RESERVA DE CITA (RESTRICCIÓN RN-01 CUMPLIDA)                          |
+|                                                                                   |
+|  Servicios Seleccionados: Quiropodia Completa + Tratamiento Láser                 |
+|  Duración Estimada Total: 75 minutos                                              |
+|  Especialista Asignado: Lic. Carmen Silva                                         |
+|  Fecha y Hora: 15/09/2026 | 09:00 - 10:15                                       |
+|                                                                                   |
+|  [ VALORES MONETARIOS / PRECIOS: OMISION ESTRICTA Y GARANTIZADA ]                 |
+|                                                                                   |
+|  +-----------------------------------------------------------------------------+  |
+|  | [ CITA RESERVADA CON ÉXITO - NOTIFICACIÓN ENVIADA POR WHATSAPP ]            |  |
+|  +-----------------------------------------------------------------------------+  |
++-----------------------------------------------------------------------------------+
+```
+**Nota de Interfaz:** Cumplimiento estricto de la Regla de Negocio RN-01. El resumen de reserva muestra exclusivamente la duración en minutos, los nombres de los servicios y del especialista, omitiendo absolutamente cualquier símbolo de moneda ($/S/.), costo o tarifa.
 
-- **ID de Pantalla en Stitch:** `projects/13539032631391197448/screens/38474b96f8cc4f9c83b847767108cbc8`
-
-**Nota de Interfaz:** Tanto en el panel dinámico de resumen (Sticky Card) como en la confirmación de la cita, únicamente se detallan los nombres de los tratamientos podológicos seleccionados, la duración calculada en minutos/horas, el profesional y gabinete asignado, y las instrucciones de higiene/llegada. Queda prohibida la inclusión de subtotales, precios unitarios, impuestos o totales monetarios.
 
 ## 3. DECISIONES DE DISEÑO Y PUNTOS PENDIENTES
 
 - **Heurísticas aplicadas:**
-  - *Visibilidad del estado del sistema (Heurística 1):* Indicación visual en tiempo real del tiempo total acumulado en minutos (ej: "Duración Total: 75 min") para dar certidumbre al usuario sobre la duración necesaria.
-  - *Prevención de errores (Heurística 5):* Ocultamiento/deshabilitado de franjas horarias con cruces y sugerencia proactiva de bloques continuos contiguos libres.
-  - *Consistencia y estándares (Heurística 4):* Sistema de diseño *Serene Podiatric Sanctuary* basado en tonos verde salvia (`#3E6B5C`), crema warm linen (`#FAF8F5`) y tipografía Newsreader/Manrope para transmitir pulcritud médica sin la frialdad hospitalaria.
-- **Bloqueos o Consultas:**
-  - *Consulta para el BA / Stakeholder:* Se mantiene la observación sobre el mecanismo definitivo de identificación del cliente (teléfono / DNI / correo) al momento de enviar las notificaciones automáticas por WhatsApp (Épica P2).
+  - **Suma visible de duración en tiempo real:** Se incluye un indicador destacado de "Duración Total Acumulada" que se actualiza dinámicamente según los servicios marcados, permitiendo al cliente comprender de forma directa la amplitud del bloque de tiempo necesario.
+  - **Prevención de errores y conflicto claro:** En caso de cruces de horarios, el sistema no solo notifica el bloqueo sino que presenta sugerencias inmediatas de slots contiguos sin solapamiento para reducir la fricción del usuario.
+  - **Diseño sin fricción comercial:** Se eliminó cualquier etiqueta de precios, carrito o costo acumulado en concordancia con la regla RN-01.
 
-# 4. ORDEN DE DELEGACIÓN PARA EL TRACKER
+- **Bloqueos o Consultas (Si aplican):**
+  - **Identificación de cliente (Punto Abierto BA-01):** Se colocó un formulario con Nombre y WhatsApp/Teléfono en la UI. Pendiente confirmar por BA/Stakeholder si se implementará autenticación formal o código de reserva para consultas/anulaciones posteriores.
+
+
+## 4. ORDEN DE DELEGACIÓN PARA EL TRACKER
 
 @PM: Los wireframes para la HU Reserva e Integración de Citas Podológicas en Tiempo Real están listos en D:\Paulo\Cursos\DMC\template-bmad\files\designer-ux\ux_01_motor_reservas.md. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.

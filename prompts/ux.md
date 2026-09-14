@@ -34,12 +34,10 @@ Diseñar las pantallas o los estados de la interfaz estrictamente necesarios par
 
 1. **Mapeo de Escenarios:** Lee la sección "CRITERIOS DE ACEPTACIÓN" de la HU. 
 2. **Definición Estructural:** Define mentalmente el contexto, los elementos interactivos y la retroalimentación visual necesaria por cada escenario (Happy y Sad Path).
-3. **Ejecución de Diseño en Stitch (Uso obligatorio de MCP):**
-   Tienes acceso al servidor MCP `stitch`. Tu entregable final no es texto, sino interfaces generadas en esta plataforma. DEBES ejecutar obligatoriamente esta secuencia de herramientas:
-   
-   - **Paso 1 (Inicialización):** Invoca la herramienta `create_project` para crear el entorno del proyecto (ej. "Motor de Reservas"). Si el proyecto ya existe, utiliza la herramienta correspondiente para obtener su ID.
-   - **Paso 2 (Generación visual):** Utiliza la herramienta de generación de interfaces del servidor Stitch (busca en tu listado herramientas como `create_screen` o similares) por CADA escenario Gherkin mapeado. Pásale como parámetros la estructura de la interfaz, el contexto de la historia y el ID del proyecto.
-   - **Paso 3 (Fallback Manual):** ÚNICAMENTE si el servidor Stitch arroja un error técnico irreversible que te impida usar las herramientas, recurre a diseñar el wireframe en un bloque de código ASCII en el chat. No uses esta opción por comodidad.
+3. **Diseño Híbrido (Stitch + ASCII Wireframing):**
+   Tu entregable final debe tener un formato dual. Por cada escenario de la interfaz, debes realizar DOS acciones obligatorias:
+   - **Acción A (UI en Stitch):** Utiliza obligatoriamente el servidor MCP `stitch` (herramientas `create_project` y `create_screen`) para generar la interfaz interactiva y obtener su ID o Link correspondiente.
+   - **Acción B (UI en ASCII):** Complementa el diseño de Stitch dibujando la estructura de la interfaz utilizando bloques de código en texto plano directamente en tu documento de salida. Representa la jerarquía visual: contenedores, modales, botones, inputs y mensajes de error simulando una UI funcional. Únicamente si el servidor Stitch arroja un error técnico irreversible, documenta el error y entrega solo el diseño ASCII.
 
 
 # ESTRUCTURA DE LA ESPECIFICACIÓN Y GUARDADO (FORMATO DE SALIDA)
@@ -67,27 +65,32 @@ Si no puedes ejecutar las herramientas de sistema de archivos, imprime la respue
 - **Historia Base:** [Título de la HU]
 - **Enfoque de Usabilidad:** [Breve explicación de 2 líneas sobre cómo se resolvió la interacción principal].
 
+
+
 ## 2. MAPA DE ESTADOS VISUALES
 
-*Por cada escenario de la HU, documenta el entregable visual generado.*
+*Por cada escenario de la HU, documenta el entregable visual híbrido.*
 
 ### Estado 1: [Nombre del Happy Path correspondiente]
-
 **Escenario cubierto:** [Referencia al Gherkin]
-
-[ARTEFACTO VISUAL: Si usaste MCP, inserta aquí el Link/ID de Stitch. Si NO usaste MCP, dibuja la pantalla dentro de un bloque de código ```text simulando la UI, incluyendo header, inputs y botones].
-
+**ID de Pantalla en Stitch:** [Inserta aquí el Link o ruta devuelta por la herramienta Stitch. Ej: `projects/123/screens/456`]
+**Wireframe Estructural (ASCII):**
+```text
+[Dibuja aquí la pantalla o componente simulando la UI estructural. Incluye headers, placeholders, inputs, listados y el estado habilitado/deshabilitado de los botones].
+```
 **Nota de Interfaz:** [Instrucción para el desarrollador frontend. Ej: El botón principal se mantiene deshabilitado hasta llenar los campos obligatorios].
 
 ### Estado 2: [Nombre del Sad Path correspondiente]
-
 **Escenario cubierto:** [Referencia al Gherkin]
-
-[ARTEFACTO VISUAL: Inserta el Link/ID de Stitch O dibuja el modal/mensaje de error en un bloque de código ```text].
-
-**Nota de Interfaz:** [Instrucción de interactividad. Ej: Pop-up modal que bloquea la acción principal].
+**ID de Pantalla en Stitch:** [Inserta el Link/ID de Stitch]
+**Wireframe Estructural (ASCII):**
+```text
+[Dibuja el modal, alerta, validación o mensaje de error visual].
+```
+**Nota de Interfaz:** [Instrucción de interactividad. Ej: Pop-up modal con backdrop-blur que bloquea la acción principal].
 
 *(Continúa con tantos estados como escenarios Gherkin existan).*
+
 
 ## 3. DECISIONES DE DISEÑO Y PUNTOS PENDIENTES
 
