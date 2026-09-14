@@ -1,19 +1,28 @@
+# Orquestador Centralizado Monolítico o Patrón de Bus de Mensajes Central
 import time
 import os
 import json
+import random
 import subprocess
 
 TRACKER_PATH = r"D:\Paulo\Cursos\DMC\template-bmad\files\tracker_bmad.md"
 
+
 def guardar_historial(agente_id, instruccion):
-    try:
-        subprocess.run("git add .", shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        mensaje_commit = f"BMAD Auto-Save: {agente_id} tarea despachada"
-        comando_commit = f'git commit -m "{mensaje_commit}" -m "Instrucción: {instruccion}"'
-        subprocess.run(comando_commit, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(f"📦 [Control de Cambios] Commit automático para {agente_id}.")
-    except subprocess.CalledProcessError:
-        pass
+    max_reintentos = 5
+    for intento in range(max_reintentos):
+        try:
+            # Intentamos hacer el commit
+            subprocess.run("git add .", shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            mensaje_commit = f"BMAD Auto-Save: {agente_id} tarea despachada"
+            comando_commit = f'git commit -m "{mensaje_commit}" -m "Instrucción: {instruccion[:50]}..."'
+            subprocess.run(comando_commit, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"📦 [Control de Cambios] Commit automático para {agente_id}.")
+            break # Si tiene éxito, salimos del bucle
+        except subprocess.CalledProcessError:
+            # Si falla (probablemente porque otro watcher está haciendo commit), esperamos un momento aleatorio
+            espera = random.uniform(0.5, 2.0)
+            time.sleep(espera)
 
 
 def obtener_info_agente(nombre_agente):
