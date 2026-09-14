@@ -7,3 +7,5 @@
 @QA: La Historia de Usuario Agendamiento de Cita y Control de Disponibilidad está lista en el archivo hu_01_agendamiento.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 @UX: La Historia de Usuario Agendamiento de Cita y Control de Disponibilidad Inteligente ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_01_agendamiento.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
+
+@BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: Sistema de Notificaciones Instantáneas y Anulación por WhatsApp. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely_spa.md.
