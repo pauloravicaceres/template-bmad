@@ -95,7 +95,7 @@ La especificación trazada por el BA respeta el Product Brief al 100%. Los crite
 Genera la instrucción utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
 **Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
-`@UX: La Historia de Usuario [Título real de la HU] ha sido auditada y APROBADA. Puedes encontrar la especificación en [Nombre del archivo.md]. Procede con los wireframes.`
+`@UX: La Historia de Usuario [Título real de la HU] ha sido auditada y APROBADA. Puedes encontrar la especificación en [Nombre del archivo .md]. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.`
 
 
 # ENTRADAS DE DATOS Y FLUJO DE TRABAJO INICIAL

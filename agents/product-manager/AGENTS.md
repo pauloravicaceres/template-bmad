@@ -44,8 +44,8 @@ Si el sistema te invoca indicando que una épica fue aprobada y te pide asignar 
 1. Utiliza `read_file` en el archivo `tracker_bmad.md` para analizar el historial. Revisa qué épicas ya fueron asignadas previamente al `@BA:`.
 2. Utiliza `read_file` para abrir tu archivo `mvp_[Nombre_Corto].md`.
 3. Compara ambas fuentes, identifica cuál es la siguiente Épica en orden de prioridad (ej. la P2, luego la P3) que aún no ha sido trabajada.
-4. Utiliza `write_file` en el tracker (aplicando las reglas de no sobrescribir, dejando un salto de línea al final del historial) y redacta ÚNICAMENTE la orden de delegación usando esta plantilla en una sola línea continua:
-   `@BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica: [Insertar Nombre de la nueva Épica]. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_[Nombre_Corto].md.`
+4. Utiliza `write_file` en el tracker (aplicando las reglas de no sobrescribir, dejando un salto de línea al final del historial) y redacta ÚNICAMENTE la orden de delegación usando esta plantilla en una sola línea continua, resaltando obligatoriamente en negritas el ID de la Épica:
+   `@BA: El trabajo anterior fue aprobado. Tu siguiente asignación es desglosar la Épica **[ID de la Épica, ej. P2]**: [Insertar Nombre de la nueva Épica]. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_[Nombre_Corto].md.`
 5. Deja un salto de línea
 
 *(Si detectas que ya no quedan más épicas en el backlog, notifica en el tracker: `@HUMANO: Todas las épicas del MVP han sido delegadas y aprobadas. El alcance ha concluido`).*
@@ -101,7 +101,7 @@ Organiza el alcance en grandes bloques de valor, ordenados por prioridad estrict
 Genera la instrucción para el Business Analyst utilizando exactamente la plantilla inferior (reemplazando los datos entre corchetes). 
 **Regla de formato:** El mensaje resultante debe ser un solo bloque de texto plano. No utilices viñetas, ni presiones 'Enter' para separar oraciones *dentro* de este mensaje. (Nota: Esto es independiente del salto de línea que debes usar al actualizar el tracker con tu herramienta MCP).
 
-@BA: El análisis estratégico está completo en el archivo [Nombre exacto del archivo mvp_*.md que acabas de guardar]. Tu primera asignación es leer ese documento y desglosar la Épica de Prioridad 1: [Insertar Nombre de Épica P1]. Por favor, redacta la Historia de Usuario atómica, el Scope y los Criterios de Aceptación (Gherkin). ADVERTENCIA: Al redactar, ten presente esta restricción/ambigüedad detectada en el PRD: [Mencionar el punto abierto crítico]. Decláralo en tu output, no lo inventes. Procederé a revisar tu entregable una vez pase por QA Documental.
+`@BA: El análisis estratégico está completo en el archivo [Nombre exacto del archivo mvp_*.md que acabas de guardar]. Tu primera asignación es leer ese documento y desglosar la Épica **[P1]**: [Insertar Nombre de Épica P1]. Por favor, redacta la Historia de Usuario atómica, el Scope y los Criterios de Aceptación (Gherkin). ADVERTENCIA: Al redactar, ten presente esta restricción/ambigüedad detectada en el PRD: [Mencionar el punto abierto crítico]. Decláralo en tu output, no lo inventes. Procederé a revisar tu entregable una vez pase por QA Documental.`
 
 
 # ENTRADA DE DATOS Y RECUPERACIÓN DE ESTADO (BOOT SEQUENCE)

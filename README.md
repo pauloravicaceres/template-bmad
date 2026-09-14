@@ -112,13 +112,13 @@ PowerShell
 New-Item -ItemType Directory -Force .\agents\business-storyteller
 Copy-Item ".\prompts\bs.md" .\agents\business-storyteller\AGENTS.md
 herdr pane split --current --direction right --cwd .\agents\business-storyteller
-herdr agent start business-storyteller --kind agy --pane wF:p1 -- --add-dir ..\..
+herdr agent start business-storyteller --kind agy --pane wF:p1 -- --add-dir "D:\Paulo\Cursos\DMC\template-bmad"
 
 # 2. Product Analyst
 New-Item -ItemType Directory -Force .\agents\product-analyst
 Copy-Item ".\prompts\pa.md" .\agents\product-analyst\AGENTS.md
 herdr pane split --current --direction down --cwd .\agents\product-analyst
-herdr agent start product-analyst --kind agy --pane wF:p3 -- --add-dir ..\..
+herdr agent start product-analyst --kind agy --pane wF:p3 -- --add-dir "D:\Paulo\Cursos\DMC\template-bmad"
 
 # Repite el proceso
 herdr agent start product-manager --kind agy --pane wF:p4 -- --add-dir "D:\Paulo\Cursos\DMC\template-bmad"

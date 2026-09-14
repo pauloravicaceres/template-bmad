@@ -1,30 +1,29 @@
-# Orquestador Centralizado Monolítico (Modelo Secuencial Estricto)
+# Orquestador Centralizado Monolítico o Patrón de Bus de Mensajes Central
 import time
 import os
 import json
-import subprocess
 import random
-from pathlib import Path
+import subprocess
 
-# ==========================================
-# RUTAS Y DIRECTORIOS DINÁMICOS
-# ==========================================
-DIRECTORIO_RAIZ = Path(__file__).resolve().parent
-TRACKER_PATH = str(DIRECTORIO_RAIZ / "files" / "tracker_bmad.md")
+TRACKER_PATH = r"D:\Paulo\Cursos\DMC\template-bmad\files\tracker_bmad.md"
+
 
 def guardar_historial(agente_id, instruccion):
     max_reintentos = 5
     for intento in range(max_reintentos):
         try:
-            subprocess.run("git add .", shell=True, check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Intentamos hacer el commit
+            subprocess.run("git add .", shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             mensaje_commit = f"BMAD Auto-Save: {agente_id} tarea despachada"
             comando_commit = f'git commit -m "{mensaje_commit}" -m "Instrucción: {instruccion[:50]}..."'
-            subprocess.run(comando_commit, shell=True, check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(comando_commit, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"📦 [Control de Cambios] Commit automático para {agente_id}.")
-            break 
+            break # Si tiene éxito, salimos del bucle
         except subprocess.CalledProcessError:
+            # Si falla (probablemente porque otro watcher está haciendo commit), esperamos un momento aleatorio
             espera = random.uniform(0.5, 2.0)
             time.sleep(espera)
+
 
 def obtener_info_agente(nombre_agente):
     try:
@@ -44,7 +43,9 @@ def obtener_info_agente(nombre_agente):
         print(f"⚠️ [Watcher] Error al consultar agentes: {e}")
         return None, None
 
+
 def extraer_instrucciones(linea):
+    """Parsea una línea y devuelve una lista de diccionarios con las tareas separadas"""
     agentes = {
         "@BS:": "business-storyteller",
         "@PA:": "product-analyst",
@@ -52,6 +53,7 @@ def extraer_instrucciones(linea):
         "@BA:": "business-analyst",
         "@QA:": "qa-documental",
         "@UX:": "designer-ux"
+        # "@ARQ:": "arquitecto"
     }
     
     tareas = []
@@ -73,14 +75,18 @@ def extraer_instrucciones(linea):
             
     return tareas
 
+
 def iniciar_watcher():
-    print(f"👁️ Watcher BMAD (Sequential Token-Passing) iniciado.")
+    print(f"👁️ Watcher BMAD (State Machine) iniciado.")
     print(f"📂 Escuchando cambios en: {TRACKER_PATH}")
     
     num_lineas_leidas = 0
     cola_tareas = []
     hash_tareas_historicas = set()
     
+    # NUEVO: Diccionario para obligar a Herdr a confirmar que recibió la orden
+    esperando_confirmacion = {} 
+
     if os.path.exists(TRACKER_PATH):
         with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
             lineas = [l for l in f.readlines() if l.strip()]
@@ -114,31 +120,38 @@ def iniciar_watcher():
                         num_lineas_leidas = len(lineas)
                         
             # ==========================================
-            # 2. FASE DE INYECCIÓN (SECUENCIAL PURA)
+            # 2. FASE DE INYECCIÓN (STATE MACHINE)
             # ==========================================
             tareas_no_procesadas = []
-            candado_disparo = False  # Garantiza una sola inyección por ciclo
             
             for tarea in cola_tareas:
-                if candado_disparo:
-                    tareas_no_procesadas.append(tarea)
-                    continue
-
                 agente = tarea['agente']
                 mensaje = tarea['mensaje']
                 
                 pane_id, estado = obtener_info_agente(agente)
                 
                 if not pane_id:
-                    print(f"❌ [Watcher] Agente '{agente}' no encontrado.")
+                    print(f"❌ [Watcher] Agente '{agente}' no encontrado. Se mantendrá en cola.")
                     tareas_no_procesadas.append(tarea)
                     continue
+                
+                # REGLA DE ORO: Si le inyectamos una tarea, NO le damos otra hasta ver el estado "working"
+                if agente in esperando_confirmacion and esperando_confirmacion[agente]:
+                    if estado == "working":
+                        print(f"🔄 [Watcher] API confirmó recepción. '{agente}' está oficialmente trabajando.")
+                        esperando_confirmacion[agente] = False
+                    else:
+                        print(f"🔄 [Watcher] '{agente}' recibió tarea. Esperando actualización de API Herdr...")
                     
+                    tareas_no_procesadas.append(tarea)
+                    continue
+
                 if estado not in ["idle", "done"]:
                     print(f"⏳ [Watcher] '{agente}' está {estado}. Esperando turno...")
                     tareas_no_procesadas.append(tarea)
                     continue 
 
+                # Si está libre y NO estamos esperando confirmación, disparamos
                 print(f"\n🚀 [Watcher] Inyectando tarea a '{agente}'...")
                 linea_escapada = mensaje.replace('"', '\\"')
                 comando = f'herdr pane run {pane_id} "{linea_escapada}"'
@@ -148,10 +161,11 @@ def iniciar_watcher():
                     print(f"✅ [Watcher] Éxito. Tarea despachada a {agente}.")
                     guardar_historial(agente, mensaje)
                     
-                    # Bloqueamos el resto de la cola hasta el siguiente ciclo de 2s
-                    candado_disparo = True
+                    # ACTIVAMOS EL CANDADO DE CONFIRMACIÓN
+                    esperando_confirmacion[agente] = True 
+                    
                 except subprocess.CalledProcessError as e:
-                    print(f"❌ [Watcher] Error de inyección. Código: {e.returncode}")
+                    print(f"❌ [Watcher] Error de inyección en '{agente}'. Código: {e.returncode}")
                     tareas_no_procesadas.append(tarea)
 
             cola_tareas = tareas_no_procesadas
@@ -163,6 +177,7 @@ def iniciar_watcher():
             print(f"⚠️ [Watcher] Error general: {e}")
             
         time.sleep(2)
+
 
 if __name__ == "__main__":
     iniciar_watcher()
