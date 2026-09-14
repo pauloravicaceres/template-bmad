@@ -17,3 +17,7 @@
 @BA: El trabajo anterior fue approved. Tu siguiente asignación es desglosar la Épica: Panel de Gestión de Citas para Profesionales Podólogos. Por favor, redacta la Historia de Usuario atómica en un nuevo archivo, el Scope y los Criterios de Aceptación (Gherkin) leyendo el contexto del archivo mvp_amely_spa.md.
 
 @QA: La Historia de Usuario Dashboard de Gestión de Citas y Estado de Atención para Podólogos está lista en el archivo hu_03_panel_podologos.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
+
+@HUMANO: Los wireframes funcionales para la Historia de Usuario Notificaciones Automáticas de Reserva y Anulación de Citas por WhatsApp están listos. Puedes encontrar la estructura de UI y los IDs de Stitch en el archivo ux_02_notificaciones_anulacion.md. El requerimiento está listo para el diseño de arquitectura y base de datos.
+
+@UX: La Historia de Usuario Dashboard de Gestión de Citas y Estado de Atención para Podólogos ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_03_panel_podologos.md. Procede con los wireframes. @PM: La validación de la épica anterior terminó con éxito. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
