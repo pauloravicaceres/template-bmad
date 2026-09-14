@@ -11,6 +11,7 @@ AGENTES = {
     "ux:": "designer-ux",
 }
 
+
 def seleccionar_carpetas():
     opciones = list(AGENTES.items())
     
@@ -56,6 +57,7 @@ def seleccionar_carpetas():
             
         return carpetas_seleccionadas
 
+
 def main():
     # utils/clean_folders.py -> raíz del proyecto
     raiz_proyecto = Path(__file__).resolve().parent.parent
@@ -91,6 +93,7 @@ def main():
             print(f"[ERROR] Fallo al limpiar {nombre_carpeta}: {e}")
 
     print("\nProceso finalizado. Los archivos en la raíz (ej. tracker_bmad.md) están intactos.")
+
 
 if __name__ == "__main__":
     main()

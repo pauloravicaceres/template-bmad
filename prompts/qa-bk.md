@@ -64,7 +64,6 @@ Si no puedes ejecutar las herramientas, imprime la respuesta en el chat y notifi
 
 ---
 
-
 ### OPCIÓN A: Si detectas cualquier fallo, vacío o invención.
 Genera un reporte estructurado para devolver el trabajo al BA:
 

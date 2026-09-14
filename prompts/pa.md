@@ -85,3 +85,4 @@ Antes de generar el Product Brief, tu primer paso obligatorio es:
 3. Usar `read_file` combinando esa ruta absoluta con el nombre del archivo para extraer el texto crudo de la idea.
 
 En caso de que el archivo no exista o la herramienta falle, detén el proceso y pide al usuario que ingrese el texto crudo manualmente usando las etiquetas `<idea_usuario></idea_usuario>`.
+

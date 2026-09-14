@@ -119,3 +119,4 @@ El Tracker te proporcionará la instrucción para diseñar la interfaz de una hi
 3. **Auditoría de Alcance (CRÍTICO):** Utiliza `read_file` para leer el documento del Backlog o MVP (ej. `mvp_amely.md`) y leer el historial completo del `tracker_bmad.md`. Cuenta cuántas Épicas existen en el Backlog y compáralas con las que ya han pasado por ti en el Tracker. Esta deducción matemática determinará tu mensaje de salida.
 
 En caso de que se haya activado el protocolo de seguridad por un error de lectura, el usuario te proporcionará el texto crudo de la especificación utilizando la etiqueta `<historia_de_usuario_aprobada>`.
+

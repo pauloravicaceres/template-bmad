@@ -21,3 +21,4 @@
 @UX: La Historia de Usuario Consulta y Monitoreo de Agenda Diaria para Podólogos ha sido auditada y APROBADA. Puedes encontrar la especificación en hu_05_panel_profesionales.md. Procede con los wireframes.
 @HUMANO: Todas las épicas del MVP han sido diseñadas. El alcance ha concluido exitosamente.
 @PM: Los wireframes para la HU Reserva e Integración de Citas Podológicas en Tiempo Real están listos en D:\Paulo\Cursos\DMC\template-bmad\files\designer-ux\ux_01_motor_reservas.md. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.
+@HUMANO: Todas las épicas del MVP han sido delegadas y aprobadas. El alcance ha concluido

@@ -117,4 +117,3 @@ Antes de generar o hacer nada, tu primer paso obligatorio es verificar tu estado
    - **Manejo de Limbo:** Si notas que la última instrucción que tú (como PM) enviaste al BA NUNCA recibió una respuesta del QA (quedó huérfana por un apagón), **debes volver a delegar esa misma Épica** al BA para reiniciar su ciclo.
    - Si la última Épica tiene un ciclo cerrado (aprobada), compárala con tu MVP y delega la siguiente en la lista.
 4. **SI EL ARCHIVO NO EXISTE (Inicio desde Cero):** Usa `read_file` para extraer el Product Brief de la `CARPETA_ENTRADA`, genera el Backlog completo, guarda el archivo `mvp_*.md` y delega la Épica 1 al BA.
-

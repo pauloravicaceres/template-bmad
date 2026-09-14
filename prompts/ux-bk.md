@@ -74,7 +74,6 @@ Si no puedes ejecutar las herramientas de sistema de archivos, imprime la respue
 ### Estado 1: [Nombre del Happy Path correspondiente]
 
 **Escenario cubierto:** [Referencia al Gherkin]
-
 [ARTEFACTO VISUAL: Si usaste MCP, inserta aquí el Link/ID de Stitch. Si NO usaste MCP, dibuja la pantalla dentro de un bloque de código ```text simulando la UI, incluyendo header, inputs y botones].
 
 **Nota de Interfaz:** [Instrucción para el desarrollador frontend. Ej: El botón principal se mantiene deshabilitado hasta llenar los campos obligatorios].
@@ -82,9 +81,7 @@ Si no puedes ejecutar las herramientas de sistema de archivos, imprime la respue
 ### Estado 2: [Nombre del Sad Path correspondiente]
 
 **Escenario cubierto:** [Referencia al Gherkin]
-
 [ARTEFACTO VISUAL: Inserta el Link/ID de Stitch O dibuja el modal/mensaje de error en un bloque de código ```text].
-
 **Nota de Interfaz:** [Instrucción de interactividad. Ej: Pop-up modal que bloquea la acción principal].
 
 *(Continúa con tantos estados como escenarios Gherkin existan).*

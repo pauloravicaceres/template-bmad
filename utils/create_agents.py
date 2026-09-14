@@ -11,6 +11,7 @@ AGENTES = {
     "ux:": "designer-ux",
 }
 
+
 def seleccionar_agentes():
     opciones = list(AGENTES.items())
     
@@ -56,6 +57,7 @@ def seleccionar_agentes():
             
         return agentes_seleccionados
 
+
 def main():
     # utils/crear_agentes.py -> raíz del proyecto
     raiz_proyecto = Path(__file__).resolve().parent.parent
@@ -91,6 +93,7 @@ def main():
         print(f"     {archivo_prompt.name} -> AGENTS.md")
 
     print("\nProceso finalizado.")
+
 
 if __name__ == "__main__":
     main()
