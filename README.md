@@ -565,4 +565,35 @@ Construí un modelo de orquestación asíncrona basado en eventos, fusionando un
 El diseño se basa en la reactividad. Cada agente opera aislado en su propio panel de terminal (Herdr) enfocado en una tarea atómica. Cuando un agente termina su trabajo, utiliza el Model Context Protocol (MCP) para guardar su entregable en disco y anexa una orden de delegación estructurada (por ejemplo, `@UX: procede con los wireframes`) al final del tracker.
 
 La autonomía real ocurre gracias al Watcher. Este orquestador lee las nuevas líneas del tracker, fragmenta las órdenes y las apila en una cola interna (FIFO Queue). Luego, sondea en tiempo real el estado de cada agente; si el destinatario está libre (`idle`), inyecta la instrucción directamente en el búfer de su terminal usando comandos TTY (`herdr pane run`), despertándolo. De esta manera, el cierre documentado de un agente se convierte automática e instantáneamente en el *prompt* de inicio del siguiente, logrando una cadena de producción de software paralela, desatendida y capaz de regular su propio tráfico sin colisionar.
+
 ---
+
+## Nota de Arquitectura: Transición al Modelo Secuencial Estricto (Token-Passing)
+
+### El Problema: Limitaciones de la Concurrencia y Latencia de Estado
+
+Durante las primeras iteraciones del motor de orquestación (BMAD), el sistema operaba bajo un modelo concurrente donde el script central (`watcher_bmad.py`) intentaba despachar múltiples tareas en paralelo basándose en los estados reportados por la API de Herdr (`idle`, `working`, `done`). Este enfoque generó tres fallas críticas de infraestructura:
+
+* **El Efecto "Ametralladora" (Sobrescritura de Búfer):** La API de Herdr presentaba una latencia de 3 a 4 segundos en actualizar el estado de un agente. Si la cola tenía múltiples requerimientos, el Watcher inyectaba la Tarea 1, y al consultar inmediatamente después, la API seguía reportando el estado anterior (`done` o `idle`). El Watcher, asumiendo falsamente que el agente estaba libre, inyectaba la Tarea 2 en la misma terminal, destruyendo el contexto del LLM y perdiendo tareas en el limbo.
+* **Colapso de la Máquina de Estados:** Al intentar mitigar el error anterior, se forzó al Watcher a esperar a que la API reportara estrictamente el estado `working` antes de liberar la siguiente tarea. Esto falló porque los agentes LLM a veces procesan la información tan rápido que completan su ciclo (`idle` -> `working` -> `done`) en menos de los 2 segundos que tarda el Watcher en volver a escanear el log (`time.sleep(2)`). El script nunca veía el estado `working` y la cola se bloqueaba infinitamente.
+* **Condiciones de Carrera en Git (`index.lock`):** El procesamiento en paralelo provocaba que múltiples agentes intentaran escribir y hacer `git commit` sobre el archivo `tracker_bmad.md` en el mismo milisegundo, resultando en colisiones a nivel de sistema operativo por bloqueos del archivo `index.lock`.
+
+### La Solución: Implementación del Modelo Secuencial (Token-Passing)
+
+Para erradicar los errores de concurrencia, se pivotó la arquitectura transfiriendo la responsabilidad de la orquestación desde el script de Python hacia la lógica de los propios agentes (Prompts). Se implementó un modelo lineal donde solo un agente trabaja a la vez, pasándose el "testigo" de forma determinista.
+
+Los ajustes estructurales realizados fueron los siguientes:
+
+**1. Refactorización del Orquestador Central (`watcher_bmad.py`)**
+
+* Se eliminaron los temporizadores de estabilización, diccionarios de retención y validaciones de estado complejas.
+* Se implementó un **Candado de Disparo Único** (`candado_disparo`). El script ahora recorre la cola, inyecta una única instrucción al primer agente disponible (`idle` o `done`), bloquea inmediatamente el resto de la cola en ese milisegundo y espera al siguiente ciclo de 2 segundos. Esto erradica el efecto ametralladora.
+
+**2. Rediseño Lógico en los Prompts (Ingeniería de Comportamiento)**
+
+* **QA Documental (`qa.md`):** Se le retiró la instrucción de orquestación dual. Al aprobar una historia, ya no notifica al PM y al UX al mismo tiempo; ahora despierta *exclusivamente* al Diseñador UX para mantener la linealidad del proceso.
+* **Diseñador UX (`ux.md`):** Se le asignó una nueva responsabilidad de **Auditoría de Alcance**. Al finalizar sus wireframes, el UX debe leer dinámicamente el Backlog (`mvp_*.md`) y el historial del Tracker. Si matemáticamente detecta que quedan épicas pendientes, despierta al Product Manager (`@PM:`); si detecta que es la última, cierra el pipeline de forma autónoma notificando al `@HUMANO:`.
+* **Product Manager (`pm.md`):** Se ajustó su lógica de iteración para obligarlo a extraer y resaltar el ID de la Épica en negritas (ej. **[P2]**) dentro del Tracker. Esto garantiza la legibilidad estructural para el rastreo del flujo y evita alucinaciones al invocar herramientas del sistema de archivos (`read_file` vs herramientas inventadas).
+
+**Trade-off Arquitectónico:**
+Esta transición sacrifica la velocidad de generación pura (paralelismo) a cambio de obtener una **estabilidad del 100%**, trazabilidad lineal perfecta en el archivo de seguimiento y la eliminación absoluta de las condiciones de carrera y dependencias de latencia en la API del entorno.
