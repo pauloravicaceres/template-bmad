@@ -12,6 +12,46 @@ from pathlib import Path
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent
 TRACKER_PATH = str(DIRECTORIO_RAIZ / "files" / "tracker_bmad.md")
 
+# ==========================================
+# NUEVO: MOTOR DE COMPILACIÓN (ESTRATEGIA 1)
+# ==========================================
+def compilar_agentes_modulares():
+    print("\n🛠️ [Build] Iniciando ensamblaje de agentes modulares...")
+    agentes_modulares = ["business-analyst", "qa-documental"] # Agrega aquí futuros agentes modulares
+    
+    for nombre in agentes_modulares:
+        ruta_agente = DIRECTORIO_RAIZ / nombre
+        if not ruta_agente.exists():
+            continue
+            
+        # El archivo base original ahora debe llamarse .base.md para protegerlo
+        base_file = ruta_agente / "agents" / f"{nombre}.base.md"
+        agent_file = ruta_agente / "agents" / f"{nombre}.agent.md"
+        instrucciones_dir = ruta_agente / "instructions"
+        
+        # Auto-migración: Si existe el .agent.md pero no el .base.md, lo renombramos
+        if not base_file.exists() and agent_file.exists():
+            agent_file.rename(base_file)
+            print(f"🔄 [Build] Archivo {agent_file.name} renombrado a .base.md para proteger el original.")
+            
+        if base_file.exists() and instrucciones_dir.exists():
+            # 1. Leer el rol y comportamiento base
+            contenido = base_file.read_text(encoding='utf-8')
+            
+            contenido += "\n\n# ==========================================\n"
+            contenido += "# REGLAS Y ESTÁNDARES ADJUNTOS (AUTO-ENSAMBLADO)\n"
+            contenido += "# ==========================================\n"
+            
+            # 2. Leer e inyectar cada archivo satélite
+            for inst_file in instrucciones_dir.glob("*.instructions.md"):
+                titulo = inst_file.stem.upper().replace('-', ' ').replace('.INSTRUCTIONS', '')
+                contenido += f"\n\n## {titulo}\n"
+                contenido += inst_file.read_text(encoding='utf-8')
+                
+            # 3. Guardar el archivo final unificado que leerá Herdr
+            agent_file.write_text(contenido, encoding='utf-8')
+            print(f"✅ [Build] {nombre}.agent.md ensamblado exitosamente.")
+
 def guardar_historial(agente_id, instruccion):
     max_reintentos = 5
     for intento in range(max_reintentos):
@@ -74,6 +114,10 @@ def extraer_instrucciones(linea):
     return tareas
 
 def iniciar_watcher():
+    # EJECUCIÓN DEL BUILD STEP
+    compilar_agentes_modulares()
+    print("-" * 50)
+    
     print(f"👁️ Watcher BMAD (Sequential Token-Passing) iniciado.")
     print(f"📂 Escuchando cambios en: {TRACKER_PATH}")
     
@@ -89,9 +133,6 @@ def iniciar_watcher():
 
     while True:
         try:
-            # ==========================================
-            # 1. FASE DE LECTURA Y ENCOLADO
-            # ==========================================
             if os.path.exists(TRACKER_PATH):
                 with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
                     lineas = [l for l in f.readlines() if l.strip()]
@@ -113,11 +154,8 @@ def iniciar_watcher():
                     elif len(lineas) < num_lineas_leidas:
                         num_lineas_leidas = len(lineas)
                         
-            # ==========================================
-            # 2. FASE DE INYECCIÓN (SECUENCIAL PURA)
-            # ==========================================
             tareas_no_procesadas = []
-            candado_disparo = False  # Garantiza una sola inyección por ciclo
+            candado_disparo = False
             
             for tarea in cola_tareas:
                 if candado_disparo:
@@ -146,9 +184,7 @@ def iniciar_watcher():
                 try:
                     subprocess.run(comando, shell=True, check=True)
                     print(f"✅ [Watcher] Éxito. Tarea despachada a {agente}.")
-                    # guardar_historial(agente, mensaje)
                     
-                    # Bloqueamos el resto de la cola hasta el siguiente ciclo de 2s
                     candado_disparo = True
                 except subprocess.CalledProcessError as e:
                     print(f"❌ [Watcher] Error de inyección. Código: {e.returncode}")
