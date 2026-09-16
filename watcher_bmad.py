@@ -146,7 +146,7 @@ def iniciar_watcher():
                 try:
                     subprocess.run(comando, shell=True, check=True)
                     print(f"✅ [Watcher] Éxito. Tarea despachada a {agente}.")
-                    guardar_historial(agente, mensaje)
+                    # guardar_historial(agente, mensaje)
                     
                     # Bloqueamos el resto de la cola hasta el siguiente ciclo de 2s
                     candado_disparo = True
