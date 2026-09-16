@@ -1,0 +1,27 @@
+apiVersion: backstage.io/v1alpha1
+kind: Agent
+metadata:
+  name: bmad-ecosystem-plugin
+  title: BMAD Multi-Agent Ecosystem Plugin
+  description: Plugin organizacional para la definición integral y autónoma de software bajo metodología BMAD (Business Storyteller, Product Analyst, Product Manager, Business Analyst, QA Documental, Designer UX) con orquestación en terminales Herdr y herramientas MCP.
+  tags:
+    - bmad
+    - multi-agent
+    - herdr
+    - mcp
+    - product-definition
+    - user-stories
+    - gherkin
+    - bdd
+    - qa-documental
+    - ux-design
+  annotations:
+    github.com/project-slug: dmc/template-bmad
+    agents.backstage.io/stack-path: plugins/core/bmad-ecosystem-plugin
+  links:
+    - url: https://github.com/dmc/template-bmad
+      title: Ver en Repositorio
+spec:
+  owner: group:default/ads-digitalarchitecture
+  type: copilot-plugin
+  category: core

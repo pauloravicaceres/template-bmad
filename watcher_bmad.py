@@ -17,30 +17,29 @@ TRACKER_PATH = str(DIRECTORIO_RAIZ / "files" / "tracker_bmad.md")
 # ==========================================
 def compilar_agentes_modulares():
     print("\n🛠️ [Build] Iniciando ensamblaje de agentes modulares...")
-    agentes_modulares = ["business-analyst", "qa-documental"] # Agrega aquí futuros agentes modulares
+    # Agrega aquí futuros agentes modulares (ej. qa-documental)
+    agentes_modulares = ["business-storyteller", "product-analyst", "product-manager",
+                         "business-analyst", "qa-documental", "designer-ux"]
     
     for nombre in agentes_modulares:
         ruta_agente = DIRECTORIO_RAIZ / nombre
         if not ruta_agente.exists():
             continue
             
-        # El archivo base original ahora debe llamarse .base.md para protegerlo
-        base_file = ruta_agente / "agents" / f"{nombre}.base.md"
+        # Archivos origen y directorio de instrucciones
         agent_file = ruta_agente / "agents" / f"{nombre}.agent.md"
         instrucciones_dir = ruta_agente / "instructions"
         
-        # Auto-migración: Si existe el .agent.md pero no el .base.md, lo renombramos
-        if not base_file.exists() and agent_file.exists():
-            agent_file.rename(base_file)
-            print(f"🔄 [Build] Archivo {agent_file.name} renombrado a .base.md para proteger el original.")
+        # Archivo destino: AGENTS.md en la raíz de la carpeta del agente
+        target_file = ruta_agente / "AGENTS.md"
+        
+        if agent_file.exists() and instrucciones_dir.exists():
+            # 1. Leer el rol y comportamiento base (sin renombrar ni modificar el original)
+            contenido = agent_file.read_text(encoding='utf-8')
             
-        if base_file.exists() and instrucciones_dir.exists():
-            # 1. Leer el rol y comportamiento base
-            contenido = base_file.read_text(encoding='utf-8')
-            
-            contenido += "\n\n# ==========================================\n"
-            contenido += "# REGLAS Y ESTÁNDARES ADJUNTOS (AUTO-ENSAMBLADO)\n"
-            contenido += "# ==========================================\n"
+            contenido += "\n\n## ==========================================\n"
+            contenido += "## REGLAS Y ESTÁNDARES ADJUNTOS (AUTO-ENSAMBLADO)\n"
+            contenido += "## ==========================================\n"
             
             # 2. Leer e inyectar cada archivo satélite
             for inst_file in instrucciones_dir.glob("*.instructions.md"):
@@ -49,8 +48,8 @@ def compilar_agentes_modulares():
                 contenido += inst_file.read_text(encoding='utf-8')
                 
             # 3. Guardar el archivo final unificado que leerá Herdr
-            agent_file.write_text(contenido, encoding='utf-8')
-            print(f"✅ [Build] {nombre}.agent.md ensamblado exitosamente.")
+            target_file.write_text(contenido, encoding='utf-8')
+            print(f"✅ [Build] AGENTS.md ensamblado exitosamente en la raíz de /{nombre}.")
 
 def guardar_historial(agente_id, instruccion):
     max_reintentos = 5
@@ -113,8 +112,9 @@ def extraer_instrucciones(linea):
             
     return tareas
 
+
 def iniciar_watcher():
-    # EJECUCIÓN DEL BUILD STEP
+    # EJECUCIÓN DEL BUILD STEP (Asumiendo que tienes compilar_agentes_modulares)
     compilar_agentes_modulares()
     print("-" * 50)
     
@@ -125,12 +125,32 @@ def iniciar_watcher():
     cola_tareas = []
     hash_tareas_historicas = set()
     
+    # ==========================================
+    # NUEVO: LÓGICA DE RECUPERACIÓN (WARM BOOT)
+    # ==========================================
     if os.path.exists(TRACKER_PATH):
         with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
             lineas = [l for l in f.readlines() if l.strip()]
-            num_lineas_leidas = len(lineas)
-        print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
-
+            
+        if lineas:
+            ultima_linea = lineas[-1]
+            print(f"\n📂 Tracker detectado con {len(lineas)} eventos históricos.")
+            print(f"Última instrucción registrada:\n>> {ultima_linea}\n")
+            
+            # Le damos el control al humano para decidir el estado
+            respuesta = input("🔄 ¿Deseas reanudar la ejecución desde esta última instrucción? (s/n): ")
+            
+            if respuesta.lower() == 's':
+                # Al restarle 1, obligamos al watcher a "leer" la última línea como si fuera nueva
+                num_lineas_leidas = len(lineas) - 1
+                print("🔓 Modo Recuperación: Re-encolando la última tarea...\n")
+            else:
+                num_lineas_leidas = len(lineas)
+                print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
+        else:
+            num_lineas_leidas = 0
+    # ==========================================
+    
     while True:
         try:
             if os.path.exists(TRACKER_PATH):

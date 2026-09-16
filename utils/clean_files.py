@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil
 import sys
 
-AGENTES = {
+AGENTS = {
     "bs:": "business-storyteller",
     "pa:": "product-analyst",
     "pm:": "product-manager",
@@ -13,9 +13,9 @@ AGENTES = {
 
 
 def seleccionar_carpetas():
-    opciones = list(AGENTES.items())
+    opciones = list(AGENTS.items())
     
-    print("\n=== LIMPIEZA DE CARPETAS DE AGENTES ===")
+    print("\n=== LIMPIEZA DE CARPETAS DE TRABAJO DE LOS AGENTES ===")
     for i, (prefijo, nombre) in enumerate(opciones, 1):
         print(f" [{i}] {nombre}")
     
@@ -30,7 +30,7 @@ def seleccionar_carpetas():
             sys.exit(0)
             
         if seleccion == 'T':
-            return AGENTES
+            return AGENTS
             
         carpetas_seleccionadas = {}
         indices_ingresados = seleccion.split(',')
