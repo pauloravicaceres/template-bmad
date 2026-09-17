@@ -6,7 +6,7 @@ from pathlib import Path
 # ==========================================
 # 1. CONFIGURACIÓN ESTRATÉGICA (FinOps / LLMOps)
 # ==========================================
-WORKSPACE_DIR = Path(__file__).resolve().parent
+WORKSPACE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Motor de Grilla (2 Columnas). 
