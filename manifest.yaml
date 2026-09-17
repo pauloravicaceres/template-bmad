@@ -43,7 +43,7 @@ capabilities:
 
 risk_level: medio
 requires_human_approval: true   # Discovery interactivo HITL en BS + control de bucles de QA
-uses_scripts: true              # watcher_bmad.py, utils/start_agents.py, utils/clean_files.py, utils/delete_agents.py
+uses_scripts: true              # watcher_bmad.py, utils/start_agents.py, utils/clean_files.py, utils/delete_agents.py, utils/approve_step.py
 uses_hooks: false
 uses_mcp: true                  # MCP Filesystem (read_file / write_file) y MCP Stitch (UI wireframes)
 

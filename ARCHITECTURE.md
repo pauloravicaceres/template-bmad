@@ -91,7 +91,7 @@ flowchart TB
     'participantTextColor': '#FFFFFF',
     'noteBkgColor': '#0F172A',
     'noteBorderColor': '#3B82F6',
-    'noteTextColor': '#E2E8F0',
+    'noteTextColor': '#FFFFFF',
     'activationBkgColor': '#7F6000',
     'activationBorderColor': '#BF9000'
   }
@@ -104,6 +104,7 @@ sequenceDiagram
     participant C as config_bmad.json
     participant BS as Business Storyteller
     participant PA as Product Analyst
+    participant H as Humano (HITL)
     participant PM as Product Manager
     participant BA as Business Analyst
     participant QA as QA Documental
@@ -126,10 +127,18 @@ sequenceDiagram
     PA->>C: read_file (Rutas)
     PA->>PA: Redacta Product Brief
     PA->>C: write_file (pb_*.md)
-    PA->>T: write_file ("@PM: PB listo...")
+    PA->>T: write_file ("@HUMANO: PB listo, requiere revisión...")
     deactivate PA
 
-    W->>T: Lee nueva línea
+    Note over W, T: Watcher entra en pausa (desconoce @HUMANO)
+    
+    H->>T: Ejecuta `python utils/approve_step.py`
+    activate H
+    H->>T: Confirma aprobación (s/n)
+    H->>T: write_file ("@PM: El Product Brief ha sido aprobado...")
+    deactivate H
+
+    W->>T: Lee nueva línea (@PM:)
     W->>PM: herdr pane run [Instrucción PM]
     
     activate PM
@@ -181,13 +190,14 @@ sequenceDiagram
 
 1. **Compilación y Arranque:** Al iniciar `watcher_bmad.py`, el motor lee las carpetas `agents/` e `instructions/` de cada agente y ensambla su archivo unificado `AGENTS.md`. `start_agents.py` despliega la grilla de terminales en Herdr asignando modelos LLM y permisos de sandbox (`--add-dir`).
 2. **Entrada y Discovery:** El stakeholder proporciona una idea cruda en el panel de `business-storyteller`. Si la idea es ambigua, el agente ejecuta preguntas interactivas (HITL). Al resolver la narrativa, guarda `idea_*.md` y escribe `@PA:` en el tracker.
-3. **Análisis de Producto:** El Watcher detecta la línea `@PA:`, valida el estado `idle` del panel y le inyecta la instrucción. El PA lee la idea, genera `pb_*.md` y notifica `@PM:`.
-4. **Gestión de Alcance y MVP:** El PM define el Backlog de Épicas y asigna la primera épica al BA mediante `@BA:`.
-5. **Especificación BDD:** El BA redacta la Historia de Usuario atómica (`hu_*.md`) con escenarios `Given-When-Then` y delega la auditoría al `@QA:`.
-6. **Bifurcación de Calidad (QA Loop):**
+3. **Análisis de Producto:** El Watcher detecta la línea `@PA:`, valida el estado `idle` del panel y le inyecta la instrucción. El PA lee la idea, genera `pb_*.md` y notifica `@HUMANO:`. Al desconocer este comando, el Watcher se queda inactivo (en pausa).
+4. **Aprobación Manual (HITL):** El operador humano verifica el Product Brief. Si está conforme, ejecuta `python utils/approve_step.py`, selecciona al Product Analyst y aprueba (s/n). El script inyecta la orden `@PM:` en el tracker, despertando nuevamente al orquestador.
+5. **Gestión de Alcance y MVP:** El PM define el Backlog de Épicas y asigna la primera épica al BA mediante `@BA:`.
+6. **Especificación BDD:** El BA redacta la Historia de Usuario atómica (`hu_*.md`) con escenarios `Given-When-Then` y delega la auditoría al `@QA:`.
+7. **Bifurcación de Calidad (QA Loop):**
    - **Rechazo:** El QA genera un reporte de observaciones y devuelve el control al `@BA:` para corrección inmediata.
    - **Aprobación:** El QA emite la certificación y despierta al `@UX:`.
-7. **Diseño y Cierre de Ciclo:** El UX diseña los wireframes correspondientes con MCP Stitch, evalúa matemáticamente el avance del MVP en el tracker, y despierta al `@PM:` para la siguiente épica o notifica el cierre completo al `@HUMANO:`.
+8. **Diseño y Cierre de Ciclo:** El UX diseña los wireframes correspondientes con MCP Stitch, evalúa matemáticamente el avance del MVP en el tracker, y despierta al `@PM:` para la siguiente épica o notifica el cierre completo al `@HUMANO:`.
 
 ---
 
@@ -214,6 +224,7 @@ sequenceDiagram
 |---|---|---|
 | **Modelo Lineal (Token-Passing)** | Erradica condiciones de carrera, colisiones de TTY y sobrescritura de búfer en terminales. | Revisar que solo un agente recibe órdenes por ciclo en el log del Watcher. |
 | **Aislamiento por Carpetas en `files/`** | Evita la corrupción de datos y colisión de nombres entre entregables de diferentes etapas. | Verificar jerarquía estricta en el directorio `files/`. |
+| **Pausa Controlada (HITL)** | El orquestador se detiene al detectar `@HUMANO:`, permitiendo auditoría manual antes de continuar. | Ejecutar `approve_step.py` para reanudar. |
 | **Sin Dependencia de Memoria Volátil** | Permite recuperación inmediata tras reinicios o fallas del sistema (*Boot Sequence*). | El PM y UX leen el estado histórico directamente desde `tracker_bmad.md`. |
 | **Acceso Elevado al Sandbox (`--add-dir`)** | Permite a los agentes interactuar con archivos en carpetas de otros roles sin bloqueos de SO. | Comprobar flag `--add-dir` en el comando de inicio en `start_agents.py`. |
 | **Protocolo Fallback en Prompts** | Si una herramienta MCP falla o una ruta no existe, el agente detiene su flujo y reporta en consola sin alucinar. | Prohibición explícita de inventar datos en `anti-hallucination-policy.instructions.md`. |

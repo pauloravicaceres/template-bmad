@@ -71,9 +71,15 @@ Dirígete a la terminal del agente **Business Storyteller** (o envía un prompt 
 
 ---
 
-### Paso 4: Monitoreo Autónomo
+### Paso 4: Monitoreo Autónomo y Aprobación (HITL)
 - **Si la idea es ambigua:** El Business Storyteller formulará 3 a 4 preguntas en su panel. Responde en el mismo chat para que proceda a generar `idea_*.md`.
-- **A partir de la delegación:** El Watcher detectará la orden `@PA:` y el flujo avanzará de forma 100% desatendida a través de PA -> PM -> BA -> QA -> UX.
+- **A partir de la delegación:** El Watcher detectará la orden `@PA:` y el flujo avanzará hacia el PA.
+- **Aprobación Manual:** Cuando el PA termina el Product Brief, detiene el flujo solicitando aprobación (`@HUMANO:`). Para continuar:
+  1. Revisa el archivo generado en `files/product-analyst/`.
+  2. Abre una nueva terminal y ejecuta `python utils/approve_step.py`.
+  3. Selecciona la opción del agente (ej. `[2] Product Analyst`) y confirma con `s`.
+  4. El script despachará la orden `@PM:` y el Watcher despertará automáticamente.
+- El resto del flujo procederá de forma desatendida a través de PM -> BA -> QA -> UX.
 - Cada tarea completada generará un entregable en su respectiva carpeta dentro de `files/` y disparará un commit automático en Git.
 
 ---

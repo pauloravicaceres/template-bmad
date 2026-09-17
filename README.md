@@ -10,7 +10,7 @@
 * **Arquitectura Modular de Agentes:** Cada agente define su rol (`agents/*.agent.md`) y reglas satélite (`instructions/*.instructions.md`), auto-ensambladas en tiempo de ejecución (`AGENTS.md`) por el orquestador.
 * **Inyección Atómica en Terminales (TTY):** Resolución dinámica de IDs de paneles en tiempo de ejecución para inyectar comandos directamente a los procesos mediante `herdr pane run`.
 * **Integración Avanzada de MCP:** Lectura de configuraciones JSON globales (`config_bmad.json`), extracción de contexto documental y guardado de entregables en rutas aisladas (`files/`) vía `MCP Filesystem` y generación de pantallas con `MCP Stitch`.
-* **Discovery Interactivo (HITL):** El Business Storyteller (BS) puede pausar la automatización para aclarar requerimientos con el usuario antes de delegar.
+* **Aprobación Manual (HITL):** Soporte para interrupciones controladas (`@HUMANO:`), permitiendo auditar y aprobar entregables (ej. Product Brief vía `utils/approve_step.py`) o aclarar requerimientos antes de continuar la automatización.
 * **Control de Concurrencia y FinOps:** Candado de disparo único en el orquestador (`watcher_bmad.py`) y asignación granular de modelos/esfuerzo de razonamiento en `utils/start_agents.py`.
 * **Trazabilidad Continua:** Commits automáticos en Git por cada tarea procesada con éxito.
 
@@ -87,7 +87,8 @@
 flowchart TD
     Idea["💡 Idea Cruda del Stakeholder"] --> BS["1. Business Storyteller (BS)<br><i>Discovery y Optimización</i>"]
     BS -->|idea_*.md| PA["2. Product Analyst (PA)<br><i>Product Brief (PRD)</i>"]
-    PA -->|pb_*.md| PM["3. Product Manager (PM)<br><i>MVP y Backlog de Épicas</i>"]
+    PA -->|@HUMANO: pb_*.md| HITL["👤 Aprobación Manual<br><i>(approve_step.py)</i>"]
+    HITL -->|@PM:| PM["3. Product Manager (PM)<br><i>MVP y Backlog de Épicas</i>"]
     PM -->|mvp_*.md| BA["4. Business Analyst (BA)<br><i>Historias de Usuario (Gherkin)</i>"]
     BA -->|hu_*.md| QA{"5. QA Documental (QA)<br><i>Auditoría de Trazabilidad</i>"}
     QA -->|Rechazo / Feedback| BA
