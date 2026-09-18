@@ -13,6 +13,7 @@ summary: >
   descubrimiento de ideas (Business Storyteller), redacción de Product Briefs (Product Analyst),
   gestión de alcance y backlog de MVP (Product Manager), especificación BDD/Gherkin (Business Analyst),
   auditoría documental rigurosa (QA Documental) y diseño de wireframes interactivos (Designer UX).
+  Incluye un motor dinámico de inyección de habilidades (skills) para capacidades modulares.
 
 audience:
   - analistas-de-negocio
@@ -40,6 +41,12 @@ capabilities:
   - bmad-watcher-orchestrator
   - bmad-mcp-filesystem-tools
   - bmad-mcp-stitch-tools
+  - bmad-dynamic-skill-injection
+  - skill-export-pdf
+  - skill-git-commit
+  - skill-read-pdf
+  - skill-pb-validator
+  - skill-hu-validator
 
 risk_level: medio
 requires_human_approval: true   # Discovery interactivo HITL en BS + control de bucles de QA

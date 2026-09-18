@@ -20,8 +20,10 @@ flowchart TB
         W -- "Monitorea" --> T
     end
 
-    subgraph Configuracion [Configuración Global]
+    subgraph Configuracion [Configuración y Extensibilidad]
         JSON{"config_bmad.json<br><i>Diccionario de Rutas</i>"}
+        SKILLS_G[("📁 /skills<br><i>Skills Globales</i>")]
+        SKILLS_L[("📁 /*/skills<br><i>Skills Locales</i>")]
     end
 
     subgraph Entorno_Herdr [Flota de Agentes BMAD]
@@ -188,7 +190,7 @@ sequenceDiagram
 
 ### Detalle de las Fases:
 
-1. **Compilación y Arranque:** Al iniciar `watcher_bmad.py`, el motor lee las carpetas `agents/` e `instructions/` de cada agente y ensambla su archivo unificado `AGENTS.md`. `start_agents.py` despliega la grilla de terminales en Herdr asignando modelos LLM y permisos de sandbox (`--add-dir`).
+1. **Compilación Modular y Arranque:** Al iniciar `watcher_bmad.py`, el motor lee las carpetas `agents/` e `instructions/` de cada agente y ensambla su archivo unificado `AGENTS.md`. Durante este proceso, resuelve dinámicamente las etiquetas `[IMPORT_SKILL: path/SKILL.md]`, inyectando el contenido de las *skills* locales (específicas del agente) o globales (transversales al proyecto). Luego, `start_agents.py` despliega la grilla de terminales en Herdr asignando modelos LLM y permisos de sandbox (`--add-dir`).
 2. **Entrada y Discovery:** El stakeholder proporciona una idea cruda en el panel de `business-storyteller`. Si la idea es ambigua, el agente ejecuta preguntas interactivas (HITL). Al resolver la narrativa, guarda `idea_*.md` y escribe `@PA:` en el tracker.
 3. **Análisis de Producto:** El Watcher detecta la línea `@PA:`, valida el estado `idle` del panel y le inyecta la instrucción. El PA lee la idea, genera `pb_*.md` y notifica `@HUMANO:`. Al desconocer este comando, el Watcher se queda inactivo (en pausa).
 4. **Aprobación Manual (HITL):** El operador humano verifica el Product Brief. Si está conforme, ejecuta `python utils/approve_step.py`, selecciona al Product Analyst y aprueba (s/n). El script inyecta la orden `@PM:` en el tracker, despertando nuevamente al orquestador.
@@ -223,6 +225,7 @@ sequenceDiagram
 | Invariante | Razón | Cómo verificar |
 |---|---|---|
 | **Modelo Lineal (Token-Passing)** | Erradica condiciones de carrera, colisiones de TTY y sobrescritura de búfer en terminales. | Revisar que solo un agente recibe órdenes por ciclo en el log del Watcher. |
+| **Inyección Dinámica de Skills** | Permite modularizar y reutilizar capacidades (`[IMPORT_SKILL: ...]`) reduciendo la duplicación de código en los prompts. | Verificar la existencia de las carpetas `/skills` locales o globales. |
 | **Aislamiento por Carpetas en `files/`** | Evita la corrupción de datos y colisión de nombres entre entregables de diferentes etapas. | Verificar jerarquía estricta en el directorio `files/`. |
 | **Pausa Controlada (HITL)** | El orquestador se detiene al detectar `@HUMANO:`, permitiendo auditoría manual antes de continuar. | Ejecutar `approve_step.py` para reanudar. |
 | **Sin Dependencia de Memoria Volátil** | Permite recuperación inmediata tras reinicios o fallas del sistema (*Boot Sequence*). | El PM y UX leen el estado histórico directamente desde `tracker_bmad.md`. |

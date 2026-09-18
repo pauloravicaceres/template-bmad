@@ -105,7 +105,23 @@ Cuando el Designer UX procese la última épica del Backlog del MVP, emitirá la
 
 ---
 
-## 5. Solución de Problemas
+## 5. Extensibilidad (Inyección Dinámica de Skills)
+
+El ecosistema permite agregar nuevas habilidades (*skills*) a los agentes de forma modular, sin duplicar código en múltiples archivos.
+
+### Cómo crear e inyectar un Skill
+1. **Define la ubicación:**
+   - **Skill Global:** Si la habilidad será usada por múltiples agentes (ej. exportar a PDF), créala en la raíz: `skills/nombre-skill/SKILL.md`.
+   - **Skill Local:** Si es específica de un dominio (ej. validación de Product Briefs), créala dentro del agente: `product-analyst/skills/nombre-skill/SKILL.md`.
+2. **Importa el Skill:** En el archivo de instrucciones (`.instructions.md`) del agente, añade la siguiente etiqueta en la línea donde deseas inyectar el contenido:
+   ```markdown
+   [IMPORT_SKILL: skills/nombre-skill/SKILL.md]
+   ```
+3. **Recompila:** Reinicia `watcher_bmad.py`. El orquestador leerá la etiqueta, buscará el archivo local o globalmente, e inyectará su contenido en el `AGENTS.md` final del agente.
+
+---
+
+## 6. Solución de Problemas
 
 | Síntoma | Causa Probable | Solución Recomendada |
 |---|---|---|
@@ -118,7 +134,7 @@ Cuando el Designer UX procese la última épica del Backlog del MVP, emitirá la
 
 ---
 
-## 6. Referencias
+## 7. Referencias
 
 - **Manual General:** [`README.md`](./README.md)
 - **Arquitectura del Sistema:** [`ARCHITECTURE.md`](./ARCHITECTURE.md)

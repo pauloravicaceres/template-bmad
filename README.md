@@ -11,6 +11,7 @@
 * **Inyección Atómica en Terminales (TTY):** Resolución dinámica de IDs de paneles en tiempo de ejecución para inyectar comandos directamente a los procesos mediante `herdr pane run`.
 * **Integración Avanzada de MCP:** Lectura de configuraciones JSON globales (`config_bmad.json`), extracción de contexto documental y guardado de entregables en rutas aisladas (`files/`) vía `MCP Filesystem` y generación de pantallas con `MCP Stitch`.
 * **Aprobación Manual (HITL):** Soporte para interrupciones controladas (`@HUMANO:`), permitiendo auditar y aprobar entregables (ej. Product Brief vía `utils/approve_step.py`) o aclarar requerimientos antes de continuar la automatización.
+* **Inyección Dinámica de Skills:** Motor de compilación que integra de manera modular habilidades transversales (globales) y de dominio (locales) en los agentes en tiempo de ejecución.
 * **Control de Concurrencia y FinOps:** Candado de disparo único en el orquestador (`watcher_bmad.py`) y asignación granular de modelos/esfuerzo de razonamiento en `utils/start_agents.py`.
 * **Trazabilidad Continua:** Commits automáticos en Git por cada tarea procesada con éxito.
 
@@ -40,6 +41,7 @@
 ├── manifest.yaml                     # Manifiesto de capacidades y gobernanza del plugin
 ├── catalog-info.yaml                 # Definición para el catálogo Backstage
 │
+├── /skills                           # Repositorio global de habilidades (export-pdf, etc.)
 ├── /utils                            # Scripts de automatización y mantenimiento
 │   ├── start_agents.py               # Despliega la grilla de terminales en Herdr (Rutas dinámicas)
 │   ├── clean_files.py                # Limpia interactivamente los entregables en files/
@@ -47,6 +49,7 @@
 │
 ├── /business-storyteller             # Agente BS: Discovery y narrativa de negocio
 ├── /product-analyst                  # Agente PA: Product Brief (PRD)
+│   └── /skills                       # Skills locales de dominio (ej. pb-validator)
 ├── /product-manager                  # Agente PM: Alcance, MVP y Backlog
 ├── /business-analyst                 # Agente BA: Historias de Usuario (BDD/Gherkin)
 ├── /qa-documental                    # Agente QA: Auditoría de trazabilidad y calidad
@@ -87,8 +90,8 @@
 flowchart TD
     Idea["💡 Idea Cruda del Stakeholder"] --> BS["1. Business Storyteller (BS)<br><i>Discovery y Optimización</i>"]
     BS -->|idea_*.md| PA["2. Product Analyst (PA)<br><i>Product Brief (PRD)</i>"]
-    PA -->|@HUMANO: pb_*.md| HITL["👤 Aprobación Manual<br><i>(approve_step.py)</i>"]
-    HITL -->|@PM:| PM["3. Product Manager (PM)<br><i>MVP y Backlog de Épicas</i>"]
+    PA -->|pb_*.md| HITL["👤 Aprobación Manual<br><i>(approve_step.py)</i>"]
+    HITL -->|Aprobado| PM["3. Product Manager (PM)<br><i>MVP y Backlog de Épicas</i>"]
     PM -->|mvp_*.md| BA["4. Business Analyst (BA)<br><i>Historias de Usuario (Gherkin)</i>"]
     BA -->|hu_*.md| QA{"5. QA Documental (QA)<br><i>Auditoría de Trazabilidad</i>"}
     QA -->|Rechazo / Feedback| BA

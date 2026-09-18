@@ -86,3 +86,7 @@ hu_[ID]_[nombre_corto].md
 - La **Orden de Delegación** para el QA (sección 5) es siempre **una sola línea sin saltos de línea internos**. Este requisito es mecánico (el Watcher parsea línea por línea); no afecta al formato del resto del documento.
 - No incluir detalles técnicos (stack, APIs, frameworks) en las secciones 1–4.
 - En el **Escenario B (corrección por QA):** sobreescribir el archivo `hu_*.md` existente aplicando únicamente las observaciones del feedback. No alterar las secciones que el QA no marcó.
+
+
+[IMPORT_SKILL: skills/hu-validator/SKILL.md]
+[IMPORT_SKILL: skills/export-pdf/SKILL.md]

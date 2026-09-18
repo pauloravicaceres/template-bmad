@@ -93,3 +93,6 @@ pb_[Nombre_Corto].md
 1. {{Pregunta crítica 1 relacionada a un dato marcado como ❓ No documentado}}.
 2. {{Pregunta crítica 2 sobre reglas de negocio ambiguas que el PM y BA no deben inventar}}.
 ```
+
+[IMPORT_SKILL: skills/pb-validator/SKILL.md]
+[IMPORT_SKILL: skills/export-pdf/SKILL.md]

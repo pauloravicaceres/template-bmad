@@ -1,9 +1,9 @@
-# Orquestador Centralizado Monolítico (Modelo Secuencial Estricto)
 import time
 import os
 import json
 import subprocess
 import random
+import re  # NUEVO: Necesario para procesar las etiquetas de inyección de Skills
 from pathlib import Path
 
 # ==========================================
@@ -11,43 +11,68 @@ from pathlib import Path
 # ==========================================
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent
 TRACKER_PATH = str(DIRECTORIO_RAIZ / "files" / "tracker_bmad.md")
+SKILLS_DIR = DIRECTORIO_RAIZ / "skills"  # NUEVO: Directorio global de habilidades
 
 # ==========================================
-# NUEVO: MOTOR DE COMPILACIÓN (ESTRATEGIA 1)
+# NUEVO: MOTOR DE COMPILACIÓN CON INYECCIÓN DE SKILLS
 # ==========================================
 def compilar_agentes_modulares():
     print("\n🛠️ [Build] Iniciando ensamblaje de agentes modulares...")
-    # Agrega aquí futuros agentes modulares (ej. qa-documental)
     agentes_modulares = ["business-storyteller", "product-analyst", "product-manager",
                          "business-analyst", "qa-documental", "designer-ux"]
+    
+    # Aseguramos que la carpeta de skills exista para no generar errores
+    SKILLS_DIR.mkdir(parents=True, exist_ok=True)
+    
+    # Función interna inteligente para Local y Global
+    def inyectar_skill(match):
+        ruta_relativa = match.group(1).strip() # ej: "skills/hu-validator/SKILL.md"
+        
+        # 1. Intentar buscar en la carpeta LOCAL del agente (ej. /business-analyst/skills/...)
+        skill_local_path = ruta_agente / ruta_relativa
+        
+        # 2. Intentar buscar en la carpeta GLOBAL del proyecto (ej. /skills/...)
+        skill_global_path = DIRECTORIO_RAIZ / ruta_relativa
+        
+        if skill_local_path.exists():
+            print(f"   🧩 [Skill Local] Inyectando '{ruta_relativa}'...")
+            return f"\n\n## 🛠️ SKILL LOCAL: {skill_local_path.parent.name.upper()}\n" + skill_local_path.read_text(encoding='utf-8')
+            
+        elif skill_global_path.exists():
+            print(f"   🌍 [Skill Global] Inyectando '{ruta_relativa}'...")
+            return f"\n\n## 🌍 SKILL GLOBAL: {skill_global_path.parent.name.upper()}\n" + skill_global_path.read_text(encoding='utf-8')
+            
+        else:
+            print(f"   ⚠️ [Skill] Error: No se encontró '{ruta_relativa}' ni local ni globalmente.")
+            return f"\n\n> ⚠️ **ERROR DE ENSAMBLAJE:** No se encontró la skill `{ruta_relativa}`.\n"
+        
     
     for nombre in agentes_modulares:
         ruta_agente = DIRECTORIO_RAIZ / nombre
         if not ruta_agente.exists():
             continue
             
-        # Archivos origen y directorio de instrucciones
         agent_file = ruta_agente / "agents" / f"{nombre}.agent.md"
         instrucciones_dir = ruta_agente / "instructions"
-        
-        # Archivo destino: AGENTS.md en la raíz de la carpeta del agente
         target_file = ruta_agente / "AGENTS.md"
         
         if agent_file.exists() and instrucciones_dir.exists():
-            # 1. Leer el rol y comportamiento base (sin renombrar ni modificar el original)
             contenido = agent_file.read_text(encoding='utf-8')
             
             contenido += "\n\n## ==========================================\n"
             contenido += "## REGLAS Y ESTÁNDARES ADJUNTOS (AUTO-ENSAMBLADO)\n"
             contenido += "## ==========================================\n"
             
-            # 2. Leer e inyectar cada archivo satélite
             for inst_file in instrucciones_dir.glob("*.instructions.md"):
                 titulo = inst_file.stem.upper().replace('-', ' ').replace('.INSTRUCTIONS', '')
-                contenido += f"\n\n## {titulo}\n"
-                contenido += inst_file.read_text(encoding='utf-8')
+                inst_contenido = inst_file.read_text(encoding='utf-8')
+              
+                # Buscamos todas las ocurrencias de [IMPORT_SKILL: archivo.md] y las reemplazamos
+                inst_contenido = re.sub(r"\[IMPORT_SKILL:\s*(.+?)\]", inyectar_skill, inst_contenido)
                 
-            # 3. Guardar el archivo final unificado que leerá Herdr
+                contenido += f"\n\n## {titulo}\n"
+                contenido += inst_contenido
+                
             target_file.write_text(contenido, encoding='utf-8')
             print(f"✅ [Build] AGENTS.md ensamblado exitosamente en la raíz de /{nombre}.")
 
@@ -112,9 +137,7 @@ def extraer_instrucciones(linea):
             
     return tareas
 
-
 def iniciar_watcher():
-    # EJECUCIÓN DEL BUILD STEP (Asumiendo que tienes compilar_agentes_modulares)
     compilar_agentes_modulares()
     print("-" * 50)
     
@@ -125,9 +148,6 @@ def iniciar_watcher():
     cola_tareas = []
     hash_tareas_historicas = set()
     
-    # ==========================================
-    # NUEVO: LÓGICA DE RECUPERACIÓN (WARM BOOT)
-    # ==========================================
     if os.path.exists(TRACKER_PATH):
         with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
             lineas = [l for l in f.readlines() if l.strip()]
@@ -137,11 +157,9 @@ def iniciar_watcher():
             print(f"\n📂 Tracker detectado con {len(lineas)} eventos históricos.")
             print(f"Última instrucción registrada:\n>> {ultima_linea}\n")
             
-            # Le damos el control al humano para decidir el estado
             respuesta = input("🔄 ¿Deseas reanudar la ejecución desde esta última instrucción? (s/n): ")
             
             if respuesta.lower() == 's':
-                # Al restarle 1, obligamos al watcher a "leer" la última línea como si fuera nueva
                 num_lineas_leidas = len(lineas) - 1
                 print("🔓 Modo Recuperación: Re-encolando la última tarea...\n")
             else:
@@ -149,8 +167,7 @@ def iniciar_watcher():
                 print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
         else:
             num_lineas_leidas = 0
-    # ==========================================
-    
+            
     while True:
         try:
             if os.path.exists(TRACKER_PATH):
