@@ -1,5 +1,5 @@
 ---
-description: 'Usar al generar interfaces visuales, llamadas al servidor Stitch y wireframes ASCII. Establece la regla 1 a 1 de escenarios Gherkin vs estados visuales y el estándar de diseño estructural.'
+description: 'Usar al generar interfaces visuales y wireframes ASCII. Establece la regla 1 a 1 de escenarios Gherkin vs estados visuales y el estándar de diseño estructural.'
 applyTo: '**'
 ---
 
@@ -21,20 +21,9 @@ Cada Criterio de Aceptación (CA) redactado bajo sintaxis Gherkin (`Dado / Cuand
 
 ---
 
-## 2. Protocolo Híbrido: Stitch + Wireframes ASCII
+## 2. Protocolo de Diseño: Wireframes ASCII
 
-Todo estado visual debe documentarse bajo una estructura dual:
-
-### Acción A — Generación en Stitch (Servidor MCP)
-1. Invocar la herramienta `generate_screen_from_text` (o la herramienta correspondiente del servidor `stitch`).
-2. **Estructura del Prompt en Stitch:** Redactar la descripción detallada en **inglés**, especificando:
-   - Tipo de dispositivo (Responsive Mobile / Desktop).
-   - Jerarquía visual y componentes (Cards, Inputs, Primary Buttons, Alerts).
-   - Estilo funcional limpio, sin distracciones estéticas irrelevantes.
-3. Extraer el identificador generado (`screenId`) y registrarlo con la URL canónica del proyecto.
-
-### Acción B — Wireframing Estructural en ASCII
-Dentro del bloque de código `text` de cada estado, representar con precisión la topología de la interfaz:
+Todo estado visual debe documentarse representando con precisión la topología de la interfaz dentro del bloque de código `text`:
 
 ```text
 +-------------------------------------------------------------------+
@@ -59,3 +48,6 @@ Dentro del bloque de código `text` de cada estado, representar con precisión l
 Cada estado visual debe concluir obligatoriamente con una **Nota de Interfaz** que detalle:
 - **Disparadores de Estado:** Qué evento exacto provoca la transición hacia esta pantalla.
 - **Reglas de Componente:** Comportamiento dinámico (ej. campos con auto-focus, dropdowns con búsqueda en tiempo real, modales con backdrop no descartable).
+
+
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

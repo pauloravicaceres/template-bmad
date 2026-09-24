@@ -1,4 +1,7 @@
 {
+  "project_name": "inventario",
+  "created_at": "2026-09-22 23:10:42",
+  "tracker": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\tracker_bmad.md",
   "routes_bmad": {
     "business-storyteller": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\business-storyteller\\",
     "product-analyst": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\product-analyst\\",
@@ -6,6 +9,9 @@
     "business-analyst": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\business-analyst\\",
     "qa-documental": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\qa-documental\\",
     "designer-ux": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\designer-ux\\",
-    "tracker": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\tracker_bmad.md"
+    "solutions-architect": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\solutions-architect\\",
+    "data-architect": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\data-architect\\",
+    "api-architect": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\api-architect\\",
+    "qa-tech": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\qa-tech\\"
   }
 }

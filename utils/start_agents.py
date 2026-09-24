@@ -8,39 +8,22 @@ from pathlib import Path
 # ==========================================
 WORKSPACE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Motor de Grilla (2 Columnas). 
-# El panel actual (donde corre este script) será la esquina superior izquierda.
-# AGENTS_CONFIG = {
-#     # Fila 1 (La izquierda es el script actual, cortamos a la derecha para iniciar la columna 2)
-#     "business-storyteller": {"target": "CURRENT_PANE",         "direction": "right"},
-    
-#     # Fila 2
-#     "product-analyst":      {"target": "CURRENT_PANE",         "direction": "down"},
-#     "product-manager":      {"target": "business-storyteller", "direction": "down"},
-    
-#     # Fila 3
-#     "business-analyst":     {"target": "product-analyst",      "direction": "down"},
-#     "qa-documental":        {"target": "product-manager",      "direction": "down"},
-    
-#     # Fila 4 (Columna Izquierda extra para equilibrar a los 6 agentes)
-#     "designer-ux":          {"target": "business-analyst",     "direction": "down"}
-# }
-
+# Motor de Grilla (2 Filas x 5 Columnas para 10 Agentes). 
+# El panel actual (donde corre este script) será la base.
 AGENTS_CONFIG = {
-    # Fila 1 (La izquierda es el script actual, cortamos a la derecha para iniciar la columna 2)
-    "business-analyst": {"target": "CURRENT_PANE", "direction": "right"},
-    
-    # Fila 2
+    # Fila 1 (Negocio, Producto, Requisitos y Diseño)
     "business-storyteller": {"target": "CURRENT_PANE", "direction": "down"},
-    "qa-documental": {"target": "business-analyst", "direction": "down"},
+    "product-manager":      {"target": "business-storyteller", "direction": "right"},
+    "business-analyst":    {"target": "product-manager", "direction": "right"},
+    "qa-documental":       {"target": "business-analyst", "direction": "right"},
+    "designer-ux":         {"target": "qa-documental", "direction": "right"},
     
-    # Fila 3
-    "product-analyst": {"target": "business-storyteller", "direction": "down"},
-    "designer-ux": {"target": "qa-documental", "direction": "down"},
-    
-    # Fila 4 (Columna Izquierda extra para equilibrar a los 6 agentes)
-    "product-manager": {"target": "product-analyst", "direction": "down"}
+    # Fila 2 (Análisis Técnico, Arquitectura e Ingeniería)
+    "product-analyst":     {"target": "business-storyteller", "direction": "down"},
+    "solutions-architect": {"target": "product-manager", "direction": "down"},
+    "data-architect":      {"target": "business-analyst", "direction": "down"},
+    "api-architect":       {"target": "qa-documental", "direction": "down"},
+    "qa-tech":             {"target": "designer-ux", "direction": "down"}
 }
 
 def obtener_panel_actual():
@@ -70,14 +53,10 @@ def inicializar_flota():
         # ---------------------------------------------------------
         # LÓGICA DE CONCATENACIÓN DE MODELO + ESFUERZO
         # ---------------------------------------------------------
-        # Extraemos valores o usamos los defaults
         modelo_base = config.get("model", "Gemini 3.7 Flash")
         esfuerzo = config.get("effort", "low")
-        
-        # Capitalizamos el esfuerzo (low -> Low) para que coincida con la sintaxis de la CLI
         esfuerzo_cap = esfuerzo.capitalize()
         
-        # Armamos el string final (ej: "Gemini 3.7 Flash (Low)")
         if f"({esfuerzo_cap})" not in modelo_base:
             modelo_final = f"{modelo_base} ({esfuerzo_cap})"
         else:

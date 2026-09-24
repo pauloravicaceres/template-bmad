@@ -50,8 +50,8 @@ hu_[ID]_[nombre_corto].md
 ## 2. CRITERIOS DE ACEPTACIÓN (BDD)
 *(Cada CA debe ser testable e independiente)*
 
-- **CA-01 — {{Nombre_Happy_Path}}:** Dado {{contexto}}, Cuando {{acción}}, Entonces {{resultado medible}}.
-- **CA-02 — {{Nombre_Sad_Path}}:** Dado {{contexto_de_error}}, Cuando {{acción_con_fallo}}, Entonces {{manejo_del_error}}.
+- **CA-01 — {{Nombre_Happy_Path}}:** **Dado** {{contexto}}, **Cuando** {{acción}}, **Entonces** {{resultado medible}}.
+- **CA-02 — {{Nombre_Sad_Path}}:** **Dado** {{contexto_de_error}}, **Cuando** {{acción_con_fallo}}, **Entonces** {{manejo_del_error}}.
 
 ## 3. 📊 DIAGRAMAS DE LA HU
 <bloque ```mermaid ... ``` relevante, o: _Sin diagrama directamente vinculado a esta HU._>
@@ -61,6 +61,10 @@ hu_[ID]_[nombre_corto].md
 - [ ] El Happy Path y al menos un Sad Path están cubiertos con Gherkin testable.
 - [ ] No existen detalles de implementación técnica en el cuerpo de la HU.
 - [ ] Los ⚠️ SUPUESTOS y ❓ Puntos Abiertos están explícitamente registrados.
+
+<!-- OPCIONAL — incluir solo si la épica tiene supuestos -->
+## Supuestos
+- <supuestos heredados del PRD o inferidos razonablemente, marcados como tal>
 
 <!-- OPCIONAL — incluir solo si la épica tiene componente visual -->
 ## 🎨 REFERENCIA UX/UI
@@ -84,9 +88,16 @@ hu_[ID]_[nombre_corto].md
 
 - El contenido `⚠️ [PROPUESTO]` aplica a todo lo inferido por el agente (anti-alucinación).
 - La **Orden de Delegación** para el QA (sección 5) es siempre **una sola línea sin saltos de línea internos**. Este requisito es mecánico (el Watcher parsea línea por línea); no afecta al formato del resto del documento.
-- No incluir detalles técnicos (stack, APIs, frameworks) en las secciones 1–4.
+- No incluir detalles de implementación técnica (stack, frameworks) en las secciones 1–4. *Excepción: Para proyectos Headless, se permite terminología de integración (códigos HTTP, esquemas JSON) para definir los Criterios de Aceptación.*
 - En el **Escenario B (corrección por QA):** sobreescribir el archivo `hu_*.md` existente aplicando únicamente las observaciones del feedback. No alterar las secciones que el QA no marcó.
+
+### ⚠️ Directiva para Proyectos Headless / Procesamiento de Datos
+Si el proyecto no tiene interfaz de usuario (ej. ETL, SSIS, Webhooks, APIs puras):
+- **Prohibido usar verbos de UI:** No uses "hacer clic", "ver pantalla" o "mostrar modal".
+- **Enfoque Backend:** Los escenarios `Dado / Cuando / Entonces` deben enfocarse en estados de persistencia, respuestas de red, códigos HTTP, logs de error, validación de esquemas (JSON/XML) y tolerancia a fallos (ej. "Entonces el registro corrupto se mueve a la tabla DLQ sin detener el job general").
+
 
 
 [IMPORT_SKILL: skills/hu-validator/SKILL.md]
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]
 [IMPORT_SKILL: skills/export-pdf/SKILL.md]

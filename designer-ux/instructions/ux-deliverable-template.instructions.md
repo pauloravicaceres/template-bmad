@@ -38,7 +38,6 @@ ux_[ID]_[nombre_corto].md
 
 ### Estado 1: {{Nombre del Estado - Happy Path}}
 - **Escenario Cubierto:** {{Referencia exacta al Criterio de Aceptación, ej. CA-01}}
-- **ID de Pantalla en Stitch:** `{{URL_O_ID_DEVUELTO_POR_STITCH}}`
 - **Wireframe Estructural (ASCII):**
 \`\`\`text
 {{Diagrama ASCII limpio representando la jerarquía de la pantalla}}
@@ -49,7 +48,6 @@ ux_[ID]_[nombre_corto].md
 
 ### Estado 2: {{Nombre del Estado - Sad Path / Error}}
 - **Escenario Cubierto:** {{Referencia al Criterio de Aceptación de error, ej. CA-02 o CA-03}}
-- **ID de Pantalla en Stitch:** `{{URL_O_ID_DEVUELTO_POR_STITCH}}`
 - **Wireframe Estructural (ASCII):**
 \`\`\`text
 {{Diagrama ASCII mostrando el modal, toast o mensaje de validación fallida}}
@@ -76,5 +74,7 @@ Usa `read_file` para obtener el texto del tracker, añade un salto de línea (`\
 `@PM: Los wireframes para la HU [Nombre] están listos en [Archivo]. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.`
 
 **SI EL MVP CONCLUYE (Épicas diseñadas = Épicas del backlog), imprime exactamente esto:**
-`@HUMANO: Todas las épicas del MVP han sido diseñadas. El alcance ha concluido exitosamente.`
+`@SA: El diseño visual del MVP ha concluido exitosamente. Por favor, lee el Product Brief y el MVP, y define el stack tecnológico y las reglas arquitectónicas del proyecto.`
 ```
+
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

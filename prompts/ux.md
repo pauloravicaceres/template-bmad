@@ -49,7 +49,7 @@ Una vez que hayas finalizado la interacción con el servidor Stitch y tengas los
 
 1. **Lectura de Configuración:** Usa `read_file` para leer la `RUTA_CONFIGURACION` definida en tus variables de entorno.
 2. **Guardado del Mapa Visual:** Extrae del JSON la ruta correspondiente a `CARPETA_SALIDA` (dentro del nodo `routes_bmad`). Usa `write_file` para crear el archivo de diseño en esa ruta absoluta. **Importante:** Construye el nombre del archivo basándote estrictamente en la Historia de Usuario que leíste. Si la historia de entrada se llama `hu_01_agendamiento.md`, tu entregable debe guardarse como `ux_01_agendamiento.md`. El texto que envíes a la herramienta debe ser tu respuesta estructurada completa (Resumen, Mapa de Estados y Decisiones).
-3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
+3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (clave raíz `tracker`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
    - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
    - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
    - Añade un salto de línea real (Enter o `\n`) al final del texto que acabas de leer para separar visualmente el historial de tu nueva intervención.

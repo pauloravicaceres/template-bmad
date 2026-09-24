@@ -9,6 +9,10 @@ AGENTS = {
     "ba:": "business-analyst",
     "qa:": "qa-documental",
     "ux:": "designer-ux",
+    "sa:": "solutions-architect",
+    "da:": "data-architect",
+    "api:": "api-architect",
+    "qt:": "qa-tech"
 }
 
 

@@ -19,7 +19,8 @@ SKILLS_DIR = DIRECTORIO_RAIZ / "skills"  # NUEVO: Directorio global de habilidad
 def compilar_agentes_modulares():
     print("\n🛠️ [Build] Iniciando ensamblaje de agentes modulares...")
     agentes_modulares = ["business-storyteller", "product-analyst", "product-manager",
-                         "business-analyst", "qa-documental", "designer-ux"]
+                         "business-analyst", "qa-documental", "designer-ux",
+                         "solutions-architect", "data-architect", "api-architect", "qa-tech"]
     
     # Aseguramos que la carpeta de skills exista para no generar errores
     SKILLS_DIR.mkdir(parents=True, exist_ok=True)
@@ -115,9 +116,13 @@ def extraer_instrucciones(linea):
         "@PM:": "product-manager",
         "@BA:": "business-analyst",
         "@QA:": "qa-documental",
-        "@UX:": "designer-ux"
+        "@UX:": "designer-ux",
+        "@SA:": "solutions-architect",
+        "@DA:": "data-architect",
+        "@API:": "api-architect",
+        "@QT:": "qa-tech"
     }
-    
+
     tareas = []
     todas_las_etiquetas = list(agentes.keys())
     

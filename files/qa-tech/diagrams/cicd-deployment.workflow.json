@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Pipeline de Integración y Despliegue Continuo (CI/CD)",
+    "output": "cicd-deployment.html",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "full-pipeline",
+        "label": "Pipeline Completo de Entrega",
+        "focus": ["code_edit", "git_push", "gh_workflow", "vitest_gate", "vercel_build", "edge_deploy", "recruiter_view"],
+        "note": "Flujo automatizado desde el commit en git hasta la disponibilidad en la red Edge."
+      },
+      {
+        "id": "quality-gates",
+        "label": "Quality Gates en CI",
+        "focus": ["gh_workflow", "vitest_gate", "ci_failed"],
+        "note": "Barreras de seguridad automáticas: ESLint, comprobación de tipos y Vitest."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "dev", "label": "Espacio de Desarrollo" },
+    { "id": "ci", "label": "GitHub Actions (CI)" },
+    { "id": "hosting", "label": "Vercel Cloud (CD)" },
+    { "id": "delivery", "label": "Reclutador / Usuario Final" },
+    { "id": "exceptions", "label": "Fallo de Integración", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "authoring", "label": "Desarrollo", "fromCol": 0, "toCol": 1 },
+    { "id": "verification", "label": "Quality Gates", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "deployment", "label": "Compilación y Edge", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "groups": [
+    { "id": "ci_pipeline", "label": "Verificación Automatizada", "lane": "ci", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "vercel_prod", "label": "Producción Jamstack", "lane": "hosting", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["code_edit", "git_push", "gh_workflow", "vitest_gate", "vercel_build", "edge_deploy", "recruiter_view"],
+  "nodes": [
+    { "id": "code_edit", "lane": "dev", "col": 0, "type": "frontend", "label": "Código TypeScript", "sublabel": "src/ & data/", "width": 140 },
+    { "id": "git_push", "lane": "dev", "col": 1, "type": "frontend", "label": "Git Push", "sublabel": "branch main", "width": 140 },
+    { "id": "gh_workflow", "lane": "ci", "col": 2, "type": "backend", "label": "GitHub Actions", "sublabel": "lint + typecheck", "tag": "automated", "width": 140 },
+    { "id": "vitest_gate", "lane": "ci", "col": 3, "type": "security", "label": "Vitest Suite", "sublabel": "unit testing", "tag": "blocking", "width": 140 },
+    { "id": "ci_failed", "lane": "exceptions", "col": 3, "type": "security", "label": "Bloqueo de Build", "sublabel": "notifica error", "width": 140 },
+    { "id": "vercel_build", "lane": "hosting", "col": 4, "type": "cloud", "label": "Vercel SSG Build", "sublabel": "next build", "tag": "static export", "width": 140 },
+    { "id": "edge_deploy", "lane": "hosting", "col": 5, "type": "cloud", "label": "Vercel Edge CDN", "sublabel": "distribución global", "width": 140 },
+    { "id": "recruiter_view", "lane": "delivery", "col": 5, "type": "external", "label": "Carga Inmediata", "sublabel": "TTFB < 100ms", "width": 140 }
+  ],
+  "edges": [
+    { "from": "code_edit", "to": "git_push" },
+    { "from": "git_push", "to": "gh_workflow", "label": "trigger", "variant": "emphasis" },
+    { "from": "gh_workflow", "to": "vitest_gate" },
+    { "from": "vitest_gate", "to": "vercel_build", "label": "tests pass", "variant": "emphasis" },
+    { "from": "vitest_gate", "to": "ci_failed", "label": "fallo", "variant": "security", "role": "error" },
+    { "from": "vercel_build", "to": "edge_deploy" },
+    { "from": "edge_deploy", "to": "recruiter_view", "label": "HTTPS", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Entrega Continua Confiable", "items": ["Push automático a rama principal dispara el workflow", "Build SSG pre-compilado listo para distribución en Edge"] },
+    { "dot": "rose", "title": "Quality Gates Inquebrantables", "items": ["ESLint y TypeCheck bloquean errores sintácticos", "Vitest previene regresiones antes del despliegue"] },
+    { "dot": "cyan", "title": "Alto Rendimiento", "items": ["Alojamiento 100% Free Tier en Vercel Hobby", "Tiempo de respuesta ultrarrápido sin servidores activos"] }
+  ]
+}

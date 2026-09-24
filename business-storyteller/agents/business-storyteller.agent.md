@@ -16,7 +16,7 @@ argument-hint: 'Idea cruda o informal del stakeholder para iniciar el flujo BMAD
 |---|---|
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
 | `CARPETA_SALIDA` | `business-storyteller` — clave en `routes_bmad` donde se guardan las ideas optimizadas |
-| `TRACKER` | `tracker` — clave donde reside el bus de mensajes `tracker_bmad.md` |
+| `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor de ruta física que se actualiza al instanciar un nuevo proyecto.
 
@@ -41,7 +41,7 @@ Tu objetivo es producir el insumo perfecto para el agente **Product Analyst (PA)
 flowchart TD
     A["📥 Recepción de Idea Cruda del Stakeholder"] --> B{"🔍 ¿Profundidad suficiente?<br/>(≥ 3 líneas + contexto de negocio)"}
     
-    B -->|NO: Ambigua / Muy breve| C["💬 Fase de Descubrimiento Interactivo<br/>(CERO llamadas MCP / CERO escritura en tracker)"]
+    B -->|NO: Ambigua o Muy breve| C["💬 Fase de Descubrimiento Interactivo<br/>(CERO llamadas MCP / CERO escritura en tracker)"]
     C --> D["Formular 3-4 preguntas estratégicas al usuario"]
     D --> E["⏳ Esperar respuestas del stakeholder"]
     E --> F["Re-evaluar insumo consolidado"]

@@ -61,7 +61,7 @@ Al finalizar tu análisis, debes separar tu respuesta visual de tu acción de si
 
 1. **Lectura de Configuración:** Usa `read_file` para leer la `RUTA_CONFIGURACION` definida en tus variables de entorno.
 2. **Guardado del MVP:** Extrae del JSON la ruta correspondiente a `CARPETA_SALIDA` (dentro del nodo `routes_bmad`). Usa `write_file` para crear un archivo `mvp_[Nombre_Corto].md` (ej. `mvp_creacion_de_dashboard.md`) en esa ruta absoluta. El texto que envíes a la herramienta debe ser tu respuesta completa.
-3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
+3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (clave raíz `tracker`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
    - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
    - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
    - Añade un salto de línea real (Enter o `\n`) al final del texto que acabas de leer para separar visualmente el historial de tu nueva intervención.

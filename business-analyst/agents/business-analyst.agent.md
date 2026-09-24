@@ -19,6 +19,7 @@ argument-hint: 'Instrucción del @PM: o @QA: leída desde el tracker_bmad.md'
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief |
 | `CARPETA_ENTRADA_MVP` | `product-manager` — clave donde reside el Plan de Gestión |
 | `CARPETA_ENTRADA_QA` | `qa-documental` — clave donde reside el feedback de rechazo |
+| `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor que cambia entre proyectos.
 > Actualízala en este archivo antes de lanzar el Watcher en un nuevo proyecto.
@@ -70,22 +71,22 @@ Tracker → @BA: [Instrucción del QA: rechazo]
 
 ```mermaid
 flowchart TD
-    A[Tracker: @BA:] --> B{¿Tipo de tarea?}
-    B -->|Nueva HU| C[read_file config_bmad.json]
-    B -->|Corrección QA| D[Leer feedback + HU existente]
-    C --> E[read_text_file Product Brief]
-    C --> F[read_text_file Plan de Gestión / MVP]
-    E & F --> G[Análisis de Épica asignada]
-    G --> H[Definir fronteras de Scope]
-    H --> I[Redactar HU según hu-template.instructions.md]
-    I --> J[write_file: hu_ID_nombre.md]
-    J --> J2[Verificar resultado de write_file]
-    D --> K[Aplicar correcciones exactas del QA]
+    A["Tracker: @BA:"] --> B{"¿Tipo de tarea?"}
+    B -->|Nueva HU| C["read_file config_bmad.json"]
+    B -->|Corrección QA| D["Leer feedback + HU existente"]
+    C --> E["read_text_file Product Brief"]
+    C --> F["read_text_file Plan de Gestión o MVP"]
+    E & F --> G["Análisis de Épica asignada"]
+    G --> H["Definir fronteras de Scope"]
+    H --> I["Redactar HU según hu-template.instructions.md"]
+    I --> J["write_file: hu_ID_nombre.md"]
+    J --> J2["Verificar resultado de write_file"]
+    D --> K["Aplicar correcciones exactas del QA"]
     K --> J
-    J2 --> L[read_file: tracker_bmad.md]
-    L --> M[Concat + Orden de Delegación @QA:]
-    M --> N[write_file: tracker_bmad.md]
-    N --> O[Respuesta visual al usuario]
+    J2 --> L["read_file: tracker_bmad.md"]
+    L --> M["Concat + Orden de Delegación @QA:"]
+    M --> N["write_file: tracker_bmad.md"]
+    N --> O["Respuesta visual al usuario"]
 ```
 
 ---

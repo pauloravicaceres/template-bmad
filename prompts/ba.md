@@ -49,8 +49,7 @@ Al finalizar tu redacción, debes separar tu respuesta visual de tu acción de s
 
 1. **Lectura de Configuración:** Usa `read_file` para leer la `RUTA_CONFIGURACION` definida en tus variables de entorno.
 2. **Guardado de la Historia:** Extrae del JSON la ruta correspondiente a `CARPETA_SALIDA` (dentro del nodo `routes_bmad`). Usa `write_file` para crear un archivo `hu_[ID]_[Nombre_Corto].md` (ej. `hu_01_agendamiento.md`) en esa ruta absoluta. El texto que envíes a la herramienta debe ser tu respuesta completa (desde el punto 1 hasta el 5).
-3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker`. Usa `write_file` para actualizar el archivo del tracker. El contenido a escribir debe ser ÚNICAMENTE el texto generado en el punto 6 (Delegación para el QA). **Asegúrate de enviarlo a la herramienta como una sola cadena de texto continuo sin saltos de línea**, iniciando estrictamente con la etiqueta `@QA:`.
-4. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (dentro del nodo `routes_bmad`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
+3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta correspondiente al `tracker` (clave raíz `tracker`). Para actualizar este archivo, sigue estrictamente esta regla de anexión:
    - NUNCA sobrescribas el archivo completo eliminando el contenido previo.
    - Primero ejecuta `read_file` sobre la ruta del `tracker` para obtener el texto existente.
    - Añade un salto de línea real (Enter o `\n`) al final del texto que acabas de leer para separar visualmente el historial de tu nueva intervención.

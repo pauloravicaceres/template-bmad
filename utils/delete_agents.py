@@ -8,7 +8,11 @@ AGENTS = [
     "product-manager",
     "business-analyst", 
     "qa-documental", 
-    "designer-ux"
+    "designer-ux",
+    "solutions-architect",
+    "data-architect",
+    "api-architect",
+    "qa-tech"
 ]
 
 def seleccionar_carpetas():

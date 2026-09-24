@@ -92,6 +92,14 @@ La especificación de requerimientos contenida en el archivo `{{NOMBRE_ARCHIVO_H
 
 ---
 
-## 3. AUTORIZACIÓN DE TRANSICIÓN
-Se autoriza formalmente el traspaso del requerimiento al **Diseñador UX** para la elaboración de la arquitectura de información, flujos visuales y wireframes correspondientes.
+## 3. AUTORIZACIÓN DE TRANSICIÓN Y ORDEN DE DELEGACIÓN (TRACKER)
+*(Analiza la naturaleza del proyecto leyendo el Product Brief y elige ÚNICAMENTE la instrucción que corresponda anexar al tracker_bmad.md)*
+
+- **SI EL PROYECTO TIENE INTERFAZ GRÁFICA (Web, App, Dashboard):**
+  Se autoriza formalmente el traspaso del requerimiento al **Diseñador UX**.
+  **Instrucción para el Tracker:** `@UX: La Historia de Usuario [NOMBRE_HU] ha sido aprobada por QA. Por favor, procede a diseñar los wireframes y estados visuales.`
+
+- **SI EL PROYECTO ES HEADLESS (APIs, ETL, SSIS, Procesos de Backend sin UI):**
+  Se autoriza formalmente el traspaso directo a la **Fase de Arquitectura**.
+  **Instrucción para el Tracker:** `@SA: La Historia de Usuario [NOMBRE_HU] ha sido aprobada por QA. Al ser un proyecto Headless, el diseño UX se omite. Por favor, formula tus preguntas para definir el stack tecnológico y la gobernanza.`
 ```

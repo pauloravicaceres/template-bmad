@@ -1,116 +1,146 @@
-# Guía de Instanciación y Configuración para Nuevos Proyectos (BMAD)
+# Guía de Instanciación, Parametrización y Despliegue (BMAD)
 
-Este manual documenta los pasos necesarios para clonar, parametrizar y desplegar el framework `template-bmad` en una nueva ruta o entorno de trabajo, garantizando el aislamiento de datos, la correcta configuración de las herramientas MCP y el flujo orquestado entre los 6 agentes del ciclo de vida BMAD.
+Este manual documenta el procedimiento oficial para inicializar, parametrizar y desplegar una nueva instancia del framework **BMAD** (Business, Management, Architecture & Development). Garantiza el aislamiento físico de datos, la configuración determinista de rutas para herramientas MCP y el flujo orquestado a través del roster oficial de agentes.
 
 ---
 
-## 1. Puntos de Contacto (Parametrización Obligatoria)
+## 1. Principios Fundamentales del Framework
 
-Al clonar la plantilla a una nueva ubicación en disco (ejemplo: `C:\Proyectos\Nuevo-BMAD`), se deben actualizar los siguientes archivos críticos:
+Antes de inicializar un entorno, ten presentes las reglas de arquitectura:
 
-### 1.1. `config_bmad.json` (Diccionario Central de Rutas)
-Contiene las rutas absolutas donde los agentes buscarán insumos y guardarán entregables vía MCP Filesystem.
-- **Acción:** Reemplazar la ruta raíz base por la del nuevo proyecto en todas las claves.
+1. **El Tracker como Único Bus de Comunicación:** Los agentes nunca se comunican directamente. Todo intercambio de instrucciones y artefactos ocurre registrando eventos en `files/tracker_bmad.md`.
+2. **Plantillas Deterministas:** Ningún agente inventa la estructura de sus salidas; todos los artefactos se generan respetando sus plantillas `.instructions.md`.
+3. **Lógica de Bypass Headless vs UI:**
+   - **Proyectos con UI:** Transitan el pipeline completo: `PA -> PM -> BA -> QA -> UX -> SA -> DA -> API -> QT`.
+   - **Proyectos Headless (ETL, SSIS, APIs puras):** Saltan dinámicamente la etapa de diseño UX: `PA -> PM -> BA -> QA -> SA -> DA -> QT`.
+4. **Pausa Obligatoria Human-in-the-Loop (HITL):** Al finalizar el Product Brief, el flujo entra en pausa obligatoria (`@HUMANO:`). El inicio del PM depende formalmente de la ejecución de `python utils/approve_step.py`.
+
+---
+
+## 2. Inicialización Automatizada con `init_bmad.py`
+
+El framework cuenta con el script oficial [`init_bmad.py`](./init_bmad.py) en la raíz del proyecto para automatizar el aprovisionamiento de un nuevo proyecto en un solo paso:
+
+```bash
+python init_bmad.py "Nombre de Mi Nuevo Proyecto"
+```
+
+### Qué realiza automáticamente este script:
+1. **Scaffolding de Almacenamiento:** Crea todas las carpetas dentro de `files/` para el roster completo de agentes:
+   - `files/business-storyteller/`
+   - `files/product-analyst/`
+   - `files/product-manager/`
+   - `files/business-analyst/`
+   - `files/qa-documental/`
+   - `files/designer-ux/`
+   - `files/solutions-architect/`
+   - `files/data-architect/`
+   - `files/api-architect/`
+   - `files/qa-tech/`
+2. **Generación del Diccionario de Rutas (`config_bmad.json`):** Construye el archivo de configuración con rutas absolutas canónicas adaptadas al directorio actual.
+3. **Reseteo Limpio del Tracker:** Inicializa `files/tracker_bmad.md` como un archivo totalmente vacío y limpio, asegurando que no existan instrucciones residuales que confundan al orquestador.
+
+---
+
+## 3. Puntos de Contacto Manuales (Si se parametriza sin `init_bmad.py`)
+
+Si optas por clonar y configurar manualmente sin ejecutar `init_bmad.py`, debes actualizar:
+
+### 3.1. `config_bmad.json` (Diccionario Central de Rutas)
+Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
 
 ```json
 {
+  "project_name": "Nuevo-Proyecto",
+  "created_at": "2026-09-23 12:00:00",
+  "tracker": "D:\\Ruta\\Al\\Proyecto\\files\\tracker_bmad.md",
   "routes_bmad": {
-    "business-storyteller": "<RUTA_NUEVO_PROYECTO>\\files\\business-storyteller\\",
-    "product-analyst": "<RUTA_NUEVO_PROYECTO>\\files\\product-analyst\\",
-    "product-manager": "<RUTA_NUEVO_PROYECTO>\\files\\product-manager\\",
-    "business-analyst": "<RUTA_NUEVO_PROYECTO>\\files\\business-analyst\\",
-    "qa-documental": "<RUTA_NUEVO_PROYECTO>\\files\\qa-documental\\",
-    "designer-ux": "<RUTA_NUEVO_PROYECTO>\\files\\designer-ux\\",
-    "tracker": "<RUTA_NUEVO_PROYECTO>\\files\\tracker_bmad.md"
+    "business-storyteller": "D:\\Ruta\\Al\\Proyecto\\files\\business-storyteller\\",
+    "product-analyst": "D:\\Ruta\\Al\\Proyecto\\files\\product-analyst\\",
+    "product-manager": "D:\\Ruta\\Al\\Proyecto\\files\\product-manager\\",
+    "business-analyst": "D:\\Ruta\\Al\\Proyecto\\files\\business-analyst\\",
+    "qa-documental": "D:\\Ruta\\Al\\Proyecto\\files\\qa-documental\\",
+    "designer-ux": "D:\\Ruta\\Al\\Proyecto\\files\\designer-ux\\",
+    "solutions-architect": "D:\\Ruta\\Al\\Proyecto\\files\\solutions-architect\\",
+    "data-architect": "D:\\Ruta\\Al\\Proyecto\\files\\data-architect\\",
+    "api-architect": "D:\\Ruta\\Al\\Proyecto\\files\\api-architect\\",
+    "qa-tech": "D:\\Ruta\\Al\\Proyecto\\files\\qa-tech\\"
   }
 }
 ```
 
----
-
-### 1.2. Archivo Bus de Mensajes (`files/tracker_bmad.md`)
-Es el archivo central de orquestación y sincronización de estado.
-- **Acción:** Limpiar el contenido del archivo si contiene eventos o historial del proyecto anterior. Debe quedar completamente vacío.
+### 3.2. Vaciado del Bus de Mensajes (`files/tracker_bmad.md`)
+Asegura que el archivo exista físicamente pero su contenido sea una cadena vacía (0 bytes) antes de encender el Watcher.
 
 ---
 
-## 2. Estructura de Directorios y Aislamiento de Datos
-
-La estructura del proyecto separa el código fuente/instrucciones del almacenamiento de artefactos generados por los agentes:
+## 4. Estructura Completa del Directorio
 
 ```text
-<RUTA_NUEVO_PROYECTO>/
-├── config_bmad.json                  # Diccionario de rutas del nuevo proyecto
-├── watcher_bmad.py                   # Orquestador del ciclo de vida y compilador de agentes (Rutas Dinámicas)
-├── README.md                         # Documentación general de arquitectura
-├── SETUP.md                          # Guía de configuración para nuevas instancias
+/template-bmad
+├── config_bmad.json                  # Diccionario de rutas absolutas para MCP
+├── watcher_bmad.py                   # Orquestador del ciclo de vida y compilador modular
+├── init_bmad.py                      # Scaffolding automatizado para nuevas instancias
+├── README.md                         # Portada principal y arquitectura del framework
+├── ARCHITECTURE.md                   # Diagramas técnicos detallados y topología
+├── GUIDE.md                          # Guía operativa de usuario y solución de incidentes
+├── SETUP.md                          # Manual de instanciación y puesta en marcha
+├── BMAD_AUDIT_REPORT.md              # Reporte de certificación de salud arquitectónica
 │
-├── /utils                            # Herramientas de automatización
-│   ├── start_agents.py               # Despliega la grilla de terminales herdr (Rutas Dinámicas)
-│   ├── clean_files.py                # Limpia los entregables en files/
-│   └── delete_agents.py              # Elimina los AGENTS.md auto-compilados
+├── /skills                           # Repositorio global de habilidades inyectables
+│   ├── /tracker-logger               # Habilidad canónica de anexión segura al tracker
+│   ├── /export-pdf                   # Exportador determinista a PDF
+│   └── /git-commit                   # Autoguardado y control de versiones
 │
-├── /business-storyteller             # Definiciones modulares del agente BS
-│   ├── /agents                       # business-storyteller.agent.md
-│   └── /instructions                 # Reglas satélite y templates
-├── /product-analyst                  # Definiciones modulares del agente PA
-├── /product-manager                  # Definiciones modulares del agente PM
-├── /business-analyst                 # Definiciones modulares del agente BA
-│   ├── /agents                       # business-analyst.agent.md (Variables de entorno)
-│   └── /instructions                 # Reglas satélite y templates
-├── /qa-documental                    # Definiciones modulares del agente QA
-├── /designer-ux                      # Definiciones modulares del agente UX
+├── /utils                            # Scripts de mantenimiento y control
+│   ├── start_agents.py               # Despliega la flota completa en paneles Herdr
+│   ├── approve_step.py               # Gateway de aprobación humana (HITL)
+│   ├── clean_files.py                # Limpiador interactivo de entregables en files/
+│   └── delete_agents.py              # Limpiador de archivos AGENTS.md auto-ensamblados
 │
-└── /files                            # Directorio de entregables (Aislamiento de Datos)
-    ├── tracker_bmad.md               # Bus de eventos y cola de orquestación
-    ├── /business-storyteller         # Salidas BS: ideas estructuradas (idea_*.md)
-    ├── /product-analyst              # Salidas PA: product briefs (pb_*.md)
-    ├── /product-manager              # Salidas PM: planes de gestión / MVP (mvp_*.md)
-    ├── /business-analyst             # Salidas BA: historias de usuario (hu_*.md)
-    ├── /qa-documental                # Salidas QA: reportes de auditoría (qa_*.md)
-    └── /designer-ux                  # Salidas UX: especificaciones UI/UX (ux_*.md)
+├── /business-storyteller             # Agente BS: Discovery y narrativa de negocio
+├── /product-analyst                  # Agente PA: Product Brief (PRD de 8 secciones)
+│   └── /skills                       # Skills locales (pb-validator)
+├── /product-manager                  # Agente PM: Backlog y priorización de Ruta Crítica
+├── /business-analyst                 # Agente BA: Historias de Usuario con BDD Gherkin
+│   └── /skills                       # Skills locales (hu-validator)
+├── /qa-documental                    # Agente QA: Control de calidad documental y Bypass
+├── /designer-ux                      # Agente UX: Wireframes ASCII y auditoría de MVP
+├── /solutions-architect              # Agente SA: Stack tecnológico y gobernanza técnica
+├── /data-architect                   # Agente DA: Modelo Entidad-Relación y ADRs de datos
+├── /api-architect                    # Agente API: Contratos de integración REST/GraphQL
+├── /qa-tech                          # Agente QT: Auditoría cruzada y compilación del TDD
+│
+└── /files                            # Aislamiento físico de entregables generados
+    ├── tracker_bmad.md               # Único bus de datos y cola de tareas
+    └── */                            # Carpetas individuales por rol
 ```
 
-> **Nota de Aislamiento:** Al iniciar un nuevo proyecto, todas las subcarpetas dentro de `files/` deben estar completamente vacías para evitar cruce de contexto entre proyectos.
+---
+
+## 5. Scripts de Utilidad y Mantenimiento (`/utils`)
+
+- **`python utils/clean_files.py`:** Permite vaciar interactivamente los entregables de una o todas las subcarpetas de `files/` (opción `T`), manteniendo intacta la estructura y el `tracker_bmad.md`.
+- **`python utils/delete_agents.py`:** Elimina los archivos `AGENTS.md` compilados para forzar una regeneración limpia desde las carpetas `agents/` e `instructions/`.
+- **`python utils/start_agents.py`:** Abre la grilla completa en **Herdr**, divide los paneles, configura permisos de sandbox (`--add-dir`) y aplica la estrategia FinOps de modelos y esfuerzos de razonamiento.
+- **`python utils/approve_step.py`:** Administra las pausas de aprobación obligatoria (HITL). Permite abrir el artefacto producido, revisarlo en el sistema operativo y emitir la orden formal correspondiente (`@PM:`, `@DEV:`, etc.) en el tracker.
 
 ---
 
-## 3. Utilidades de Mantenimiento (`/utils`)
+## 6. Checklist de Puesta en Marcha (Paso a Paso)
 
-El framework cuenta con scripts auxiliares en `utils/` para agilizar el ciclo de vida:
+Para poner en marcha un nuevo proyecto desde cero:
 
-1. **`python utils/clean_files.py`:**
-   - Permite vaciar de forma interactiva las subcarpetas de `files/` (individualmente o todas con `T`), preservando `tracker_bmad.md`.
-2. **`python utils/delete_agents.py`:**
-   - Elimina los archivos `AGENTS.md` generados por el compilador para forzar una reconstrucción limpia desde las carpetas `agents/` e `instructions/`.
-3. **`python utils/start_agents.py`:**
-   - Abre y nombra automáticamente los 6 paneles en `herdr`, configura la asignación de modelos y los permisos `--add-dir`. Resuelve dinámicamente el `WORKSPACE_DIR` mediante `Path(__file__)`, por lo que **no requiere edición manual de rutas**.
-   - **Asignación de Modelo y Esfuerzo (FinOps / LLMOps):**
-     - El modelo asignado a los agentes se puede personalizar editando la variable `modelo_base` (por defecto `"Gemini 3.7 Flash"`).
-     - El nivel de esfuerzo de razonamiento se configura en la variable `esfuerzo` (opciones: `"low"`, `"medium"`, `"high"`).
-     - *Opcional:* También se pueden sobreescribir estos valores de manera individual por agente dentro del diccionario `AGENTS_CONFIG` agregando las claves `"model"` y `"effort"`.
-
----
-
-## 4. Checklist de Puesta en Marcha (Paso a Paso)
-
-Sigue esta lista de verificación secuencial para inicializar y levantar el proyecto en una nueva ruta:
-
-- [ ] **1. Clonar/Copiar:** Copiar el directorio `template-bmad` a la nueva ruta deseada.
-- [ ] **2. Limpieza de Entregables:** Ejecutar `python utils/clean_files.py` y seleccionar opción `T` para vaciar entregables previos.
-- [ ] **3. Limpieza de Compilación previa:** Ejecutar `python utils/delete_agents.py` si existen archivos `AGENTS.md` residuales.
-- [ ] **4. Actualizar `config_bmad.json`:** Modificar todas las rutas absolutas para que apunten al nuevo directorio.
-- [ ] **5. Limpiar `files/tracker_bmad.md`:** Asegurar que el archivo de tracker esté completamente vacío.
-- [ ] **6. Iniciar el Watcher (Compilación y Escucha):**
-  - En una terminal, ejecutar el orquestador:
-    ```bash
-    python watcher_bmad.py
-    ```
-  - *Nota:* El watcher compilará automáticamente los agentes modulares (`compilar_agentes_modulares()`), generando los archivos `AGENTS.md` unificados para cada agente y quedará escuchando `tracker_bmad.md`.
-- [ ] **7. Desplegar los Agentes en `herdr`:**
-  - En la terminal principal de `herdr`, ejecutar el script de arranque:
-    ```bash
-    python utils/start_agents.py
-    ```
-  - Esto dividirá la pantalla en los paneles correspondientes, asignará los modelos (FinOps) e inicializará cada agente con acceso dinámico a la ruta (`--add-dir`), cargando sus `AGENTS.md` compilados.
-- [ ] **8. Verificación:** Confirmar que todos los agentes queden en estado activo/idle en `herdr` y que el watcher reporte que está a la escucha de nuevas instrucciones.
+- [ ] **Paso 1: Clonar plantilla:** Copiar el repositorio a la carpeta de destino.
+- [ ] **Paso 2: Inicializar entorno:** Ejecutar `python init_bmad.py "Nombre del Proyecto"` para crear las carpetas de `files/`, generar `config_bmad.json` y vaciar `tracker_bmad.md`.
+- [ ] **Paso 3: Arrancar el Orquestador:**
+  ```bash
+  python watcher_bmad.py
+  ```
+  *(El Watcher auto-ensamblará los archivos `AGENTS.md` inyectando las skills y quedará escuchando el tracker).*
+- [ ] **Paso 4: Levantar la flota de agentes en Herdr:**
+  En tu terminal principal de Herdr, ejecutar:
+  ```bash
+  python utils/start_agents.py
+  ```
+- [ ] **Paso 5: Disparar el requerimiento:** Inyectar la primera orden en la terminal de `@BS:` o directamente en el tracker.

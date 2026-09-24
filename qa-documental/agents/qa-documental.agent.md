@@ -18,6 +18,7 @@ argument-hint: 'Instrucción del @BA: leída desde el tracker_bmad.md'
 | `CARPETA_SALIDA` | `qa-documental` — clave en `routes_bmad` donde se guardan los reportes |
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief (Fuente de la Verdad) |
 | `CARPETA_ENTRADA_HU` | `business-analyst` — clave donde residen las Historias de Usuario a auditar |
+| `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor de ruta física que se actualiza al instanciar un nuevo proyecto.
 
@@ -37,7 +38,7 @@ Determinas con criterio quirúrgico e imparcial si la especificación es matemá
 
 ```mermaid
 flowchart TD
-    A["Tracker: Instrucción @QA:"] --> B["read_file: RUTA_CONFIGURACION"]
+    A["Tracker: Instrucción QA"] --> B["read_file: RUTA_CONFIGURACION"]
     B --> C["Extraer rutas: CARPETA_ENTRADA_PB y CARPETA_ENTRADA_HU"]
     C --> D["read_file: Product Brief pb_*.md"]
     C --> E["read_file: Historia de Usuario hu_*.md"]
@@ -51,10 +52,12 @@ flowchart TD
     K --> L["read_file: tracker_bmad.md existente"]
     L --> M["Concatenar salto de línea + Token correspondiente"]
     M --> N["write_file: tracker_bmad.md consolidado"]
-    H -.->|Token| O["@BA: Notificación de rechazo con ruta de feedback"]
-    I -.->|Token| P["@UX: Aprobación formal para avanzar a Wireframes"]
+    H -.->|Token| O["Handoff BA: Notificación de rechazo con ruta de feedback"]
+    I -.->|Evaluar Tipo de Proyecto| P{"¿Es Headless?"}
+    P -->|NO: Tiene UI| Q["Handoff UX: Aprobación formal para avanzar a Wireframes"]
+    P -->|SÍ: Sin UI| R["Handoff SA: Bypass de UX, avanzar a Arquitectura"]
 ```
-
+  
 ---
 
 ## ⚙️ ACCIONES DE SISTEMA OBLIGATORIAS (MCP)
@@ -67,7 +70,7 @@ flowchart TD
 | 4 | `write_file` | Guardar el reporte (`aprobado_qa_*.md` o `feedback_qa_*.md`) en `CARPETA_SALIDA` |
 | 5 | `read_file` | **Verificar lectura del reporte recién escrito** (comprobación post-escritura obligatoria) |
 | 6 | `read_file` | Leer el contenido completo actual de `tracker_bmad.md` |
-| 7 | `write_file` | Reescribir el tracker anexando la orden `@BA:` o `@UX:` al final |
+| 7 | `write_file` | Reescribir el tracker anexando la orden `@BA:` , `@UX:` o `@SA:` al final |
 
 ---
 

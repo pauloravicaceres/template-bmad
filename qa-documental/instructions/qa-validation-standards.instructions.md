@@ -72,3 +72,6 @@ applyTo: '**'
                                 │
                                 └──► APROBADO (Opción B)
 ```
+
+
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

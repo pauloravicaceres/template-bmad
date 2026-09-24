@@ -1,12 +1,12 @@
 ---
-description: 'Usar para estructurar la salida física del archivo pb_[Nombre_Corto].md en la carpeta product-analyst. Define las 8 secciones canónicas obligatorias validadas por el Quality Gate del Watcher en BMAD.'
+description: 'Usar para estructurar la salida física del archivo pb_[Nombre_Corto].md en la carpeta product-analyst. Define las secciones canónicas obligatorias validadas por el Quality Gate del Watcher en BMAD.'
 applyTo: '**'
 ---
 
 # Plantilla Determinista del Product Brief
 
 > Estructura canónica obligatoria para el artefacto generado por el Product Analyst (`pb_[Nombre_Corto].md`).
-> Las 8 secciones son de presencia obligatoria para superar el Quality Gate hacia el Product Manager.
+> Las 8 secciones de contenido más la orden de delegación son de presencia obligatoria para superar el Quality Gate hacia el Product Manager.
 
 ---
 
@@ -18,7 +18,7 @@ pb_[Nombre_Corto].md
 
 ---
 
-## Estructura Canónica de las 8 Secciones
+## Estructura Canónica de las Secciones
 
 ```markdown
 # PRODUCT BRIEF: {{TITULO_DEL_PRODUCTO}}
@@ -92,7 +92,16 @@ pb_[Nombre_Corto].md
 
 1. {{Pregunta crítica 1 relacionada a un dato marcado como ❓ No documentado}}.
 2. {{Pregunta crítica 2 sobre reglas de negocio ambiguas que el PM y BA no deben inventar}}.
+
+---
+
+## 9. ORDEN DE DELEGACIÓN PARA EL TRACKER (PAUSA OBLIGATORIA HITL)
+*(Al finalizar el Product Brief, el flujo entra en pausa obligatoria Human-in-the-Loop para revisión humana. La activación de @PM: depende de utils/approve_step.py)*
+
+@HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el @PM:.
 ```
 
+
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]
 [IMPORT_SKILL: skills/pb-validator/SKILL.md]
 [IMPORT_SKILL: skills/export-pdf/SKILL.md]

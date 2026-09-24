@@ -50,7 +50,7 @@ Una vez completada la fase de preguntas, genera tu respuesta bajo la siguiente e
 **ACCIONES DE SISTEMA OBLIGATORIAS (USO DE MCP):**
 1. **Lectura de Configuración:** Usa `read_file` para leer la `RUTA_CONFIGURACION`.
 2. **Guardado de la Idea de Usuario:** Extrae del JSON la ruta de `CARPETA_SALIDA` (en `routes_bmad`). Usa `write_file` para crear el archivo `idea_[Nombre_Corto].md` conteniendo **ÚNICA Y EXCLUSIVAMENTE** el texto narrativo de la idea optimizada (sin etiquetas XML, sin bloques de código y sin justificaciones analíticas).
-3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta del `tracker` (en `routes_bmad`):
+3. **Actualización del Tracker (Handoff Autónomo):** Extrae del JSON la ruta del `tracker` (clave raíz `tracker`):
    - NUNCA sobrescribas el archivo completo.
    - Lee el contenido actual con `read_file`.
    - Concatena al final un salto de línea (`\n`) seguido de:

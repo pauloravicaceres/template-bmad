@@ -1,14 +1,23 @@
-# BMAD Multi-Agent Ecosystem — Arquitectura
+# BMAD Multi-Agent Ecosystem — Arquitectura Técnica
 
-> Este documento describe la arquitectura técnica, la topología física y lógica de agentes, los diagramas de componentes y secuencia, la gestión de estado y el ciclo de vida secuencial (*Token-Passing*) del ecosistema multi-agente BMAD sobre Herdr y herramientas MCP.
+> Este documento describe la arquitectura técnica, la topología física y lógica de agentes, los diagramas de componentes y secuencia, la gestión de estado y el ciclo de vida secuencial (*Token-Passing*) del framework BMAD (Business, Management, Architecture & Development) sobre Herdr y herramientas MCP.
 
 ---
 
 ## 1. Visión General y Topología del Sistema
 
-El framework BMAD está diseñado para guiar una iniciativa de software desde su concepción inicial informal hasta la especificación técnica completa con criterios BDD y wireframes de interfaz de usuario.
+El framework BMAD está diseñado para guiar una iniciativa de software desde su concepción inicial informal hasta la especificación técnica completa con criterios BDD, wireframes de interfaz de usuario, diseño de persistencia relacional (MER), contratos de integración de APIs y auditoría cruzada de arquitectura (TDD).
 
-La orquestación se realiza mediante un demonio en Python (`watcher_bmad.py`) que escucha eventos en un bus de mensajes de texto plano (`files/tracker_bmad.md`) y despacha instrucciones a terminales independientes en **Herdr** mediante inyección TTY atómica (`herdr pane run`). Los agentes operan de manera desacoplada utilizando el Model Context Protocol (MCP) para la lectura y escritura de artefactos en disco.
+### Principios Arquitectónicos Inmutables
+1. **El Tracker como Único Bus de Datos y Comunicación:** Los agentes **NO** se comunican entre sí por chat ni invocaciones directas. Todos los agentes leen y escriben exclusivamente en un archivo central llamado `files/tracker_bmad.md`. Cada agente anexa su bitácora al final (*read -> concat -> write*) usando etiquetas formales de Handoff (ej. `@PA:`, `@PM:`, `@BA:`, `@QA:`, `@UX:`, `@SA:`, `@DA:`, `@API:`, `@QT:`).
+2. **Plantillas Deterministas:** Todos los entregables (`pb_*.md`, `mvp_*.md`, `hu_*.md`, `ux_*.md`, `tech_guidelines.md`, `db_*.md`, `api_*.md`, `tech-design_*.md`) se generan a partir de plantillas estrictas (`.instructions.md`). Prohibido permitir que un agente invente la estructura de un documento.
+3. **Lógica de Bypass Headless vs UI (Rutas Dinámicas):** El framework es consciente de la naturaleza del proyecto:
+   - **Ruta con UI (Web, Mobile, Dashboards):** `BS -> PA -> (HITL) -> PM -> BA -> QA -> UX -> SA -> DA -> API -> QT`.
+   - **Ruta Headless (ETL, SSIS, Pipelines de Datos, APIs puras):** El flujo salta automáticamente el diseño visual de interfaces: `BS -> PA -> (HITL) -> PM -> BA -> QA -> SA -> DA -> QT`.
+4. **Política Anti-Alucinación:** Ningún agente asume alcances no definidos en el Product Brief o en las Historias de Usuario. Todo supuesto debe marcarse explícitamente con `⚠️ [PROPUESTO]` o `❓ No documentado`.
+5. **Auditoría Cruzada:** El agente `qa-tech` es el compilador final. Audita matemáticamente que el diseño de base de datos (`db_*.md`) y los contratos (`api_*.md`) no se contradigan antes de generar el Technical Design Document (TDD).
+
+---
 
 ### Arquitectura de Componentes
 
@@ -16,24 +25,34 @@ La orquestación se realiza mediante un demonio en Python (`watcher_bmad.py`) qu
 flowchart TB
     subgraph Motor_Orquestacion [Motor Central de Orquestación]
         W["watcher_bmad.py<br><i>Compilador Modular + Token-Passing</i>"]
-        T[("tracker_bmad.md<br><i>Bus de Eventos</i>")]
+        T[("tracker_bmad.md<br><i>Único Bus de Eventos y Datos</i>")]
         W -- "Monitorea" --> T
     end
 
     subgraph Configuracion [Configuración y Extensibilidad]
-        JSON{"config_bmad.json<br><i>Diccionario de Rutas</i>"}
+        JSON{"config_bmad.json<br><i>Diccionario de Rutas Absolutas</i>"}
         SKILLS_G[("📁 /skills<br><i>Skills Globales</i>")]
         SKILLS_L[("📁 /*/skills<br><i>Skills Locales</i>")]
     end
 
-    subgraph Entorno_Herdr [Flota de Agentes BMAD]
-        direction LR
-        BS("Business Storyteller")
-        PA("Product Analyst")
-        PM("Product Manager")
-        BA("Business Analyst")
-        QA("QA Documental")
-        UX("Designer UX")
+    subgraph Flota_BMAD [Roster Oficial de Agentes BMAD]
+        direction TB
+        subgraph Fase_B [Fase Business]
+            BS("Business Storyteller")
+            PA("Product Analyst")
+        end
+        subgraph Fase_M [Fase Management]
+            PM("Product Manager")
+            BA("Business Analyst")
+            QA("QA Documental")
+            UX("Designer UX")
+        end
+        subgraph Fase_A [Fase Architecture]
+            SA("Solutions Architect")
+            DA("Data Architect")
+            API("API Architect")
+            QT("QA Técnico")
+        end
     end
 
     subgraph Herramientas_MCP [Servidores MCP]
@@ -41,213 +60,172 @@ flowchart TB
         MCP_ST[["MCP Stitch<br><i>Wireframes UI</i>"]]
     end
 
-    subgraph Almacenamiento [files/ - Aislamiento de Datos]
+    subgraph Almacenamiento [files/ - Aislamiento Físico de Entregables]
         DIR_BS["📁 business-storyteller"]
         DIR_PA["📁 product-analyst"]
         DIR_PM["📁 product-manager"]
         DIR_BA["📁 business-analyst"]
         DIR_QA["📁 qa-documental"]
         DIR_UX["📁 designer-ux"]
+        DIR_SA["📁 solutions-architect"]
+        DIR_DA["📁 data-architect"]
+        DIR_API["📁 api-architect"]
+        DIR_QT["📁 qa-tech"]
     end
 
-    T -- "herdr pane run" --> BS & PA & PM & BA & QA & UX
-    BS & PA & PM & BA & QA & UX -. "Lee rutas" .-> JSON
-    BS & PA & PM & BA & QA & UX === MCP_FS
+    T -- "herdr pane run" --> BS & PA & PM & BA & QA & UX & SA & DA & API & QT
+    BS & PA & PM & BA & QA & UX & SA & DA & API & QT -. "Lee rutas" .-> JSON
+    BS & PA & PM & BA & QA & UX & SA & DA & API & QT === MCP_FS
     UX === MCP_ST
-    MCP_FS --> DIR_BS & DIR_PA & DIR_PM & DIR_BA & DIR_QA & DIR_UX
-    MCP_FS -- "Anexa Evento" --> T
+    MCP_FS --> DIR_BS & DIR_PA & DIR_PM & DIR_BA & DIR_QA & DIR_UX & DIR_SA & DIR_DA & DIR_API & DIR_QT
+    MCP_FS -- "Anexa Evento (Append-Only)" --> T
 ```
 
 ---
 
-## 2. Componentes y Responsabilidades
+## 2. Roster Oficial de Agentes y Responsabilidades
 
-| Componente | Responsabilidad | Entrada | Salida |
-|---|---|---|---|
-| `watcher_bmad.py` | Compila definiciones modulares (`AGENTS.md`), monitorea `tracker_bmad.md`, encola tareas FIFO y despacha comandos vía TTY a Herdr. | Eventos en `tracker_bmad.md` | Inyección TTY (`herdr pane run`) |
-| `business-storyteller` | Evalúa ambigüedad (HITL), refina ideas crudas e inyecta dolor de negocio y actores. | Idea cruda del stakeholder | `files/business-storyteller/idea_*.md` |
-| `product-analyst` | Estructura el Product Brief (PRD) formal alineado a la metodología BMAD. | Idea refinada (`idea_*.md`) | `files/product-analyst/pb_*.md` |
-| `product-manager` | Define el alcance del MVP, arquitectura funcional y prioriza el Backlog de Épicas. | Product Brief (`pb_*.md`) | `files/product-manager/mvp_*.md` |
-| `business-analyst` | Desglosa épicas en Historias de Usuario atómicas con criterios de aceptación en Gherkin (BDD). | Backlog (`mvp_*.md`) y PB (`pb_*.md`) | `files/business-analyst/hu_*.md` |
-| `qa-documental` | Audita trazabilidad, consistencia lógica, *sad paths* y ausencia de alucinaciones. | HU (`hu_*.md`) vs PB (`pb_*.md`) | `files/qa-documental/qa_*.md` |
-| `designer-ux` | Diseña flujos UI y wireframes mediante MCP Stitch; audita alcance remanente en el Backlog. | HU aprobada (`hu_*.md`) | `files/designer-ux/ux_*.md` |
-| `MCP Filesystem` | Herramientas estandarizadas de sistema de archivos (`read_file`, `write_file`). | Rutas en `config_bmad.json` | Operaciones de E/S en disco |
-| `MCP Stitch` | Servidor MCP para generación y prototipado visual de pantallas. | Especificaciones UI en Gherkin | Wireframes y assets UI |
+| Agente | Fase BMAD | Responsabilidad Principal | Entrada Principal | Entregable Canónico |
+|---|:---:|---|---|---|
+| `business-storyteller` | Business | Refina ideas crudas, evalúa ambigüedad (HITL) e inyecta dolor de negocio y actores. | Visión informal del stakeholder | `idea_*.md` |
+| `product-analyst` | Business | Transforma la idea en un Product Brief formal de 8 secciones canónicas. Activa pausa HITL. | `idea_*.md` | `pb_*.md` |
+| `product-manager` | Management | Define el MVP por Ruta Crítica (P1-P5) y orquesta la delegación iterativa de épicas al BA. | `pb_*.md` (Aprobado HITL) | `mvp_*.md` |
+| `business-analyst` | Management | Desglosa épicas en Historias de Usuario atómicas con criterios de aceptación Gherkin (BDD). | `mvp_*.md` y `pb_*.md` | `hu_*.md` |
+| `qa-documental` | Management | Audita trazabilidad BDD, coherencia y ausencia de alucinaciones. Gestiona el Bypass Headless. | `hu_*.md` vs `pb_*.md` | `aprobado_qa_*.md` / `feedback_qa_*.md` |
+| `designer-ux` | Management / UX | Diseña estados visuales en wireframes ASCII (1 escenario BDD = 1 estado visual). | `hu_*.md` (Aprobada) | `ux_*.md` |
+| `solutions-architect` | Architecture | Formula cuestionario técnico al humano y consolida el stack y reglas de gobernanza. | `pb_*.md`, `mvp_*.md` + Q&A | `tech_guidelines.md` |
+| `data-architect` | Architecture | Modela la persistencia física: Modelo Entidad-Relación (MER), diccionario y ADRs de datos. | `hu_*.md`, `pb_*.md`, guidelines | `db_*.md` |
+| `api-architect` | Architecture | Diseña los contratos de integración (Endpoints, payloads JSON, status codes) y ADRs. | `db_*.md`, `hu_*.md` | `api_*.md` |
+| `qa-tech` | Architecture | Audita matemáticamente coherencia entre MER y API; compila el Tech Design Document (TDD). | `db_*.md` y `api_*.md` | `tech-design_*.md` |
 
 ---
 
-## 3. Flujo End-to-End y Secuencia Asíncrona
+## 3. Flujo End-to-End y Secuencia Asíncrona (Token-Passing)
 
-### Diagrama de Secuencia Asíncrona (Token-Passing)
+### Diagrama de Secuencia Completo
 
 ```mermaid
-%%{init: {
-  'theme': 'base',
-  'themeVariables': {
-    'actorBkg': '#45818E',
-    'actorBorder': '#76A5AF',
-    'actorTextColor': '#FFFFFF',
-    'actorLineColor': '#64748B',
-    'participantBkg': '#334155',
-    'participantBorder': '#475569',
-    'participantTextColor': '#FFFFFF',
-    'noteBkgColor': '#0F172A',
-    'noteBorderColor': '#3B82F6',
-    'noteTextColor': '#FFFFFF',
-    'activationBkgColor': '#7F6000',
-    'activationBorderColor': '#BF9000'
-  }
-}}%%
 sequenceDiagram
     autonumber
     actor Stakeholder
     participant W as Watcher (Python)
-    participant T as tracker_bmad.md
-    participant C as config_bmad.json
+    participant T as tracker_bmad.md (Bus)
     participant BS as Business Storyteller
     participant PA as Product Analyst
-    participant H as Humano (HITL)
+    participant H as Humano (HITL / approve_step.py)
     participant PM as Product Manager
     participant BA as Business Analyst
     participant QA as QA Documental
     participant UX as Designer UX
+    participant SA as Solutions Architect
+    participant DA as Data Architect
+    participant API as API Architect
+    participant QT as QA Técnico
 
-    Note over W, T: Watcher activo escuchando tracker_bmad.md
+    Note over W, T: Watcher activo monitoreando tracker_bmad.md (Append-Only)
     
-    Stakeholder->>BS: Prompt en CLI: "Idea de negocio"
-    activate BS
-    BS->>C: read_file (Rutas)
-    BS->>BS: Discovery / Optimización
-    BS->>C: write_file (idea_*.md)
-    BS->>T: write_file ("@PA: Idea lista...")
-    deactivate BS
-
-    W->>T: Lee nueva línea
-    W->>PA: herdr pane run [Instrucción PA]
+    Stakeholder->>BS: Prompt en CLI: Idea de negocio
+    BS->>BS: Refinamiento narrativo / Discovery
+    BS->>T: write_file ("@PA: Idea lista en idea_*.md")
     
-    activate PA
-    PA->>C: read_file (Rutas)
-    PA->>PA: Redacta Product Brief
-    PA->>C: write_file (pb_*.md)
+    W->>T: Detecta línea nueva
+    W->>PA: herdr pane run [@PA:]
+    PA->>PA: Redacta Product Brief (8 secciones canónicas)
     PA->>T: write_file ("@HUMANO: PB listo, requiere revisión...")
-    deactivate PA
-
-    Note over W, T: Watcher entra en pausa (desconoce @HUMANO)
     
+    Note over W, T: Pausa Obligatoria HITL (Watcher ignora @HUMANO)
     H->>T: Ejecuta `python utils/approve_step.py`
-    activate H
-    H->>T: Confirma aprobación (s/n)
     H->>T: write_file ("@PM: El Product Brief ha sido aprobado...")
-    deactivate H
-
-    W->>T: Lee nueva línea (@PM:)
-    W->>PM: herdr pane run [Instrucción PM]
     
-    activate PM
-    PM->>C: read_file (Rutas)
-    PM->>PM: Define MVP y Backlog
-    PM->>C: write_file (mvp_*.md)
-    PM->>T: write_file ("@BA: Desglosa Épica...")
-    deactivate PM
-
-    W->>T: Lee nueva línea
-    W->>BA: herdr pane run [Instrucción BA]
+    W->>PM: herdr pane run [@PM:]
+    PM->>PM: Define MVP y Backlog (P1..Pn)
+    PM->>T: write_file ("@BA: Desglosa Épica P1...")
     
-    activate BA
-    BA->>C: read_file (Rutas)
-    BA->>BA: Redacta HU (Gherkin)
-    BA->>C: write_file (hu_*.md)
-    BA->>T: write_file ("@QA: HU lista...")
-    deactivate BA
-
-    W->>T: Lee nueva línea
-    W->>QA: herdr pane run [Instrucción QA]
+    W->>BA: herdr pane run [@BA:]
+    BA->>BA: Redacta HU atómica con criterios Gherkin
+    BA->>T: write_file ("@QA: HU lista en hu_*.md...")
     
-    activate QA
-    QA->>C: read_file (Rutas)
-    QA->>QA: Audita Trazabilidad
+    W->>QA: herdr pane run [@QA:]
+    QA->>QA: Auditoría contra Product Brief
     
-    alt Rechazo (Loop de Corrección)
-        QA->>C: write_file (feedback_qa_*.md)
-        QA->>T: write_file ("@BA: HU rechazada...")
+    alt Rechazo Documental
+        QA->>T: write_file ("@BA: HU rechazada, subsanar feedback_qa_*.md...")
         W->>BA: Re-dispara corrección
-    else Aprobación
-        QA->>C: write_file (aprobado_qa_*.md)
-        QA->>T: write_file ("@UX: HU aprobada...")
+    else Aprobado (Tiene UI)
+        QA->>T: write_file ("@UX: HU aprobada, generar wireframes...")
+        W->>UX: herdr pane run [@UX:]
+        UX->>UX: Diseña wireframes ASCII por escenario
+        alt Épicas pendientes en MVP
+            UX->>T: write_file ("@PM: Wireframes listos. Siguiente Épica...")
+            W->>PM: Re-despacha siguiente Épica al BA
+        else MVP Concluido (Todas las épicas diseñadas)
+            UX->>T: write_file ("@SA: MVP concluido. Iniciar Arquitectura...")
+        end
+    else Aprobado (Bypass Headless - ETL/APIs puras)
+        QA->>T: write_file ("@SA: Proyecto Headless. Bypass UX, avanzar a Arquitectura...")
     end
-    deactivate QA
 
-    W->>T: Lee nueva línea
-    W->>UX: herdr pane run [Instrucción UX]
-    
-    activate UX
-    UX->>C: read_file (Rutas)
-    UX->>UX: Genera Wireframes UI (Stitch MCP)
-    UX->>C: write_file (ux_*.md)
-    UX->>T: write_file ("@PM: Siguiente Épica / Cierre")
-    deactivate UX
+    Note over W, SA: Inicio de Fase de Arquitectura
+    W->>SA: herdr pane run [@SA:]
+    SA->>T: write_file ("@HUMANO: Formular 5 preguntas de gobernanza...")
+    H->>T: Responde stack y preferencias en tracker
+    SA->>SA: Genera tech_guidelines.md
+    SA->>T: write_file ("@DA: Guidelines listas. Iniciar diseño MER...")
+
+    W->>DA: herdr pane run [@DA:]
+    DA->>DA: Diseña Modelo Entidad-Relación y ADRs
+    alt Proyecto con APIs
+        DA->>T: write_file ("@API: MER listo en db_*.md. Diseñar contratos...")
+        W->>API: herdr pane run [@API:]
+        API->>API: Diseña contratos REST/GraphQL y ADRs
+        API->>T: write_file ("@QT: Contratos listos en api_*.md. Compilar TDD...")
+    else Proyecto Headless Puro (ETL sin APIs)
+        DA->>T: write_file ("@QT: MER listo. Bypass API, compilar TDD...")
+    end
+
+    W->>QT: herdr pane run [@QT:]
+    QT->>QT: Auditoría Cruzada (MER vs API)
+    alt Inconsistencia Técnica Detectada
+        QT->>T: write_file ("@DA: o @API: Corregir inconsistencia en feedback_tech_*.md...")
+    else Arquitectura 100% Coherente
+        QT->>QT: Compila tech-design_*.md (TDD Maestro)
+        QT->>T: write_file ("@HUMANO: Arquitectura consolidada y aprobada...")
+    end
+
+    Note over W, H: Cierre de Fase Técnica / Traspaso a Codificación (@DEV:)
 ```
 
-### Detalle de las Fases:
-
-1. **Compilación Modular y Arranque:** Al iniciar `watcher_bmad.py`, el motor lee las carpetas `agents/` e `instructions/` de cada agente y ensambla su archivo unificado `AGENTS.md`. Durante este proceso, resuelve dinámicamente las etiquetas `[IMPORT_SKILL: path/SKILL.md]`, inyectando el contenido de las *skills* locales (específicas del agente) o globales (transversales al proyecto). Luego, `start_agents.py` despliega la grilla de terminales en Herdr asignando modelos LLM y permisos de sandbox (`--add-dir`).
-2. **Entrada y Discovery:** El stakeholder proporciona una idea cruda en el panel de `business-storyteller`. Si la idea es ambigua, el agente ejecuta preguntas interactivas (HITL). Al resolver la narrativa, guarda `idea_*.md` y escribe `@PA:` en el tracker.
-3. **Análisis de Producto:** El Watcher detecta la línea `@PA:`, valida el estado `idle` del panel y le inyecta la instrucción. El PA lee la idea, genera `pb_*.md` y notifica `@HUMANO:`. Al desconocer este comando, el Watcher se queda inactivo (en pausa).
-4. **Aprobación Manual (HITL):** El operador humano verifica el Product Brief. Si está conforme, ejecuta `python utils/approve_step.py`, selecciona al Product Analyst y aprueba (s/n). El script inyecta la orden `@PM:` en el tracker, despertando nuevamente al orquestador.
-5. **Gestión de Alcance y MVP:** El PM define el Backlog de Épicas y asigna la primera épica al BA mediante `@BA:`.
-6. **Especificación BDD:** El BA redacta la Historia de Usuario atómica (`hu_*.md`) con escenarios `Given-When-Then` y delega la auditoría al `@QA:`.
-7. **Bifurcación de Calidad (QA Loop):**
-   - **Rechazo:** El QA genera un reporte de observaciones y devuelve el control al `@BA:` para corrección inmediata.
-   - **Aprobación:** El QA emite la certificación y despierta al `@UX:`.
-8. **Diseño y Cierre de Ciclo:** El UX diseña los wireframes correspondientes con MCP Stitch, evalúa matemáticamente el avance del MVP en el tracker, y despierta al `@PM:` para la siguiente épica o notifica el cierre completo al `@HUMANO:`.
-
 ---
 
-## 4. Estado y Fuente de Verdad
+## 4. Gestión de Estado y Fuentes de Verdad
 
-| Dato / Estado | Ubicación | Escribe | Lee |
+El framework desacopla el almacenamiento de los entregables en subdirectorios exclusivos dentro de `files/`:
+
+| Entregable / Dominio | Ubicación Física | Agente Creador | Consumidores Principales |
 |---|---|---|---|
-| Rutas del Ecosistema | `config_bmad.json` | Operador / Configuración | Todos los agentes vía `read_file` |
-| Bus de Eventos y Handoffs | `files/tracker_bmad.md` | Agentes vía MCP (`write_file`) | `watcher_bmad.py` y agentes |
-| Definiciones Modulares | `*/agents/*.agent.md` e `*/instructions/*.md` | Equipo / Desarrollador | `watcher_bmad.py` (Compilador) |
-| Entregables de Negocio | `files/business-storyteller/` | Business Storyteller | Product Analyst |
-| Product Briefs (PRD) | `files/product-analyst/` | Product Analyst | PM, BA, QA |
-| Backlog y Plan MVP | `files/product-manager/` | Product Manager | BA, UX |
-| Historias de Usuario | `files/business-analyst/` | Business Analyst | QA Documental, UX |
-| Auditorías de Calidad | `files/qa-documental/` | QA Documental | Business Analyst |
-| Wireframes y UI Specs | `files/designer-ux/` | Designer UX | Stakeholder / Arquitectura |
-| Trazabilidad de Versiones | Repositorio Local Git | `watcher_bmad.py` (Auto-commit) | Auditoría humana / `git diff` |
+| Rutas Absolutas del Proyecto | `config_bmad.json` | `init_bmad.py` / Operador | Todos los agentes vía `read_file` |
+| Bus Central de Handoffs | `files/tracker_bmad.md` | Todos los agentes vía MCP | `watcher_bmad.py` y agentes |
+| Ideas de Negocio Refinadas | `files/business-storyteller/idea_*.md` | `business-storyteller` | `product-analyst` |
+| Product Briefs (PRD Canónico) | `files/product-analyst/pb_*.md` | `product-analyst` | `product-manager`, `business-analyst`, `qa-documental`, `solutions-architect` |
+| Backlogs y Planes MVP | `files/product-manager/mvp_*.md` | `product-manager` | `business-analyst`, `designer-ux`, `solutions-architect` |
+| Historias de Usuario BDD | `files/business-analyst/hu_*.md` | `business-analyst` | `qa-documental`, `designer-ux`, `data-architect`, `api-architect` |
+| Reportes y Certificados QA | `files/qa-documental/qa_*.md` | `qa-documental` | `business-analyst`, `designer-ux`, `solutions-architect` |
+| Wireframes y Diseños UI | `files/designer-ux/ux_*.md` | `designer-ux` | `solutions-architect`, Frontend Developer |
+| Gobernanza y Stack | `files/solutions-architect/tech_guidelines.md` | `solutions-architect` | `data-architect`, `api-architect`, `qa-tech`, Developers |
+| Diseño de Base de Datos (MER) | `files/data-architect/db_*.md` | `data-architect` | `api-architect`, `qa-tech`, Database Administrators |
+| Contratos de API | `files/api-architect/api_*.md` | `api-architect` | `qa-tech`, Backend & Frontend Developers |
+| Tech Design Document (TDD) | `files/qa-tech/tech-design_*.md` | `qa-tech` | Humano, Tech Lead, Developers |
 
 ---
 
-## 5. Decisiones e Invariantes
+## 5. Invariantes y Mecanismos de Resiliencia
 
-| Invariante | Razón | Cómo verificar |
-|---|---|---|
-| **Modelo Lineal (Token-Passing)** | Erradica condiciones de carrera, colisiones de TTY y sobrescritura de búfer en terminales. | Revisar que solo un agente recibe órdenes por ciclo en el log del Watcher. |
-| **Inyección Dinámica de Skills** | Permite modularizar y reutilizar capacidades (`[IMPORT_SKILL: ...]`) reduciendo la duplicación de código en los prompts. | Verificar la existencia de las carpetas `/skills` locales o globales. |
-| **Aislamiento por Carpetas en `files/`** | Evita la corrupción de datos y colisión de nombres entre entregables de diferentes etapas. | Verificar jerarquía estricta en el directorio `files/`. |
-| **Pausa Controlada (HITL)** | El orquestador se detiene al detectar `@HUMANO:`, permitiendo auditoría manual antes de continuar. | Ejecutar `approve_step.py` para reanudar. |
-| **Sin Dependencia de Memoria Volátil** | Permite recuperación inmediata tras reinicios o fallas del sistema (*Boot Sequence*). | El PM y UX leen el estado histórico directamente desde `tracker_bmad.md`. |
-| **Acceso Elevado al Sandbox (`--add-dir`)** | Permite a los agentes interactuar con archivos en carpetas de otros roles sin bloqueos de SO. | Comprobar flag `--add-dir` en el comando de inicio en `start_agents.py`. |
-| **Protocolo Fallback en Prompts** | Si una herramienta MCP falla o una ruta no existe, el agente detiene su flujo y reporta en consola sin alucinar. | Prohibición explícita de inventar datos en `anti-hallucination-policy.instructions.md`. |
-
----
-
-## 6. Límites y Stop Conditions
-
-- 🛑 **Discovery Interactivo:** Si la idea del usuario es demasiado breve (< 3 líneas) o ambigua, el BS **no** escribe en el tracker ni llama a MCP hasta completar el diálogo con el humano.
-- 🛑 **Rechazo Documental:** Si una HU carece de *sad paths* o introduce requerimientos no presentes en el Product Brief, el QA **bloquea el avance** a la fase de diseño UX.
-- 🛑 **Falla de Rutas:** Si `config_bmad.json` no es accesible, el agente se detiene de forma segura y solicita intervención humana en su terminal.
-- 🛑 **Fin de Proyecto:** Al finalizar la última épica del Backlog, el Designer UX transfiere el control final al `@HUMANO:` deteniendo el ciclo automático.
-
----
-
-## 7. Referencias
-
-- **Manual General:** [`README.md`](./README.md)
-- **Guía de Uso Rápido:** [`GUIDE.md`](./GUIDE.md)
-- **Instanciación y Despliegue:** [`SETUP.md`](./SETUP.md)
-- **Preguntas Técnicas Frecuentes:** [`QUESTIONS.md`](./QUESTIONS.md)
-- **Manifiesto del Plugin:** [`manifest.yaml`](./manifest.yaml)
-- **Catálogo Backstage:** [`catalog-info.yaml`](./catalog-info.yaml)
+1. **El Tracker como Event Sourcing Inmutable:** La comunicación es exclusivamente mediante adición al final de `tracker_bmad.md`. Se prohíbe sobreescribir borrando el histórico.
+2. **Backpressure en Watcher:** El orquestador sondea el estado de cada panel en Herdr. Si el agente está `working`, la tarea se retiene en memoria evitando saturación de terminales.
+3. **Pausas Human-in-the-Loop (HITL):** 
+   - Post-Product Brief: Requiere `python utils/approve_step.py` para activar `@PM:`.
+   - Post-Tech Design: Requiere aprobación humana para autorizar codificación (`@DEV:`).
+4. **Recuperación tras Reinicio (Crash Recovery):**
+   - El PM y el Diseñador UX reconstruyen el estado del backlog leyendo directamente `tracker_bmad.md` y `mvp_*.md`.
+   - Solutions Architect lee el historial del tracker para determinar si se encuentra en fase Q&A o en fase de consolidación.
+5. **Inyección Dinámica de Skills:** Mediante la sintaxis `[IMPORT_SKILL: skills/ruta/SKILL.md]`, el compilador inyecta capacidades reutilizables (como `tracker-logger` y `export-pdf`) en el `AGENTS.md` de cada agente sin duplicar texto.

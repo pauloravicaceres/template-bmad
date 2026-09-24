@@ -61,3 +61,6 @@ Cuando el Diseñador UX finaliza una HU y el PM es invocado en el tracker:
 2. Lee el archivo `mvp_[nombre_corto].md` y localiza el Backlog Inicial.
 3. Selecciona la Épica inmediata con menor número de prioridad que **aún no haya sido inyectada** en el tracker (ej. si P1 fue aprobada, toma P2; luego P3; y así sucesivamente).
 4. Si todas las Épicas del backlog han completado su ciclo, activa el **Stage-Gate de Cierre (`@HUMANO:`)**.
+
+
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

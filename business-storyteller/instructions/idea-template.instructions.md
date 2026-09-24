@@ -33,3 +33,6 @@ El contenido del archivo debe ser exclusivamente texto plano continuo en primera
 1. Párrafo 1: Identidad del stakeholder, contexto del negocio y declaración explícita del dolor o fricción operativa.
 2. Párrafo 2: Mapeo de actores involucrados en el flujo.
 3. Párrafo 3 a N: Descripción agrupada de los módulos funcionales requeridos para resolver el dolor, integrando las restricciones de forma natural.
+
+
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

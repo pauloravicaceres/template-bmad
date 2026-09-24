@@ -76,3 +76,6 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 
 {{Texto plano de delegación inicial hacia el @BA: en una sola línea continua}}.
 ```
+
+
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]
