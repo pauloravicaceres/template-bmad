@@ -11,6 +11,7 @@
 * **Lógica de Bypass (Headless vs UI):** El ecosistema reconoce la naturaleza del proyecto:
   - **Proyectos con UI:** Transitan el pipeline visual completo: `BA -> QA -> UX -> SA -> DA -> API -> QT`.
   - **Proyectos Headless (ETL, SSIS, APIs puras, Pipelines de Datos):** Saltan automáticamente la fase de diseño UX: `BA -> QA -> SA -> DA -> QT`.
+* **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `files/context/legacy_ecosystem.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
 * **Aprobación Manual Obligatoria (HITL):** Soporte para interrupciones controladas (`@HUMANO:`), donde la activación del `@PM:` depende obligatoriamente de la aprobación humana del Product Brief mediante `utils/approve_step.py`, garantizando control de alcance antes del desglose de épicas.
 * **Arquitectura Modular de Agentes:** Cada agente define su rol (`agents/*.agent.md`) y reglas satélite (`instructions/*.instructions.md`), auto-ensambladas en tiempo de ejecución (`AGENTS.md`) por el orquestador.
 * **Inyección Atómica en Terminales (TTY):** Resolución dinámica de IDs de paneles en tiempo de ejecución para inyectar comandos directamente a los procesos mediante `herdr pane run`.
@@ -71,6 +72,8 @@
 │
 └── /files                            # Directorio de Entregables (Aislamiento de Datos)
     ├── tracker_bmad.md               # Único bus de eventos y cola de orquestación
+    ├── /context                      # Contexto opcional de ecosistema heredado (Brownfield)
+    │   └── legacy_ecosystem.md       # Interruptor físico con directrices del sistema preexistente
     ├── /business-storyteller         # Salidas BS: ideas estructuradas (idea_*.md)
     ├── /product-analyst              # Salidas PA: product briefs (pb_*.md)
     ├── /product-manager              # Salidas PM: planes de gestión / MVP (mvp_*.md)
@@ -88,6 +91,8 @@
 ## 🚀 Puesta en Marcha Rápida
 
 1. **Configuración Inicial:** Ejecutar `python init_bmad.py "Nombre del Proyecto"` (o actualizar rutas en `config_bmad.json`, ver [SETUP.md](./SETUP.md)).
+   - **Modo Greenfield (Proyecto Nuevo):** Operación estándar sin precondiciones (verificar que `files/context/legacy_ecosystem.md` no exista).
+   - **Modo Brownfield (Sistema Existente):** Crear `files/context/legacy_ecosystem.md` documentando el dominio, tecnologías, bases de datos y restricciones del sistema legado.
 2. **Terminal 1 - Watcher:**
    ```bash
    python watcher_bmad.py
@@ -113,7 +118,7 @@ flowchart TD
     QA -->|Rechazo / Feedback| BA
     QA -->|Aprobado: Tiene UI| UX["6. Designer UX (UX)<br><i>Wireframes ASCII y Estados</i>"]
     UX -->|Épicas Pendientes| PM
-    UX -->|MVP Concluido| SA["7. Solutions Architect (SA)<br><i>Stack y Gobernanza (HITL Q&A)</i>"]
+    UX -->|MVP Concluido| SA["7. Solutions Architect (SA)<br><i>Stack y Gobernanza (Q&A o Contexto Legacy)</i>"]
     QA -->|Aprobado: Bypass Headless| SA
     SA -->|tech_guidelines.md| DA["8. Data Architect (DA)<br><i>MER y Diccionario de Datos</i>"]
     DA -->|Requiere APIs| API["9. API Architect (API)<br><i>Contratos REST/GraphQL</i>"]

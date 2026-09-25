@@ -14,6 +14,7 @@ Antes de inicializar un entorno, ten presentes las reglas de arquitectura:
    - **Proyectos con UI:** Transitan el pipeline completo: `PA -> PM -> BA -> QA -> UX -> SA -> DA -> API -> QT`.
    - **Proyectos Headless (ETL, SSIS, APIs puras):** Saltan dinámicamente la etapa de diseño UX: `PA -> PM -> BA -> QA -> SA -> DA -> QT`.
 4. **Pausa Obligatoria Human-in-the-Loop (HITL):** Al finalizar el Product Brief, el flujo entra en pausa obligatoria (`@HUMANO:`). El inicio del PM depende formalmente de la ejecución de `python utils/approve_step.py`.
+5. **Estrategia Dual Greenfield / Brownfield:** El framework es completamente agnóstico y soporta tanto proyectos nuevos desde cero como la subordinación a sistemas preexistentes mediante el interruptor físico opcional `files/context/legacy_ecosystem.md`.
 
 ---
 
@@ -27,6 +28,7 @@ python init_bmad.py "Nombre de Mi Nuevo Proyecto"
 
 ### Qué realiza automáticamente este script:
 1. **Scaffolding de Almacenamiento:** Crea todas las carpetas dentro de `files/` para el roster completo de agentes:
+   - `files/context/` *(Opcional: aloja `legacy_ecosystem.md` para proyectos Brownfield)*
    - `files/business-storyteller/`
    - `files/product-analyst/`
    - `files/product-manager/`
@@ -54,6 +56,7 @@ Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
   "project_name": "Nuevo-Proyecto",
   "created_at": "2026-09-23 12:00:00",
   "tracker": "D:\\Ruta\\Al\\Proyecto\\files\\tracker_bmad.md",
+  "context": "D:\\Ruta\\Al\\Proyecto\\files\\context\\legacy_ecosystem.md",
   "routes_bmad": {
     "business-storyteller": "D:\\Ruta\\Al\\Proyecto\\files\\business-storyteller\\",
     "product-analyst": "D:\\Ruta\\Al\\Proyecto\\files\\product-analyst\\",
@@ -68,6 +71,9 @@ Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
   }
 }
 ```
+
+> **Parámetro `"context"` (Opcional para Brownfield):**
+> Apunta al archivo `files/context/legacy_ecosystem.md`. Si el archivo existe físicamente y contiene directrices de sistemas preexistentes, los agentes operarán en modo subordinado (Brownfield). Si el archivo no existe o se elimina, el ecosistema corre en modo Greenfield estándar sin restricciones ni fallos.
 
 ### 3.2. Vaciado del Bus de Mensajes (`files/tracker_bmad.md`)
 Asegura que el archivo exista físicamente pero su contenido sea una cadena vacía (0 bytes) antes de encender el Watcher.
@@ -113,6 +119,8 @@ Asegura que el archivo exista físicamente pero su contenido sea una cadena vac�
 │
 └── /files                            # Aislamiento físico de entregables generados
     ├── tracker_bmad.md               # Único bus de datos y cola de tareas
+    ├── /context                      # Ingestión de ecosistema preexistente (Brownfield)
+    │   └── legacy_ecosystem.md       # Interruptor físico opcional con directrices legadas
     └── */                            # Carpetas individuales por rol
 ```
 
@@ -133,6 +141,7 @@ Para poner en marcha un nuevo proyecto desde cero:
 
 - [ ] **Paso 1: Clonar plantilla:** Copiar el repositorio a la carpeta de destino.
 - [ ] **Paso 2: Inicializar entorno:** Ejecutar `python init_bmad.py "Nombre del Proyecto"` para crear las carpetas de `files/`, generar `config_bmad.json` y vaciar `tracker_bmad.md`.
+- [ ] **Paso 2.1 (Opcional - Proyectos Brownfield):** Si la solución debe coexistir con un sistema o base de datos preexistente, crear `files/context/legacy_ecosystem.md` y documentar la arquitectura, motores relacionales, protocolos y restricciones heredadas. Para proyectos 100% nuevos (Greenfield), omitir este paso asegurando que dicho archivo no exista.
 - [ ] **Paso 3: Arrancar el Orquestador:**
   ```bash
   python watcher_bmad.py

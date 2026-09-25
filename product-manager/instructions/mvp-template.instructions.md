@@ -78,4 +78,13 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 ```
 
 
+---
+
+### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)
+Si existe el archivo `files/context/legacy_ecosystem.md`:
+1. **Sección 2 (Backlog del MVP):** Al definir y justificar la prioridad de las Épicas (P1, P2, ...), categorizar el tipo de impacto respecto al legado (ej. "Extensión de componente existente", "Nueva capacidad desacoplada" o "Integración con Core preexistente").
+2. **Sección 3 (Riesgos y Dependencias):** Identificar explícitamente los riesgos de regresión, acoplamiento operativo y compatibilidad con el sistema heredado documentado.
+3. **Si el archivo NO existe (Modo Greenfield):** Estructura el Backlog del MVP estándar basado únicamente en el Product Brief.
+
+
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

@@ -3,7 +3,7 @@ kind: Agent
 metadata:
   name: bmad-ecosystem-plugin
   title: BMAD Multi-Agent Ecosystem Plugin
-  description: Plugin organizacional para la definición integral y autónoma de software bajo metodología BMAD (Business Storyteller, Product Analyst, Product Manager, Business Analyst, QA Documental, Designer UX) con orquestación en terminales Herdr y herramientas MCP.
+  description: Plugin organizacional para la definición integral, autónoma y desacoplada de software bajo metodología BMAD cubriendo Negocio (BS, PA), Gestión (PM, BA, QA, UX) y Arquitectura Técnica (SA, DA, API, QT) con soporte dual Greenfield/Brownfield, orquestado en terminales Herdr y herramientas MCP.
   tags:
     - bmad
     - multi-agent
@@ -15,13 +15,20 @@ metadata:
     - bdd
     - qa-documental
     - ux-design
+    - solutions-architecture
+    - data-architecture
+    - mer-modeling
+    - api-contracts
+    - qa-tech
+    - tech-design
+    - greenfield-brownfield
   annotations:
-    github.com/project-slug: dmc/template-bmad
+    github.com/project-slug: paulo/template-bmad
     agents.backstage.io/stack-path: plugins/core/bmad-ecosystem-plugin
   links:
-    - url: https://github.com/dmc/template-bmad
+    - url: https://github.com/paulo/template-bmad
       title: Ver en Repositorio
 spec:
   owner: group:default/ads-digitalarchitecture
-  type: copilot-plugin
+  type: bmad-plugin
   category: core

@@ -44,6 +44,7 @@
 | `Backpressure` | Mecanismo del Watcher para retener tareas encoladas hasta que el agente destinatario se encuentre en estado `idle`. |
 | `HITL (Human-in-the-Loop)` | Pausa controlada del flujo donde la continuación hacia el siguiente rol depende de una acción humana (ej. `utils/approve_step.py`). |
 | `Bypass Headless` | Enrutamiento condicional donde proyectos sin interfaz gráfica omiten la fase de UX y avanzan directamente de QA a Arquitectura. |
+| `Modo Dual (Greenfield / Brownfield)` | Capacidad nativa donde la presencia del archivo `files/context/legacy_ecosystem.md` actúa como interruptor: si existe, todos los agentes subordinan sus entregables al sistema legado; si no, operan como proyecto nuevo sin restricciones. |
 
 ---
 
@@ -94,10 +95,12 @@ Dirígete a la terminal del agente **Business Storyteller** (o envía un prompt 
 ### Paso 5: Transición a Fase de Arquitectura
 Cuando el Designer UX concluye el diseño visual de todas las épicas del MVP (o QA en modo Headless):
 1. **Delegación a SA:** Designer UX anexa formalmente la orden `@SA:` en el tracker.
-2. **Descubrimiento Técnico:** Solutions Architect formula 5 preguntas de gobernanza (Cloud, stack, Greenfield/Brownfield) al `@HUMANO:`.
-3. **Consolidación Técnica:** Tras tu respuesta en el tracker, SA genera `tech_guidelines.md` y delega a `@DA:`.
+2. **Evaluación de Entorno y Descubrimiento Técnico:**
+   - **En Modo Greenfield (sin archivo legacy):** Solutions Architect formula 5 preguntas de gobernanza (Cloud, stack, presupuesto, Greenfield/Brownfield) al `@HUMANO:` en el tracker. Tras tu respuesta, genera `tech_guidelines.md`.
+   - **En Modo Brownfield (con `files/context/legacy_ecosystem.md`):** Solutions Architect detecta e ingiere el archivo automáticamente (Cero Fricción), adopta el stack, servidores y restricciones preexistentes sin formular preguntas genéricas al humano, y compila inmediatamente `tech_guidelines.md` subordinado al ecosistema legacy.
+3. **Delegación a Persistencia:** SA delega formalmente a `@DA:`.
 4. **Persistencia e Integración:** Data Architect genera el MER (`db_*.md`) y delega a `@API:` (o a `@QT:` si es ETL). API Architect define los contratos (`api_*.md`) y delega a `@QT:`.
-5. **Auditoría Cruzada Final:** QA Técnico audita la coherencia entre el MER y la API, compila el documento maestro `tech-design_*.md` y solicita la aprobación final (`@HUMANO:`).
+5. **Auditoría Cruzada Final:** QA Técnico audita la coherencia entre el MER y la API (y contra el archivo legacy si aplica), compila el documento maestro `tech-design_*.md` y solicita la aprobación final (`@HUMANO:`).
 6. **Aprobación de Arquitectura:** Ejecuta nuevamente `python utils/approve_step.py` (Opción 7: QA Técnico) para transferir el proyecto al equipo de desarrollo (`@DEV:`).
 
 ---
@@ -112,10 +115,12 @@ Cuando el Designer UX concluye el diseño visual de todas las épicas del MVP (o
 | **BA** | `mvp_[nombre].md` + `pb_[nombre].md` | `hu_[nombre].md` (Historias BDD) | `files/business-analyst/` |
 | **QA** | `hu_[nombre].md` + `pb_[nombre].md` | `aprobado_qa_*.md` / `feedback_qa_*.md` | `files/qa-documental/` |
 | **UX** | `hu_[nombre].md` (Aprobada) | `ux_[nombre].md` (Wireframes ASCII) | `files/designer-ux/` |
-| **SA** | `pb_*.md` + `mvp_*.md` + Q&A Humano | `tech_guidelines.md` (Gobernanza) | `files/solutions-architect/` |
+| **SA** | `pb_*.md` + `mvp_*.md` + (Q&A Humano o `legacy_ecosystem.md`) | `tech_guidelines.md` (Gobernanza) | `files/solutions-architect/` |
 | **DA** | `hu_*.md` + `pb_*.md` + Guidelines | `db_[nombre].md` (MER + ADRs) | `files/data-architect/` |
 | **API** | `db_*.md` + `hu_*.md` | `api_[nombre].md` (Contratos + ADRs) | `files/api-architect/` |
 | **QT** | `db_*.md` + `api_*.md` | `tech-design_[nombre].md` (TDD Maestro) | `files/qa-tech/` |
+
+> *Nota sobre Modo Brownfield: Si existe el archivo `files/context/legacy_ecosystem.md`, todos los agentes de negocio, producto, requerimientos y arquitectura lo consumen de forma complementaria para subordinar sus entregables a dicho entorno.*
 
 ---
 
@@ -145,6 +150,8 @@ El ecosistema permite agregar nuevas habilidades (*skills*) a los agentes de for
 | Bucle infinito entre BA y QA (Rechazo repetido) | El LLM del BA no logra interpretar el feedback de QA | Intervenir manualmente en la terminal del BA inyectando la corrección puntual y reactivar el Watcher. |
 | El Watcher no reacciona a nuevas líneas en el tracker | El archivo `tracker_bmad.md` tiene problemas de codificación o permisos | Guardar el archivo en formato UTF-8 sin BOM o reiniciar el proceso `python watcher_bmad.py`. |
 | Faltan archivos `AGENTS.md` en los directorios de los agentes | No se ejecutó el paso de compilación previa | El Watcher los compila automáticamente al iniciar, o se pueden forzar corriendo `python watcher_bmad.py`. |
+| El enjambre ignora restricciones del sistema existente | `files/context/legacy_ecosystem.md` no existe o está vacío | Crear `files/context/legacy_ecosystem.md` detallando el stack, datos y reglas preexistentes antes de iniciar el flujo. |
+| Se desea alternar entre Greenfield y Brownfield | Gestión del archivo interruptor físico | Para Greenfield: renombrar o borrar `legacy_ecosystem.md`. Para Brownfield: crear o poblar dicho archivo. |
 | Se requiere reiniciar el proyecto desde cero | Existen archivos residuales de ejecuciones previas | Ejecutar `python utils/clean_files.py` (opción `T`) y vaciar `files/tracker_bmad.md`. |
 
 ---

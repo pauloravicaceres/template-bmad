@@ -101,6 +101,15 @@ pb_[Nombre_Corto].md
 @HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el @PM:.
 ```
 
+---
+
+### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)
+Si existe el archivo `files/context/legacy_ecosystem.md`:
+1. **Sección 4 (Alcance Inicial):** Delimitar formalmente qué componentes, módulos o servicios del sistema heredado se integran o consumen, y cuáles quedan explícitamente fuera de alcance.
+2. **Sección 5 (Restricciones):** Catalogar obligatoriamente las restricciones tecnológicas, de infraestructura y de modelo de negocio documentadas en el archivo legacy como restricciones duras innegociables.
+3. **Sección 7 (Supuestos):** Si faltan detalles de integración no descritos en el archivo legacy, registrarlos explícitamente bajo la etiqueta `⚠️ SUPUESTO:` sin inventar capacidades preexistentes.
+4. **Si el archivo NO existe (Modo Greenfield):** Elabora el Product Brief estándar según la idea del usuario sin precondiciones heredadas.
+
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]
 [IMPORT_SKILL: skills/pb-validator/SKILL.md]

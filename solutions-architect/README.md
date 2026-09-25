@@ -8,25 +8,26 @@ Su misión es traducir las restricciones de negocio, el presupuesto y las capaci
 
 ### 📦 Entradas y Artefactos de Salida
 
-* **Entradas (Lectura):** `pb_*.md` (Product Brief), `mvp_*.md` (Backlog) y las directivas del operador en el `tracker_bmad.md`.
-* **Artefacto Intermedio:** Cuestionario estratégico de 5 preguntas clave dirigido al `@HUMANO:` en el tracker.
+* **Entradas (Lectura):** `pb_*.md` (Product Brief), `mvp_*.md` (Backlog), `files/context/legacy_ecosystem.md` (opcional) y las directivas del operador en el `tracker_bmad.md`.
+* **Artefacto Intermedio:** Cuestionario estratégico de 5 preguntas clave dirigido al `@HUMANO:` en el tracker (exclusivo para Modo Greenfield).
 * **Artefacto Generado:** `tech_guidelines.md` (El manifiesto oficial de infraestructura y reglas arquitectónicas corporativas).
 * **Handoff:**
-  * **Fase 1 (Descubrimiento / Q&A):** Formula las preguntas y delega el turno al **`@HUMANO:`** en el tracker.
-  * **Fase 2 (Consolidación de Stack):** Tras recibir las respuestas, compila las directrices y delega al **Data Architect (`@DA:`)** para iniciar el modelado relacional (MER).
+  * **Modo Greenfield (Proyecto Nuevo):** Formula las 5 preguntas y delega el turno al **`@HUMANO:`**. Tras recibir las respuestas, compila las directrices y delega al **Data Architect (`@DA:`)**.
+  * **Modo Brownfield (Cero Fricción):** Detecta `files/context/legacy_ecosystem.md`, omite el cuestionario interactivo genérico, compila de inmediato `tech_guidelines.md` subordinado al sistema legado y delega directamente al **Data Architect (`@DA:`)**.
 
 ### ⚙️ Pilares de Diseño y Responsabilidades
 
-* **1. Gobernanza, Stack y Topología (Greenfield vs. Brownfield)**
-  * Evalúa la naturaleza del ecosistema: determina si es un desarrollo desde cero (*Greenfield*) o un proyecto de integración/mantenimiento (*Brownfield*) con bases de datos o sistemas *legacy* preexistentes.
-  * Define el proveedor Cloud (ej. AWS, Azure, GCP), lenguajes, frameworks, estilos arquitectónicos (Monolito modular, Serverless, Microservicios) y normativas de seguridad.
+* **1. Gobernanza, Stack, Estado y Resiliencia (Greenfield vs. Brownfield)**
+  * Evalúa la presencia física de `files/context/legacy_ecosystem.md`: si existe, adopta de forma determinista la arquitectura y servidores preexistentes; si no existe, asume desarrollo desde cero (*Greenfield*).
+  * Define el proveedor Cloud, lenguajes, frameworks, estilos arquitectónicos, fronteras de manejo de estado y patrones de tolerancia a fallos/resiliencia.
 
-* **2. Dinámica Interactiva (Cuestionario Estratégico)**
-  * Antes de consolidar el diseño, formula al `@HUMANO:` 5 preguntas clave sobre Cloud, lenguajes del equipo, presupuesto y restricciones regulatorias, integrando al usuario como CTO ejecutivo del enjambre.
+* **2. Dinámica Interactiva vs. Ingesta Silenciosa**
+  * En Greenfield, formula al `@HUMANO:` 5 preguntas clave sobre Cloud, lenguajes, presupuesto y restricciones. En Brownfield, ingiere autónomamente las reglas sin generar cuellos de botella.
 
 * **3. Trazabilidad de Handoffs (Conciencia de Bypass)**
   * **Recepción Flexible:** Sabe que puede ser invocado por el agente **UX** (al concluir el diseño visual de todas las épicas del MVP) o directamente por el **QA Documental** (mediante el *Bypass Headless* para proyectos de datos puros o SSIS).
   * **Imposición de Restricciones:** Al transferir el turno al Data Architect (`@DA:`), fija el motor de base de datos exacto sobre el cual se debe construir el MER.
 
-* **4. Propiedad de los ADRs Macro**
-  * Inicia el registro de los Architecture Decision Records (ADRs), documentando formalmente las decisiones de infraestructura y dejando constancia explícita de las **Alternativas Evaluadas y Descartadas**.
+* **4. Propiedad de los ADRs Macro (Formato MADR)**
+  * Inicia el registro de los Architecture Decision Records (ADRs) bajo el estándar formal MADR, documentando formalmente las decisiones de infraestructura con alternativas viables reales y costos/trade-offs explícitos.
+  * Para entornos Brownfield, cataloga las decisiones impuestas como `Aceptado (heredado)` sin requerir alternativas ficticias.

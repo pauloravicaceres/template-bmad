@@ -98,6 +98,14 @@ Si el proyecto no tiene interfaz de usuario (ej. ETL, SSIS, Webhooks, APIs puras
 
 
 
+### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)
+Si existe el archivo `files/context/legacy_ecosystem.md`:
+- **Subordinación de Criterios de Aceptación:** Léelo en su totalidad. Los Criterios de Aceptación (BDD) deben subordinarse estrictamente a las reglas de negocio, validaciones, flujos y máquinas de estado descritas en dicho archivo.
+- **Enfoque de No-Regresión en DoD:** En la sección `## 4. DEFINITION OF DONE`, es obligatorio incluir el ítem:
+  - [ ] La funcionalidad respeta las reglas de negocio y restricciones operativas del ecosistema preexistente documentado.
+- **Si el archivo NO existe (Modo Greenfield):** Redacta las HUs estándar en base al Product Brief y Backlog de MVP sin precondiciones heredadas.
+
+
 [IMPORT_SKILL: skills/hu-validator/SKILL.md]
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]
 [IMPORT_SKILL: skills/export-pdf/SKILL.md]

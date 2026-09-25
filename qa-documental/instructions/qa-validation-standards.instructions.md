@@ -60,13 +60,23 @@ applyTo: '**'
 
 ---
 
+---
+
+## Dimensión 6: Coexistencia con Ecosistema Preexistente (Modo Brownfield)
+*(Aplica si existe el archivo `files/context/legacy_ecosystem.md`)*
+
+- [ ] **No-Regresión Operativa:** La HU no contradice las máquinas de estado, reglas de negocio o limitaciones descritas en el archivo legacy.
+- [ ] **Verificación en DoD:** La sección Definition of Done de la HU incluye formalmente el ítem de respeto y no-regresión contra el ecosistema preexistente.
+
+---
+
 ## Matriz de Decisión Binaria
 
 ```
 ¿Existen alucinaciones de alcance sin etiquetar?   ──► SÍ ──► RECHAZADO (Opción A)
 ¿Falta al menos un Sad Path / Edge Case en Gherkin? ──► SÍ ──► RECHAZADO (Opción A)
 ¿La historia mezcla más de una transacción básica? ──► SÍ ──► RECHAZADO (Opción A)
-¿Existe contradicción lógica o con el PRD?         ──► SÍ ──► RECHAZADO (Opción A)
+¿Existe contradicción con el PRD o archivo legacy?  ──► SÍ ──► RECHAZADO (Opción A)
                     │
                     └──► NO a todo lo anterior: 100% de cumplimiento
                                 │

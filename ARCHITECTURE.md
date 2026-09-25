@@ -16,6 +16,7 @@ El framework BMAD está diseñado para guiar una iniciativa de software desde su
    - **Ruta Headless (ETL, SSIS, Pipelines de Datos, APIs puras):** El flujo salta automáticamente el diseño visual de interfaces: `BS -> PA -> (HITL) -> PM -> BA -> QA -> SA -> DA -> QT`.
 4. **Política Anti-Alucinación:** Ningún agente asume alcances no definidos en el Product Brief o en las Historias de Usuario. Todo supuesto debe marcarse explícitamente con `⚠️ [PROPUESTO]` o `❓ No documentado`.
 5. **Auditoría Cruzada:** El agente `qa-tech` es el compilador final. Audita matemáticamente que el diseño de base de datos (`db_*.md`) y los contratos (`api_*.md`) no se contradigan antes de generar el Technical Design Document (TDD).
+6. **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** El framework soporta de manera nativa tanto iniciativas completamente nuevas como sistemas preexistentes mediante el interruptor físico `files/context/legacy_ecosystem.md`. Si dicho archivo existe, todos los agentes (de negocio y arquitectura) subordinan obligatoriamente sus entregables al dominio, reglas y restricciones tecnológicas descritas en él. Si no existe, operan en modo Greenfield estándar sin precondiciones.
 
 ---
 
@@ -61,6 +62,7 @@ flowchart TB
     end
 
     subgraph Almacenamiento [files/ - Aislamiento Físico de Entregables]
+        DIR_CTX["📁 context<br><i>legacy_ecosystem.md (Opcional)</i>"]
         DIR_BS["📁 business-storyteller"]
         DIR_PA["📁 product-analyst"]
         DIR_PM["📁 product-manager"]
@@ -78,6 +80,7 @@ flowchart TB
     BS & PA & PM & BA & QA & UX & SA & DA & API & QT === MCP_FS
     UX === MCP_ST
     MCP_FS --> DIR_BS & DIR_PA & DIR_PM & DIR_BA & DIR_QA & DIR_UX & DIR_SA & DIR_DA & DIR_API & DIR_QT
+    DIR_CTX -. "Ingestión Brownfield (read_file)" .-> MCP_FS
     MCP_FS -- "Anexa Evento (Append-Only)" --> T
 ```
 
@@ -167,10 +170,16 @@ sequenceDiagram
 
     Note over W, SA: Inicio de Fase de Arquitectura
     W->>SA: herdr pane run [@SA:]
-    SA->>T: write_file ("@HUMANO: Formular 5 preguntas de gobernanza...")
-    H->>T: Responde stack y preferencias en tracker
-    SA->>SA: Genera tech_guidelines.md
-    SA->>T: write_file ("@DA: Guidelines listas. Iniciar diseño MER...")
+    alt Modo Brownfield (Existe files/context/legacy_ecosystem.md)
+        SA->>SA: Ingesta silenciosa de legacy_ecosystem.md (Cero Fricción)
+        SA->>SA: Compila tech_guidelines.md subordinado al ecosistema legacy
+        SA->>T: write_file ("@DA: Guidelines Brownfield listas. Iniciar diseño MER...")
+    else Modo Greenfield (Sin archivo legacy)
+        SA->>T: write_file ("@HUMANO: Formular 5 preguntas de gobernanza...")
+        H->>T: Responde stack y preferencias en tracker
+        SA->>SA: Genera tech_guidelines.md estándar
+        SA->>T: write_file ("@DA: Guidelines listas. Iniciar diseño MER...")
+    end
 
     W->>DA: herdr pane run [@DA:]
     DA->>DA: Diseña Modelo Entidad-Relación y ADRs
@@ -204,6 +213,7 @@ El framework desacopla el almacenamiento de los entregables en subdirectorios ex
 | Entregable / Dominio | Ubicación Física | Agente Creador | Consumidores Principales |
 |---|---|---|---|
 | Rutas Absolutas del Proyecto | `config_bmad.json` | `init_bmad.py` / Operador | Todos los agentes vía `read_file` |
+| Contexto Ecosistema Heredado | `files/context/legacy_ecosystem.md` | Operador / Stakeholder | Todos los agentes vía `read_file` (Modo Brownfield) |
 | Bus Central de Handoffs | `files/tracker_bmad.md` | Todos los agentes vía MCP | `watcher_bmad.py` y agentes |
 | Ideas de Negocio Refinadas | `files/business-storyteller/idea_*.md` | `business-storyteller` | `product-analyst` |
 | Product Briefs (PRD Canónico) | `files/product-analyst/pb_*.md` | `product-analyst` | `product-manager`, `business-analyst`, `qa-documental`, `solutions-architect` |
@@ -229,3 +239,5 @@ El framework desacopla el almacenamiento de los entregables en subdirectorios ex
    - El PM y el Diseñador UX reconstruyen el estado del backlog leyendo directamente `tracker_bmad.md` y `mvp_*.md`.
    - Solutions Architect lee el historial del tracker para determinar si se encuentra en fase Q&A o en fase de consolidación.
 5. **Inyección Dinámica de Skills:** Mediante la sintaxis `[IMPORT_SKILL: skills/ruta/SKILL.md]`, el compilador inyecta capacidades reutilizables (como `tracker-logger` y `export-pdf`) en el `AGENTS.md` de cada agente sin duplicar texto.
+6. **Detección Condicional No Bloqueante (Dualidad Greenfield / Brownfield):** Todos los agentes consultan la existencia de `files/context/legacy_ecosystem.md` mediante MCP Filesystem. Si no existe o la carpeta está vacía, no emiten errores ni bloqueos: continúan su ejecución en modo Greenfield limpio con paridad absoluta. Si existe, subordinan automáticamente sus decisiones y entregables a dicho contexto.
+

@@ -22,6 +22,7 @@ Antes de proponer o escribir cualquier cambio, debes evaluar si cumple con estos
    - Proyectos Headless (ETL, SSIS, APIs): Salta la capa visual (`BA -> QA -> SA -> DA -> QT`).
 4. **Política Anti-Alucinación:** Ningún agente inventa reglas de negocio o columnas de base de datos. Si falta información, deben usar explícitamente etiquetas como `⚠️ [PROPUESTO]` o `⚠️ SUPUESTO:`.
 5. **Auditoría Cruzada:** El agente Compilador (`qa-tech` o QT) actúa como árbitro final, cruzando el diseño de la Base de Datos (`db_*.md`) contra los contratos de Red (`api_*.md`) antes de autorizar el paso a desarrollo.
+6. **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** El framework soporta de manera nativa tanto proyectos nuevos como sistemas preexistentes mediante el interruptor físico `files/context/legacy_ecosystem.md`. Si dicho archivo existe, todos los agentes (de negocio y arquitectura) subordinan obligatoriamente sus entregables al dominio, reglas y restricciones tecnológicas descritas en él, sean cuales sean. Si no existe, operan en modo Greenfield estándar sin precondiciones.
 
 # HEURÍSTICA DE OPERACIÓN (CLI)
 Cuando el usuario te pida evaluar o modificar el ecosistema:

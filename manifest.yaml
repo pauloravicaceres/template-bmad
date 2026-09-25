@@ -6,22 +6,27 @@ status: activo
 owner: ai-delivery
 maintainers:
   - ai-delivery
-version: 1.0.0
+version: 1.1.0
 
 summary: >
-  Plugin organizacional para la definición integral y autónoma de software bajo metodología BMAD:
+  Plugin organizacional para la definición integral, autónoma y desacoplada de software bajo metodología BMAD:
   descubrimiento de ideas (Business Storyteller), redacción de Product Briefs (Product Analyst),
   gestión de alcance y backlog de MVP (Product Manager), especificación BDD/Gherkin (Business Analyst),
-  auditoría documental rigurosa (QA Documental) y diseño de wireframes interactivos (Designer UX).
-  Incluye un motor dinámico de inyección de habilidades (skills) para capacidades modulares.
+  auditoría documental rigurosa (QA Documental), diseño de wireframes interactivos (Designer UX),
+  gobernanza de stack y cloud (Solutions Architect), modelado relacional MER (Data Architect),
+  diseño de contratos de integración (API Architect) y compilación del TDD con diagramación dual (QA Tech).
+  Soporta de manera nativa proyectos Greenfield y Brownfield, además de un motor dinámico de inyección de habilidades (skills).
 
 audience:
   - analistas-de-negocio
   - dueños-de-producto
   - gerentes-de-producto
   - arquitectos-de-software
+  - arquitectos-de-soluciones
+  - arquitectos-de-datos
   - diseñadores-ux
   - ingenieros-de-calidad
+  - desarrolladores-de-software
 
 technologies:
   - python
@@ -38,10 +43,16 @@ capabilities:
   - bmad-business-analyst
   - bmad-qa-documental
   - bmad-designer-ux
+  - bmad-solutions-architect
+  - bmad-data-architect
+  - bmad-api-architect
+  - bmad-qa-tech
+  - bmad-dual-greenfield-brownfield
   - bmad-watcher-orchestrator
   - bmad-mcp-filesystem-tools
   - bmad-mcp-stitch-tools
   - bmad-dynamic-skill-injection
+  - skill-tracker-logger
   - skill-export-pdf
   - skill-git-commit
   - skill-read-pdf
@@ -49,7 +60,7 @@ capabilities:
   - skill-hu-validator
 
 risk_level: medio
-requires_human_approval: true   # Discovery interactivo HITL en BS + control de bucles de QA
+requires_human_approval: true   # Discovery interactivo HITL en BS + Pausa obligatoria post-PB (approve_step.py) + Q&A SA en Greenfield + Aprobación TDD (@DEV:)
 uses_scripts: true              # watcher_bmad.py, utils/start_agents.py, utils/clean_files.py, utils/delete_agents.py, utils/approve_step.py
 uses_hooks: false
 uses_mcp: true                  # MCP Filesystem (read_file / write_file) y MCP Stitch (UI wireframes)
@@ -61,5 +72,5 @@ compatible_with:
 
 lifecycle:
   created: 2026-08-15
-  last_reviewed: 2026-09-16
-  next_review: 2026-12-16
+  last_reviewed: 2026-09-23
+  next_review: 2026-12-23
