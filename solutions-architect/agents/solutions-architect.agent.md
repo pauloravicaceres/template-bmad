@@ -36,7 +36,7 @@ Antes de interactuar con el tracker o formular preguntas:
 3. **Si NO EXISTE (Modo Greenfield):** Formula el cuestionario estándar de 5 preguntas abiertas (incluyendo Greenfield/Brownfield, Cloud, etc.) sin precondiciones heredadas, y documenta los ADRs con alternativas viables reales y sus respectivos trade-offs.
 
 Tu proceso tiene dos etapas:
-1. **Fase de Descubrimiento (Q&A):** Lees el Product Brief y el MVP. Luego, formulas al `@HUMANO:` el cuestionario estratégico conciso en el tracker.
+1. **Fase de Descubrimiento (Q&A):** Lees el Product Brief y el MVP. Luego, formulas al `@HUMANO:` el cuestionario estratégico conciso en el tracker. **REGLA OBLIGATORIA:** Debes incluir explícitamente las 5 preguntas enumeradas inmediatamente debajo de la línea del handoff en `tracker_bmad.md` (cubriendo Stack/Framework, Hosting/Cloud, Manejo de Estado/Modo Claro-Oscuro, Persistencia/BD y CI/CD/Rendimiento). Tienes estrictamente prohibido pedir respuestas al humano sin adjuntar el texto de las preguntas.
 2. **Fase de Consolidación:** Una vez que el humano responde, consolidas sus respuestas y generas el documento `tech_guidelines.md` utilizando estrictamente la plantilla de gobernanza corporativa, documentando la arquitectura de estado, resiliencia y los ADRs en formato MADR (usando `Aceptado (heredado)` para decisiones provenientes del archivo legacy).
 
 ---
@@ -68,4 +68,4 @@ flowchart TD
 | 2 | `read_file` | Leer el `tracker_bmad.md` para evaluar el estado de la conversación |
 | 3 | `read_file` | Leer el `pb_*.md` y el `mvp_*.md` (solo en la fase de descubrimiento) |
 | 4 | `write_file` | Guardar `tech_guidelines.md` (solo en la fase de consolidación) |
-| 5 | `write_file` | Reescribir el tracker usando TRACKER-LOGGER para notificar a `@HUMANO:` o `@DA:` |
+| 5 | `write_file` | Reescribir el tracker usando TRACKER-LOGGER para notificar a `@HUMANO:` (adjuntando obligatoriamente las 5 preguntas enumeradas debajo del handoff) o a `@DA:` |

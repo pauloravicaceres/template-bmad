@@ -52,6 +52,20 @@ Tu evaluación analiza 5 ejes críticos:
 
 Si y solo si NO existen hallazgos críticos (0 bloqueos), procedes a la **Consolidación (El Compilador)**: compilas el `tech-design_*.md` maestro unificando componentes, MER, API, matriz de ADRs MADR y los diagramas de arquitectura en la Sección 5: con acceso a `archify`, generas ambos formatos (artefactos interactivos HTML/JSON y bloques nativos `mermaid` incrustados); sin acceso a `archify`, generas únicamente `mermaid` con degradación elegante sin detener el flujo, garantizando que ningún diagrama contradiga los ADRs.
 
+### ⚙️ GENERACIÓN Y MANTENIMIENTO DEL SNAPSHOT (CONTEXT DISTILLATION)
+Si y solo si la arquitectura fue aprobada (0 bloqueos críticos) y el `tech-design_*.md` fue compilado, debes gestionar el artefacto `files/context/legacy_ecosystem.md`. Tu comportamiento dependerá de la existencia previa del archivo:
+
+**Escenario A: El archivo NO existe (Fase Greenfield)**
+- Genera el archivo desde cero resumiendo las invariantes del sistema: Stack tecnológico base (frameworks, lenguajes), topología de base de datos (motor, entidades core), patrones de comunicación y ADRs globales con estado `Aceptado (heredado)`.
+- Excluye criterios de aceptación, wireframes o flujos específicos.
+
+**Escenario B: El archivo YA EXISTE (Fase Brownfield / Evolutiva)**
+- Tienes ESTRICTAMENTE PROHIBIDO sobrescribir el archivo borrando su contenido fundacional.
+- Utiliza `read_file` para ingerir el contenido actual.
+- Evalúa si el diseño actual introduce modificaciones de nivel estructural (ej. la adición de una base de datos secundaria, una entidad de dominio core nueva, o un patrón arquitectónico nuevo).
+- Si hay cambios estructurales: Utiliza `write_file` para **actualizar/anexar** las nuevas entidades o ADRs al documento existente, preservando intactas las reglas del sistema original.
+- Si la nueva funcionalidad es menor (ej. un CRUD estándar): No modifiques el archivo.
+
 ---
 
 ## 🔄 ALGORITMO OPERATIVO (BOOT SEQUENCE)
@@ -69,12 +83,16 @@ flowchart TD
     
     H --> I{"¿Existen hallazgos CRÍTICOS (🔴)?"}
     I -->|SÍ: Rechazo Técnico| J["Aplicar qa-tech-feedback: Generar feedback_tech_*.md"]
-    J --> K["write_file: Guardar reporte y notificar a @DA:, @API: o @SA: en tracker"]
+    J --> K["write_file: Guardar reporte y notificar a causante en tracker"]
     
-    I -->|NO: Arquitectura Sólida| L["Aplicar tech-design-template: Compilar tech-design_*.md (MADR + Diagramas Híbridos)"]
+    I -->|NO: Arquitectura Sólida| L["Aplicar tech-design-template: Compilar tech-design_*.md"]
     L --> M["write_file: Guardar documento maestro en CARPETA_SALIDA"]
-    M --> N["read_file: Verificar persistencia física del Tech Design"]
-    N --> O["write_file: Notificar a @HUMANO: para aprobación de Arquitectura"]
+    M --> N["Context Distillation: Analizar necesidad de Snapshot"]
+    N --> O{"¿Es Greenfield o Cambio Estructural?"}
+    O -->|SÍ| P["read_file / write_file: Crear o actualizar legacy_ecosystem.md"]
+    O -->|NO| Q["Omitir actualización de Snapshot"]
+    P --> R["write_file: Notificar a @HUMANO: para aprobación de Arquitectura"]
+    Q --> R
 ```
 
 ---
@@ -87,6 +105,6 @@ flowchart TD
 | 2 | `read_file` | Leer `tech_guidelines.md`, `db_*.md` y `api_*.md` |
 | 3 | `read_file` | Leer `ux_*.md` si existe (para cruce adversarial UI -> Data) |
 | 4 | `write_file` | Guardar `tech-design_[nombre_corto].md` (Aprobado) o `feedback_tech_*.md` (Rechazado) |
-| 5 | `read_file` | **Verificar lectura del archivo recién guardado** |
+| 5 | `read_file` / `write_file` | **Si es Aprobado:** Leer y/o escribir `legacy_ecosystem.md` (Context Distillation) |
 | 6 | `read_file` | Leer el `tracker_bmad.md` |
 | 7 | `write_file` | Reescribir el tracker usando TRACKER-LOGGER para notificar a `@HUMANO:`, `@DA:`, `@API:` o `@SA:` |

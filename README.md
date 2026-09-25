@@ -12,6 +12,8 @@
   - **Proyectos con UI:** Transitan el pipeline visual completo: `BA -> QA -> UX -> SA -> DA -> API -> QT`.
   - **Proyectos Headless (ETL, SSIS, APIs puras, Pipelines de Datos):** Saltan automáticamente la fase de diseño UX: `BA -> QA -> SA -> DA -> QT`.
 * **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `files/context/legacy_ecosystem.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
+* **Auto-Evolución y Destilación de Contexto (Context Distillation):** El QA Tech (`qa-tech`) actúa como **Bibliotecario de Arquitectura**. Al compilar el Tech Design Document (TDD), evalúa si hubo cambios estructurales y genera o actualiza automáticamente el archivo `files/context/legacy_ecosystem.md`. Esto cierra el ciclo de vida arquitectónico, permitiendo que un proyecto nacido como *Greenfield* destile sus propias invariantes y prepare el terreno para futuras iteraciones evolutivas (*Brownfield*) de manera 100% desatendida.
+* **Auditoría Adversarial Zero-Trust (Quality Gate Técnico):** El QA Tech no valida ciegamente; aplica duda metódica por defecto, audita trazabilidad forzosa UI-Data (cero campos huérfanos), detector de mentiras en ADRs (cazando alternativas absurdas o trade-offs cosméticos) y clasifica hallazgos en una matriz de severidad (Crítico, Advertencia, Sugerencia) con auto-sanación agéntica.
 * **Aprobación Manual Obligatoria (HITL):** Soporte para interrupciones controladas (`@HUMANO:`), donde la activación del `@PM:` depende obligatoriamente de la aprobación humana del Product Brief mediante `utils/approve_step.py`, garantizando control de alcance antes del desglose de épicas.
 * **Arquitectura Modular de Agentes:** Cada agente define su rol (`agents/*.agent.md`) y reglas satélite (`instructions/*.instructions.md`), auto-ensambladas en tiempo de ejecución (`AGENTS.md`) por el orquestador.
 * **Inyección Atómica en Terminales (TTY):** Resolución dinámica de IDs de paneles en tiempo de ejecución para inyectar comandos directamente a los procesos mediante `herdr pane run`.
@@ -122,10 +124,63 @@ flowchart TD
     QA -->|Aprobado: Bypass Headless| SA
     SA -->|tech_guidelines.md| DA["8. Data Architect (DA)<br><i>MER y Diccionario de Datos</i>"]
     DA -->|Requiere APIs| API["9. API Architect (API)<br><i>Contratos REST/GraphQL</i>"]
-    DA -->|Headless Puro / ETL| QT["10. QA Técnico (QT)<br><i>Auditoría Cruzada y Compilación</i>"]
+    DA -->|Headless Puro / ETL| QT["10. QA Técnico (QT)<br><i>Auditoría Adversarial y Compilación</i>"]
     API -->|api_*.md| QT
     QT -->|tech-design_*.md| Fin["✅ Aprobación Final HITL / Codificación"]
+    QT -.->|Context Distillation<br><i>Crea o actualiza snapshot</i>| Legacy[("🏛️ files/context/legacy_ecosystem.md<br><i>Memoria Invariante para Iteraciones Brownfield</i>")]
 ```
+
+---
+
+## 🧬 Auto-Evolución de Proyectos: El Ciclo de Vida Cerrado (Context Distillation)
+
+Uno de los mayores retos en la arquitectura con agentes autónomos es la **amnesia evolutiva**: los proyectos comienzan desde cero (*Greenfield*), pero a medida que el software crece a lo largo de múltiples épicas o sprints, los nuevos agentes pueden perder de vista las decisiones estructurales iniciales, provocando dispersión tecnológica, duplicidad de patrones y regresiones en la persistencia.
+
+El framework BMAD resuelve este problema convirtiendo al **QA Técnico (`qa-tech`)** en el **Bibliotecario de Arquitectura** del enjambre:
+
+```mermaid
+flowchart LR
+    subgraph Iteracion1 ["Iteración 1: Génesis (Greenfield)"]
+        direction TB
+        SA1["Solutions Architect\n(Stack & Guidelines)"] --> DA1["Data Architect\n(MER & Persistencia)"]
+        DA1 --> API1["API Architect\n(Contratos REST/GraphQL)"]
+        API1 --> QT1["QA-Tech Senior\n(Compilador & Auditor)"]
+        QT1 -->|tech-design.md| TDD1["Tech Design Document Maestro"]
+        QT1 ==>|Context Distillation| Snapshot[("🏛️ files/context/legacy_ecosystem.md\n(Stack, Topología DB, ADRs MADR)")]
+    end
+
+    subgraph Iteracion2 ["Iteraciones Futuras (Brownfield Automático)"]
+        direction TB
+        Snapshot -.->|Ingesta Silenciosa| SA2["Solutions Architect\n(Decisiones Heredadas)"]
+        Snapshot -.->|Coexistencia de Esquema| DA2["Data Architect\n(Respeto de Tablas & Motores)"]
+        Snapshot -.->|Compatibilidad de Protocolos| API2["API Architect\n(BFF & Mapeo de Errores)"]
+        SA2 & DA2 & API2 --> QT2["QA-Tech (Auditor Adversarial)"]
+        QT2 -->|Actualización Incremental| Snapshot
+    end
+```
+
+### ⚙️ Protocolo Operativo del Bibliotecario de Arquitectura:
+
+1. **Génesis Greenfield (Creación Autónoma del Snapshot Fundacional):**
+   * Si el proyecto arrancó sin precondiciones (`files/context/legacy_ecosystem.md` no existía), el QA Tech, tras auditar y compilar exitosamente el `tech-design_*.md`, destila automáticamente las **invariantes duras del sistema**:
+     * **Stack tecnológico base:** Runtimes, frameworks, nube y directivas de despliegue.
+     * **Topología de base de datos:** Motor de persistencia, dialecto relacional y entidades de dominio core.
+     * **Patrones de comunicación:** Protocolos de red, estándares de payload y convenciones de endpoints.
+     * **Registro formal de decisiones (ADRs MADR):** Consolida las decisiones iniciales marcadas como base del ecosistema.
+   * Filtra el ruido temporal (omite wireframes transitorios, criterios Gherkin específicos o épicas individuales) para concentrar la esencia arquitectónica pura.
+
+2. **Evolución Brownfield (Preservación y Anexión Incremental):**
+   * Si el archivo ya existía (en iteraciones posteriores o proyectos sobre software preexistente), el QA Tech tiene **estrictamente prohibido sobrescribirlo** o borrar el historial fundacional.
+   * Evalúa mediante análisis cruzado si la nueva entrega introduce **cambios de nivel estructural** (ej. adición de una base de datos secundaria, una nueva entidad core de dominio o un patrón arquitectónico mayor).
+   * **Si hay cambios estructurales:** Actualiza y anexa las nuevas entidades o decisiones al documento existente sin tocar las invariantes previas.
+   * **Si la entrega es menor (ej. un CRUD estándar):** Mantiene el archivo intacto evitando la polución de contexto.
+
+3. **Cierre de Ciclo sin Intervención Humana:**
+   * La próxima vez que el enjambre despierte para una nueva funcionalidad, los agentes detectarán el snapshot automáticamente:
+     * El `solutions-architect` omite el cuestionario interactivo genérico y registra los ADRs previos como `Aceptado (heredado)`.
+     * El `data-architect` diseña nuevas tablas extendiendo las existentes sin colisiones relacionales.
+     * El `api-architect` respeta los estándares de red establecidos.
+   * El ciclo se vuelve **auto-sostenible y evolutivo por diseño**.
 
 ---
 

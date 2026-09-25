@@ -125,6 +125,13 @@ def extraer_instrucciones(linea):
 
     tareas = []
     todas_las_etiquetas = list(agentes.keys())
+
+    # Salvaguarda: Si el Handoff está dirigido al @HUMANO:, no despachar ningún agente
+    if "@HUMANO:" in linea:
+        pos_humano = linea.find("@HUMANO:")
+        pos_agentes = [linea.find(tag) for tag in todas_las_etiquetas if linea.find(tag) != -1]
+        if not pos_agentes or pos_humano < min(pos_agentes):
+            return []
     
     for etiqueta, agente_nombre in agentes.items():
         if etiqueta in linea:

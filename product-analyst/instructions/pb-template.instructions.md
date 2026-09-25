@@ -96,9 +96,9 @@ pb_[Nombre_Corto].md
 ---
 
 ## 9. ORDEN DE DELEGACIÓN PARA EL TRACKER (PAUSA OBLIGATORIA HITL)
-*(Al finalizar el Product Brief, el flujo entra en pausa obligatoria Human-in-the-Loop para revisión humana. La activación de @PM: depende de utils/approve_step.py)*
+*(Al finalizar el Product Brief, el flujo entra en pausa obligatoria Human-in-the-Loop para revisión humana. La activación del Product Manager depende de utils/approve_step.py. REGLA ESTRICTA: Usa siempre el nombre en texto plano "product-manager", NUNCA la etiqueta "@PM:" para evitar disparos accidentales en el orquestador).*
 
-@HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el @PM:.
+@HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
 ```
 
 ---
