@@ -14,6 +14,7 @@
 * **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `files/context/legacy_ecosystem.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
 * **Auto-Evolución y Destilación de Contexto (Context Distillation):** El QA Tech (`qa-tech`) actúa como **Bibliotecario de Arquitectura**. Al compilar el Tech Design Document (TDD), evalúa si hubo cambios estructurales y genera o actualiza automáticamente el archivo `files/context/legacy_ecosystem.md`. Esto cierra el ciclo de vida arquitectónico, permitiendo que un proyecto nacido como *Greenfield* destile sus propias invariantes y prepare el terreno para futuras iteraciones evolutivas (*Brownfield*) de manera 100% desatendida.
 * **Auditoría Adversarial Zero-Trust (Quality Gate Técnico):** El QA Tech no valida ciegamente; aplica duda metódica por defecto, audita trazabilidad forzosa UI-Data (cero campos huérfanos), detector de mentiras en ADRs (cazando alternativas absurdas o trade-offs cosméticos) y clasifica hallazgos en una matriz de severidad (Crítico, Advertencia, Sugerencia) con auto-sanación agéntica.
+* **Gobernanza Arquitectónica Automatizada (Lex Superior) y Blindaje Anti-Sycophancy:** Blindaje institucional contra la complacencia de los LLMs (*sycophancy*). Las invariantes técnicas del archivo físico `files/context/legacy_ecosystem.md` tienen jerarquía constitucional sobre peticiones informales en el tracker. Si un usuario solicita tecnologías incompatibles sin una Cláusula de Excepción formal en el archivo físico, el SA, DA y API están obligados a ignorar la solicitud, y el QA Tech actúa como guardián adversarial rechazando sumariamente cualquier diseño complaciente con severidad 🔴 CRÍTICO.
 * **Aprobación Manual Obligatoria (HITL):** Soporte para interrupciones controladas (`@HUMANO:`), donde la activación del `@PM:` depende obligatoriamente de la aprobación humana del Product Brief mediante `utils/approve_step.py`, garantizando control de alcance antes del desglose de épicas.
 * **Arquitectura Modular de Agentes:** Cada agente define su rol (`agents/*.agent.md`) y reglas satélite (`instructions/*.instructions.md`), auto-ensambladas en tiempo de ejecución (`AGENTS.md`) por el orquestador.
 * **Inyección Atómica en Terminales (TTY):** Resolución dinámica de IDs de paneles en tiempo de ejecución para inyectar comandos directamente a los procesos mediante `herdr pane run`.
@@ -181,6 +182,57 @@ flowchart LR
      * El `data-architect` diseña nuevas tablas extendiendo las existentes sin colisiones relacionales.
      * El `api-architect` respeta los estándares de red establecidos.
    * El ciclo se vuelve **auto-sostenible y evolutivo por diseño**.
+
+---
+
+## 🛡️ Gobernanza Arquitectónica Automatizada (Lex Superior) y Blindaje Anti-Sycophancy
+
+En sistemas multi-agente operados con modelos fundacionales (LLMs), un riesgo latente es la **complacencia algorítmica (*sycophancy*)**: la tendencia del modelo a obedecer sumisamente las solicitudes inmediatas de un usuario en el chat o tracker, incluso cuando contradicen directamente las invariantes técnicas, la infraestructura preexistente o las decisiones de gobernanza corporativa.
+
+Para erradicar este riesgo y dotar al enjambre de autoridad técnica real, el framework BMAD instituye el principio jurídico-técnico de **Lex Superior** y un sistema de **Defensa en Profundidad en Tres Barreras**:
+
+```mermaid
+flowchart TD
+    subgraph JerarquiaNormativa ["Pirámide de Jerarquía Normativa (Lex Superior)"]
+        direction TB
+        L1["🏛️ Nivel 1 (Constitución Inviolable):<br><b>files/context/legacy_ecosystem.md</b><br><i>(Stack, Motores DB, Patrones Base)</i>"]
+        L2["📐 Nivel 2 (Directiva de Solución):<br><b>files/solutions-architect/tech_guidelines.md</b><br><i>(ADRs MADR subordinados al Nivel 1)</i>"]
+        L3["💾 Nivel 3 (Diseño de Persistencia y Red):<br><b>db_*.md / api_*.md</b><br><i>(Modelado MER y Contratos REST/GraphQL)</i>"]
+        L4["💬 Nivel 4 (Peticiones Transitorias):<br><b>files/tracker_bmad.md</b><br><i>(Instrucciones de usuario o prompts informales)</i>"]
+    end
+    
+    L1 ==>|Prevalece sobre| L2
+    L2 ==>|Prevalece sobre| L3
+    L3 ==>|Prevalece sobre| L4
+```
+
+### 🧱 Las Tres Barreras de Defensa en Profundidad:
+
+1. **Barrera 1 - Solutions Architect (SA):** 
+   Si el usuario solicita en el tracker una tecnología divergente (por ejemplo, *"Diseña el módulo de mensajería usando Node.js y MongoDB"* cuando el ecosistema base documentado en `legacy_ecosystem.md` es *.NET 10 y SQL Server*), el SA verifica si existe una excepción formal registrada. Al no existir, **anula de plano la solicitud del tracker**, adapta la solución al stack oficial (C# / SQL Server) y deja constancia del rechazo en el log del tracker.
+2. **Barrera 2 - Data Architect (DA) y API Architect (API):** 
+   Si por alguna anomalía de razonamiento el SA sufriera de complacencia e incluyera una tecnología no autorizada en `tech_guidelines.md`, el DA y el API Architect cuentan con **inmunidad jerárquica**: subordinan su diseño directamente al archivo físico `legacy_ecosystem.md`, desobedeciendo la directiva del SA y modelando exclusivamente sobre los motores aprobados.
+3. **Barrera 3 - QA Tech (QT - Guardián Constitucional Inflexible):** 
+   Durante la auditoría adversarial del TDD, el QA Tech realiza el cruce contra `files/context/legacy_ecosystem.md`. Si detecta cualquier componente tecnológico no homologado introducido sin respaldo físico, emite una no conformidad con severidad 🔴 **CRÍTICO: Complacencia Ilegal (Sycophancy Breach)**, rechaza el Tech Design Document y devuelve el control al responsable con feedback corrector.
+
+---
+
+### 📝 Cómo habilitar una excepción tecnológica: La Cláusula de Excepción
+
+En BMAD, la arquitectura **no se altera mediante conversaciones de chat ni instrucciones en el tracker**. La única vía legítima para autorizar la introducción de un nuevo motor de base de datos, lenguaje o framework en un entorno existente es editando **físicamente** el archivo `files/context/legacy_ecosystem.md` e incorporando una **Cláusula de Excepción Arquitectónica**:
+
+````markdown
+## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA: [ID_EXCEPCION]
+- **Tecnología / Motor Autorizado:** [Ej. Node.js 22 LTS / MongoDB 8.0]
+- **Ámbito Permitido:** [Exclusivamente para el microservicio de Notificaciones Push y Chat]
+- **Justificación Ejecutiva:** [Aprobado por Arquitectura / CTO para soportar protocolo WebSockets nativo de alta concurrencia]
+- **Estrategia de Convivencia:** [Aislamiento perimetral, interoperabilidad mediante eventos REST/Kafka hacia el core SQL Server]
+````
+
+Cuando los agentes detectan este bloque en el archivo físico, la divergencia queda formalmente legitimada:
+- El **Solutions Architect** registrará el ADR correspondiente con estado `Aceptado (propuesto con excepción)`.
+- El **Data Architect** modelará sobre el motor alternativo respetando los límites de su ámbito.
+- El **QA Tech** validará la arquitectura sin activar el bloqueo adversarial.
 
 ---
 

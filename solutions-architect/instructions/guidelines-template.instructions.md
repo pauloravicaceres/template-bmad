@@ -106,7 +106,8 @@ Si existe el archivo `files/context/legacy_ecosystem.md`:
 1. **Sección 1 (Project Overview):** Consignar obligatoriamente: `Naturaleza del Proyecto: Brownfield (Subordinado a las directrices de files/context/legacy_ecosystem.md)`.
 2. **Sección 3 (Tech Stack) y Sección 5 (Architecture Rules):** Explicitar las tecnologías, componentes e infraestructura heredadas documentadas en el archivo legacy, y establecer las reglas obligatorias de coexistencia, interoperabilidad y no-regresión para los nuevos componentes. Todas las decisiones tecnológicas impuestas por el sistema existente deben registrarse como ADRs con `Estado: Aceptado (heredado)` sin requerir alternativas consideradas.
 3. **Sección 9 (Database):** Subordinar el motor, esquema y dialecto a las restricciones de base de datos declaradas en el archivo legacy.
-4. **Si el archivo NO existe (Modo Greenfield):** Define la arquitectura y gobernanza estándar según las respuestas del stakeholder sin precondiciones heredadas.
+4. **Lex Superior y Blindaje Anti-Sycophancy:** Queda estrictamente prohibido adoptar stacks, lenguajes o motores incompatibles con el archivo legacy, incluso si el humano los solicitó de forma imperativa en el tracker. Toda petición desalineada es nula y debe adaptarse a las directivas del ecosistema heredado, a menos que exista físicamente en `files/context/legacy_ecosystem.md` una sección titulada `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA` que autorice explícitamente dicha desviación.
+5. **Si el archivo NO existe (Modo Greenfield):** Define la arquitectura y gobernanza estándar según las respuestas del stakeholder sin precondiciones heredadas.
 
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

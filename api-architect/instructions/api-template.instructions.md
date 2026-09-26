@@ -86,10 +86,11 @@ applyTo: '**'
 
 ### ⚠️ Directiva de Interfaz para Ecosistemas Preexistentes (Modo Brownfield)
 Si existe el archivo `files/context/legacy_ecosystem.md`:
-1. **Subordinación Estricta de Interfaz:** Lee el archivo legacy en su totalidad. Los contratos de integración deben subordinarse a los protocolos de comunicación, servicios de red y mecanismos de autenticación especificados en el documento legacy.
+1. **Subordinación Estricta de Interfaz (Lex Superior):** Lee el archivo legacy en su totalidad. Los contratos de integración deben subordinarse a los protocolos de comunicación, servicios de red y mecanismos de autenticación especificados en el documento legacy. Las directivas del archivo legacy anulan cualquier petición divergente del tracker.
 2. **Capa de Adaptación y Mapeo de Errores:** Si el sistema preexistente utiliza protocolos específicos, servicios legados o procedimientos almacenados, diseñar los adaptadores necesarios (BFF / Facade) y el mapeo formal de códigos de error hacia respuestas estándar.
-3. **ADR Obligatorio de Interfaz Heredada (MADR):** Redactar un ADR justificando la compatibilidad con los protocolos heredados, utilizando el estado `Aceptado (heredado)` sin requerir alternativas consideradas.
-4. **Si el archivo NO existe (Modo Greenfield):** Diseña contratos de API estándar basados en el MER y las HUs sin restricciones heredadas.
+3. **Nulidad de Peticiones y Salvoconducto Único:** Si el usuario en el tracker solicita exponer contratos o mecanismos de red contrarios a la política del archivo legacy, queda anulado. La única excepción admisible es que exista formalmente una sección `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA` en el archivo físico `legacy_ecosystem.md`.
+4. **ADR Obligatorio de Interfaz Heredada (MADR):** Redactar un ADR justificando la compatibilidad con los protocolos heredados, utilizando el estado `Aceptado (heredado)` sin requerir alternativas consideradas.
+5. **Si el archivo NO existe (Modo Greenfield):** Diseña contratos de API estándar basados en el MER y las HUs sin restricciones heredadas.
 
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

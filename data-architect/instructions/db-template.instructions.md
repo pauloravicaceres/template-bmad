@@ -87,10 +87,11 @@ erDiagram
 
 ### ⚠️ Directiva de Persistencia para Ecosistemas Preexistentes (Modo Brownfield)
 Si existe el archivo `files/context/legacy_ecosystem.md`:
-1. **Subordinación Estricta de Persistencia:** Lee el archivo legacy en su totalidad. El motor de persistencia, dialecto SQL, tipos de datos y convenciones relacionales deben subordinarse estrictamente a lo establecido en dicho archivo.
-2. **Prohibición de Incompatibilidad:** Queda estrictamente prohibido proponer motores de base de datos que colisionen con las directivas del archivo legacy.
-3. **ADR Obligatorio de Coexistencia (MADR):** Redactar un ADR justificando la integración, extensiones de tablas o coexistencia con las entidades y procedimientos del esquema heredado, utilizando el estado `Aceptado (heredado)` sin requerir alternativas consideradas.
-4. **Si el archivo NO existe (Modo Greenfield):** Modela el MER y diccionario de datos libremente según lo dispuesto en `tech_guidelines.md` sin precondiciones heredadas.
+1. **Subordinación Estricta de Persistencia (Lex Superior):** Lee el archivo legacy en su totalidad. El motor de persistencia, dialecto SQL, tipos de datos y convenciones relacionales deben subordinarse estrictamente a lo establecido en dicho archivo. Las restricciones del archivo legacy prevalecen sobre cualquier Historia de Usuario (`hu_*.md`), sobre las peticiones del tracker y sobre el propio `tech_guidelines.md` del Solutions Architect.
+2. **Prohibición de Incompatibilidad y Complacencia:** Queda estrictamente prohibido proponer o modelar motores de base de datos que colisionen con las directivas del archivo legacy (ej. proponer colecciones NoSQL si el legado exige SQL relacional), incluso si el usuario lo pidió en el tracker o el SA lo incluyó por complacencia. Toda petición divergente es nula de pleno derecho.
+3. **Salvoconducto Único (Cláusula de Excepción):** La única forma legal de modelar sobre un motor divergente es que exista físicamente en `files/context/legacy_ecosystem.md` una sección titulada `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA` que lo autorice expresamente. Sin ella, el DA debe modelar exclusivamente sobre el motor heredado (ej. modelar tablas relacionales o campos JSON nativos en SQL Server en lugar de MongoDB) y registrar en un ADR el estado `Rechazado (Violación de Gobernanza Legacy)` para el motor caprichoso.
+4. **ADR Obligatorio de Coexistencia (MADR):** Redactar un ADR justificando la integración, extensiones de tablas o coexistencia con las entidades y procedimientos del esquema heredado, utilizando el estado `Aceptado (heredado)` sin requerir alternativas consideradas.
+5. **Si el archivo NO existe (Modo Greenfield):** Modela el MER y diccionario de datos libremente según lo dispuesto en `tech_guidelines.md` sin precondiciones heredadas.
 
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]
