@@ -18,3 +18,4 @@ applyTo: '**'
 
 
 [IMPORT_SKILL: skills/devops-validator/SKILL.md]
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

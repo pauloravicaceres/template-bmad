@@ -54,6 +54,13 @@ flowchart TB
             API("API Architect")
             QT("QA Técnico")
         end
+        subgraph Fase_D [Fase Development & Delivery]
+            DEV_B("Dev Backend (.NET VSA)")
+            DEV_F("Dev Frontend (Angular 22)")
+            QA_A("QA Auto (xUnit/Jest)")
+            CR("Code Review (SecOps & Gatekeeper)")
+            DEVOPS("DevOps & SRE")
+        end
     end
 
     subgraph Herramientas_MCP [Servidores MCP]
@@ -73,13 +80,18 @@ flowchart TB
         DIR_DA["📁 data-architect"]
         DIR_API["📁 api-architect"]
         DIR_QT["📁 qa-tech"]
+        DIR_DEVB["📁 dev-backend"]
+        DIR_DEVF["📁 dev-frontend"]
+        DIR_QAA["📁 qa-auto"]
+        DIR_CR["📁 code-review"]
+        DIR_DEVOPS["📁 devops"]
     end
 
-    T -- "herdr pane run" --> BS & PA & PM & BA & QA & UX & SA & DA & API & QT
-    BS & PA & PM & BA & QA & UX & SA & DA & API & QT -. "Lee rutas" .-> JSON
-    BS & PA & PM & BA & QA & UX & SA & DA & API & QT === MCP_FS
+    T -- "herdr pane run" --> BS & PA & PM & BA & QA & UX & SA & DA & API & QT & DEV_B & DEV_F & QA_A & CR & DEVOPS
+    BS & PA & PM & BA & QA & UX & SA & DA & API & QT & DEV_B & DEV_F & QA_A & CR & DEVOPS -. "Lee rutas" .-> JSON
+    BS & PA & PM & BA & QA & UX & SA & DA & API & QT & DEV_B & DEV_F & QA_A & CR & DEVOPS === MCP_FS
     UX === MCP_ST
-    MCP_FS --> DIR_BS & DIR_PA & DIR_PM & DIR_BA & DIR_QA & DIR_UX & DIR_SA & DIR_DA & DIR_API & DIR_QT
+    MCP_FS --> DIR_BS & DIR_PA & DIR_PM & DIR_BA & DIR_QA & DIR_UX & DIR_SA & DIR_DA & DIR_API & DIR_QT & DIR_DEVB & DIR_DEVF & DIR_QAA & DIR_CR & DIR_DEVOPS
     DIR_CTX -. "Ingestión Brownfield (read_file)" .-> MCP_FS
     MCP_FS -- "Anexa Evento (Append-Only)" --> T
 ```
@@ -100,6 +112,11 @@ flowchart TB
 | `data-architect` | Architecture | Modela la persistencia física: Modelo Entidad-Relación (MER), diccionario y ADRs de datos. | `hu_*.md`, `pb_*.md`, guidelines | `db_*.md` |
 | `api-architect` | Architecture | Diseña los contratos de integración (Endpoints, payloads JSON, status codes) y ADRs. | `db_*.md`, `hu_*.md` | `api_*.md` |
 | `qa-tech` | Architecture | Audita matemáticamente coherencia entre MER y API; compila el Tech Design Document (TDD). | `db_*.md` y `api_*.md` | `tech-design_*.md` |
+| `dev-backend` | Development | Desarrolla slices backend de producción (.NET Modulith, C# 12, Carter, MediatR, VSA). | `tech-design_*.md`, `legacy_ecosystem.md` | Código C# en `Modules/` |
+| `dev-frontend` | Development | Desarrolla componentes UI reactivos en Angular 22 Zoneless con Signals y PrimeNG. | `tech-design_*.md`, `ux_*.md` | Componentes `.ts`, `.html` en `src/app/` |
+| `qa-auto` | Delivery / QA | Diseña y ejecuta suites automáticas xUnit/Testcontainers/Jest (Zero-Tautology Policy). | `hu_*.md` y código fuente | Tests `*Tests.cs`, `*.spec.ts` |
+| `code-review` | Delivery / SecOps | Quality Gatekeeper final. Audita físicamente el código (anti-rubber-stamping, CancellationToken, IDOR, N+1). | Código fuente y tests | Dictamen `[APROBADO]` / `[RECHAZADO]` |
+| `devops` | Delivery / SRE | Diseña Dockerfiles multi-stage, compose resiliente con healthchecks y pipelines CI/CD. | `tech-design_*.md`, requerimientos infra | `docker-compose.yml`, Workflows |
 
 ---
 
@@ -124,6 +141,11 @@ sequenceDiagram
     participant DA as Data Architect
     participant API as API Architect
     participant QT as QA Técnico
+    participant DEVB as Dev Backend
+    participant DEVF as Dev Frontend
+    participant QAA as QA Automation
+    participant CR as Code Review
+    participant DOPS as DevOps & SRE
 
     Note over W, T: Watcher activo monitoreando tracker_bmad.md (Append-Only)
     
@@ -201,7 +223,38 @@ sequenceDiagram
         QT->>T: write_file ("@HUMANO: Arquitectura consolidada y aprobada...")
     end
 
-    Note over W, H: Cierre de Fase Técnica / Traspaso a Codificación (@DEV:)
+    Note over W, H: Cierre de Arquitectura / Inicio de Fase D (Development & Delivery)
+    H->>T: Ejecuta `python utils/approve_step.py` (Opción 10 / 11)
+    
+    par Implementación de Slices y Componentes UI
+        W->>DEVB: herdr pane run [@DEV-BACK:]
+        DEVB->>DEVB: Implementa Features en .NET VSA
+        DEVB->>T: write_file ("@QA-AUTO: Backend listo para testing...")
+    and
+        W->>DEVF: herdr pane run [@DEV-FRONT:]
+        DEVF->>DEVF: Implementa Componentes Angular 22 Zoneless con Signals
+        DEVF->>T: write_file ("@QA-AUTO: Frontend listo para testing...")
+    and
+        opt Aprovisionamiento Paralelo de Infraestructura
+            H->>T: write_file ("@DEVOPS: Aprovisionar entorno Docker y Compose...")
+            W->>DOPS: herdr pane run [@DEVOPS:]
+            DOPS->>DOPS: Genera Dockerfiles, docker-compose.yml y pipelines
+            DOPS->>T: write_file ("@HUMANO: Infraestructura aprovisionada...")
+        end
+    end
+
+    W->>QAA: herdr pane run [@QA-AUTO:]
+    QAA->>QAA: Automatiza pruebas xUnit, Testcontainers y Jest (Zero-Tautology)
+    QAA->>T: write_file ("@CODE-REVIEW: Batería de pruebas completada...")
+
+    W->>CR: herdr pane run [@CODE-REVIEW:]
+    CR->>CR: Lectura física de código, verificación CancellationToken, N+1, IDOR y XSS
+    alt Violaciones Críticas Detectadas
+        CR->>T: write_file ("[RECHAZADO] - @DEV-BACK: o @DEV-FRONT: Corregir...")
+    else Código y Pruebas 100% Conformes
+        CR->>T: write_file ("[APROBADO] HU certificada con éxito...")
+        CR->>T: write_file ("@DEVOPS: Desplegar y validar entorno de producción...")
+    end
 ```
 
 ---
@@ -218,13 +271,18 @@ El framework desacopla el almacenamiento de los entregables en subdirectorios ex
 | Ideas de Negocio Refinadas | `files/business-storyteller/idea_*.md` | `business-storyteller` | `product-analyst` |
 | Product Briefs (PRD Canónico) | `files/product-analyst/pb_*.md` | `product-analyst` | `product-manager`, `business-analyst`, `qa-documental`, `solutions-architect` |
 | Backlogs y Planes MVP | `files/product-manager/mvp_*.md` | `product-manager` | `business-analyst`, `designer-ux`, `solutions-architect` |
-| Historias de Usuario BDD | `files/business-analyst/hu_*.md` | `business-analyst` | `qa-documental`, `designer-ux`, `data-architect`, `api-architect` |
+| Historias de Usuario BDD | `files/business-analyst/hu_*.md` | `business-analyst` | `qa-documental`, `designer-ux`, `data-architect`, `api-architect`, `dev-backend`, `dev-frontend` |
 | Reportes y Certificados QA | `files/qa-documental/qa_*.md` | `qa-documental` | `business-analyst`, `designer-ux`, `solutions-architect` |
-| Wireframes y Diseños UI | `files/designer-ux/ux_*.md` | `designer-ux` | `solutions-architect`, Frontend Developer |
+| Wireframes y Diseños UI | `files/designer-ux/ux_*.md` | `designer-ux` | `solutions-architect`, `dev-frontend` |
 | Gobernanza y Stack | `files/solutions-architect/tech_guidelines.md` | `solutions-architect` | `data-architect`, `api-architect`, `qa-tech`, Developers |
-| Diseño de Base de Datos (MER) | `files/data-architect/db_*.md` | `data-architect` | `api-architect`, `qa-tech`, Database Administrators |
-| Contratos de API | `files/api-architect/api_*.md` | `api-architect` | `qa-tech`, Backend & Frontend Developers |
-| Tech Design Document (TDD) | `files/qa-tech/tech-design_*.md` | `qa-tech` | Humano, Tech Lead, Developers |
+| Diseño de Base de Datos (MER) | `files/data-architect/db_*.md` | `data-architect` | `api-architect`, `qa-tech`, `dev-backend` |
+| Contratos de API | `files/api-architect/api_*.md` | `api-architect` | `qa-tech`, `dev-backend`, `dev-frontend` |
+| Tech Design Document (TDD) | `files/qa-tech/tech-design_*.md` | `qa-tech` | Humano, `dev-backend`, `dev-frontend`, `devops` |
+| Código Fuente Backend | `src/backend-modulith-template/` | `dev-backend` | `qa-auto`, `code-review`, `devops` |
+| Código Fuente Frontend | `src/template-base/` | `dev-frontend` | `qa-auto`, `code-review`, `devops` |
+| Baterías de Pruebas Automáticas | Directorios de Tests (`tests/`) | `qa-auto` | `code-review`, CI/CD Pipeline |
+| Dictámenes de Code Review | Registrado en `tracker_bmad.md` | `code-review` | Desarrolladores, Humano, `devops` |
+| Infraestructura y CI/CD | `docker-compose.yml`, `.github/` | `devops` | Desarrolladores, Operador, Servidores |
 
 ---
 

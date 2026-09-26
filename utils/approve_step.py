@@ -71,10 +71,34 @@ APPROVAL_CONFIG = {
         "message": "@DA: Las directrices de arquitectura técnica han sido aprobadas en {file}. Procede con el diseño del Modelo Entidad-Relación (MER)."
     },
     "10": {
-        "name": "QA Técnico (QT) -> Aprobación Final de Arquitectura y Codificación",
+        "name": "QA Técnico (QT) -> Handoff a Desarrollo Backend (@DEV-BACK:)",
         "folder": "qa-tech",
         "file_regex": r"(tech-design_[\w_]+\.md)",
-        "message": "@DEV: La arquitectura técnica consolidada ha sido verificada y aprobada por QT y Negocio en el archivo {file}. Procede con la codificación y configuración del repositorio."
+        "message": "@DEV-BACK: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Backend siguiendo VSA y la Lex Superior."
+    },
+    "11": {
+        "name": "QA Técnico (QT) -> Handoff a Desarrollo Frontend (@DEV-FRONT:)",
+        "folder": "qa-tech",
+        "file_regex": r"(tech-design_[\w_]+\.md)",
+        "message": "@DEV-FRONT: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Frontend en Angular 22 Zoneless y PrimeNG."
+    },
+    "12": {
+        "name": "Devs (Backend/Frontend) -> Handoff a QA Automation (@QA-AUTO:)",
+        "folder": "dev-backend",
+        "file_regex": r"([\w_]+\.cs|[\w_]+\.ts)",
+        "message": "@QA-AUTO: El código fuente de la Feature ha sido implementado y auto-auditado. Procede con el diseño y ejecución de la suite de pruebas automatizadas xUnit/Jest."
+    },
+    "13": {
+        "name": "QA Automation (QA-Auto) -> Handoff a Code Review (@CODE-REVIEW:)",
+        "folder": "qa-auto",
+        "file_regex": r"([\w_]+Tests?\.cs|[\w_]+\.spec\.ts)",
+        "message": "@CODE-REVIEW: La suite de pruebas automatizadas y cobertura de Criterios de Aceptación ha sido completada. Procede con la auditoría SecOps, OWASP y calidad técnica final."
+    },
+    "14": {
+        "name": "Code Review -> Aprobación Final y Handoff a DevOps (@DEVOPS:)",
+        "folder": "code-review",
+        "file_regex": r"(tracker_bmad\.md)",
+        "message": "@DEVOPS: El código y las pruebas han sido aprobados con éxito en la compuerta de Code Review. Procede con el aprovisionamiento de contenedores, Docker Compose y pipelines CI/CD."
     }
 }
 

@@ -39,6 +39,11 @@ python init_bmad.py "Nombre de Mi Nuevo Proyecto"
    - `files/data-architect/`
    - `files/api-architect/`
    - `files/qa-tech/`
+   - `files/dev-backend/`
+   - `files/dev-frontend/`
+   - `files/qa-auto/`
+   - `files/code-review/`
+   - `files/devops/`
 2. **Generación del Diccionario de Rutas (`config_bmad.json`):** Construye el archivo de configuración con rutas absolutas canónicas adaptadas al directorio actual.
 3. **Reseteo Limpio del Tracker:** Inicializa `files/tracker_bmad.md` como un archivo totalmente vacío y limpio, asegurando que no existan instrucciones residuales que confundan al orquestador.
 
@@ -67,7 +72,12 @@ Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
     "solutions-architect": "D:\\Ruta\\Al\\Proyecto\\files\\solutions-architect\\",
     "data-architect": "D:\\Ruta\\Al\\Proyecto\\files\\data-architect\\",
     "api-architect": "D:\\Ruta\\Al\\Proyecto\\files\\api-architect\\",
-    "qa-tech": "D:\\Ruta\\Al\\Proyecto\\files\\qa-tech\\"
+    "qa-tech": "D:\\Ruta\\Al\\Proyecto\\files\\qa-tech\\",
+    "dev-backend": "D:\\Ruta\\Al\\Proyecto\\files\\dev-backend\\",
+    "dev-frontend": "D:\\Ruta\\Al\\Proyecto\\files\\dev-frontend\\",
+    "qa-auto": "D:\\Ruta\\Al\\Proyecto\\files\\qa-auto\\",
+    "code-review": "D:\\Ruta\\Al\\Proyecto\\files\\code-review\\",
+    "devops": "D:\\Ruta\\Al\\Proyecto\\files\\devops\\"
   }
 }
 ```
@@ -130,7 +140,7 @@ Asegura que el archivo exista físicamente pero su contenido sea una cadena vac�
 
 - **`python utils/clean_files.py`:** Permite vaciar interactivamente los entregables de una o todas las subcarpetas de `files/` (opción `T`), manteniendo intacta la estructura y el `tracker_bmad.md`.
 - **`python utils/delete_agents.py`:** Elimina los archivos `AGENTS.md` compilados para forzar una regeneración limpia desde las carpetas `agents/` e `instructions/`.
-- **`python utils/start_agents.py`:** Abre la grilla completa en **Herdr**, divide los paneles, configura permisos de sandbox (`--add-dir`) y aplica la estrategia FinOps de modelos y esfuerzos de razonamiento.
+- **`python utils/start_agents.py`:** Abre la flota completa en **Herdr** distribuida en 3 pestañas temáticas (*Negocio y Producto*, *Arquitectura e Ingeniería*, *Desarrollo y Delivery*), divide los paneles, configura permisos de sandbox (`--add-dir`) y aplica la estrategia FinOps de modelos y esfuerzos de razonamiento.
 - **`python utils/approve_step.py`:** Administra las pausas de aprobación obligatoria (HITL). Permite abrir el artefacto producido, revisarlo en el sistema operativo y emitir la orden formal correspondiente (`@PM:`, `@DEV:`, etc.) en el tracker.
 
 ---

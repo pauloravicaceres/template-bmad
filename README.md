@@ -7,10 +7,11 @@
 ## 🌟 Capacidades Principales
 
 * **El Tracker como Único Bus de Datos y Comunicación:** Los agentes **NO** se comunican entre sí por chat ni APIs directas. Toda la coordinación y paso de entregables fluye exclusivamente mediante eventos anexados al final de `files/tracker_bmad.md` bajo el patrón estricto de adición (*read -> concat -> write*).
-* **Roster Oficial de Agentes:** Pipeline estructurado de 9 agentes core (`product-analyst`, `product-manager`, `business-analyst`, `qa-documental`, `designer-ux`, `solutions-architect`, `data-architect`, `api-architect` y `qa-tech`), junto al agente de intake `business-storyteller`.
+* **Roster Oficial de 15 Agentes:** Flota especializada dividida en 4 fases metodológicas: Fase B (Business: `business-storyteller`, `product-analyst`), Fase M (Management: `product-manager`, `business-analyst`, `qa-documental`, `designer-ux`), Fase A (Architecture: `solutions-architect`, `data-architect`, `api-architect`, `qa-tech`) y Fase D (Development & Delivery: `dev-backend`, `dev-frontend`, `qa-auto`, `code-review`, `devops`).
+* **Fase D (Development & Delivery) Especializada:** Segregación estricta entre Constructores (`dev-backend` en .NET VSA y `dev-frontend` en Angular 22 Zoneless) y Auditores (`qa-auto` con xUnit/Testcontainers/Jest y `code-review` como compuerta SecOps/OWASP). La infraestructura es aprovisionada en paralelo por `devops` (Docker rootless, compose resiliente y GitHub Actions).
 * **Lógica de Bypass (Headless vs UI):** El ecosistema reconoce la naturaleza del proyecto:
-  - **Proyectos con UI:** Transitan el pipeline visual completo: `BA -> QA -> UX -> SA -> DA -> API -> QT`.
-  - **Proyectos Headless (ETL, SSIS, APIs puras, Pipelines de Datos):** Saltan automáticamente la fase de diseño UX: `BA -> QA -> SA -> DA -> QT`.
+  - **Proyectos con UI:** Transitan el pipeline visual completo: `BA -> QA -> UX -> SA -> DA -> API -> QT -> (DEV-BACK / DEV-FRONT) -> QA-AUTO -> CODE-REVIEW`.
+  - **Proyectos Headless (ETL, SSIS, APIs puras, Pipelines de Datos):** Saltan automáticamente la fase de diseño UX: `BA -> QA -> SA -> DA -> QT -> DEV-BACK -> QA-AUTO -> CODE-REVIEW`.
 * **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `files/context/legacy_ecosystem.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
 * **Auto-Evolución y Destilación de Contexto (Context Distillation):** El QA Tech (`qa-tech`) actúa como **Bibliotecario de Arquitectura**. Al compilar el Tech Design Document (TDD), evalúa si hubo cambios estructurales y genera o actualiza automáticamente el archivo `files/context/legacy_ecosystem.md`. Esto cierra el ciclo de vida arquitectónico, permitiendo que un proyecto nacido como *Greenfield* destile sus propias invariantes y prepare el terreno para futuras iteraciones evolutivas (*Brownfield*) de manera 100% desatendida.
 * **Auditoría Adversarial Zero-Trust (Quality Gate Técnico):** El QA Tech no valida ciegamente; aplica duda metódica por defecto, audita trazabilidad forzosa UI-Data (cero campos huérfanos), detector de mentiras en ADRs (cazando alternativas absurdas o trade-offs cosméticos) y clasifica hallazgos en una matriz de severidad (Crítico, Advertencia, Sugerencia) con auto-sanación agéntica.
@@ -53,7 +54,7 @@
 │
 ├── /skills                           # Repositorio global de habilidades (tracker-logger, export-pdf, etc.)
 ├── /utils                            # Scripts de automatización y mantenimiento
-│   ├── start_agents.py               # Despliega la grilla de terminales en Herdr (Rutas dinámicas)
+│   ├── start_agents.py               # Despliega la flota en 3 pestañas temáticas en Herdr (Rutas dinámicas)
 │   ├── approve_step.py               # Script HITL para autorizar transiciones (@PM:, @DEV:)
 │   ├── clean_files.py                # Limpia interactivamente los entregables en files/
 │   └── delete_agents.py              # Elimina los archivos AGENTS.md auto-compilados
@@ -70,6 +71,11 @@
 ├── /data-architect                   # Agente DA: Modelo Entidad-Relación (MER) y persistencia
 ├── /api-architect                    # Agente API: Contratos de integración REST/GraphQL
 ├── /qa-tech                          # Agente QT: Auditoría cruzada y compilación del TDD
+├── /dev-backend                      # Agente DEV-BACK: Senior Backend Dev (.NET 8/10 VSA)
+├── /dev-frontend                     # Agente DEV-FRONT: Senior Frontend Dev (Angular 22 Zoneless)
+├── /qa-auto                          # Agente QA-AUTO: Senior QA Automation (xUnit, Testcontainers, Jest)
+├── /code-review                      # Agente CR: Tech Lead & SecOps Reviewer (OWASP, Gates)
+├── /devops                           # Agente DEVOPS: Cloud, Docker & SRE Engineer
 │
 ├── /prompts                          # Prompts monolíticos de referencia (Legacy)
 │
@@ -86,7 +92,12 @@
     ├── /solutions-architect          # Salidas SA: gobernanza técnica (tech_guidelines.md)
     ├── /data-architect               # Salidas DA: diseño de persistencia (db_*.md)
     ├── /api-architect                # Salidas API: contratos de interfaz (api_*.md)
-    └── /qa-tech                      # Salidas QT: compilado maestro (tech-design_*.md)
+    ├── /qa-tech                      # Salidas QT: compilado maestro (tech-design_*.md)
+    ├── /dev-backend                  # Salidas DEV-BACK: logs y artefactos backend
+    ├── /dev-frontend                 # Salidas DEV-FRONT: logs y artefactos frontend
+    ├── /qa-auto                      # Salidas QA-AUTO: suites de pruebas y cobertura
+    ├── /code-review                  # Salidas CR: certificaciones y dictámenes SecOps
+    └── /devops                       # Salidas DEVOPS: configs de despliegue y compose
 ```
 
 ---
@@ -125,9 +136,18 @@ flowchart TD
     QA -->|Aprobado: Bypass Headless| SA
     SA -->|tech_guidelines.md| DA["8. Data Architect (DA)<br><i>MER y Diccionario de Datos</i>"]
     DA -->|Requiere APIs| API["9. API Architect (API)<br><i>Contratos REST/GraphQL</i>"]
-    DA -->|Headless Puro / ETL| QT["10. QA Técnico (QT)<br><i>Auditoría Adversarial y Compilación</i>"]
     API -->|api_*.md| QT
-    QT -->|tech-design_*.md| Fin["✅ Aprobación Final HITL / Codificación"]
+    QT -->|tech-design_*.md| HITLD["👤 Pausa HITL Fase D<br><i>(approve_step.py)</i>"]
+    HITLD -->|Aprobado Backend| DevBack["11. Dev Backend (DEV-BACK)<br><i>.NET 8/10 Modulith & VSA</i>"]
+    HITLD -->|Aprobado Frontend| DevFront["12. Dev Frontend (DEV-FRONT)<br><i>Angular 22 Zoneless & PrimeNG</i>"]
+    DevBack & DevFront --> QAAuto["13. QA Automation (QA-AUTO)<br><i>xUnit, Testcontainers & Jest</i>"]
+    QAAuto -->|Pruebas Verificadas| CR{"14. Code Review (CR)<br><i>Quality Gate & SecOps</i>"}
+    CR -->|Rechazo de Calidad| DevBack
+    CR -->|Rechazo de Calidad| DevFront
+    CR -->|Rechazo de Pruebas| QAAuto
+    CR -->|Aprobado| DevOps["15. DevOps & SRE (DEVOPS)<br><i>Docker Compose & CI/CD</i>"]
+    DevOps --> Fin["🚀 Software en Producción Certificado"]
+    QT -.->|Aprovisionamiento Paralelo| DevOps
     QT -.->|Context Distillation<br><i>Crea o actualiza snapshot</i>| Legacy[("🏛️ files/context/legacy_ecosystem.md<br><i>Memoria Invariante para Iteraciones Brownfield</i>")]
 ```
 

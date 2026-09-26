@@ -23,3 +23,4 @@ applyTo: '**'
 3. Solo tras validar físicamente el archivo, notifica la finalización en el tracker.
 
 [IMPORT_SKILL: skills/vsa-validator/SKILL.md]
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

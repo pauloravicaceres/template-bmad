@@ -33,6 +33,11 @@
 | **Data Architecture** | `data-architect` | Modela la persistencia: Modelo Entidad-Relación (MER), diccionario y ADRs (`db_*.md`). |
 | **API Architecture** | `api-architect` | Diseña contratos de integración REST/GraphQL, payloads y códigos de respuesta (`api_*.md`). |
 | **Quality Assurance (Tech)** | `qa-tech` | Audita coherencia cruzada (MER vs API) y compila el documento maestro (`tech-design_*.md`). |
+| **Backend Development** | `dev-backend` | Desarrolla Features backend en .NET 8/10 Modulith bajo Vertical Slice Architecture y Lex Superior. |
+| **Frontend Development** | `dev-frontend` | Construye componentes reactivos en Angular 22 Zoneless con Signals y PrimeNG v22.1.1. |
+| **QA Automation** | `qa-auto` | Diseña y ejecuta suites automáticas xUnit/Testcontainers/Jest con cobertura de CA (Zero-Tautology). |
+| **Code Review & SecOps** | `code-review` | Gatekeeper final: lectura física, verificación de CancellationToken, N+1, IDOR, XSS y veredicto formal. |
+| **DevOps & SRE** | `devops` | Aprovisiona Dockerfiles rootless, compose resiliente con healthchecks y pipelines CI/CD. |
 
 ### Términos Fundamentales
 

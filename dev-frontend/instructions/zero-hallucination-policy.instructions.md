@@ -24,3 +24,4 @@ applyTo: '**'
 
 
 [IMPORT_SKILL: skills/zoneless-validator/SKILL.md]
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

@@ -21,7 +21,12 @@ def init_project(nombre_proyecto):
         "solutions-architect",
         "data-architect",
         "api-architect",
-        "qa-tech"
+        "qa-tech",
+        "dev-backend",
+        "dev-frontend",
+        "qa-auto",
+        "code-review",
+        "devops"
     ]
     
     print(f"\n🚀 Inicializando proyecto BMAD: {nombre_proyecto}")

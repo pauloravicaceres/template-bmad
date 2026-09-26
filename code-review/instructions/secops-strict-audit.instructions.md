@@ -17,3 +17,4 @@ Como Tech Lead, tienes **Tolerancia Cero** frente a bloqueos de hilos y sobrecar
 
 
 [IMPORT_SKILL: skills/code-review-gatekeeper/SKILL.md]
+[IMPORT_SKILL: skills/tracker-logger/SKILL.md]

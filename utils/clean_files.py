@@ -12,7 +12,12 @@ AGENTS = {
     "sa:": "solutions-architect",
     "da:": "data-architect",
     "api:": "api-architect",
-    "qt:": "qa-tech"
+    "qt:": "qa-tech",
+    "dev-back:": "dev-backend",
+    "dev-front:": "dev-frontend",
+    "qa-auto:": "qa-auto",
+    "code-rev:": "code-review",
+    "devops:": "devops"
 }
 
 

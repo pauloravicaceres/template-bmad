@@ -18,9 +18,12 @@ SKILLS_DIR = DIRECTORIO_RAIZ / "skills"  # NUEVO: Directorio global de habilidad
 # ==========================================
 def compilar_agentes_modulares():
     print("\n🛠️ [Build] Iniciando ensamblaje de agentes modulares...")
-    agentes_modulares = ["business-storyteller", "product-analyst", "product-manager",
-                         "business-analyst", "qa-documental", "designer-ux",
-                         "solutions-architect", "data-architect", "api-architect", "qa-tech"]
+    agentes_modulares = [
+        "business-storyteller", "product-analyst", "product-manager",
+        "business-analyst", "qa-documental", "designer-ux",
+        "solutions-architect", "data-architect", "api-architect", "qa-tech",
+        "dev-backend", "dev-frontend", "qa-auto", "code-review", "devops"
+    ]
     
     # Aseguramos que la carpeta de skills exista para no generar errores
     SKILLS_DIR.mkdir(parents=True, exist_ok=True)
@@ -29,8 +32,17 @@ def compilar_agentes_modulares():
     def inyectar_skill(match):
         ruta_relativa = match.group(1).strip() # ej: "skills/hu-validator/SKILL.md"
         
-        # 1. Intentar buscar en la carpeta LOCAL del agente (ej. /business-analyst/skills/...)
+        # 1. Intentar buscar en la carpeta LOCAL del agente (ej. /business-analyst/skills/... o /skill/...)
         skill_local_path = ruta_agente / ruta_relativa
+        if not skill_local_path.exists():
+            if ruta_relativa.startswith("skills/"):
+                alt_rel = "skill/" + ruta_relativa[len("skills/"):]
+                if (ruta_agente / alt_rel).exists():
+                    skill_local_path = ruta_agente / alt_rel
+            elif ruta_relativa.startswith("skill/"):
+                alt_rel = "skills/" + ruta_relativa[len("skill/"):]
+                if (ruta_agente / alt_rel).exists():
+                    skill_local_path = ruta_agente / alt_rel
         
         # 2. Intentar buscar en la carpeta GLOBAL del proyecto (ej. /skills/...)
         skill_global_path = DIRECTORIO_RAIZ / ruta_relativa
@@ -57,22 +69,24 @@ def compilar_agentes_modulares():
         instrucciones_dir = ruta_agente / "instructions"
         target_file = ruta_agente / "AGENTS.md"
         
-        if agent_file.exists() and instrucciones_dir.exists():
+        if agent_file.exists():
             contenido = agent_file.read_text(encoding='utf-8')
+            # Procesar skills si existen en el propio agent.md
+            contenido = re.sub(r"\[IMPORT_SKILL:\s*(.+?)\]", inyectar_skill, contenido)
             
-            contenido += "\n\n## ==========================================\n"
-            contenido += "## REGLAS Y ESTÁNDARES ADJUNTOS (AUTO-ENSAMBLADO)\n"
-            contenido += "## ==========================================\n"
-            
-            for inst_file in instrucciones_dir.glob("*.instructions.md"):
-                titulo = inst_file.stem.upper().replace('-', ' ').replace('.INSTRUCTIONS', '')
-                inst_contenido = inst_file.read_text(encoding='utf-8')
-              
-                # Buscamos todas las ocurrencias de [IMPORT_SKILL: archivo.md] y las reemplazamos
-                inst_contenido = re.sub(r"\[IMPORT_SKILL:\s*(.+?)\]", inyectar_skill, inst_contenido)
-                
-                contenido += f"\n\n## {titulo}\n"
-                contenido += inst_contenido
+            if instrucciones_dir.exists():
+                archivos_instrucciones = list(instrucciones_dir.glob("*.instructions.md"))
+                if archivos_instrucciones:
+                    contenido += "\n\n## ==========================================\n"
+                    contenido += "## REGLAS Y ESTÁNDARES ADJUNTOS (AUTO-ENSAMBLADO)\n"
+                    contenido += "## ==========================================\n"
+                    
+                    for inst_file in archivos_instrucciones:
+                        titulo = inst_file.stem.upper().replace('-', ' ').replace('.INSTRUCTIONS', '')
+                        inst_contenido = inst_file.read_text(encoding='utf-8')
+                        inst_contenido = re.sub(r"\[IMPORT_SKILL:\s*(.+?)\]", inyectar_skill, inst_contenido)
+                        contenido += f"\n\n## {titulo}\n"
+                        contenido += inst_contenido
                 
             target_file.write_text(contenido, encoding='utf-8')
             print(f"✅ [Build] AGENTS.md ensamblado exitosamente en la raíz de /{nombre}.")
@@ -120,7 +134,16 @@ def extraer_instrucciones(linea):
         "@SA:": "solutions-architect",
         "@DA:": "data-architect",
         "@API:": "api-architect",
-        "@QT:": "qa-tech"
+        "@QT:": "qa-tech",
+        "@DEV-BACK:": "dev-backend",
+        "@DEV-BACKEND:": "dev-backend",
+        "@DEV-FRONT:": "dev-frontend",
+        "@DEV-FRONTEND:": "dev-frontend",
+        "@QA-AUTO:": "qa-auto",
+        "@CODE-REVIEW:": "code-review",
+        "@CR:": "code-review",
+        "@DEVOPS:": "devops",
+        "@DEV:": "dev-backend"
     }
 
     tareas = []
