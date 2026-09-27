@@ -29,7 +29,7 @@ python init_bmad.py "Nombre de Mi Nuevo Proyecto"
 
 ### Qué realiza automáticamente este script:
 1. **Scaffolding de Almacenamiento:** Crea todas las carpetas dentro de `files/` para el roster completo de agentes:
-   - `files/context/` *(Opcional: aloja `constitution.md` para proyectos Brownfield)*
+   - `.specify/memory/` *(Opcional: aloja `constitution.md` para proyectos Brownfield)*
    - `files/business-storyteller/`
    - `files/product-analyst/`
    - `files/product-manager/`

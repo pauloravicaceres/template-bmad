@@ -12,7 +12,16 @@ applyTo: '**'
   - 🚫 PROHIBIDO importar `zone.js` o usar `NgModules`.
   - 🚫 PROHIBIDO usar `*ngIf` o `*ngFor`.
   - 🚫 PROHIBIDO suscribirte manualmente con `.subscribe()` cuando el flujo pueda resolverse nativamente con `toSignal()` o pipelines reactivos.
-- **Cero CSS Hackeado:** Está prohibido el uso de `::ng-deep` para sobrescribir estilos de PrimeNG. Debes utilizar las propiedades nativas del componente (ej. `[style]`, `[class]`, `styleClass`) o el sistema de grillas estándar.
+- **Cero CSS Hackeado / Maquetación Prohibida en Componentes:**
+  - 🚫 PROHIBIDO usar `::ng-deep` para sobrescribir estilos de PrimeNG.
+  - 🚫 PROHIBIDO escribir reglas de maquetación (márgenes, paddings, flexbox, grids, gaps, posicionamiento) en los archivos `.css` o `.scss` de los componentes.
+  - ✅ OBLIGATORIO usar EXCLUSIVAMENTE las clases utilitarias de **PrimeFlex** directamente en el `.html`. Ejemplos canónicos:
+    - Layout: `flex`, `flex-column`, `flex-row`, `flex-wrap`
+    - Alineación: `justify-content-between`, `justify-content-center`, `align-items-center`
+    - Espaciado: `p-2`, `p-4`, `m-0`, `gap-3`, `px-3`, `py-2`
+    - Grid Responsivo: `col-12`, `md:col-6`, `lg:col-4`
+    - Bordes/Efectos: `border-round`, `border-round-lg`, `shadow-2`
+  - Para ajustes visuales propios de un componente PrimeNG usa exclusivamente `[style]`, `[class]` o `styleClass` en el propio tag del componente.
 
 ## 2. Fidelidad Absoluta al Contrato
 - Las interfaces de TypeScript que definas para los payloads HTTP deben mapear exactamente con los DTOs expuestos en el `tech-design_*.md`. Si el diseño dice `productId: string`, no lo declares como `number`.

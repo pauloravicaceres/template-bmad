@@ -18,8 +18,8 @@ Antes de proponer o escribir cualquier cambio, debes evaluar si cumple con estos
 1. **El Bus de Datos (Tracker):** Los agentes NO chatean entre sí. Leen y escriben asíncronamente en el `tracker_bmad.md`. Las órdenes de delegación (Handoffs como `@QA:`, `@SA:`) deben ser deterministas y de una sola línea.
 2. **Plantillas Deterministas (Estructura como Código):** Los entregables (`pb_*.md`, `hu_*.md`, `tech-design_*.md`) no son prosa libre. Deben tener secciones rígidas, checklist de DoD (Definition of Done) y variables estandarizadas. El `@BA` opera bajo la Estrategia Dual-Output, generando simultáneamente HUs técnicas en Gherkin puro (`files/business-analyst/hu_*.md`) y HUs para stakeholders de negocio (`files/business-analyst/HUs-stakeholders/hu_*.md`).
 3. **Topología Dinámica (Bypass Inteligente):** El framework se adapta a la naturaleza del requerimiento:
-   - Proyectos con UI: `BA -> QA -> [SDD Gatekeeper: Spec Kit] -> UX -> SA -> DA -> API -> QT -> /speckit.implement -> (DEV-BACK / DEV-FRONT) -> QA-AUTO -> CODE-REVIEW`
-   - Proyectos Headless (ETL, SSIS, APIs): Salta la capa visual (`BA -> QA -> [SDD Gatekeeper: Spec Kit] -> SA -> DA -> QT -> /speckit.implement -> DEV-BACK -> QA-AUTO -> CODE-REVIEW`).
+   - Proyectos con UI: `BS -> PA -> PM -> BA -> QA -> [SDD Gatekeeper: Spec Kit] -> UX -> SA -> DA -> API -> QT -> /speckit.implement -> (DEV-BACK / DEV-FRONT) -> QA-AUTO -> CODE-REVIEW`
+   - Proyectos Headless (ETL, SSIS, APIs): Salta la capa visual (`BS -> PA -> PM -> BA -> QA -> [SDD Gatekeeper: Spec Kit] -> SA -> DA -> QT -> /speckit.implement -> DEV-BACK -> QA-AUTO -> CODE-REVIEW`).
    - Infraestructura y Plataforma: `DEVOPS` opera en paralelo para aprovisionar contenedores, compose y CI/CD.
 4. **Política Anti-Alucinación:** Ningún agente inventa reglas de negocio o columnas de base de datos. Si falta información, deben usar explícitamente etiquetas como `⚠️ [PROPUESTO]` o `⚠️ SUPUESTO:`.
 5. **Auditoría Cruzada:** El agente Compilador (`qa-tech` o QT) actúa como árbitro final, cruzando el diseño de la Base de Datos (`db_*.md`) contra los contratos de Red (`api_*.md`) antes de autorizar el paso a desarrollo.
