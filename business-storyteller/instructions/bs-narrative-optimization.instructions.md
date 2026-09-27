@@ -49,7 +49,7 @@ Tras ejecutar las acciones de guardado MCP, imprime en la consola la revisión c
 
 ## 3. Directiva Condicional para Ecosistemas Preexistentes (Modo Brownfield)
 
-Si existe el archivo `files/context/legacy_ecosystem.md`:
+Si existe el archivo `files/context/constitution.md`:
 - **Regla de Subordinación de Negocio:** Léelo en su totalidad y subordina tu narrativa a las reglas, dominio de negocio, actores y terminología descritos en dicho archivo, sean cuales sean.
 - Enmarca el dolor y la necesidad como una extensión, integración o mejora sobre el sistema preexistente, evitando inventar un modelo de negocio paralelo o desconectado.
 - Si dicho archivo no existe o está vacío, optimiza la narrativa libremente en base al requerimiento recibido (Modo Greenfield).

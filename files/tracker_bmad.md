@@ -121,7 +121,7 @@
 ### [25-09-2026] QA Tech
 - **Hora:** 00:05:45
 - **Artefacto generado:** `files/qa-tech/tech-design_tarjeta_identidad_digital.md`
-- **Estado:** Auditoría adversarial Zero-Trust completada con 0 bloqueos críticos (100% trazabilidad UI-Data, MADR sin alternativas falsas ni trade-offs cosméticos, arquitectura Jamstack/SSG proporcional). Tech Design Document consolidado y snapshot legacy_ecosystem.md creado exitosamente.
+- **Estado:** Auditoría adversarial Zero-Trust completada con 0 bloqueos críticos (100% trazabilidad UI-Data, MADR sin alternativas falsas ni trade-offs cosméticos, arquitectura Jamstack/SSG proporcional). Tech Design Document consolidado y snapshot constitution.md creado exitosamente.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @HUMANO: El Tech Design Document maestro ha sido compilado y aprobado por QA Técnico en files/qa-tech/tech-design_tarjeta_identidad_digital.md. Por favor, revisa y autoriza formalmente el diseño de arquitectura para dar inicio a la fase de implementación y desarrollo.
 
@@ -136,7 +136,7 @@
 ### [25-09-2026] Product Analyst
 - **Hora:** 00:20:45
 - **Artefacto generado:** `files/product-analyst/pb_menu_navegacion_perfil.md`
-- **Estado:** Product Brief para la extensión del menú de navegación estructurado en 8 secciones canónicas bajo modo Brownfield (subordinado a legacy_ecosystem.md), aplicación estricta de políticas anti-alucinación y persistencia física verificada.
+- **Estado:** Product Brief para la extensión del menú de navegación estructurado en 8 secciones canónicas bajo modo Brownfield (subordinado a constitution.md), aplicación estricta de políticas anti-alucinación y persistencia física verificada.
 - **⚠️ Puntos Abiertos:** Definición de apertura de vista de Experiencia (misma pestaña o nueva) y convención de nombrado del archivo PDF de Estudios.
 - **Handoff:** @HUMANO: El Product Brief pb_menu_navegacion_perfil.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
 
@@ -149,21 +149,21 @@
 ### [25-09-2026] Product Manager
 - **Hora:** 00:22:45
 - **Artefacto generado:** `files/product-manager/mvp_menu_navegacion_perfil.md`
-- **Estado:** Plan estratégico y Backlog del MVP estructurado bajo metodología de Ruta Crítica (P1/P2) en Modo Brownfield (subordinado a legacy_ecosystem.md), persistido físicamente y verificado en disco.
+- **Estado:** Plan estratégico y Backlog del MVP estructurado bajo metodología de Ruta Crítica (P1/P2) en Modo Brownfield (subordinado a constitution.md), persistido físicamente y verificado en disco.
 - **⚠️ Puntos Abiertos:** Definición de apertura de vista de Experiencia (misma pestaña o nueva) y convención de nombrado del archivo PDF de Estudios.
 - **Handoff:** @BA: Se transfiere el plan estratégico del MVP (mvp_menu_navegacion_perfil.md) en Modo Brownfield. Inicia el análisis detallado y especificación de Historias de Usuario para la Épica [P1] Componente Menú de Navegación y Enrutamiento a Vista de Experiencia.
 
 ### [25-09-2026] Business Analyst
 - **Hora:** 00:23:30
 - **Artefacto generado:** `files/business-analyst/hu_01_menu_navegacion_experiencia.md`
-- **Estado:** Historia de Usuario HU-01 en Modo Brownfield subordinada a legacy_ecosystem.md, estructurada bajo estándar BDD (Happy/Sad Path con garantía de no-regresión y cero FOUT), validada con skill hu-validator y persistida exitosamente.
+- **Estado:** Historia de Usuario HU-01 en Modo Brownfield subordinada a constitution.md, estructurada bajo estándar BDD (Happy/Sad Path con garantía de no-regresión y cero FOUT), validada con skill hu-validator y persistida exitosamente.
 - **⚠️ Puntos Abiertos:** Definición de apertura de vista de Experiencia (misma pestaña o nueva ventana).
 - **Handoff:** @QA: La Historia de Usuario Componente Menú de Navegación y Enrutamiento a Vista de Experiencia está lista en el archivo hu_01_menu_navegacion_experiencia.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 ### [25-09-2026] QA Documental
 - **Hora:** 00:26:00
 - **Artefacto generado:** `files/qa-documental/aprobado_qa_01_menu_navegacion_experiencia.md`
-- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a legacy_ecosystem.md). Certificado de Aprobación emitido y verificado en disco.
+- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a constitution.md). Certificado de Aprobación emitido y verificado en disco.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @UX: La Historia de Usuario hu_01_menu_navegacion_experiencia.md ha sido aprobada por QA. Por favor, procede a diseñar los wireframes y estados visuales del menú de navegación y la vista base de Experiencia.
 
@@ -184,14 +184,14 @@
 ### [25-09-2026] Business Analyst
 - **Hora:** 00:28:15
 - **Artefacto generado:** `files/business-analyst/hu_02_descarga_documento_estudios.md`
-- **Estado:** Historia de Usuario HU-02 en Modo Brownfield subordinada a legacy_ecosystem.md, estructurada bajo estándar BDD (Happy/Sad Path para entrega estática de PDF y resiliencia), validada con skill hu-validator y persistida exitosamente.
+- **Estado:** Historia de Usuario HU-02 en Modo Brownfield subordinada a constitution.md, estructurada bajo estándar BDD (Happy/Sad Path para entrega estática de PDF y resiliencia), validada con skill hu-validator y persistida exitosamente.
 - **⚠️ Puntos Abiertos:** Confirmación del identificador y nombre canónico del asset PDF a servir para "Estudios".
 - **Handoff:** @QA: La Historia de Usuario Descarga Directa de Documento de Estudios está lista en el archivo hu_02_descarga_documento_estudios.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 ### [25-09-2026] QA Documental
 - **Hora:** 00:29:00
 - **Artefacto generado:** `files/qa-documental/aprobado_qa_02_descarga_documento_estudios.md`
-- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a legacy_ecosystem.md). Certificado de Aprobación emitido y verificado en disco.
+- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a constitution.md). Certificado de Aprobación emitido y verificado en disco.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @UX: La Historia de Usuario hu_02_descarga_documento_estudios.md ha sido aprobada por QA. Por favor, procede a diseñar los wireframes y estados visuales del botón/enlace de descarga de Estudios.
 
@@ -206,7 +206,7 @@
 ### [25-09-2026] Solutions Architect
 - **Hora:** 00:30:30
 - **Artefacto generado:** `Ninguno`
-- **Estado:** Análisis de requerimientos y alcance (Product Brief y MVP) completado en Modo Brownfield (subordinado a legacy_ecosystem.md). Formulado cuestionario táctico enfocado en la integración del menú de navegación, enrutamiento SSG de experiencia, entrega estática de PDF y no-regresión.
+- **Estado:** Análisis de requerimientos y alcance (Product Brief y MVP) completado en Modo Brownfield (subordinado a constitution.md). Formulado cuestionario táctico enfocado en la integración del menú de navegación, enrutamiento SSG de experiencia, entrega estática de PDF y no-regresión.
 - **⚠️ Puntos Abiertos:** Definición de integración de componente NavigationMenu en layout compartido, enrutamiento a /experiencia, extensión de esquema profile.config.json para navegación/PDF y validación CI/CD.
 - **Handoff:** @HUMANO: Se ha completado el análisis de arquitectura en Modo Brownfield. Por favor, responde al siguiente cuestionario de 5 preguntas tácticas para proceder con la actualización de tech_guidelines.md y la posterior delegación al data-architect.
 
@@ -235,28 +235,28 @@
 ### [25-09-2026] Solutions Architect
 - **Hora:** 00:33:15
 - **Artefacto generado:** `files/solutions-architect/tech_guidelines.md`
-- **Estado:** Gobernanza técnica y arquitectura consolidada en tech_guidelines.md en Modo Brownfield (subordinado a legacy_ecosystem.md), integrando componente NavigationMenu estático en Layout compartido, enrutamiento nativo a /experiencia, entrega estática de PDF en /public/docs/, extensión tipada de esquema profile.schema.ts con Zod y matriz de ADRs (ADR-001 a ADR-009) en formato MADR. Persistencia física verificada en disco.
+- **Estado:** Gobernanza técnica y arquitectura consolidada en tech_guidelines.md en Modo Brownfield (subordinado a constitution.md), integrando componente NavigationMenu estático en Layout compartido, enrutamiento nativo a /experiencia, entrega estática de PDF en /public/docs/, extensión tipada de esquema profile.schema.ts con Zod y matriz de ADRs (ADR-001 a ADR-009) en formato MADR. Persistencia física verificada en disco.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @DA: El documento tech_guidelines.md en Modo Brownfield ha sido generado y verificado. Por favor, procede con la extensión del modelo de datos y el esquema tipado en db_*.md.
 
 ### [25-09-2026] Data Architect
 - **Hora:** 00:35:40
 - **Artefacto generado:** `files/data-architect/db_tarjeta_identidad_digital.md`
-- **Estado:** MER y modelo de datos extendido en Modo Brownfield (subordinado a legacy_ecosystem.md). Esquema JSON tipado `profile.config.json` enriquecido con `navItems` y `documents`, contrato Zod `profile.schema.ts` actualizado, 100% de trazabilidad UI->Data auditada sin campos huérfanos y persistencia física verificada.
+- **Estado:** MER y modelo de datos extendido en Modo Brownfield (subordinado a constitution.md). Esquema JSON tipado `profile.config.json` enriquecido con `navItems` y `documents`, contrato Zod `profile.schema.ts` actualizado, 100% de trazabilidad UI->Data auditada sin campos huérfanos y persistencia física verificada.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @QT: El modelo de datos extendido (MER, diccionario tipado con Zod y trazabilidad UI-Data Brownfield) ha sido consolidado y auditado contra las HUs y wireframes de UX. Al tratarse de una arquitectura SSG estática sin capa de APIs externas, procede directamente con la auditoría técnica y compilación del Tech Design Document (TDD).
 
 ### [25-09-2026] QA Tech
 - **Hora:** 00:38:30
 - **Artefacto generado:** `files/qa-tech/tech-design_tarjeta_identidad_digital.md`
-- **Estado:** Auditoría adversarial Zero-Trust en Modo Brownfield completada con 0 bloqueos críticos (100% trazabilidad UI-Data, compatibilidad e invariantes heredadas respetadas, MADR sin alternativas falsas, enrutamiento multirruta SSG con Layout compartido y cero FOUT). Tech Design Document consolidado y snapshot legacy_ecosystem.md actualizado exitosamente.
+- **Estado:** Auditoría adversarial Zero-Trust en Modo Brownfield completada con 0 bloqueos críticos (100% trazabilidad UI-Data, compatibilidad e invariantes heredadas respetadas, MADR sin alternativas falsas, enrutamiento multirruta SSG con Layout compartido y cero FOUT). Tech Design Document consolidado y snapshot constitution.md actualizado exitosamente.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @HUMANO: El Tech Design Document maestro Brownfield ha sido compilado y aprobado por QA Técnico en files/qa-tech/tech-design_tarjeta_identidad_digital.md. Por favor, revisa y autoriza formalmente la arquitectura técnica para avanzar hacia la fase de implementación y desarrollo.
 
 ### [25-09-2026] Business Storyteller
 - **Hora:** 00:48:00
 - **Artefacto generado:** `files/business-storyteller/idea_modulo_experiencia.md`
-- **Estado:** Narrativa de negocio optimizada en modo Brownfield subordinada a legacy_ecosystem.md (Astro/Tailwind SSG con datos estáticos tipados), estructurada con dolor, actores y modularidad funcional, y validada post-escritura.
+- **Estado:** Narrativa de negocio optimizada en modo Brownfield subordinada a constitution.md (Astro/Tailwind SSG con datos estáticos tipados), estructurada con dolor, actores y modularidad funcional, y validada post-escritura.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @PA: Se transfiere la narrativa de negocio optimizada para el módulo de Experiencia Profesional con el fin de iniciar el análisis de producto y especificación del Product Brief.
 
@@ -265,7 +265,7 @@
 ### [25-09-2026] Product Analyst
 - **Hora:** 00:48:40
 - **Artefacto generado:** `files/product-analyst/pb_modulo_experiencia.md`
-- **Estado:** Product Brief para el módulo de Experiencia Profesional estructurado en 8 secciones canónicas bajo modo Brownfield (subordinado a legacy_ecosystem.md), aplicación estricta de directivas anti-alucinación y verificación post-escritura completada.
+- **Estado:** Product Brief para el módulo de Experiencia Profesional estructurado en 8 secciones canónicas bajo modo Brownfield (subordinado a constitution.md), aplicación estricta de directivas anti-alucinación y verificación post-escritura completada.
 - **⚠️ Puntos Abiertos:** Definición de ordenamiento cronológico inverso estricto y soporte futuro para hipervínculos externos en empresas.
 - **Handoff:** @HUMANO: El Product Brief pb_modulo_experiencia.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
 
@@ -278,21 +278,21 @@
 ### [25-09-2026] Product Manager
 - **Hora:** 00:49:50
 - **Artefacto generado:** `files/product-manager/mvp_modulo_experiencia.md`
-- **Estado:** Plan estratégico y Backlog del MVP estructurado bajo metodología de Ruta Crítica (P1/P2) en Modo Brownfield (subordinado a legacy_ecosystem.md), persistido físicamente y verificado en disco.
+- **Estado:** Plan estratégico y Backlog del MVP estructurado bajo metodología de Ruta Crítica (P1/P2) en Modo Brownfield (subordinado a constitution.md), persistido físicamente y verificado en disco.
 - **⚠️ Puntos Abiertos:** Definición de ordenamiento cronológico inverso estricto y soporte futuro para hipervínculos externos en empresas.
 - **Handoff:** @BA: Se transfiere el plan estratégico del MVP (mvp_modulo_experiencia.md) en Modo Brownfield. Inicia el análisis detallado y especificación de Historias de Usuario para la Épica [P1] Componente y Visualización Estructurada de Experiencia Laboral.
 
 ### [25-09-2026] Business Analyst
 - **Hora:** 00:50:20
 - **Artefacto generado:** `files/business-analyst/hu_01_visualizacion_experiencia_laboral.md`
-- **Estado:** Historia de Usuario HU-01 en Modo Brownfield subordinada a legacy_ecosystem.md, estructurada bajo estándar BDD (Happy/Sad Path con adaptabilidad responsiva, sin desbordamiento horizontal y cero FOUT), validada con skill hu-validator y persistida exitosamente.
+- **Estado:** Historia de Usuario HU-01 en Modo Brownfield subordinada a constitution.md, estructurada bajo estándar BDD (Happy/Sad Path con adaptabilidad responsiva, sin desbordamiento horizontal y cero FOUT), validada con skill hu-validator y persistida exitosamente.
 - **⚠️ Puntos Abiertos:** Definición de ordenamiento cronológico inverso estricto y soporte futuro para hipervínculos externos en empresas.
 - **Handoff:** @QA: La Historia de Usuario Componente y Visualización Estructurada de Experiencia Laboral está lista en el archivo hu_01_visualizacion_experiencia_laboral.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 ### [25-09-2026] QA Documental
 - **Hora:** 00:51:30
 - **Artefacto generado:** `files/qa-documental/aprobado_qa_01_visualizacion_experiencia_laboral.md`
-- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a legacy_ecosystem.md). Certificado de Aprobación emitido y verificado en disco.
+- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a constitution.md). Certificado de Aprobación emitido y verificado en disco.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @UX: La Historia de Usuario hu_01_visualizacion_experiencia_laboral.md ha sido aprobada por QA. Por favor, procede a diseñar los wireframes y estados visuales para la vista de Experiencia.
 
@@ -313,14 +313,14 @@
 ### [25-09-2026] Business Analyst
 - **Hora:** 00:53:15
 - **Artefacto generado:** `files/business-analyst/hu_02_navegacion_retorno_coherencia.md`
-- **Estado:** Historia de Usuario HU-02 en Modo Brownfield subordinada a legacy_ecosystem.md, estructurada bajo estándar BDD (Happy/Sad Path para navegación fluida, cero FOUT y layout compartido), validada con skill hu-validator y persistida exitosamente.
+- **Estado:** Historia de Usuario HU-02 en Modo Brownfield subordinada a constitution.md, estructurada bajo estándar BDD (Happy/Sad Path para navegación fluida, cero FOUT y layout compartido), validada con skill hu-validator y persistida exitosamente.
 - **⚠️ Puntos Abiertos:** Ubicación del botón de retorno (independiente vs. integrado en barra de navegación).
 - **Handoff:** @QA: La Historia de Usuario Integración de Navegación de Retorno y Coherencia Multirruta está lista en el archivo hu_02_navegacion_retorno_coherencia.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 
 ### [25-09-2026] QA Documental
 - **Hora:** 00:54:00
 - **Artefacto generado:** `files/qa-documental/aprobado_qa_02_navegacion_retorno_coherencia.md`
-- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a legacy_ecosystem.md). Certificado de Aprobación emitido y verificado en disco.
+- **Estado:** Auditoría documental completada con 100% de cumplimiento en las 6 dimensiones de la rúbrica BMAD (incluyendo subordinación a constitution.md). Certificado de Aprobación emitido y verificado en disco.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @UX: La Historia de Usuario hu_02_navegacion_retorno_coherencia.md ha sido aprobada por QA. Por favor, procede a diseñar los wireframes y estados visuales del mecanismo de retorno y coherencia multirruta.
 
@@ -335,7 +335,7 @@
 ### [25-09-2026] Solutions Architect
 - **Hora:** 00:55:30
 - **Artefacto generado:** `Ninguno`
-- **Estado:** Análisis de requerimientos y alcance (Product Brief y MVP) completado en Modo Brownfield (subordinado a legacy_ecosystem.md). Formulado cuestionario táctico enfocado en la arquitectura del componente de experiencia laboral, extensión del esquema tipado de persistencia, adaptabilidad responsiva y coherencia multirruta.
+- **Estado:** Análisis de requerimientos y alcance (Product Brief y MVP) completado en Modo Brownfield (subordinado a constitution.md). Formulado cuestionario táctico enfocado en la arquitectura del componente de experiencia laboral, extensión del esquema tipado de persistencia, adaptabilidad responsiva y coherencia multirruta.
 - **⚠️ Puntos Abiertos:** Definición del patrón visual de despliegue (tabla responsiva vs. tarjetas/timeline), extensión del esquema en profile.schema.ts para registros de experiencia, ordenamiento cronológico inverso y pruebas automatizadas en CI/CD.
 - **Handoff:** @HUMANO: Se ha completado el análisis de arquitectura en Modo Brownfield para el módulo de Experiencia Profesional. Por favor, responde al siguiente cuestionario de 5 preguntas tácticas para proceder con la actualización de tech_guidelines.md y la posterior delegación al data-architect.
 
@@ -362,20 +362,20 @@
 ### [25-09-2026] Solutions Architect
 - **Hora:** 00:57:30
 - **Artefacto generado:** `files/solutions-architect/tech_guidelines.md`
-- **Estado:** Gobernanza técnica y arquitectura consolidada en tech_guidelines.md en Modo Brownfield (subordinado a legacy_ecosystem.md), integrando el componente ExperienceList.astro (CSS Grid/Flexbox responsivo Zero JS), extensión del esquema profile.schema.ts con Zod para la colección experience, soporte de empty state defensivo, navegación bidireccional multirruta y matriz de ADRs (ADR-001 a ADR-012) en formato MADR. Persistencia física verificada en disco.
+- **Estado:** Gobernanza técnica y arquitectura consolidada en tech_guidelines.md en Modo Brownfield (subordinado a constitution.md), integrando el componente ExperienceList.astro (CSS Grid/Flexbox responsivo Zero JS), extensión del esquema profile.schema.ts con Zod para la colección experience, soporte de empty state defensivo, navegación bidireccional multirruta y matriz de ADRs (ADR-001 a ADR-012) en formato MADR. Persistencia física verificada en disco.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @DA: El documento tech_guidelines.md ha sido actualizado y verificado para el módulo de Experiencia Profesional. Por favor, procede con la extensión del modelo de datos y el esquema tipado en db_*.md.
 
 ### [25-09-2026] Data Architect
 - **Hora:** 00:58:35
 - **Artefacto generado:** `files/data-architect/db_tarjeta_identidad_digital.md`
-- **Estado:** MER y modelo de datos extendido para el módulo de Experiencia Profesional en Modo Brownfield (subordinado a legacy_ecosystem.md). Esquema JSON `profile.config.json` y contrato Zod `profile.schema.ts` consolidados con la entidad `EXPERIENCE_ITEM` (id, company, role, period, responsibilities), soporte de Empty State defensivo, trazabilidad 100% UI->Data auditada sin campos huérfanos y persistencia física verificada.
+- **Estado:** MER y modelo de datos extendido para el módulo de Experiencia Profesional en Modo Brownfield (subordinado a constitution.md). Esquema JSON `profile.config.json` y contrato Zod `profile.schema.ts` consolidados con la entidad `EXPERIENCE_ITEM` (id, company, role, period, responsibilities), soporte de Empty State defensivo, trazabilidad 100% UI->Data auditada sin campos huérfanos y persistencia física verificada.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @QT: El modelo de datos estructurado para el módulo de Experiencia Profesional (MER, esquema Zod ProfileConfigSchema con experience, soporte de Empty State y auditoría de trazabilidad UI-Data Brownfield) ha sido consolidado y verificado. Procede directamente con la auditoría técnica y compilación del Tech Design Document (TDD).
 
 ### [25-09-2026] QA Tech
 - **Hora:** 00:59:45
 - **Artefacto generado:** `files/qa-tech/tech-design_tarjeta_identidad_digital.md`
-- **Estado:** Auditoría adversarial Zero-Trust Brownfield completada con 0 bloqueos críticos (100% trazabilidad UI-Data, compatibilidad e invariantes heredadas respetadas, MADR sin alternativas falsas, maquetación responsiva con ExperienceList.astro Zero JS, soporte de Empty State defensivo y navegación bidireccional multirruta con cero FOUT). Tech Design Document consolidado y snapshot legacy_ecosystem.md actualizado exitosamente.
+- **Estado:** Auditoría adversarial Zero-Trust Brownfield completada con 0 bloqueos críticos (100% trazabilidad UI-Data, compatibilidad e invariantes heredadas respetadas, MADR sin alternativas falsas, maquetación responsiva con ExperienceList.astro Zero JS, soporte de Empty State defensivo y navegación bidireccional multirruta con cero FOUT). Tech Design Document consolidado y snapshot constitution.md actualizado exitosamente.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @HUMANO: El Tech Design Document maestro Brownfield con el módulo de Experiencia Profesional ha sido compilado y aprobado por QA Técnico en files/qa-tech/tech-design_tarjeta_identidad_digital.md. Por favor, revisa y autoriza formalmente la arquitectura técnica para dar inicio a la fase de implementación y desarrollo.

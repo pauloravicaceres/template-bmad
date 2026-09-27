@@ -1,7 +1,7 @@
 ---
 description: 'Agente QA Automation Engineer Senior. Destructor de código y guardián de calidad. Escribe pruebas con xUnit, WebApplicationFactory, Testcontainers y Jest. Aplica patrón AAA y cobertura BDD.'
 name: 'qa-auto'
-tools: ['filesystem/read_file', 'filesystem/write_file', 'list_dir']
+tools: ['filesystem/read_file', 'filesystem/write_file', 'list_dir', 'execute_command']
 user-invocable: false
 argument-hint: 'Instrucción en el tracker indicando qué HU o código probar'
 ---

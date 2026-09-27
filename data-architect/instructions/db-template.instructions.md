@@ -1,9 +1,9 @@
 ---
-description: 'Plantilla determinista para el artefacto generado por el Data Architect (db_[nombre_corto].md). Incluye MER, diccionario de datos, trazabilidad UI-Data y registro de decisiones (ADR) en formato MADR.'
+description: 'Plantilla determinista para el artefacto generado por el Data Architect (db_[nombre_corto].md). Incluye MER, diccionario de datos, trazabilidad UI-Data / Spec Kit y registro de decisiones (ADR) en formato MADR.'
 applyTo: '**'
 ---
 
-# Plantilla de Base de Datos y Decisiones (MER + ADR)
+# Plantilla de Base de Datos y Decisiones (MER + ADR) — SDD Bridge
 
 ## Convención de Nombres de Archivo
 `db_[nombre_corto].md` (ej. `db_motor_reservas.md`)
@@ -13,6 +13,7 @@ applyTo: '**'
 ```markdown
 # DISEÑO DE PERSISTENCIA (MER): {{TITULO_EPICA}}
 
+- **Especificación SDD Base:** `spec.md` y `tasks.md` (Spec Kit)
 - **Historias de Usuario Base:** {{Nombres de los archivos hu_*.md procesados}}
 - **Diseño Visual UX Auditado:** {{Nombre de ux_*.md auditado o "N/A - Bypass Headless"}}
 - **Fecha de Diseño:** {{FECHA_ACTUAL}}
@@ -21,12 +22,12 @@ applyTo: '**'
 ---
 
 ## 1. ARCHITECTURE DECISION RECORDS (ADR - Formato MADR)
-*(Justificación técnica de las decisiones estructurales más importantes tomadas para este diseño)*
+*(Justificación técnica de las decisiones estructurales de persistencia derivadas de spec.md y constitution.md)*
 
 ### ADR-01: {{Título de la decisión, ej. Motor de Persistencia o Tipo de Llave Primaria}}
 - **Estado:** {{ Aceptado | Aceptado (heredado) }}
-  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/legacy_ecosystem.md. Las decisiones heredadas no requieren alternativas consideradas.*
-- **Contexto:** {{Qué necesidad de modelado, regla funcional o restricción del legacy_ecosystem.md motiva la elección}}.
+  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
+- **Contexto:** {{Qué necesidad de modelado de spec.md o restricción del constitution.md motiva la elección}}.
 - **Decisión:** {{Tipo de dato, motor, particionamiento o normalización seleccionada en una frase clara y verificable}}.
 - **Alternativas Evaluadas (Obligatorio en decisiones nuevas):**
   - **Alternativa A:** {{Opción viable descartada y justificación técnica con argumentos reales}}.
@@ -40,24 +41,26 @@ applyTo: '**'
 
 ## 2. MODELO ENTIDAD-RELACIÓN (MER)
 
-\`\`\`mermaid
+```mermaid
 erDiagram
-    %% Reemplazar con el diseño exacto basado en las Historias de Usuario
+    %% Reemplazar con el diseño exacto basado en spec.md y tasks.md
     USUARIO ||--o{ RESERVA : "realiza"
     USUARIO {
         uuid id PK
         string email UK
         datetime created_at
     }
-\`\`\`
+```
 
 ---
 
 ## 3. DICCIONARIO DE DATOS Y RESTRICCIONES
+*(Mapeado estrictamente a las entidades definidas en spec.md y wireframes UX)*
 
 ### Tabla: `USUARIO`
 - `id` (UUID): Llave primaria.
 - `email` (VARCHAR 255): Único, requerido. Formato validado.
+- `created_at` (TIMESTAMP WITH TIME ZONE): Auditoría de creación.
 
 ---
 
@@ -70,28 +73,25 @@ erDiagram
 *(Analiza el Product Brief y el MVP para determinar el siguiente paso y genera una sola línea de texto continuo sin saltos internos)*
 
 - **SI EL PROYECTO REQUIERE COMUNICACIÓN EXTERNA (APIs REST/GraphQL/Eventos):**
-  `@API: El modelo de datos (MER) y la persistencia han sido definidos. Por favor, diseña los contratos de integración (Endpoints/Payloads) basados en estas tablas.`
+  `@API: El modelo de datos (MER) y la persistencia han sido definidos a partir de spec.md y tasks.md. Por favor, diseña los contratos de integración (Endpoints/Payloads) basados en estas tablas.`
 
 - **SI EL PROYECTO ES PURAMENTE DE PROCESAMIENTO / ETL (Sin endpoints externos):**
-  `@QT: El modelo de datos y las reglas de procesamiento ETL han sido definidos. Al no requerir capa de API, procede directamente con la auditoría y compilación del Tech Design Document (TDD).`
+  `@QT: El modelo de datos y las reglas de procesamiento ETL han sido definidos a partir de spec.md y tasks.md. Al no requerir capa de API, procede directamente con la auditoría y compilación del Tech Design Document (TDD).`
 ```
 
 ---
 
-### ⚠️ DIRECTIVA OBLIGATORIA DE TRAZABILIDAD UI -> DATA (Cruce con UX)
-1. **Inspección Visual de Datos:** Si el proyecto cuenta con diseño visual (`files/designer-ux/ux_*.md`), el Data Architect debe auditar cada wireframe y estado visual antes de cerrar el MER.
-2. **Cero Campos Huérfanos:** Cada elemento de interfaz que requiera persistencia o cálculo (ej. etiquetas de descuento, badges de estado, contadores, timestamps de edición, preferencias de visualización) debe tener su columna y tipo correspondiente en el Diccionario de Datos.
-3. **Excepción Headless:** Si el proyecto proviene de un Bypass Headless (sin `ux_*.md`), el modelo se deriva exclusivamente de las Historias de Usuario (`hu_*.md`) y del Product Brief (`pb_*.md`).
+### ⚠️ DIRECTIVA OBLIGATORIA DE TRAZABILIDAD UI / SPEC KIT -> DATA
+1. **Inspección Visual y Contractual de Datos:** El Data Architect audita `spec.md`, `tasks.md` y `files/designer-ux/ux_*.md` (si existe diseño visual) antes de cerrar el MER.
+2. **Cero Campos Huérfanos:** Cada elemento de interfaz o entidad de contrato que requiera persistencia o cálculo debe tener su columna y tipo correspondiente en el Diccionario de Datos.
+3. **Excepción Headless:** Si el proyecto proviene de un Bypass Headless (sin `ux_*.md`), el modelo se deriva exclusivamente de los contratos de `spec.md`, `tasks.md` y `hu_*.md`.
 
 ---
 
 ### ⚠️ Directiva de Persistencia para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/legacy_ecosystem.md`:
-1. **Subordinación Estricta de Persistencia (Lex Superior):** Lee el archivo legacy en su totalidad. El motor de persistencia, dialecto SQL, tipos de datos y convenciones relacionales deben subordinarse estrictamente a lo establecido en dicho archivo. Las restricciones del archivo legacy prevalecen sobre cualquier Historia de Usuario (`hu_*.md`), sobre las peticiones del tracker y sobre el propio `tech_guidelines.md` del Solutions Architect.
-2. **Prohibición de Incompatibilidad y Complacencia:** Queda estrictamente prohibido proponer o modelar motores de base de datos que colisionen con las directivas del archivo legacy (ej. proponer colecciones NoSQL si el legado exige SQL relacional), incluso si el usuario lo pidió en el tracker o el SA lo incluyó por complacencia. Toda petición divergente es nula de pleno derecho.
-3. **Salvoconducto Único (Cláusula de Excepción):** La única forma legal de modelar sobre un motor divergente es que exista físicamente en `files/context/legacy_ecosystem.md` una sección titulada `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA` que lo autorice expresamente. Sin ella, el DA debe modelar exclusivamente sobre el motor heredado (ej. modelar tablas relacionales o campos JSON nativos en SQL Server en lugar de MongoDB) y registrar en un ADR el estado `Rechazado (Violación de Gobernanza Legacy)` para el motor caprichoso.
-4. **ADR Obligatorio de Coexistencia (MADR):** Redactar un ADR justificando la integración, extensiones de tablas o coexistencia con las entidades y procedimientos del esquema heredado, utilizando el estado `Aceptado (heredado)` sin requerir alternativas consideradas.
-5. **Si el archivo NO existe (Modo Greenfield):** Modela el MER y diccionario de datos libremente según lo dispuesto en `tech_guidelines.md` sin precondiciones heredadas.
-
+Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+1. **Subordinación Estricta de Persistencia (Lex Superior):** El motor de persistencia, dialecto SQL, tipos de datos y esquemas deben subordinarse estrictamente a lo establecido en la constitución técnica.
+2. **Prohibición de Incompatibilidad y Complacencia:** Queda estrictamente prohibido proponer o modelar motores incompatibles sin la sección física `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA`.
+3. **ADR Obligatorio de Coexistencia (MADR):** Redactar un ADR justificando la integración o extensión de tablas heredadas con estado `Aceptado (heredado)`.
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

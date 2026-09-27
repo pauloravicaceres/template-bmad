@@ -41,11 +41,20 @@ def init_project(nombre_proyecto):
         rutas_absolutas[carpeta] = str(ruta.resolve())
         print(f"📁 Estructura verificada: files/{carpeta}/")
         
+    # Subcarpeta obligatoria para estrategia Dual-Output de HUs
+    (DIR_FILES / "business-analyst" / "HUs-stakeholders").mkdir(parents=True, exist_ok=True)
+
+    # Asegurar carpeta de contexto para la constitución del sistema (Gobernanza)
+    dir_context = DIR_FILES / "context"
+    dir_context.mkdir(parents=True, exist_ok=True)
+    constitution_path = dir_context / "constitution.md"
+        
     # 2. Generar Archivo de Configuración (Single Source of Truth de Rutas)
     config_data = {
         "project_name": nombre_proyecto,
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "tracker": str(TRACKER_PATH.resolve()),
+        "context": str(constitution_path.resolve()),
         "routes_bmad": rutas_absolutas
     }
     

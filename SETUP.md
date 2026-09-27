@@ -14,7 +14,8 @@ Antes de inicializar un entorno, ten presentes las reglas de arquitectura:
    - **Proyectos con UI:** Transitan el pipeline completo: `PA -> PM -> BA -> QA -> UX -> SA -> DA -> API -> QT`.
    - **Proyectos Headless (ETL, SSIS, APIs puras):** Saltan dinámicamente la etapa de diseño UX: `PA -> PM -> BA -> QA -> SA -> DA -> QT`.
 4. **Pausa Obligatoria Human-in-the-Loop (HITL):** Al finalizar el Product Brief, el flujo entra en pausa obligatoria (`@HUMANO:`). El inicio del PM depende formalmente de la ejecución de `python utils/approve_step.py`.
-5. **Estrategia Dual Greenfield / Brownfield:** El framework es completamente agnóstico y soporta tanto proyectos nuevos desde cero como la subordinación a sistemas preexistentes mediante el interruptor físico opcional `files/context/legacy_ecosystem.md`.
+5. **Estrategia Dual Greenfield / Brownfield:** El framework es completamente agnóstico y soporta tanto proyectos nuevos desde cero como la subordinación a sistemas preexistentes mediante el interruptor físico opcional `files/context/constitution.md`.
+6. **Puente SDD y SDD Gatekeeper:** Al aprobar QA Documental la HU, el orquestador `watcher_bmad.py` activa una pausa lógica interceptora. El operador transita el ciclo interactivo de Spec Kit (`/speckit.specify -> /speckit.clarify -> /speckit.plan -> /speckit.tasks -> /speckit.analyze`) y reanuda el avance hacia Arquitectura ejecutando `python utils/approve_step.py` (opciones 5 o 6). La implementación en Fase D se gatilla mediante `/speckit.implement`.
 
 ---
 
@@ -28,12 +29,12 @@ python init_bmad.py "Nombre de Mi Nuevo Proyecto"
 
 ### Qué realiza automáticamente este script:
 1. **Scaffolding de Almacenamiento:** Crea todas las carpetas dentro de `files/` para el roster completo de agentes:
-   - `files/context/` *(Opcional: aloja `legacy_ecosystem.md` para proyectos Brownfield)*
+   - `files/context/` *(Opcional: aloja `constitution.md` para proyectos Brownfield)*
    - `files/business-storyteller/`
    - `files/product-analyst/`
    - `files/product-manager/`
-   - `files/business-analyst/`
-   - `files/qa-documental/`
+   - `files/business-analyst/` *(aloja HUs técnicas para Spec Kit)*
+     - `files/business-analyst/HUs-stakeholders/` *(aloja HUs funcionales para negocio)*
    - `files/designer-ux/`
    - `files/solutions-architect/`
    - `files/data-architect/`
@@ -61,7 +62,7 @@ Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
   "project_name": "Nuevo-Proyecto",
   "created_at": "2026-09-23 12:00:00",
   "tracker": "D:\\Ruta\\Al\\Proyecto\\files\\tracker_bmad.md",
-  "context": "D:\\Ruta\\Al\\Proyecto\\files\\context\\legacy_ecosystem.md",
+  "context": "D:\\Ruta\\Al\\Proyecto\\files\\context\\constitution.md",
   "routes_bmad": {
     "business-storyteller": "D:\\Ruta\\Al\\Proyecto\\files\\business-storyteller\\",
     "product-analyst": "D:\\Ruta\\Al\\Proyecto\\files\\product-analyst\\",
@@ -83,10 +84,16 @@ Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
 ```
 
 > **Parámetro `"context"` (Opcional para Brownfield):**
-> Apunta al archivo `files/context/legacy_ecosystem.md`. Si el archivo existe físicamente y contiene directrices de sistemas preexistentes, los agentes operarán en modo subordinado (Brownfield). Si el archivo no existe o se elimina, el ecosistema corre en modo Greenfield estándar sin restricciones ni fallos.
+> Apunta al archivo `files/context/constitution.md`. Si el archivo existe físicamente y contiene directrices de sistemas preexistentes, los agentes operarán en modo subordinado (Brownfield). Si el archivo no existe o se elimina, el ecosistema corre en modo Greenfield estándar sin restricciones ni fallos.
 
 ### 3.2. Vaciado del Bus de Mensajes (`files/tracker_bmad.md`)
 Asegura que el archivo exista físicamente pero su contenido sea una cadena vacía (0 bytes) antes de encender el Watcher.
+
+### 3.3. Selección de Stack Tecnológico (Fase D como Cartucho Intercambiable)
+El enjambre BMAD es 100% agnóstico de tecnologías. Para definir o cambiar el stack de programación (ej. Java, Python, Go, Node, .NET):
+1. Documenta los lenguajes, frameworks y bases de datos en `files/context/constitution.md`.
+2. Adapta las directrices de código (`.instructions.md`) en las carpetas de los 5 agentes de la Fase D (`dev-backend/`, `dev-frontend/`, `qa-auto/`, `code-review/`, `devops/`).
+3. El motor de orquestación en Python **no se toca**, ya que opera mediante tokens agnósticos (`@DEV-BACK:`, `@QA-AUTO:`, etc.). Consulta [`PLUGGABLE_PHASE_D.md`](./PLUGGABLE_PHASE_D.md) para más detalles.
 
 ---
 
@@ -101,6 +108,7 @@ Asegura que el archivo exista físicamente pero su contenido sea una cadena vac�
 ├── ARCHITECTURE.md                   # Diagramas técnicos detallados y topología
 ├── GUIDE.md                          # Guía operativa de usuario y solución de incidentes
 ├── SETUP.md                          # Manual de instanciación y puesta en marcha
+├── PLUGGABLE_PHASE_D.md              # Especificación y guía de intercambio de stack tecnológico
 ├── BMAD_AUDIT_REPORT.md              # Reporte de certificación de salud arquitectónica
 │
 ├── /skills                           # Repositorio global de habilidades inyectables
@@ -110,6 +118,7 @@ Asegura que el archivo exista físicamente pero su contenido sea una cadena vac�
 │
 ├── /utils                            # Scripts de mantenimiento y control
 │   ├── start_agents.py               # Despliega la flota completa en paneles Herdr
+│   ├── stop_agents.py                # Cierra limpiamente todas las pestañas y paneles de agentes en Herdr
 │   ├── approve_step.py               # Gateway de aprobación humana (HITL)
 │   ├── clean_files.py                # Limpiador interactivo de entregables en files/
 │   └── delete_agents.py              # Limpiador de archivos AGENTS.md auto-ensamblados
@@ -126,11 +135,16 @@ Asegura que el archivo exista físicamente pero su contenido sea una cadena vac�
 ├── /data-architect                   # Agente DA: Modelo Entidad-Relación y ADRs de datos
 ├── /api-architect                    # Agente API: Contratos de integración REST/GraphQL
 ├── /qa-tech                          # Agente QT: Auditoría cruzada y compilación del TDD
+├── /dev-backend                      # Agente DEV-BACK: Construcción de lógica de negocio y servidor
+├── /dev-frontend                     # Agente DEV-FRONT: Construcción de interfaz de usuario y clientes
+├── /qa-auto                          # Agente QA-AUTO: Automatización de pruebas (Zero-Tautology)
+├── /code-review                      # Agente CR: Auditoría SecOps, calidad y gatekeeper final
+├── /devops                           # Agente DEVOPS: Infraestructura, contenedores y CI/CD
 │
 └── /files                            # Aislamiento físico de entregables generados
     ├── tracker_bmad.md               # Único bus de datos y cola de tareas
     ├── /context                      # Ingestión de ecosistema preexistente (Brownfield)
-    │   └── legacy_ecosystem.md       # Interruptor físico opcional con directrices legadas
+    │   └── constitution.md       # Interruptor físico opcional con directrices legadas
     └── */                            # Carpetas individuales por rol
 ```
 
@@ -141,6 +155,7 @@ Asegura que el archivo exista físicamente pero su contenido sea una cadena vac�
 - **`python utils/clean_files.py`:** Permite vaciar interactivamente los entregables de una o todas las subcarpetas de `files/` (opción `T`), manteniendo intacta la estructura y el `tracker_bmad.md`.
 - **`python utils/delete_agents.py`:** Elimina los archivos `AGENTS.md` compilados para forzar una regeneración limpia desde las carpetas `agents/` e `instructions/`.
 - **`python utils/start_agents.py`:** Abre la flota completa en **Herdr** distribuida en 3 pestañas temáticas (*Negocio y Producto*, *Arquitectura e Ingeniería*, *Desarrollo y Delivery*), divide los paneles, configura permisos de sandbox (`--add-dir`) y aplica la estrategia FinOps de modelos y esfuerzos de razonamiento.
+- **`python utils/stop_agents.py`:** Cierra y apaga automáticamente las 3 pestañas temáticas y cualquier panel remanente de agentes BMAD en Herdr, protegiendo la consola de ejecución.
 - **`python utils/approve_step.py`:** Administra las pausas de aprobación obligatoria (HITL). Permite abrir el artefacto producido, revisarlo en el sistema operativo y emitir la orden formal correspondiente (`@PM:`, `@DEV:`, etc.) en el tracker.
 
 ---
@@ -151,7 +166,7 @@ Para poner en marcha un nuevo proyecto desde cero:
 
 - [ ] **Paso 1: Clonar plantilla:** Copiar el repositorio a la carpeta de destino.
 - [ ] **Paso 2: Inicializar entorno:** Ejecutar `python init_bmad.py "Nombre del Proyecto"` para crear las carpetas de `files/`, generar `config_bmad.json` y vaciar `tracker_bmad.md`.
-- [ ] **Paso 2.1 (Opcional - Proyectos Brownfield):** Si la solución debe coexistir con un sistema o base de datos preexistente, crear `files/context/legacy_ecosystem.md` y documentar la arquitectura, motores relacionales, protocolos y restricciones heredadas. Para proyectos 100% nuevos (Greenfield), omitir este paso asegurando que dicho archivo no exista.
+- [ ] **Paso 2.1 (Opcional - Proyectos Brownfield):** Si la solución debe coexistir con un sistema o base de datos preexistente, crear `files/context/constitution.md` y documentar la arquitectura, motores relacionales, protocolos y restricciones heredadas. Para proyectos 100% nuevos (Greenfield), omitir este paso asegurando que dicho archivo no exista.
 - [ ] **Paso 3: Arrancar el Orquestador:**
   ```bash
   python watcher_bmad.py

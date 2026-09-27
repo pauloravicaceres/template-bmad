@@ -8,7 +8,7 @@
 ---
 
 ## 1. DECLARACIÓN FORMAL DE CONFORMIDAD
-La especificación de requerimientos contenida en el archivo `hu_02_navegacion_retorno_coherencia.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_modulo_experiencia.md`) y el snapshot de arquitectura en `legacy_ecosystem.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión frente a la navegación multirruta y persistencia de temas (Astro SSG + script inline anti-FOUT) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto el retorno intuitivo como la resiliencia en recargas y manejo de historial.
+La especificación de requerimientos contenida en el archivo `hu_02_navegacion_retorno_coherencia.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_modulo_experiencia.md`) y el snapshot de arquitectura en `constitution.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión frente a la navegación multirruta y persistencia de temas (Astro SSG + script inline anti-FOUT) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto el retorno intuitivo como la resiliencia en recargas y manejo de historial.
 
 ---
 
@@ -21,7 +21,7 @@ La especificación de requerimientos contenida en el archivo `hu_02_navegacion_r
 | **3. Cobertura BDD / Gherkin** | ✅ CUMPLE | Happy Paths (CA-01 retorno instantáneo, CA-02 preservación de tema y cero FOUT) y Sad Path/Fallback (CA-03 estabilidad ante recargas e historial) completamente testeables. |
 | **4. Consistencia Lógica** | ✅ CUMPLE | Diagrama Mermaid integrado armónicamente con la ejecución del script anti-FOUT y la transición hacia `/`. |
 | **5. Separación Negocio/Técnica** | ✅ CUMPLE | Especificación orientada a la experiencia de usuario y comportamiento observable sin acoplamiento restrictivo a librerías externas. |
-| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Cumplimiento estricto con las invariantes de `legacy_ecosystem.md` (`Layout.astro` compartido, `theme_preference` en `localStorage` y cero JavaScript innecesario). Criterio de no-regresión explícito en DoD. |
+| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Cumplimiento estricto con las invariantes de `constitution.md` (`Layout.astro` compartido, `theme_preference` en `localStorage` y cero JavaScript innecesario). Criterio de no-regresión explícito en DoD. |
 
 ---
 

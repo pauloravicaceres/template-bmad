@@ -2,8 +2,8 @@
 """
 start_agents.py
 Despliega la flota completa de 15 agentes de BMAD organizada en 3 pestañas temáticas en Herdr:
-  1. Negocio y Producto (5 agentes)
-  2. Arquitectura e Ingeniería (5 agentes)
+  1. Negocio y Producto (6 agentes en grilla 2x3)
+  2. Arquitectura e Ingeniería (4 agentes)
   3. Desarrollo y Delivery (5 agentes)
 
 Aplica estrategia FinOps (modelo y esfuerzo de razonamiento) y sandbox con --add-dir.
@@ -15,6 +15,14 @@ import json
 import sys
 from pathlib import Path
 
+# Prevenir errores de codificación en consolas de Windows (cp1252)
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 # ==========================================
 # 1. CONFIGURACIÓN ESTRATÉGICA (FinOps / LLMOps)
 # ==========================================
@@ -22,25 +30,37 @@ WORKSPACE_DIR = Path(__file__).resolve().parent.parent
 
 TABS_CONFIG = {
     "Negocio y Producto": [
+        # Fila 1
         {"name": "business-storyteller", "model": "Gemini 3.7 Flash", "effort": "low"},
-        {"name": "product-manager",      "model": "Gemini 3.7 Flash", "effort": "medium"},
-        {"name": "business-analyst",    "model": "Gemini 3.7 Flash", "effort": "medium"},
-        {"name": "qa-documental",       "model": "Gemini 3.7 Flash", "effort": "low"},
-        {"name": "designer-ux",         "model": "Gemini 3.7 Flash", "effort": "medium"},
+        {"name": "product-analyst",     "model": "Gemini 3.7 Flash", "effort": "medium", "target": "business-storyteller", "direction": "right"},
+        {"name": "product-manager",     "model": "Gemini 3.7 Flash", "effort": "medium", "target": "product-analyst", "direction": "right"},
+
+        # Fila 2
+        {"name": "business-analyst",    "model": "Gemini 3.7 Flash", "effort": "medium", "target": "business-storyteller", "direction": "down"},
+        {"name": "qa-documental",       "model": "Gemini 3.7 Flash", "effort": "medium", "target": "product-analyst", "direction": "down"},
+        {"name": "designer-ux",         "model": "Gemini 3.7 Flash", "effort": "medium", "target": "product-manager", "direction": "down"},
     ],
     "Arquitectura e Ingeniería": [
-        {"name": "product-analyst",     "model": "Gemini 3.7 Flash", "effort": "medium"},
         {"name": "solutions-architect", "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "data-architect",      "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "api-architect",       "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "qa-tech",             "model": "Gemini 3.7 Flash", "effort": "high"},
+        {"name": "data-architect",      "model": "Gemini 3.7 Flash", "effort": "high", "target": "solutions-architect", "direction": "right"},
+        {"name": "api-architect",       "model": "Gemini 3.7 Flash", "effort": "high", "target": "solutions-architect", "direction": "down"},
+        {"name": "qa-tech",             "model": "Gemini 3.7 Flash", "effort": "high", "target": "data-architect", "direction": "down"},
     ],
     "Desarrollo y Delivery": [
-        {"name": "dev-backend",         "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "dev-frontend",        "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "qa-auto",             "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "code-review",         "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "devops",              "model": "Gemini 3.7 Flash", "effort": "medium"},
+        # 1. Root (Arriba Izquierda): Ocupa toda la pantalla inicialmente
+        {"name": "dev-backend",  "model": "Gemini 3.7 Flash", "effort": "high"},
+        
+        # 2. Cortamos la pantalla a la mitad (Abajo Izquierda). Esto crea la línea horizontal perfecta.
+        {"name": "qa-auto",      "model": "Gemini 3.7 Flash", "effort": "high", "target": "dev-backend", "direction": "down"},
+        
+        # 3. Cortamos la mitad superior en dos (Arriba Derecha)
+        {"name": "dev-frontend", "model": "Gemini 3.7 Flash", "effort": "high", "target": "dev-backend", "direction": "right"},
+        
+        # 4. Cortamos la mitad inferior (Abajo Medio)
+        {"name": "code-review",  "model": "Gemini 3.7 Flash", "effort": "high", "target": "qa-auto", "direction": "right"},
+        
+        # 5. Volvemos a cortar el último panel inferior para el 3er bloque (Abajo Derecha)
+        {"name": "devops",       "model": "Gemini 3.7 Flash", "effort": "medium", "target": "code-review", "direction": "right"},
     ]
 }
 
@@ -234,6 +254,9 @@ def inicializar_flota():
 
         print(f"   📑 Pestaña creada: {tab_id} (Panel Raíz: {root_pane_id})")
 
+        # Diccionario para mapear los nombres de agentes a sus respectivos pane_id en la pestaña actual
+        tab_panes = {primer_agente["name"]: root_pane_id}
+
         # 2. Configurar el primer agente en el panel raíz de la pestaña
         print(f"   🪟 [1/{total_agentes}] Configurando {primer_agente['name']}...")
         configurar_agente_en_panel(root_pane_id, primer_agente["name"], primer_agente)
@@ -241,18 +264,23 @@ def inicializar_flota():
 
         prev_pane_id = root_pane_id
 
-        # 3. Configurar los agentes subsiguientes (2 al 5) dividiendo hacia la derecha
+        # 3. Configurar los agentes subsiguientes según target y direction
         for idx, agente in enumerate(agentes[1:], start=2):
             nombre = agente["name"]
+            target_name = agente.get("target")
+            target_pane_id = tab_panes.get(target_name, prev_pane_id)
+            direction = agente.get("direction", "right")
+
             dir_agente = WORKSPACE_DIR / nombre
             dir_agente.mkdir(parents=True, exist_ok=True)
 
-            print(f"   🪟 [{idx}/{total_agentes}] Creando panel a la derecha para {nombre}...")
+            target_desc = f"'{target_name}'" if target_name else "panel anterior"
+            print(f"   🪟 [{idx}/{total_agentes}] Creando panel ({direction} desde {target_desc}) para {nombre}...")
 
             cmd_split = [
                 "herdr", "pane", "split",
-                "--pane", prev_pane_id,
-                "--direction", "right",
+                "--pane", target_pane_id,
+                "--direction", direction,
                 "--cwd", str(dir_agente)
             ]
             try:
@@ -270,10 +298,11 @@ def inicializar_flota():
                 if not pane_id:
                     raise ValueError(f"No se pudo extraer pane_id: {res_split.stdout.strip()}")
 
+                tab_panes[nombre] = pane_id
+                prev_pane_id = pane_id
+
                 configurar_agente_en_panel(pane_id, nombre, agente)
                 print(f"      ✅ {nombre} listo.")
-
-                prev_pane_id = pane_id
 
             except subprocess.CalledProcessError as e:
                 err_msg = e.stderr.strip() if e.stderr else e.stdout.strip()
@@ -302,8 +331,8 @@ def inicializar_flota():
 
     print("\n" + "=" * 65)
     print("🎉 DESPLIEGUE MULTI-TAB COMPLETADO CON ÉXITO")
-    print("   • Tab 1: Negocio y Producto (5 agentes)")
-    print("   • Tab 2: Arquitectura e Ingeniería (5 agentes)")
+    print("   • Tab 1: Negocio y Producto (6 agentes - Grilla 2x3)")
+    print("   • Tab 2: Arquitectura e Ingeniería (4 agentes)")
     print("   • Tab 3: Desarrollo y Delivery (5 agentes)")
     print("=" * 65 + "\n")
 

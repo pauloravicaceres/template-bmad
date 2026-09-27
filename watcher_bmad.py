@@ -1,10 +1,22 @@
 import time
 import os
+import sys
 import json
 import subprocess
 import random
 import re  # NUEVO: Necesario para procesar las etiquetas de inyección de Skills
 from pathlib import Path
+
+# Configuración de codificación UTF-8 para stdout/stderr en Windows
+if sys.platform.startswith('win'):
+    try:
+        if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+            sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 
 # ==========================================
 # RUTAS Y DIRECTORIOS DINÁMICOS
@@ -155,6 +167,50 @@ def extraer_instrucciones(linea):
         pos_agentes = [linea.find(tag) for tag in todas_las_etiquetas if linea.find(tag) != -1]
         if not pos_agentes or pos_humano < min(pos_agentes):
             return []
+
+    # ==========================================
+    # SDD GATEKEEPER: Intercepción de Aprobación de QA Documental
+    # ==========================================
+    linea_lower = linea.lower()
+    es_transicion_a_arquitectura = "@UX:" in linea or "@SA:" in linea
+    es_aprobacion_qa = (
+        "aprobado_qa_" in linea_lower
+        or "aprobada por qa" in linea_lower
+        or "aprobado por qa" in linea_lower
+        or ("@qa:" in linea_lower and "aprobad" in linea_lower)
+        or ("aprobad" in linea_lower and es_transicion_a_arquitectura and "ciclo sdd" not in linea_lower)
+    )
+
+    if es_transicion_a_arquitectura and es_aprobacion_qa:
+        print("\n" + "=" * 80)
+        print("🛑 [PAUSA SDD INTERCEPTADA] CERTIFICADO QA DOCUMENTAL REGISTRADO")
+        print("=" * 80)
+        print("El agente 'qa-documental' ha emitido la aprobación de la Historia de Usuario.")
+        print("El avance automático hacia UX / Arquitectura ha sido DETENIDO para el ciclo SDD.\n")
+        print("📋 SECUENCIA REQUERIDA EN GITHUB SPEC KIT (CLI / HERDR):")
+        print("   1. /speckit.specify files/business-analyst/hu_[ID]_[nombre].md")
+        print("   2. /speckit.clarify")
+        print("   3. /speckit.plan")
+        print("   4. /speckit.tasks")
+        print("   5. /speckit.analyze (Auditoría automática contra constitution.md)\n")
+        print("🔓 PARA LIBERAR LA TRANSICIÓN HACIA FASE A (UX / ARQUITECTURA):")
+        print("   Una vez concluido /speckit.analyze, ejecute en otra terminal:")
+        print("   python utils/approve_step.py")
+        print("   y seleccione la opción: [5] Spec Kit (SDD Bridge) -> UX  (o [6] para Headless)")
+        print("=" * 80 + "\n")
+        return []
+
+    # Notificación informativa para gatillo de implementacion Spec Kit
+    if "@SPEC-KIT:" in linea:
+        print("\n" + "=" * 80)
+        print("⚡ [GATILLO SDD DETECTADO] ARQUITECTURA TÉCNICA LISTA PARA IMPLEMENTACIÓN")
+        print("=" * 80)
+        print("El QA Técnico ha certificado y compilado el Tech Design maestro.")
+        print("Ejecute en la terminal / CLI de Spec Kit:")
+        print("   /speckit.implement")
+        print("para iniciar el despacho coordinado de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS).")
+        print("=" * 80 + "\n")
+
     
     for etiqueta, agente_nombre in agentes.items():
         if etiqueta in linea:

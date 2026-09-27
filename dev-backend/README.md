@@ -2,7 +2,7 @@
 
 > **Fase:** D (Development & Delivery) | **Rol:** Constructor Backend Core | **Handoff Token:** `@DEV-BACK:` / `@DEV-BACKEND:`
 
-El agente **`dev-backend`** es el desarrollador backend de élite del framework BMAD. Su propósito es traducir los diseños técnicos consolidados (`tech-design_*.md`) en código fuente de producción bajo la arquitectura de **Modular Monolith (.NET 8/10)**, aplicando de forma estricta los principios de **Vertical Slice Architecture (VSA)** y la **Lex Superior** dictada en la Constitución Técnica (`files/context/legacy_ecosystem.md`).
+El agente **`dev-backend`** es el desarrollador backend de élite del framework BMAD. Su propósito es traducir los diseños técnicos consolidados (`tech-design_*.md`) en código fuente de producción bajo la arquitectura de **Modular Monolith (.NET 8/10)**, aplicando de forma estricta los principios de **Vertical Slice Architecture (VSA)** y la **Lex Superior** dictada en la Constitución Técnica (`files/context/constitution.md`).
 
 ---
 
@@ -22,7 +22,7 @@ El agente **`dev-backend`** es el desarrollador backend de élite del framework 
 | Archivo / Fuente | Ruta Típica | Propósito |
 |---|---|---|
 | **Tech Design Maestro** | `files/qa-tech/tech-design_*.md` | Especificación técnica canónica, contratos de DTOs y modelos de datos. |
-| **Constitución Técnica** | `files/context/legacy_ecosystem.md` | Invariantes inmutables de stack, schemas y patrones de persistencia. |
+| **Constitución Técnica** | `files/context/constitution.md` | Invariantes inmutables de stack, schemas y patrones de persistencia. |
 | **Directivas del SA** | `files/solutions-architect/tech_guidelines.md` | ADRs MADR y lineamientos específicos de la solución. |
 
 ---

@@ -3,7 +3,7 @@
 - **Historia de Usuario Fuente:** `hu_02_descarga_documento_estudios.md`
 - **Fecha de Diseño:** 25-09-2026
 - **Diseñador UX:** Agente UX Senior BMAD
-- **Modo de Operación:** Brownfield (Subordinado a `legacy_ecosystem.md`)
+- **Modo de Operación:** Brownfield (Subordinado a `constitution.md`)
 
 ---
 

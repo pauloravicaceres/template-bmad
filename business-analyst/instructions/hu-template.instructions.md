@@ -1,110 +1,150 @@
 ---
-description: 'Usar al generar cualquier Historia de Usuario (HU). Esqueleto determinista: define qué secciones son OBLIGATORIAS en toda HU y cuáles son OPCIONALES según el tipo de épica. Palabras clave: plantilla HU, historia de usuario, criterios de aceptación, BDD, DoD, Gherkin.'
+description: 'Usar al generar la Historia de Usuario Técnica (Spec Kit Ready). Especificación de alta fidelidad técnica optimizada para el comando /speckit.specify. Incluye metadatos formales, sintaxis Gherkin pura, matriz de casos borde, pre/postcondiciones verificables y DoD.'
 applyTo: '**'
 ---
 
-# Plantilla de Historia de Usuario — BMAD
+# Plantilla de Historia de Usuario Técnica (Spec Kit Ready) — BMAD
 
-Toda HU generada por el agente BA usa esta estructura. Las secciones **OBLIGATORIAS** deben estar
-presentes en cualquier épica. Las **OPCIONALES** solo si el tipo de cambio las requiere.
-
-> El contrato de calidad del QA Documental evalúa la presencia de las secciones obligatorias.
-> Una HU que omita cualquiera de ellas será rechazada automáticamente.
+Toda HU Técnica generada por el agente BA usa esta estructura aséptica y determinista, optimizada para su consumo directo por el comando `/speckit.specify` de GitHub Spec Kit.
 
 ## Secciones OBLIGATORIAS
 
 | Sección | Por qué es obligatoria |
 |---|---|
-| `## 1. HISTORIA DE USUARIO` con **Como / Quiero / Para** | Define el valor de negocio; sin esto no es una HU |
-| `## 2. CRITERIOS DE ACEPTACIÓN` (≥ 2, incluyendo al menos 1 Sad Path) | Definen "hecho" y son la base del QA |
-| `## 3. 📊 DIAGRAMAS DE LA HU` (bloque `mermaid` o declaración "Sin diagrama") | Trazabilidad visual del flujo |
-| `## 4. DEFINITION OF DONE` | Cierre de calidad con ítems verificables |
-| `## 5. ORDEN DE DELEGACIÓN PARA EL QA` | Handoff autónomo al siguiente agente |
+| `## 1. METADATOS FORMALES` | Indexación por máquina, trazabilidad en Spec Kit y backlog |
+| `## 2. ESPECIFICACIÓN FUNCIONAL Y ESCENARIOS GHERKIN` | Sintaxis pura Gherkin (Scenario, Given, When, Then, And) |
+| `## 3. MATRIZ DE CASOS BORDE Y EXCEPCIONES` | Cobertura exhaustiva de fallos, tipado de errores y límites |
+| `## 4. PRECONDICIONES Y POSTCONDICIONES VERIFICABLES` | Invariantes de estado de datos y seguridad auditables |
+| `## 5. 📊 DIAGRAMA DE SECUENCIA / ESTADOS` (bloque `mermaid`) | Flujo visual determinista |
+| `## 6. DEFINITION OF DONE (TÉCNICA)` | Criterios de completitud y no-regresión |
+| `## 7. ORDEN DE DELEGACIÓN PARA EL QA` | Handoff determinista en una sola línea continua |
 | Pie de **origen + `[PROPUESTO]`** | Trazabilidad contra el Product Brief |
 
-## Secciones OPCIONALES
-
-- `## 🎨 REFERENCIA UX/UI` — Solo para épicas con componente de interfaz visual.
-- `## ❓ PUNTOS ABIERTOS` — Registrar ambigüedades no bloqueantes para resolución posterior.
-
-## Convención de Nombres de Archivo
-
+## Convención de Nombres de Archivo y Ruta
 ```
-hu_[ID]_[nombre_corto].md
+files/business-analyst/hu_[ID]_[nombre_corto].md
 ```
-
-- `ID`: Número secuencial de dos dígitos (`01`, `02`, …) asignado por el PM.
-- `nombre_corto`: snake_case, máximo 4 palabras, **agnóstico al dominio** (sin nombre de proyecto ni cliente).
-
-**Ejemplos válidos:** `hu_01_motor_reservas.md`, `hu_03_gestion_cancelacion.md`
-**Ejemplos inválidos:** `hu_01_amely_spa_motor.md` ← contiene nombre de proyecto específico.
+- `ID`: Número secuencial de dos dígitos (`01`, `02`, …).
+- `nombre_corto`: snake_case, máximo 4 palabras, agnóstico al dominio.
 
 ## Esqueleto Completo (rellenar desde el Product Brief; nunca inventar)
 
 ```markdown
-## 1. HISTORIA DE USUARIO
-**Como** {{ROL_USUARIO}}
-**Quiero** {{CAPACIDAD_O_ACCION}}
-**Para** {{VALOR_DE_NEGOCIO}}
+# ESPECIFICACIÓN TÉCNICA DE HISTORIA DE USUARIO: {{TITULO_HU}}
 
-## 2. CRITERIOS DE ACEPTACIÓN (BDD)
-*(Cada CA debe ser testable e independiente)*
+## 1. METADATOS FORMALES
+- **Feature ID:** FEAT-{{ID}}
+- **Story ID:** HU-{{ID}}
+- **Épica:** {{NOMBRE_EPICA}}
+- **Tipo:** {{Feature | Enhancement | Bugfix | Refactor}}
+- **Prioridad:** {{Alta | Media | Baja}}
+- **Tags:** [{{TAG_1}}, {{TAG_2}}, {{TAG_3}}]
+- **Consumo SDD:** `/speckit.specify files/business-analyst/hu_{{ID}}_{{nombre_corto}}.md`
 
-- **CA-01 — {{Nombre_Happy_Path}}:** **Dado** {{contexto}}, **Cuando** {{acción}}, **Entonces** {{resultado medible}}.
-- **CA-02 — {{Nombre_Sad_Path}}:** **Dado** {{contexto_de_error}}, **Cuando** {{acción_con_fallo}}, **Entonces** {{manejo_del_error}}.
+---
 
-## 3. 📊 DIAGRAMAS DE LA HU
-<bloque ```mermaid ... ``` relevante, o: _Sin diagrama directamente vinculado a esta HU._>
+## 2. ESPECIFICACIÓN FUNCIONAL Y ESCENARIOS GHERKIN (BDD)
 
-## 4. DEFINITION OF DONE
-- [ ] La HU cumple con todos los Criterios de Aceptación declarados.
-- [ ] El Happy Path y al menos un Sad Path están cubiertos con Gherkin testable.
-- [ ] No existen detalles de implementación técnica en el cuerpo de la HU.
-- [ ] Los ⚠️ SUPUESTOS y ❓ Puntos Abiertos están explícitamente registrados.
+### 2.1. Descripción de la Capacidad
+**Como** {{ROL_USUARIO_O_SERVICIO}}
+**Quiero** {{CAPACIDAD_TECNICA_O_FUNCIONAL}}
+**Para** {{OBJETIVO_MEDIBLE_DE_SISTEMA}}
 
-<!-- OPCIONAL — incluir solo si la épica tiene supuestos -->
-## Supuestos
-- <supuestos heredados del PRD o inferidos razonablemente, marcados como tal>
+### 2.2. Escenarios Formales en Sintaxis Gherkin Pura
 
-<!-- OPCIONAL — incluir solo si la épica tiene componente visual -->
-## 🎨 REFERENCIA UX/UI
-- **Pantalla / Módulo:** {{nombre_pantalla}} o "No aplica para backend puro"
+```gherkin
+Feature: {{TITULO_HU}}
+  Como {{ROL_USUARIO_O_SERVICIO}}
+  Quiero {{CAPACIDAD_TECNICA_O_FUNCIONAL}}
+  Para {{OBJETIVO_MEDIBLE_DE_SISTEMA}}
 
-<!-- OPCIONAL — incluir si hay ambigüedades no bloqueantes -->
-## ❓ PUNTOS ABIERTOS
-1. {{Pregunta o vacío de información que no bloquea la HU pero debe resolverse a nivel de negocio}}
+  Scenario: SC-01 [Happy Path] {{Nombre_Claro_Escenario_Exitoso}}
+    Given {{Estado inicial del sistema y precondiciones de datos}}
+    When {{Acción precisa del actor o payload de entrada}}
+    Then {{Respuesta medible, estado mutado, persistencia o código HTTP}}
+    And {{Invariante de seguridad o ausencia de efectos colaterales}}
+
+  Scenario: SC-02 [Sad Path] {{Nombre_Claro_Escenario_Fallo}}
+    Given {{Contexto de entrada con datos inválidos o estado inconsistente}}
+    When {{El actor intenta ejecutar la acción}}
+    Then {{El sistema rechaza la operación con código y tipado de error estandarizado}}
+    And {{El estado del sistema permanece intacto sin mutaciones indebidas}}
+```
+
+---
+
+## 3. MATRIZ DE CASOS BORDE Y EXCEPCIONES
+
+| ID | Condición Límite / Error | Tipo de Evento | Comportamiento Esperado | Código / Tipo de Respuesta |
+|---|---|---|---|---|
+| CB-01 | Payload incompleto o nulo | Validación de Esquema | Rechazo inmediato con lista de violaciones | HTTP 400 / ValidationException |
+| CB-02 | Recurso solicitado no existe | Consulta | Notificación de recurso inexistente | HTTP 404 / NotFoundException |
+| CB-03 | Timeout en dependencia externa | Falla de Red | Ejecución de política de reintento/fallback | HTTP 504 / TimeoutException |
+
+---
+
+## 4. PRECONDICIONES Y POSTCONDICIONES VERIFICABLES
+
+### 4.1. Precondiciones del Sistema
+- {{Condición 1 requerida antes de invocar la funcionalidad}}
+- {{Condición 2 de autenticación, permisos o existencia de registros}}
+
+### 4.2. Postcondiciones y Mutaciones
+- {{Estado final de la base de datos o almacenamiento persistente}}
+- {{Eventos o notificaciones emitidas}}
+- {{Invariantes preservadas (seguridad, auditoría, no-regresión)}}
+
+---
+
+## 5. 📊 DIAGRAMA DE SECUENCIA / ESTADOS
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuario / Consumidor
+    participant S as Sistema / Servicio
+    participant DB as Persistencia / Cache
+
+    U->>S: Petición (Payload / Acción)
+    alt Validación Exitosa (Happy Path)
+        S->>DB: Persistir / Consultar
+        DB-->>S: Confirmación
+        S-->>U: Respuesta Exitosa (200 / Datos)
+    else Fallo o Validación Inválida (Sad Path)
+        S-->>U: Rechazo Tipado (Error / 4xx)
+    end
+```
+
+---
+
+## 6. DEFINITION OF DONE (TÉCNICA)
+- [ ] La especificación contiene todos los metadatos requeridos para Spec Kit.
+- [ ] Todos los escenarios BDD están escritos en sintaxis pura Gherkin.
+- [ ] La matriz de casos borde cubre al menos validación, límites y fallo de persistencia.
+- [ ] Las precondiciones y postcondiciones son verificables mediante pruebas automatizadas.
+- [ ] El diagrama de secuencia refleja con fidelidad el flujo de Happy y Sad Path.
+- [ ] Ausencia de supuestos no tipificados (cualquier inferencia está marcada como ⚠️ [PROPUESTO]).
 
 ---
 > **Origen:** {{Nombre_del_archivo_fuente}} (Product Brief / Plan de Gestión).
 > Todo contenido generado que no esté explícito en la fuente se marca como `⚠️ [PROPUESTO]`.
 
-## 5. ORDEN DE DELEGACIÓN PARA EL QA
+## 7. ORDEN DE DELEGACIÓN PARA EL QA
 *(Generar como una sola línea de texto continuo, sin saltos de línea internos)*
 
-@QA: La Historia de Usuario {{TITULO_HU}} está lista en el archivo hu_{{ID}}_{{nombre_corto}}.md. Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
+@QA: La Historia de Usuario Técnica {{TITULO_HU}} está lista en el archivo hu_{{ID}}_{{nombre_corto}}.md (y su versión de stakeholders en files/business-analyst/HUs-stakeholders/hu_{{ID}}_{{nombre_corto}}.md). Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 ```
-
-## Reglas de Formato
-
-- El contenido `⚠️ [PROPUESTO]` aplica a todo lo inferido por el agente (anti-alucinación).
-- La **Orden de Delegación** para el QA (sección 5) es siempre **una sola línea sin saltos de línea internos**. Este requisito es mecánico (el Watcher parsea línea por línea); no afecta al formato del resto del documento.
-- No incluir detalles de implementación técnica (stack, frameworks) en las secciones 1–4. *Excepción: Para proyectos Headless, se permite terminología de integración (códigos HTTP, esquemas JSON) para definir los Criterios de Aceptación.*
-- En el **Escenario B (corrección por QA):** sobreescribir el archivo `hu_*.md` existente aplicando únicamente las observaciones del feedback. No alterar las secciones que el QA no marcó.
 
 ### ⚠️ Directiva para Proyectos Headless / Procesamiento de Datos
 Si el proyecto no tiene interfaz de usuario (ej. ETL, SSIS, Webhooks, APIs puras):
 - **Prohibido usar verbos de UI:** No uses "hacer clic", "ver pantalla" o "mostrar modal".
-- **Enfoque Backend:** Los escenarios `Dado / Cuando / Entonces` deben enfocarse en estados de persistencia, respuestas de red, códigos HTTP, logs de error, validación de esquemas (JSON/XML) y tolerancia a fallos (ej. "Entonces el registro corrupto se mueve a la tabla DLQ sin detener el job general").
-
-
+- **Enfoque Backend:** Los escenarios `Given / When / Then` deben enfocarse en estados de persistencia, respuestas de red, códigos HTTP, logs de error, validación de esquemas (JSON/XML) y tolerancia a fallos.
 
 ### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/legacy_ecosystem.md`:
-- **Subordinación de Criterios de Aceptación:** Léelo en su totalidad. Los Criterios de Aceptación (BDD) deben subordinarse estrictamente a las reglas de negocio, validaciones, flujos y máquinas de estado descritas en dicho archivo.
-- **Enfoque de No-Regresión en DoD:** En la sección `## 4. DEFINITION OF DONE`, es obligatorio incluir el ítem:
-  - [ ] La funcionalidad respeta las reglas de negocio y restricciones operativas del ecosistema preexistente documentado.
-- **Si el archivo NO existe (Modo Greenfield):** Redacta las HUs estándar en base al Product Brief y Backlog de MVP sin precondiciones heredadas.
-
+Si existe el archivo `files/context/constitution.md`:
+- **Subordinación de Escenarios:** Léelo en su totalidad. Los escenarios Gherkin deben subordinarse estrictamente a las reglas de negocio, validaciones y máquinas de estado del sistema existente.
+- **Enfoque de No-Regresión en DoD:** En la sección `## 6. DEFINITION OF DONE (TÉCNICA)`, incluir obligatoriamente:
+  - [ ] La funcionalidad respeta las reglas de negocio y restricciones del ecosistema preexistente documentado.
+- **Si el archivo NO existe (Modo Greenfield):** Redacta las especificaciones estándar en base al Product Brief y Backlog de MVP.
 
 [IMPORT_SKILL: skills/hu-validator/SKILL.md]
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

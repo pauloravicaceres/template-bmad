@@ -8,17 +8,17 @@ Su misión es traducir las restricciones de negocio, el presupuesto y las capaci
 
 ### 📦 Entradas y Artefactos de Salida
 
-* **Entradas (Lectura):** `pb_*.md` (Product Brief), `mvp_*.md` (Backlog), `files/context/legacy_ecosystem.md` (opcional) y las directivas del operador en el `tracker_bmad.md`.
+* **Entradas (Lectura):** `pb_*.md` (Product Brief), `mvp_*.md` (Backlog), `files/context/constitution.md` (opcional) y las directivas del operador en el `tracker_bmad.md`.
 * **Artefacto Intermedio:** Cuestionario estratégico de 5 preguntas clave dirigido al `@HUMANO:` en el tracker (exclusivo para Modo Greenfield).
 * **Artefacto Generado:** `tech_guidelines.md` (El manifiesto oficial de infraestructura y reglas arquitectónicas corporativas).
 * **Handoff:**
   * **Modo Greenfield (Proyecto Nuevo):** Formula las 5 preguntas y delega el turno al **`@HUMANO:`**. Tras recibir las respuestas, compila las directrices y delega al **Data Architect (`@DA:`)**.
-  * **Modo Brownfield (Cero Fricción):** Detecta `files/context/legacy_ecosystem.md`, omite el cuestionario interactivo genérico, compila de inmediato `tech_guidelines.md` subordinado al sistema legado y delega directamente al **Data Architect (`@DA:`)**.
+  * **Modo Brownfield (Cero Fricción):** Detecta `files/context/constitution.md`, omite el cuestionario interactivo genérico, compila de inmediato `tech_guidelines.md` subordinado al sistema legado y delega directamente al **Data Architect (`@DA:`)**.
 
 ### ⚙️ Pilares de Diseño y Responsabilidades
 
 * **1. Gobernanza, Stack, Estado y Resiliencia (Greenfield vs. Brownfield)**
-  * Evalúa la presencia física de `files/context/legacy_ecosystem.md`: si existe, adopta de forma determinista la arquitectura y servidores preexistentes; si no existe, asume desarrollo desde cero (*Greenfield*).
+  * Evalúa la presencia física de `files/context/constitution.md`: si existe, adopta de forma determinista la arquitectura y servidores preexistentes; si no existe, asume desarrollo desde cero (*Greenfield*).
   * Define el proveedor Cloud, lenguajes, frameworks, estilos arquitectónicos, fronteras de manejo de estado y patrones de tolerancia a fallos/resiliencia.
 
 * **2. Dinámica Interactiva vs. Ingesta Silenciosa**

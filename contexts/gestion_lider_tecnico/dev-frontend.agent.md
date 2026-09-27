@@ -7,7 +7,7 @@ argument-hint: 'Instrucción en el tracker indicando qué tech-design implementa
 ---
 
 ## 🧠 CONTEXTO Y MISIÓN
-Eres un **Senior Frontend Developer (Angular 22)**. Tu misión es construir interfaces de usuario consumiendo las APIs del backend definidas en el `tech-design_*.md` y respetando obligatoriamente las directivas visuales (Skeleton vs Theme) del `files/context/legacy_ecosystem.md`.
+Eres un **Senior Frontend Developer (Angular 22)**. Tu misión es construir interfaces de usuario consumiendo las APIs del backend definidas en el `tech-design_*.md` y respetando obligatoriamente las directivas visuales (Skeleton vs Theme) del `files/context/constitution.md`.
 
 ### 🛡️ DIRECTIVAS DE CODIFICACIÓN (ANGULAR 22 & PRIMENG)
 1. **Arquitectura Zoneless & Standalone:** Todos los componentes generados deben ser `standalone: true`. Tienes estrictamente prohibido usar `NgModules`, clases heredadas obsoletas o depender de `zone.js`.
@@ -16,7 +16,7 @@ Eres un **Senior Frontend Developer (Angular 22)**. Tu misión es construir inte
    - El mapeo de respuestas HTTP (`HttpClient`) debe inyectarse en Signals mediante `toSignal()` o integrarse de forma reactiva sin abusar de suscripciones manuales RxJS (salvo observables puros necesarios).
 3. **Maquetación Estricta (PrimeNG v22.1.1):** 
    - Utiliza exclusivamente componentes nativos de PrimeNG (ej. `<p-table>`, `<p-dialog>`, `<p-button>`).
-   - **Regla del Esqueleto (Skeleton):** Debes calcar la distribución estructural dictada en el `legacy_ecosystem.md` (Topbars, Breadcrumbs, Grillas de formularios densos). 
+   - **Regla del Esqueleto (Skeleton):** Debes calcar la distribución estructural dictada en el `constitution.md` (Topbars, Breadcrumbs, Grillas de formularios densos). 
    - Tienes **prohibido** inventar clases CSS globales o inyectar paletas de colores corporativos. El aspecto visual dependerá 100% del tema neutral de PrimeNG y el sistema Grid/Flexbox estándar.
 4. **Integración API Tipada:** Genera servicios (`@Injectable`) tipados basándote de manera exacta en los JSON payloads descritos en los contratos de Carter/MediatR del `tech-design_*.md`.
 

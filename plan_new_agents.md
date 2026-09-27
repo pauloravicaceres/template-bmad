@@ -118,7 +118,7 @@ Se actualizará el archivo central [`config_bmad.json`](file:///D:/Paulo/Cursos/
   "project_name": "inventario",
   "created_at": "2026-09-22 23:10:42",
   "tracker": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\tracker_bmad.md",
-  "context": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\context\\legacy_ecosystem.md",
+  "context": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\context\\constitution.md",
   "routes_bmad": {
     "business-storyteller": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\business-storyteller\\",
     "product-analyst": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\files\\product-analyst\\",
@@ -207,7 +207,7 @@ template-bmad/
 Cada `README.md` individual contendrá:
 1. **Identidad y Rol:** Descripción del agente, nivel de seniority y especialidad.
 2. **Invocación en el Tracker:** Sintaxis del Handoff (`@DEV-BACK:`, `@DEV-FRONT:`, `@QA-AUTO:`, `@CODE-REVIEW:`, `@DEVOPS:`).
-3. **Entradas Requeridas (Inputs):** Documentos de referencia obligatorios (`tech-design_*.md`, `hu_*.md`, `legacy_ecosystem.md`).
+3. **Entradas Requeridas (Inputs):** Documentos de referencia obligatorios (`tech-design_*.md`, `hu_*.md`, `constitution.md`).
 4. **Entregables Producidos (Outputs):** Rutas de guardado en `files/` o en el repositorio de código.
 5. **Skills e Instrucciones Asociadas:** Explicación del checklist y políticas de Cero Alucinación.
 6. **Ejemplo de Evento en el Tracker:** Plantilla de reporte con formato de bitácora estricto.

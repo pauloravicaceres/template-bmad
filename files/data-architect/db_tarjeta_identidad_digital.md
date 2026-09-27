@@ -4,7 +4,7 @@
 - **Diseño Visual UX Auditado:** `ux_01_visualizacion_experiencia_laboral.md`, `ux_02_navegacion_retorno_coherencia.md`
 - **Fecha de Diseño:** 25-09-2026
 - **Data Architect:** Agente DA Senior BMAD
-- **Modo de Operación:** Brownfield (Subordinado estrictamente a `files/context/legacy_ecosystem.md`)
+- **Modo de Operación:** Brownfield (Subordinado estrictamente a `files/context/constitution.md`)
 
 ---
 
@@ -12,7 +12,7 @@
 
 ### ADR-01: Esquema de Datos Estático Tipado con Validación Zod en Build-Time
 - **Estado:** Aceptado (heredado)
-- **Contexto:** Decisión consolidada en `legacy_ecosystem.md` y `tech_guidelines.md` (ADR-003 / ADR-005). El sistema opera bajo arquitectura Jamstack/SSG pura sin bases de datos SQL/NoSQL en servidor. Toda la persistencia de datos reside en `src/config/profile.config.json` y se audita con contratos TypeScript/Zod (`src/config/profile.schema.ts`).
+- **Contexto:** Decisión consolidada en `constitution.md` y `tech_guidelines.md` (ADR-003 / ADR-005). El sistema opera bajo arquitectura Jamstack/SSG pura sin bases de datos SQL/NoSQL en servidor. Toda la persistencia de datos reside en `src/config/profile.config.json` y se audita con contratos TypeScript/Zod (`src/config/profile.schema.ts`).
 - **Decisión:** Mantener la persistencia estática mediante `profile.config.json` validado en tiempo de compilación con `ProfileConfigSchema` de Zod.
 - **Consecuencias:**
   - ✅ **Ventajas / Impacto Positivo:** Costo de infraestructura $0, latencia de red cero, seguridad absoluta contra inyecciones y validación estricta de tipos previa a cada despliegue.
@@ -20,7 +20,7 @@
 
 ### ADR-02: Persistencia Cliente de Preferencia de Tema Visual con Fallback Resiliente
 - **Estado:** Aceptado (heredado)
-- **Contexto:** Decisión heredada de `legacy_ecosystem.md` (ADR-002 / ADR-006). La preferencia de tema (Light/Dark Mode) se persiste en el cliente a través de `localStorage` bajo la clave `theme_preference`, consumida por un script bloqueante inline en `<head>` para garantizar cero FOUT/FOUC en transiciones multirruta (`/` <-> `/experiencia`).
+- **Contexto:** Decisión heredada de `constitution.md` (ADR-002 / ADR-006). La preferencia de tema (Light/Dark Mode) se persiste en el cliente a través de `localStorage` bajo la clave `theme_preference`, consumida por un script bloqueante inline en `<head>` para garantizar cero FOUT/FOUC en transiciones multirruta (`/` <-> `/experiencia`).
 - **Decisión:** Conservar la clave `theme_preference` en `localStorage` con fallback a `prefers-color-scheme` y degradación segura a memoria volátil en entornos restrictivos.
 - **Consecuencias:**
   - ✅ **Ventajas / Impacto Positivo:** Transiciones instantáneas sin parpadeo visual entre la tarjeta principal y la vista de trayectoria laboral.
@@ -28,7 +28,7 @@
 
 ### ADR-03: Extensión del Modelo de Datos para Menú de Navegación y Documentos Descargables
 - **Estado:** Aceptado (heredado)
-- **Contexto:** Decisión consolidada en `legacy_ecosystem.md` (ADR-007 / ADR-008). Estructuración de colecciones tipadas para items de navegación (`navItems`) y metadata documental (`documents`).
+- **Contexto:** Decisión consolidada en `constitution.md` (ADR-007 / ADR-008). Estructuración de colecciones tipadas para items de navegación (`navItems`) y metadata documental (`documents`).
 - **Decisión:** Mantener las entidades `NAV_ITEM` y `DOCUMENTS_CONFIG` centralizadas en `profile.config.json`.
 - **Consecuencias:**
   - ✅ **Ventajas / Impacto Positivo:** Centralización de rutas internas y descarga de PDF (`/docs/estudios.pdf`).

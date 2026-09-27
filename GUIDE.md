@@ -26,18 +26,18 @@
 | **Discovery & Storytelling** | `business-storyteller` | Evalúa la idea cruda, ejecuta preguntas de refinamiento si es ambigua y produce `idea_*.md`. |
 | **Product Definition** | `product-analyst` | Transforma la narrativa en un Product Brief formal estructurado (`pb_*.md`). Activa pausa HITL. |
 | **Management & Planning** | `product-manager` | Tras aprobación HITL, prioriza el alcance del MVP, define la arquitectura modular y el Backlog (`mvp_*.md`). |
-| **Specification & BDD** | `business-analyst` | Redacta Historias de Usuario atómicas con criterios de aceptación en sintaxis Gherkin (`hu_*.md`). |
-| **Quality Assurance (Doc)** | `qa-documental` | Audita trazabilidad, *sad paths* y coherencia lógica (`qa_*.md`). Gestiona bypass Headless vs UI. |
+| **Specification & BDD** | `business-analyst` | Estrategia Dual-Output: Redacta HU Técnica (Gherkin puro / Spec Kit en `hu_*.md`) y HU para Stakeholders (`HUs-stakeholders/`). |
+| **Quality Assurance (Doc)** | `qa-documental` | Audita trazabilidad BDD y coherencia lógica (`qa_*.md`). Al certificar, activa la pausa **SDD Gatekeeper**. |
 | **UX & Visual Design** | `designer-ux` | Traduce escenarios Gherkin a wireframes ASCII (`ux_*.md`), audita avance y delega a `@SA:`. |
 | **Solutions Architecture** | `solutions-architect` | Formula cuestionario técnico al humano y consolida stack y reglas de gobernanza (`tech_guidelines.md`). |
 | **Data Architecture** | `data-architect` | Modela la persistencia: Modelo Entidad-Relación (MER), diccionario y ADRs (`db_*.md`). |
 | **API Architecture** | `api-architect` | Diseña contratos de integración REST/GraphQL, payloads y códigos de respuesta (`api_*.md`). |
 | **Quality Assurance (Tech)** | `qa-tech` | Audita coherencia cruzada (MER vs API) y compila el documento maestro (`tech-design_*.md`). |
-| **Backend Development** | `dev-backend` | Desarrolla Features backend en .NET 8/10 Modulith bajo Vertical Slice Architecture y Lex Superior. |
-| **Frontend Development** | `dev-frontend` | Construye componentes reactivos en Angular 22 Zoneless con Signals y PrimeNG v22.1.1. |
-| **QA Automation** | `qa-auto` | Diseña y ejecuta suites automáticas xUnit/Testcontainers/Jest con cobertura de CA (Zero-Tautology). |
-| **Code Review & SecOps** | `code-review` | Gatekeeper final: lectura física, verificación de CancellationToken, N+1, IDOR, XSS y veredicto formal. |
-| **DevOps & SRE** | `devops` | Aprovisiona Dockerfiles rootless, compose resiliente con healthchecks y pipelines CI/CD. |
+| **Backend Development** | `dev-backend` | Desarrolla la lógica de negocio, endpoints y persistencia del backend según las directrices y contratos del TDD. |
+| **Frontend Development** | `dev-frontend` | Construye interfaces de usuario y componentes visuales reactivos según los wireframes y contratos del TDD. |
+| **QA Automation** | `qa-auto` | Diseña y ejecuta suites automáticas (unitarias e integración) con cobertura de Criterios de Aceptación (Zero-Tautology). |
+| **Code Review & SecOps** | `code-review` | Gatekeeper final: lectura física, verificación de concurrencia, N+1, IDOR, XSS, OWASP y emisión de veredicto formal. |
+| **DevOps & SRE** | `devops` | Aprovisiona contenedores multi-stage, compose resiliente con healthchecks y pipelines CI/CD. |
 
 ### Términos Fundamentales
 
@@ -49,7 +49,8 @@
 | `Backpressure` | Mecanismo del Watcher para retener tareas encoladas hasta que el agente destinatario se encuentre en estado `idle`. |
 | `HITL (Human-in-the-Loop)` | Pausa controlada del flujo donde la continuación hacia el siguiente rol depende de una acción humana (ej. `utils/approve_step.py`). |
 | `Bypass Headless` | Enrutamiento condicional donde proyectos sin interfaz gráfica omiten la fase de UX y avanzan directamente de QA a Arquitectura. |
-| `Modo Dual (Greenfield / Brownfield)` | Capacidad nativa donde la presencia del archivo `files/context/legacy_ecosystem.md` actúa como interruptor: si existe, todos los agentes subordinan sus entregables al sistema legado; si no, operan como proyecto nuevo sin restricciones. |
+| `Modo Dual (Greenfield / Brownfield)` | Capacidad nativa donde la presencia del archivo `files/context/constitution.md` actúa como interruptor: si existe, todos los agentes subordinan sus entregables al sistema legado; si no, operan como proyecto nuevo sin restricciones. |
+| `Cartucho Intercambiable (Pluggable Phase D)` | Principio arquitectónico donde los agentes de construcción y testing operan como interfaces abstractas. El stack (.NET, Java, Python, Go) se cambia modificando únicamente `constitution.md` y las instrucciones locales, manteniendo intacto el orquestador Python. |
 
 ---
 
@@ -93,20 +94,41 @@ Dirígete a la terminal del agente **Business Storyteller** (o envía un prompt 
      ```
   3. Selecciona la opción `[2] Product Analyst` y confirma con `s`.
   4. El script inyectará la orden `@PM:` en el tracker y el Watcher despertará automáticamente.
-- **Fase Ágil de Especificación:** El PM asignará épicas al BA (`@BA:`), quien redactará las HUs y delegará a QA (`@QA:`). Tras la aprobación, el flujo continúa a UX (`@UX:`) o salta a Arquitectura (`@SA:`) si es Headless.
+- **Fase Ágil de Especificación (Estrategia Dual-Output):** El PM asignará épicas al BA (`@BA:`), quien redactará simultáneamente:
+  - La **HU Técnica (Spec Kit Ready)** en `files/business-analyst/hu_[ID]_[nombre].md`.
+  - La **HU para Stakeholders** en `files/business-analyst/HUs-stakeholders/hu_[ID]_[nombre].md`.
+  - El BA delega la revisión al QA Documental (`@QA:`).
+
+- **🛑 Intercepción SDD Gatekeeper (Pausa Lógica de Spec Kit):**
+  Cuando `@QA:` emite su certificado de aprobación (`aprobado_qa_*.md`), el orquestador **`watcher_bmad.py` intercepta el avance automático hacia UX o Arquitectura y detiene el flujo**. La consola del Watcher mostrará un banner indicando que es el momento del ciclo interactivo de Spec Kit:
+  1. Ejecutar en terminal:
+     ```bash
+     /speckit.specify files/business-analyst/hu_[ID]_[nombre].md
+     /speckit.clarify
+     /speckit.plan
+     /speckit.tasks
+     /speckit.analyze
+     ```
+  2. Una vez validada la especificación contra la constitución técnica con `/speckit.analyze`, abre otra terminal y ejecuta el liberador:
+     ```bash
+     python utils/approve_step.py
+     ```
+  3. Selecciona la opción **`[5] Spec Kit (SDD Bridge) -> UX`** (o **`[6] Spec Kit -> SA`** si es un proyecto Headless).
+  4. El script despachará el evento al tracker y el Watcher reanudará el enrutamiento hacia la Fase de Arquitectura.
 
 ---
 
-### Paso 5: Transición a Fase de Arquitectura
-Cuando el Designer UX concluye el diseño visual de todas las épicas del MVP (o QA en modo Headless):
-1. **Delegación a SA:** Designer UX anexa formalmente la orden `@SA:` en el tracker.
-2. **Evaluación de Entorno y Descubrimiento Técnico:**
-   - **En Modo Greenfield (sin archivo legacy):** Solutions Architect formula 5 preguntas de gobernanza (Cloud, stack, presupuesto, Greenfield/Brownfield) al `@HUMANO:` en el tracker. Tras tu respuesta, genera `tech_guidelines.md`.
-   - **En Modo Brownfield (con `files/context/legacy_ecosystem.md`):** Solutions Architect detecta e ingiere el archivo automáticamente (Cero Fricción), adopta el stack, servidores y restricciones preexistentes sin formular preguntas genéricas al humano, y compila inmediatamente `tech_guidelines.md` subordinado al ecosistema legacy.
-3. **Delegación a Persistencia:** SA delega formalmente a `@DA:`.
-4. **Persistencia e Integración:** Data Architect genera el MER (`db_*.md`) y delega a `@API:` (o a `@QT:` si es ETL). API Architect define los contratos (`api_*.md`) y delega a `@QT:`.
-5. **Auditoría Cruzada Final:** QA Técnico audita la coherencia entre el MER y la API (y contra el archivo legacy si aplica), compila el documento maestro `tech-design_*.md` y solicita la aprobación final (`@HUMANO:`).
-6. **Aprobación de Arquitectura:** Ejecuta nuevamente `python utils/approve_step.py` (Opción 7: QA Técnico) para transferir el proyecto al equipo de desarrollo (`@DEV:`).
+### Paso 5: Transición a Fase de Arquitectura y Despacho SDD
+1. **Consumo de Artefactos Spec Kit:** `designer-ux`, `solutions-architect`, `data-architect`, `api-architect` y `qa-tech` toman como fuente de la verdad `spec.md`, `plan.md` y `tasks.md`:
+   - `designer-ux`: Diseña wireframes ASCII mapeando cada tarea de UI de `tasks.md`.
+   - `solutions-architect`: Consolida directrices (`tech_guidelines.md`) enriqueciendo los ADRs de `plan.md`.
+   - `data-architect`: Modela la persistencia física (`db_*.md`) alineada a las entidades de `spec.md` y `tasks.md`.
+   - `api-architect`: Diseña los contratos REST/GraphQL (`api_*.md`) mapeando los endpoints planificados.
+2. **Compilación y Certificación TDD:** `qa-tech` audita de forma cruzada el MER y las APIs contra `tasks.md`, compila el documento maestro `tech-design_*.md` y emite en el tracker la orden `@SPEC-KIT:`.
+3. **Gatillo de Implementación Fase D (`/speckit.implement`):**
+   - Ejecuta en terminal `/speckit.implement` (o `python utils/approve_step.py` opción `[10]`).
+   - Spec Kit despacha en paralelo las tareas a los agentes de la Fase D (`dev-backend`, `dev-frontend`, `devops`), quienes ejecutan comandos de compilación, construcción y pruebas directamente mediante su herramienta de terminal canónica **`execute_command`**.
+   - `qa-auto` valida los tests no-tautológicos y `code-review` audita el código fuente antes del despliegue final.
 
 ---
 
@@ -120,12 +142,12 @@ Cuando el Designer UX concluye el diseño visual de todas las épicas del MVP (o
 | **BA** | `mvp_[nombre].md` + `pb_[nombre].md` | `hu_[nombre].md` (Historias BDD) | `files/business-analyst/` |
 | **QA** | `hu_[nombre].md` + `pb_[nombre].md` | `aprobado_qa_*.md` / `feedback_qa_*.md` | `files/qa-documental/` |
 | **UX** | `hu_[nombre].md` (Aprobada) | `ux_[nombre].md` (Wireframes ASCII) | `files/designer-ux/` |
-| **SA** | `pb_*.md` + `mvp_*.md` + (Q&A Humano o `legacy_ecosystem.md`) | `tech_guidelines.md` (Gobernanza) | `files/solutions-architect/` |
+| **SA** | `pb_*.md` + `mvp_*.md` + (Q&A Humano o `constitution.md`) | `tech_guidelines.md` (Gobernanza) | `files/solutions-architect/` |
 | **DA** | `hu_*.md` + `pb_*.md` + Guidelines | `db_[nombre].md` (MER + ADRs) | `files/data-architect/` |
 | **API** | `db_*.md` + `hu_*.md` | `api_[nombre].md` (Contratos + ADRs) | `files/api-architect/` |
 | **QT** | `db_*.md` + `api_*.md` | `tech-design_[nombre].md` (TDD Maestro) | `files/qa-tech/` |
 
-> *Nota sobre Modo Brownfield: Si existe el archivo `files/context/legacy_ecosystem.md`, todos los agentes de negocio, producto, requerimientos y arquitectura lo consumen de forma complementaria para subordinar sus entregables a dicho entorno.*
+> *Nota sobre Modo Brownfield: Si existe el archivo `files/context/constitution.md`, todos los agentes de negocio, producto, requerimientos y arquitectura lo consumen de forma complementaria para subordinar sus entregables a dicho entorno.*
 
 ---
 
@@ -155,8 +177,8 @@ El ecosistema permite agregar nuevas habilidades (*skills*) a los agentes de for
 | Bucle infinito entre BA y QA (Rechazo repetido) | El LLM del BA no logra interpretar el feedback de QA | Intervenir manualmente en la terminal del BA inyectando la corrección puntual y reactivar el Watcher. |
 | El Watcher no reacciona a nuevas líneas en el tracker | El archivo `tracker_bmad.md` tiene problemas de codificación o permisos | Guardar el archivo en formato UTF-8 sin BOM o reiniciar el proceso `python watcher_bmad.py`. |
 | Faltan archivos `AGENTS.md` en los directorios de los agentes | No se ejecutó el paso de compilación previa | El Watcher los compila automáticamente al iniciar, o se pueden forzar corriendo `python watcher_bmad.py`. |
-| El enjambre ignora restricciones del sistema existente | `files/context/legacy_ecosystem.md` no existe o está vacío | Crear `files/context/legacy_ecosystem.md` detallando el stack, datos y reglas preexistentes antes de iniciar el flujo. |
-| Se desea alternar entre Greenfield y Brownfield | Gestión del archivo interruptor físico | Para Greenfield: renombrar o borrar `legacy_ecosystem.md`. Para Brownfield: crear o poblar dicho archivo. |
+| El enjambre ignora restricciones del sistema existente | `files/context/constitution.md` no existe o está vacío | Crear `files/context/constitution.md` detallando el stack, datos y reglas preexistentes antes de iniciar el flujo. |
+| Se desea alternar entre Greenfield y Brownfield | Gestión del archivo interruptor físico | Para Greenfield: renombrar o borrar `constitution.md`. Para Brownfield: crear o poblar dicho archivo. |
 | Se requiere reiniciar el proyecto desde cero | Existen archivos residuales de ejecuciones previas | Ejecutar `python utils/clean_files.py` (opción `T`) y vaciar `files/tracker_bmad.md`. |
 
 ---

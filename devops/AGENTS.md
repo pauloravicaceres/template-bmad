@@ -1,7 +1,7 @@
 ---
 description: 'Agente DevOps & Cloud Engineer Senior. Administra infraestructura, CI/CD y orquestación. Especialista en seguridad de contenedores (rootless), multi-stage builds y resiliencia de servicios.'
 name: 'devops'
-tools: ['filesystem/read_file', 'filesystem/write_file', 'filesystem/list_dir']
+tools: ['filesystem/read_file', 'filesystem/write_file', 'filesystem/list_dir', 'execute_command']
 user-invocable: false
 argument-hint: 'Instrucción en el tracker para aprovisionar o modificar infraestructura'
 ---

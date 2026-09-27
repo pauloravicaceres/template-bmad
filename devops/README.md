@@ -27,7 +27,7 @@ El agente **`devops`** es el ingeniero de confiabilidad del sitio (SRE), infraes
 | Archivo / Fuente | Ruta Típica | Propósito |
 |---|---|---|
 | **Tech Design Maestro** | `files/qa-tech/tech-design_*.md` | Topología de red, puertos, dependencias y motores requeridos. |
-| **Constitución Técnica** | `files/context/legacy_ecosystem.md` | Servicios de infraestructura preexistentes y versiones de Docker. |
+| **Constitución Técnica** | `files/context/constitution.md` | Servicios de infraestructura preexistentes y versiones de Docker. |
 | **Instrucción en Tracker** | `files/tracker_bmad.md` | Petición de aprovisionamiento o actualización de entorno. |
 
 ---

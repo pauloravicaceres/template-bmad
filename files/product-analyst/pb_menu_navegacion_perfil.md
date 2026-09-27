@@ -3,7 +3,7 @@
 - **Documento Fuente:** idea_menu_navegacion_perfil.md
 - **Fecha de Elaboración:** 25-09-2026
 - **Product Analyst:** Agente PA Senior BMAD (Fase Discovery)
-- **Modo de Operación:** Brownfield (Subordinado a `legacy_ecosystem.md`)
+- **Modo de Operación:** Brownfield (Subordinado a `constitution.md`)
 
 ---
 

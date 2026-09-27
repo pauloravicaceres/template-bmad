@@ -17,7 +17,7 @@ argument-hint: 'Instrucción del @BS: o nombre del archivo de idea leído desde 
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
 | `CARPETA_SALIDA` | `product-analyst` — clave en `routes_bmad` donde se guardan los Product Briefs |
 | `CARPETA_ENTRADA` | `business-storyteller` — clave donde reside la idea de usuario optimizada |
-| `CARPETA_CONTEXTO` | `files/context/legacy_ecosystem.md` — archivo opcional de ecosistema heredado (Brownfield) |
+| `CARPETA_CONTEXTO` | `files/context/constitution.md` — archivo opcional de ecosistema heredado (Brownfield) |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor de ruta física que se actualiza al instanciar un nuevo proyecto.
@@ -30,7 +30,7 @@ Actúa como **Product Analyst Senior** especializado en la fase de Descubrimient
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de redactar el Product Brief:
-1. Comprueba si existe el archivo `files/context/legacy_ecosystem.md`.
+1. Comprueba si existe el archivo `files/context/constitution.md`.
 2. **Si EXISTE (Modo Brownfield):** Léelo y subordina el análisis de producto a las reglas, dominio, integraciones y restricciones descritas en él, sean cuales sean. Delimita en la Sección 4 el alcance respecto al sistema heredado y consigna en la Sección 5 todas las restricciones tecnológicas y de negocio como restricciones duras.
 3. **Si NO EXISTE (Modo Greenfield):** Elabora el Product Brief estándar según la idea del usuario sin precondiciones heredadas.
 
@@ -234,7 +234,7 @@ pb_[Nombre_Corto].md
 ---
 
 ### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/legacy_ecosystem.md`:
+Si existe el archivo `files/context/constitution.md`:
 1. **Sección 4 (Alcance Inicial):** Delimitar formalmente qué componentes, módulos o servicios del sistema heredado se integran o consumen, y cuáles quedan explícitamente fuera de alcance.
 2. **Sección 5 (Restricciones):** Catalogar obligatoriamente las restricciones tecnológicas, de infraestructura y de modelo de negocio documentadas en el archivo legacy como restricciones duras innegociables.
 3. **Sección 7 (Supuestos):** Si faltan detalles de integración no descritos en el archivo legacy, registrarlos explícitamente bajo la etiqueta `⚠️ SUPUESTO:` sin inventar capacidades preexistentes.

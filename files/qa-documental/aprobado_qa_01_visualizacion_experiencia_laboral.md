@@ -8,7 +8,7 @@
 ---
 
 ## 1. DECLARACIÓN FORMAL DE CONFORMIDAD
-La especificación de requerimientos contenida en el archivo `hu_01_visualizacion_experiencia_laboral.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_modulo_experiencia.md`) y el contexto técnico consolidado en `legacy_ecosystem.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión operativa frente a la arquitectura estática multirruta (Astro SSG, Tailwind CSS con soporte Light/Dark Mode) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto el despliegue estructurado y responsivo como los escenarios de resiliencia y fallback ante colecciones vacías.
+La especificación de requerimientos contenida en el archivo `hu_01_visualizacion_experiencia_laboral.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_modulo_experiencia.md`) y el contexto técnico consolidado en `constitution.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión operativa frente a la arquitectura estática multirruta (Astro SSG, Tailwind CSS con soporte Light/Dark Mode) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto el despliegue estructurado y responsivo como los escenarios de resiliencia y fallback ante colecciones vacías.
 
 ---
 
@@ -21,7 +21,7 @@ La especificación de requerimientos contenida en el archivo `hu_01_visualizacio
 | **3. Cobertura BDD / Gherkin** | ✅ CUMPLE | Happy Paths (CA-01 despliegue jerárquico con contraste WCAG AA, CA-02 fluidez móvil sin scroll horizontal) y Sad Path/Fallback (CA-03 estado neutro ante colección vacía) testeables y verificables. |
 | **4. Consistencia Lógica** | ✅ CUMPLE | Flujo del diagrama Mermaid perfectamente alineado con las bifurcaciones de datos y adaptabilidad a viewport. |
 | **5. Separación Negocio/Técnica** | ✅ CUMPLE | Especificación centrada en la experiencia de usuario y presentación funcional sin polución técnica de bajo nivel. |
-| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Cumplimiento estricto con las directrices de `legacy_ecosystem.md` (arquitectura SSG "Zero JS", Layout compartido multirruta y script anti-FOUT). Criterio de no-regresión explícito en DoD. |
+| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Cumplimiento estricto con las directrices de `constitution.md` (arquitectura SSG "Zero JS", Layout compartido multirruta y script anti-FOUT). Criterio de no-regresión explícito en DoD. |
 
 ---
 

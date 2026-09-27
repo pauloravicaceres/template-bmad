@@ -8,7 +8,7 @@
 ---
 
 ## 1. DECLARACIÓN FORMAL DE CONFORMIDAD
-La especificación de requerimientos contenida en el archivo `hu_02_descarga_documento_estudios.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_menu_navegacion_perfil.md`) y el snapshot de arquitectura en `legacy_ecosystem.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión frente a la arquitectura estática de assets (Zero JavaScript) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto la descarga/apertura exitosa como los escenarios de resiliencia ante no disponibilidad del recurso.
+La especificación de requerimientos contenida en el archivo `hu_02_descarga_documento_estudios.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_menu_navegacion_perfil.md`) y el snapshot de arquitectura en `constitution.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión frente a la arquitectura estática de assets (Zero JavaScript) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto la descarga/apertura exitosa como los escenarios de resiliencia ante no disponibilidad del recurso.
 
 ---
 
@@ -21,7 +21,7 @@ La especificación de requerimientos contenida en el archivo `hu_02_descarga_doc
 | **3. Cobertura BDD / Gherkin** | ✅ CUMPLE | Happy Paths (CA-01 descarga directa, CA-02 entrega de asset estático ligero) y Sad Path/Fallback (CA-03 manejo resiliente sin ruptura de layout) verificados y testeables. |
 | **4. Consistencia Lógica** | ✅ CUMPLE | Diagrama Mermaid perfectamente alineado con las precondiciones y bifurcaciones de disponibilidad de asset. |
 | **5. Separación Negocio/Técnica** | ✅ CUMPLE | Especificación centrada en la interacción funcional y entrega de valor al usuario sin detalles de implementación de bajo nivel. |
-| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Cumplimiento estricto con las invariantes de `legacy_ecosystem.md` (distribución de assets estáticos y preservación del tema activo). Criterio de no-regresión explícito en DoD. |
+| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Cumplimiento estricto con las invariantes de `constitution.md` (distribución de assets estáticos y preservación del tema activo). Criterio de no-regresión explícito en DoD. |
 
 ---
 

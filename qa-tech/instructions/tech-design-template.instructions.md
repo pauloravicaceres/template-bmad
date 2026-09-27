@@ -1,11 +1,11 @@
 ---
-description: 'Usar EXCLUSIVAMENTE cuando el QT aprueba la arquitectura. Plantilla determinista para consolidar db_*.md y api_*.md en el documento maestro tech-design_[nombre_corto].md con diagramación híbrida y matriz consolidada MADR.'
+description: 'Usar EXCLUSIVAMENTE cuando el QT aprueba la arquitectura. Plantilla determinista para consolidar db_*.md, api_*.md y artefactos Spec Kit en el documento maestro tech-design_[nombre_corto].md con diagramación híbrida, matriz consolidada MADR y orden hacia /speckit.implement.'
 applyTo: '**'
 ---
 
-# Plantilla del Tech Design Maestro (Consolidado)
+# Plantilla del Tech Design Maestro (Consolidado) — SDD Bridge
 
-> Este documento unifica la visión de componentes, el MER, la API, los diagramas de arquitectura y centraliza todos los ADRs generados por los arquitectos especialistas bajo el formato MADR.
+> Este documento unifica la visión de componentes, el MER, la API, los diagramas de arquitectura, valida la correspondencia con `spec.md` y `tasks.md`, y centraliza todos los ADRs generados bajo el formato MADR.
 
 ## Convención de Nombres de Archivo
 `tech-design_[nombre_corto].md` (ej. `tech-design_motor_reservas.md`)
@@ -17,22 +17,23 @@ applyTo: '**'
 
 - **Fecha de Compilación:** {{FECHA_ACTUAL}}
 - **Auditor y Consolidador:** Agente QT Senior BMAD
+- **Fuente SDD:** `spec.md` y `tasks.md` (GitHub Spec Kit)
 - **Estado:** ✅ AUDITADO Y APROBADO (Auditoría Adversarial Exitosa)
 
 ---
 
 ## 1. Architecture Overview
-*(Resumen de alto nivel del propósito técnico del sistema y su patrón de diseño principal, inferido a partir de los documentos analizados).*
+*(Resumen de alto nivel del propósito técnico del sistema y su patrón de diseño principal, validado contra el plan.md y tasks.md).*
 
 ---
 
 ## 2. Components
-*(Listado de los módulos o subsistemas lógicos que componen la solución).*
+*(Listado de los módulos o subsistemas lógicos que componen la solución y su relación con las tareas de tasks.md).*
 
 ---
 
 ## 3. Data Model
-*(Integrar aquí el contenido completo y exacto de la sección Modelo Entidad-Relación y Diccionario de Datos extraído del archivo `db_*.md`, incluyendo la validación de no-orfandad frente al diseño UX).*
+*(Integrar aquí el contenido completo y exacto de la sección Modelo Entidad-Relación y Diccionario de Datos extraído del archivo `db_*.md`, incluyendo la validación de no-orfandad frente al diseño UX y contratos de spec.md).*
 
 ---
 
@@ -55,16 +56,16 @@ applyTo: '**'
     - 📄 **Especificación Fuente JSON:** [`diagrams/[nombre].[tipo].json`](file:///D:/Paulo/Cursos/DMC/template-bmad/files/qa-tech/diagrams/[nombre].[tipo].json)
     - **Estado de Validación:** ✅ *Showcase Pass (N/N checks)*
 
-    \`\`\`mermaid
+    ```mermaid
     [código nativo de mermaid representando la arquitectura]
-    \`\`\`
+    ```
 
 - **Escenario B: Sin acceso a la skill `archify` (Fallback Nativo - Cero Fricción):**
   - Si la skill no está disponible en tu entorno de herramientas, **no te detengas ni solicites instalación manual al humano**.
   - Aplica el principio de degradación elegante y genera los diagramas **únicamente en sintaxis nativa `mermaid`** directamente dentro de este documento, omitiendo los enlaces HTML/JSON e incluyendo esta nota al pie del bloque:
     > *Nota de Arquitectura: Diagrama generado exclusivamente con Mermaid por ausencia de dependencias externas. Para habilitar visores HTML interactivos, instale la skill en la raíz del proyecto (`npx skills add tt-a1i/archify -g`) y solicite la actualización de esta sección.*
 
-- **Consistencia Inmutable:** Sea cual sea el escenario aplicado, ningún diagrama puede contradecir lo estipulado en los ADRs (ej. si el ADR dice "Microservicios", el diagrama no puede mostrar un "Monolito").
+- **Consistencia Inmutable:** Sea cual sea el escenario aplicado, ningún diagrama puede contradecir lo estipulado en los ADRs.
 
 ---
 
@@ -103,17 +104,23 @@ applyTo: '**'
 - **Decisión:** ...
 - **Alternativas Evaluadas:** ...
 - **Consecuencias (Beneficios y Costos Reales):** ...
+
+---
+
+## 8. ORDEN DE DELEGACIÓN PARA EL TRACKER
+*(Instrucción de una sola línea continua para gatillar Spec Kit Implement hacia la Fase D)*
+
+@SPEC-KIT: La arquitectura técnica consolidada ha sido verificada y aprobada en tech-design_{{nombre_corto}}.md. Gatillar /speckit.implement para despacho de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS).
 ```
 
 ---
 
 ### ⚠️ Directiva de Compilación para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/legacy_ecosystem.md`:
-1. **Auditoría Cruzada de Restricciones Legacy:** Verificar que el modelo de persistencia (`db_*.md`) y los contratos de red (`api_*.md`) respeten estrictamente las tecnologías, protocolos y motores especificados en el archivo legacy. Si se detectan violaciones, emite inmediatamente rechazo (`feedback_tech_*.md`).
-2. **Registro MADR Heredado:** Asegurar que las decisiones técnicas provenientes del sistema existente estén registradas con estado `Aceptado (heredado)` sin requerir alternativas inventadas.
-3. **Diagramas de Arquitectura (Sección 5):** Los diagramas de componentes y despliegue deben representar explícitamente la convivencia entre la nueva solución y la infraestructura/servidores heredados descritos en el archivo legacy.
+Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+1. **Auditoría Cruzada de Restricciones Legacy:** Verificar que el modelo de persistencia (`db_*.md`) y los contratos de red (`api_*.md`) respeten estrictamente las tecnologías, protocolos y motores especificados en la constitución.
+2. **Registro MADR Heredado:** Asegurar que las decisiones técnicas provenientes del sistema existente estén registradas con estado `Aceptado (heredado)`.
+3. **Diagramas de Arquitectura (Sección 5):** Los diagramas de componentes y despliegue deben representar explícitamente la convivencia entre la nueva solución y la infraestructura heredada.
 4. **Sección de Integraciones (Sección 4):** Consignar formalmente los mecanismos de adaptación y protocolos de interoperabilidad con el sistema preexistente.
 5. **Si el archivo NO existe (Modo Greenfield):** Compila el Tech Design Document estándar consolidando el MER, la API y los ADRs sin precondiciones heredadas.
-
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

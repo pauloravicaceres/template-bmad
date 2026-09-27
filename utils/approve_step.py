@@ -5,6 +5,17 @@ import platform
 import subprocess
 from pathlib import Path
 
+# Configuración de codificación UTF-8 para stdout/stderr en Windows
+if sys.platform.startswith('win'):
+    try:
+        if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+            sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
+
 # ==========================================
 # RUTAS Y DIRECTORIOS DINÁMICOS
 # ==========================================
@@ -13,7 +24,7 @@ DIRECTORIO_RAIZ = Path(__file__).resolve().parent.parent
 TRACKER_PATH = DIRECTORIO_RAIZ / "files" / "tracker_bmad.md"
 
 # ==========================================
-# MATRIZ DE APROBACIÓN Y HANDOFF (HITL)
+# MATRIZ DE APROBACIÓN Y HANDOFF (HITL & SDD BRIDGE)
 # ==========================================
 APPROVAL_CONFIG = {
     "1": {
@@ -41,16 +52,16 @@ APPROVAL_CONFIG = {
         "message": "@QA: La Historia de Usuario ha sido revisada en el archivo {file}. Por favor, procede con la auditoría documental contra el Product Brief."
     },
     "5": {
-        "name": "QA Documental (QA) -> UX [Ruta con Interfaz Gráfica]",
+        "name": "Spec Kit (SDD Bridge / analyze) -> UX [Diseño de Interfaces]",
         "folder": "qa-documental",
-        "file_regex": r"(aprobado_qa_[\w_]+\.md)",
-        "message": "@UX: La Historia de Usuario ha sido AUDITADA y APROBADA formalmente por QA Documental (ver certificado {file}). Procede con la fase de diseño UX, elaboración de flujos y wireframes correspondientes."
+        "file_regex": r"(tasks\.md|spec\.md|aprobado_qa_[\w_]+\.md)",
+        "message": "@UX: El ciclo SDD (/specify -> /plan -> /tasks -> /analyze) ha concluido con éxito. Procede con el diseño visual y wireframes tomando como Fuente de la Verdad los artefactos tasks.md y spec.md."
     },
     "6": {
-        "name": "QA Documental (QA) -> SA [Ruta Bypass Headless: ETL / APIs puras]",
+        "name": "Spec Kit (SDD Bridge / analyze) -> SA [Bypass Headless]",
         "folder": "qa-documental",
-        "file_regex": r"(aprobado_qa_[\w_]+\.md)",
-        "message": "@SA: La Historia de Usuario ha sido AUDITADA y APROBADA formalmente por QA Documental en {file}. Al ser un proyecto Headless, el diseño UX se omite. Por favor, formula tus preguntas para definir el stack tecnológico y la gobernanza."
+        "file_regex": r"(tasks\.md|plan\.md|aprobado_qa_[\w_]+\.md)",
+        "message": "@SA: El ciclo SDD ha concluido con éxito. Al ser un proyecto Headless, el diseño UX se omite. Procede con las directrices de arquitectura técnica basadas en tasks.md y plan.md."
     },
     "7": {
         "name": "Designer UX (UX) -> Siguiente Épica hacia PM",
@@ -71,34 +82,40 @@ APPROVAL_CONFIG = {
         "message": "@DA: Las directrices de arquitectura técnica han sido aprobadas en {file}. Procede con el diseño del Modelo Entidad-Relación (MER)."
     },
     "10": {
-        "name": "QA Técnico (QT) -> Handoff a Desarrollo Backend (@DEV-BACK:)",
+        "name": "QA Técnico (QT) -> Gatillo Spec Kit Implement (/speckit.implement)",
         "folder": "qa-tech",
         "file_regex": r"(tech-design_[\w_]+\.md)",
-        "message": "@DEV-BACK: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Backend siguiendo VSA y la Lex Superior."
+        "message": "@SPEC-KIT: La arquitectura técnica ha sido compilada y aprobada en {file}. Gatillar /speckit.implement para despacho de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS)."
     },
     "11": {
-        "name": "QA Técnico (QT) -> Handoff a Desarrollo Frontend (@DEV-FRONT:)",
+        "name": "QA Técnico (QT) -> Despacho Directo Backend (@DEV-BACK:) [Fallback]",
         "folder": "qa-tech",
         "file_regex": r"(tech-design_[\w_]+\.md)",
-        "message": "@DEV-FRONT: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Frontend en Angular 22 Zoneless y PrimeNG."
+        "message": "@DEV-BACK: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Backend según los contratos y directrices arquitectónicas vigentes."
     },
     "12": {
-        "name": "Devs (Backend/Frontend) -> Handoff a QA Automation (@QA-AUTO:)",
-        "folder": "dev-backend",
-        "file_regex": r"([\w_]+\.cs|[\w_]+\.ts)",
-        "message": "@QA-AUTO: El código fuente de la Feature ha sido implementado y auto-auditado. Procede con el diseño y ejecución de la suite de pruebas automatizadas xUnit/Jest."
+        "name": "QA Técnico (QT) -> Despacho Directo Frontend (@DEV-FRONT:) [Fallback]",
+        "folder": "qa-tech",
+        "file_regex": r"(tech-design_[\w_]+\.md)",
+        "message": "@DEV-FRONT: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Frontend según el diseño UX y los contratos de integración vigentes."
     },
     "13": {
-        "name": "QA Automation (QA-Auto) -> Handoff a Code Review (@CODE-REVIEW:)",
-        "folder": "qa-auto",
-        "file_regex": r"([\w_]+Tests?\.cs|[\w_]+\.spec\.ts)",
-        "message": "@CODE-REVIEW: La suite de pruebas automatizadas y cobertura de Criterios de Aceptación ha sido completada. Procede con la auditoría SecOps, OWASP y calidad técnica final."
+        "name": "Devs (Backend/Frontend) -> Handoff a QA Automation (@QA-AUTO:)",
+        "folder": "dev-backend",
+        "file_regex": r"([\w_\-\.]+\.(?:cs|ts|js|py|java|go|rs|kt|php|rb|md))",
+        "message": "@QA-AUTO: El código fuente de la Feature ha sido implementado y auto-auditado. Procede con el diseño y ejecución de la suite de pruebas automatizadas cubriendo los Criterios de Aceptación (Zero-Tautology)."
     },
     "14": {
+        "name": "QA Automation (QA-Auto) -> Handoff a Code Review (@CODE-REVIEW:)",
+        "folder": "qa-auto",
+        "file_regex": r"([\w_\-\.]*(?:test|spec)[\w_\-\.]*\.(?:cs|ts|js|py|java|go|rs|md)|[\w_\-\.]+\.md)",
+        "message": "@CODE-REVIEW: La suite de pruebas automatizadas y la verificación de Criterios de Aceptación han sido completadas. Procede con la auditoría SecOps, OWASP y calidad técnica integral."
+    },
+    "15": {
         "name": "Code Review -> Aprobación Final y Handoff a DevOps (@DEVOPS:)",
         "folder": "code-review",
         "file_regex": r"(tracker_bmad\.md)",
-        "message": "@DEVOPS: El código y las pruebas han sido aprobados con éxito en la compuerta de Code Review. Procede con el aprovisionamiento de contenedores, Docker Compose y pipelines CI/CD."
+        "message": "@DEVOPS: El código y las pruebas han sido aprobados con éxito en la compuerta de Code Review. Procede con el aprovisionamiento de infraestructura, contenedores y pipelines CI/CD."
     }
 }
 
@@ -155,21 +172,33 @@ def main():
     
     if not archivo_detectado:
         print(f"\n⚠️ No se encontró ningún archivo asociado al {config['name']} en el tracker.")
-        archivo_detectado = input("✍️ Ingrese el nombre del archivo manualmente (ej. pb_proyecto.md): ").strip()
+        archivo_detectado = input("✍️ Ingrese el nombre del archivo manualmente (ej. tasks.md, spec.md o pb_proyecto.md): ").strip()
         if not archivo_detectado:
             print("Operación cancelada.")
             sys.exit(1)
     else:
         print(f"\n📄 Archivo detectado en el tracker: {archivo_detectado}")
         
-    # 2. APERTURA AUTOMÁTICA DEL ARCHIVO
-    ruta_fisica = DIRECTORIO_RAIZ / "files" / config["folder"] / archivo_detectado
-    
-    if ruta_fisica.exists():
-        print(f"🔍 Abriendo archivo para revisión humana...")
+    # 2. APERTURA AUTOMÁTICA DEL ARCHIVO (Búsqueda multi-ruta resiliente)
+    candidatos_ruta = [
+        DIRECTORIO_RAIZ / "files" / config["folder"] / archivo_detectado,
+        DIRECTORIO_RAIZ / ".specify" / archivo_detectado,
+        DIRECTORIO_RAIZ / "specs" / archivo_detectado,
+        DIRECTORIO_RAIZ / "files" / "business-analyst" / archivo_detectado,
+        DIRECTORIO_RAIZ / archivo_detectado
+    ]
+    ruta_fisica = None
+    for cand in candidatos_ruta:
+        if cand.exists():
+            ruta_fisica = cand
+            break
+            
+    if ruta_fisica:
+        print(f"🔍 Abriendo archivo para revisión humana ({ruta_fisica.name})...")
         abrir_archivo_en_so(ruta_fisica)
     else:
-        print(f"⚠️ El archivo está referenciado en el tracker pero no existe físicamente en:\n{ruta_fisica}")
+        ruta_defecto = DIRECTORIO_RAIZ / "files" / config["folder"] / archivo_detectado
+        print(f"⚠️ El archivo está referenciado en el tracker pero no existe físicamente en:\n{ruta_defecto}")
         
     # 3. Confirmación humana
     confirmacion = input(f"\n❓ ¿Deseas autorizar formalmente el avance hacia la siguiente fase? (s/n): ").strip().lower()

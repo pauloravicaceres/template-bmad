@@ -3,7 +3,7 @@
 - **Documento Fuente:** pb_menu_navegacion_perfil.md
 - **Fecha de Elaboración:** 25-09-2026
 - **Product Manager:** Agente Orquestador BMAD (Fase M)
-- **Modo de Operación:** Brownfield (Subordinado a `legacy_ecosystem.md`)
+- **Modo de Operación:** Brownfield (Subordinado a `constitution.md`)
 
 ---
 

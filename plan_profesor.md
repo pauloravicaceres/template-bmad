@@ -62,7 +62,7 @@ Adoptamos lo más valioso del rigor técnico y analítico del profesor:
   - `Decisión Tomada`.
   - `Alternativas Consideradas` (con justificación real de descarte).
   - `Consecuencias` (obligatoriedad de consignar al menos un trade-off o costo real).
-* **Integración Brownfield:** Cuando exista [`files/context/legacy_ecosystem.md`](file:///D:/Paulo/Cursos/DMC/template-bmad/files/context/legacy_ecosystem.md), las decisiones técnicas impuestas por el sistema existente se catalogan automáticamente como `Aceptado (heredado)`, quedando exentas de inventar alternativas ficticias.
+* **Integración Brownfield:** Cuando exista [`files/context/constitution.md`](file:///D:/Paulo/Cursos/DMC/template-bmad/files/context/constitution.md), las decisiones técnicas impuestas por el sistema existente se catalogan automáticamente como `Aceptado (heredado)`, quedando exentas de inventar alternativas ficticias.
 
 ### B. Inyección de las Áreas de Decisión: Estado y Resiliencia
 * Se enriquecen las directrices corporativas del SA ([`guidelines-template.instructions.md`](file:///D:/Paulo/Cursos/DMC/template-bmad/solutions-architect/instructions/guidelines-template.instructions.md)) incorporando dos secciones dedicadas:
@@ -114,7 +114,7 @@ A continuación se presentan los bloques exactos listos para ser inyectados en l
 
 #### ADR-001: {{Título de la Decisión de Infraestructura o Stack}}
 - **Estado:** {{ Aceptado | Aceptado (heredado) }}
-  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/legacy_ecosystem.md. Las decisiones heredadas no requieren alternativas consideradas.*
+  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
 - **Contexto:** {{Qué requerimiento del PRD o restricción técnica motiva esta decisión}}.
 - **Decisión:** {{Qué patrón, tecnología o servicio se seleccionó en una frase clara y verificable}}.
 - **Alternativas Consideradas (Obligatorio en decisiones nuevas):**
@@ -137,7 +137,7 @@ A continuación se presentan los bloques exactos listos para ser inyectados en l
 
 ### ADR-01: {{Título de la decisión, ej. Motor de Persistencia o Tipo de Llave Primaria}}
 - **Estado:** {{ Aceptado | Aceptado (heredado) }}
-- **Contexto:** {{Qué necesidad de modelado o restricción del legacy_ecosystem.md motiva la elección}}.
+- **Contexto:** {{Qué necesidad de modelado o restricción del constitution.md motiva la elección}}.
 - **Decisión:** {{Tipo de dato, motor o normalización seleccionada}}.
 - **Alternativas Evaluadas:**
   - **Alternativa A:** {{Opción viable descartada y justificación técnica}}.
@@ -243,7 +243,7 @@ A continuación se presentan los bloques exactos listos para ser inyectados en l
 | Capacidad Existente en BMAD | Impacto del Upgrade Adversarial | Garantía de No-Regresión |
 |---|---|---|
 | **Bypass Headless** (`BA -> QA -> SA -> DA -> QT`) | Nulo | Si no existe `ux_*.md`, el DA y el QT saltan la validación UI-Data automáticamente sin arrojar error. |
-| **Interruptor Brownfield** (`legacy_ecosystem.md`) | Reforzado | Las decisiones del sistema legado pasan directamente a estado `Aceptado (heredado)`, agilizando el flujo sin preguntas redundantemente formuladas. |
+| **Interruptor Brownfield** (`constitution.md`) | Reforzado | Las decisiones del sistema legado pasan directamente a estado `Aceptado (heredado)`, agilizando el flujo sin preguntas redundantemente formuladas. |
 | **Token-Passing del Tracker** (`tracker_bmad.md`) | Intacto | Las órdenes de rechazo o aprobación del QT siguen la sintaxis formal de una sola línea (`@DA:`, `@API:`, `@HUMANO:`). |
 | **Diagramación Resiliente Dual** (`archify` + `mermaid`) | Intacto | Mantiene la generación dual con fallback autónomo en la Sección 5 del Tech Design. |
 

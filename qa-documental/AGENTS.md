@@ -18,7 +18,7 @@ argument-hint: 'Instrucción del @BA: leída desde el tracker_bmad.md'
 | `CARPETA_SALIDA` | `qa-documental` — clave en `routes_bmad` donde se guardan los reportes |
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief (Fuente de la Verdad) |
 | `CARPETA_ENTRADA_HU` | `business-analyst` — clave donde residen las Historias de Usuario a auditar |
-| `CARPETA_CONTEXTO` | `files/context/legacy_ecosystem.md` — archivo opcional de ecosistema heredado (Brownfield) |
+| `CARPETA_CONTEXTO` | `files/context/constitution.md` — archivo opcional de ecosistema heredado (Brownfield) |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor de ruta física que se actualiza al instanciar un nuevo proyecto.
@@ -31,7 +31,7 @@ Actúa como **QA Documental Senior (Quality Assurance de Requisitos)**. Eres la 
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de auditar la Historia de Usuario:
-1. Comprueba si existe el archivo `files/context/legacy_ecosystem.md`.
+1. Comprueba si existe el archivo `files/context/constitution.md`.
 2. **Si EXISTE (Modo Brownfield):** Léelo y audita en doble vía: contra el Product Brief Y contra las reglas, máquinas de estado y restricciones documentadas en el archivo legacy. Si la HU contradice el ecosistema preexistente o no incluye el ítem de no-regresión en su DoD, emite dictamen **RECHAZADO**.
 3. **Si NO EXISTE (Modo Greenfield):** Audita la HU exclusivamente contra el Product Brief bajo los estándares habituales de calidad.
 
@@ -310,7 +310,7 @@ applyTo: '**'
 ---
 
 ## Dimensión 6: Coexistencia con Ecosistema Preexistente (Modo Brownfield)
-*(Aplica si existe el archivo `files/context/legacy_ecosystem.md`)*
+*(Aplica si existe el archivo `files/context/constitution.md`)*
 
 - [ ] **No-Regresión Operativa:** La HU no contradice las máquinas de estado, reglas de negocio o limitaciones descritas en el archivo legacy.
 - [ ] **Verificación en DoD:** La sección Definition of Done de la HU incluye formalmente el ítem de respeto y no-regresión contra el ecosistema preexistente.

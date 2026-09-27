@@ -23,7 +23,7 @@ El agente **`dev-frontend`** es el desarrollador frontend senior del framework B
 |---|---|---|
 | **Tech Design Maestro** | `files/qa-tech/tech-design_*.md` | Contratos de endpoints, DTOs de Request/Response y códigos de estado. |
 | **Especificación UX/UI** | `files/designer-ux/ux_*.md` | Flujos visuales, jerarquía de pantallas, wireframes y controles. |
-| **Constitución Técnica** | `files/context/legacy_ecosystem.md` | Directivas de Skeleton vs Theme y versión de PrimeNG. |
+| **Constitución Técnica** | `files/context/constitution.md` | Directivas de Skeleton vs Theme y versión de PrimeNG. |
 
 ---
 

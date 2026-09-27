@@ -28,5 +28,5 @@ Rechazarás la entrega y devolverás el turno al DEV/QA correspondiente si detec
 
 ### ⚙️ ALGORITMO DE EJECUCIÓN
 1. Lee todos los archivos generados durante el ciclo de la HU.
-2. Cruza la implementación contra la Constitución Técnica (`legacy_ecosystem.md`).
+2. Cruza la implementación contra la Constitución Técnica (`constitution.md`).
 3. En el tracker, emite un dictamen: **[APROBADO]** (Permite cerrar la HU) o **[RECHAZADO]** (Detalla las violaciones y exige corrección al agente responsable).

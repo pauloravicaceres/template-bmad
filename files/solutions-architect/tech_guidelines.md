@@ -8,7 +8,7 @@
 ## 1. Project Overview
 - **Qué es el sistema:** Tarjeta de Identidad Digital Ultra-Minimalista con Menú de Navegación Multirruta, Descarga de Documentos y Módulo de Experiencia Profesional, diseñada para proyectar la marca personal del titular y exhibir su trayectoria laboral estructurada en una vista dedicada sin sobrecarga visual.
 - **Qué problema resuelve:** Centraliza la presencia digital del profesional permitiendo a visitantes y reclutadores auditar su historial de puestos, empresas, períodos y responsabilidades laborales de forma legible, responsiva y ultrarrápida, complementando el perfil inicial y la descarga de credenciales.
-- **Naturaleza del Proyecto:** Brownfield (Subordinado a las directrices de `files/context/legacy_ecosystem.md`, la tarjeta de identidad base y el menú de navegación multirruta).
+- **Naturaleza del Proyecto:** Brownfield (Subordinado a las directrices de `files/context/constitution.md`, la tarjeta de identidad base y el menú de navegación multirruta).
 - **Arquitectura general:** Arquitectura Jamstack / Static Site Generation (SSG) multirruta con **Astro 4.x**, orientada a "Zero JavaScript by default", con distribución perimetral en Edge CDN (Vercel / GitHub Pages), renderizado sin servidor (Serverless Static Delivery), enrutamiento estático basado en archivos y persistencia de tema en cliente.
 
 ## 2. Repository Structure
@@ -301,14 +301,14 @@
 
 ## 11. Agent Instructions (Dev Guidelines)
 - **Antes de programar:**
-  - Leer este documento `tech_guidelines.md`, las historias de usuario aprobadas (`hu_*.md`), wireframes de UX (`ux_*.md`) y el snapshot `legacy_ecosystem.md`.
+  - Leer este documento `tech_guidelines.md`, las historias de usuario aprobadas (`hu_*.md`), wireframes de UX (`ux_*.md`) y el snapshot `constitution.md`.
   - Construir `ExperienceList.astro` con CSS Grid/Flexbox y utilidades de Tailwind semánticas (`dark:`).
 - **Qué debe validar después / Cuándo pedir confirmación:**
   - Ejecutar `npm run build` y comprobar que `experiencia/index.html` se compile correctamente.
   - Probar el estado vacío pasando un array vacío para validar el fallback visual.
 
 ## 12. Definition of Done
-- [x] Arquitectura Brownfield formalizada y subordinada a `legacy_ecosystem.md`.
+- [x] Arquitectura Brownfield formalizada y subordinada a `constitution.md`.
 - [x] Componente `ExperienceList.astro` especificado con diseño responsivo y Zero JS overhead.
 - [x] Matriz de ADRs (ADR-001 a ADR-012) consolidada bajo formato MADR con trade-offs reales.
 - [x] Extensión del contrato de datos tipado (`profile.schema.ts`) con la colección `experience` y Zod.

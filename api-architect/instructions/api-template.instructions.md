@@ -1,9 +1,9 @@
 ---
-description: 'Plantilla determinista para el artefacto generado por el API Architect (api_[nombre_corto].md). Incluye contratos REST/GraphQL, registro de decisiones (ADR) en formato MADR y orden de delegación hacia el QA Técnico.'
+description: 'Plantilla determinista para el artefacto generado por el API Architect (api_[nombre_corto].md). Incluye contratos REST/GraphQL mapeados desde spec.md y tasks.md de Spec Kit, registro de decisiones (ADR) en formato MADR y orden de delegación hacia el QA Técnico.'
 applyTo: '**'
 ---
 
-# Plantilla de Contratos API y Decisiones (API + ADR)
+# Plantilla de Contratos API y Decisiones (API + ADR) — SDD Bridge
 
 ## Convención de Nombres de Archivo
 `api_[nombre_corto].md` (ej. `api_motor_reservas.md`)
@@ -13,6 +13,7 @@ applyTo: '**'
 ```markdown
 # CONTRATO DE INTEGRACIÓN (API): {{TITULO_EPICA}}
 
+- **Especificación SDD Base:** `spec.md` y `tasks.md` (Spec Kit)
 - **Modelo Base de Datos:** {{Nombre del archivo db_*.md}}
 - **Fecha de Diseño:** {{FECHA_ACTUAL}}
 - **API Architect:** Agente API Senior BMAD
@@ -24,8 +25,8 @@ applyTo: '**'
 
 ### ADR-01: {{Título de la decisión, ej. Elección del método de Autenticación o formato de Payload}}
 - **Estado:** {{ Aceptado | Aceptado (heredado) }}
-  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/legacy_ecosystem.md. Las decisiones heredadas no requieren alternativas consideradas.*
-- **Contexto:** {{Qué requerimiento de negocio, seguridad o limitación del MER motivó la decisión}}.
+  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
+- **Contexto:** {{Qué requerimiento de spec.md, seguridad o limitación del MER motivó la decisión}}.
 - **Decisión:** {{Qué patrón de API, verbo HTTP, protocolo o estructura JSON se eligió y por qué en una frase clara y verificable}}.
 - **Alternativas Evaluadas (Obligatorio en decisiones nuevas):**
   - **Alternativa A:** {{Opción viable descartada y justificación técnica con argumentos reales}}.
@@ -44,30 +45,32 @@ applyTo: '**'
 ---
 
 ## 3. ENDPOINTS DEFINIDOS
+*(Mapeo 1 a 1 de endpoints y operaciones requeridas en spec.md y tasks.md)*
 
 ### Endpoint: `{{VERBO HTTP}} {{RUTA}}`
-- **Propósito Funcional:** {{Relación con el Criterio de Aceptación, ej. "Registrar nueva cita"}}
+- **Tarea Spec Kit:** {{ID de Tarea en tasks.md, ej. Task 2.1: API Endpoints}}
+- **Propósito Funcional:** {{Relación con el escenario de spec.md, ej. "Registrar nueva cita"}}
 - **Request Headers:**
   - `Content-Type`: `application/json`
 - **Request Body (Payload JSON):**
-\`\`\`json
+```json
 {
     "ejemplo_campo": "valor estricto mapeado desde el db_*.md"
 }
-\`\`\`
+```
 - **Respuestas (Status Codes):**
-  - ✅ **200 OK** (Happy Path):
-  \`\`\`json
+  - ✅ **200 OK / 201 Created** (Happy Path):
+  ```json
   { "id": "uuid", "status": "CONFIRMADA" }
-  \`\`\`
-  - ❌ **400 Bad Request** (Sad Path - Validaciones Gherkin):
-  \`\`\`json
+  ```
+  - ❌ **400 Bad Request** (Sad Path - Validaciones Gherkin / spec.md):
+  ```json
   { "error": "BAD_REQUEST", "message": "El formato del correo es inválido" }
-  \`\`\`
+  ```
   - ❌ **409 Conflict** (Sad Path - Regla de Negocio):
-  \`\`\`json
+  ```json
   { "error": "CONFLICT", "message": "El horario seleccionado ya está ocupado" }
-  \`\`\`
+  ```
 
 ---
 
@@ -79,18 +82,16 @@ applyTo: '**'
 ## 5. ORDEN DE DELEGACIÓN PARA EL TRACKER
 *(Instrucción de una sola línea continua para notificar al QA Técnico)*
 
-@QT: Los contratos de integración (API) y endpoints para {{TITULO_EPICA}} han sido definidos en api_{{nombre_corto}}.md. Por favor, procede con la auditoría cruzada contra el modelo de persistencia (db_*.md) y la compilación del Tech Design (TDD).
+@QT: Los contratos de integración (API) y endpoints para {{TITULO_EPICA}} han sido definidos en api_{{nombre_corto}}.md basados en spec.md y db_{{nombre_corto}}.md. Por favor, procede con la auditoría cruzada y la compilación del Tech Design (TDD).
 ```
 
 ---
 
 ### ⚠️ Directiva de Interfaz para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/legacy_ecosystem.md`:
-1. **Subordinación Estricta de Interfaz (Lex Superior):** Lee el archivo legacy en su totalidad. Los contratos de integración deben subordinarse a los protocolos de comunicación, servicios de red y mecanismos de autenticación especificados en el documento legacy. Las directivas del archivo legacy anulan cualquier petición divergente del tracker.
-2. **Capa de Adaptación y Mapeo de Errores:** Si el sistema preexistente utiliza protocolos específicos, servicios legados o procedimientos almacenados, diseñar los adaptadores necesarios (BFF / Facade) y el mapeo formal de códigos de error hacia respuestas estándar.
-3. **Nulidad de Peticiones y Salvoconducto Único:** Si el usuario en el tracker solicita exponer contratos o mecanismos de red contrarios a la política del archivo legacy, queda anulado. La única excepción admisible es que exista formalmente una sección `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA` en el archivo físico `legacy_ecosystem.md`.
-4. **ADR Obligatorio de Interfaz Heredada (MADR):** Redactar un ADR justificando la compatibilidad con los protocolos heredados, utilizando el estado `Aceptado (heredado)` sin requerir alternativas consideradas.
-5. **Si el archivo NO existe (Modo Greenfield):** Diseña contratos de API estándar basados en el MER y las HUs sin restricciones heredadas.
-
+Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+1. **Subordinación Estricta de Interfaz (Lex Superior):** Los contratos de integración deben subordinarse a los protocolos de comunicación, servicios de red y mecanismos de autenticación especificados en el documento de constitución.
+2. **Capa de Adaptación:** Diseñar los adaptadores necesarios (BFF / Facade) y el mapeo formal de códigos de error hacia respuestas estándar.
+3. **Nulidad de Peticiones y Salvoconducto Único:** Si en el tracker se solicitan protocolos incompatibles, queda anulado salvo que exista una sección `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA`.
+4. **ADR Obligatorio de Interfaz Heredada (MADR):** Redactar un ADR justificando la compatibilidad con los protocolos heredados con estado `Aceptado (heredado)`.
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

@@ -2,7 +2,7 @@
 
 - **Fecha de Compilación:** 25-09-2026
 - **Auditor y Consolidador:** Agente QT Senior BMAD
-- **Modo de Operación:** Brownfield (Evolución de Arquitectura Subordinada a `legacy_ecosystem.md`)
+- **Modo de Operación:** Brownfield (Evolución de Arquitectura Subordinada a `constitution.md`)
 - **Estado:** ✅ AUDITADO Y APROBADO (Auditoría Adversarial Exitosa - 0 Bloqueos Críticos)
 
 ---

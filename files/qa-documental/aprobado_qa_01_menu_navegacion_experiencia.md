@@ -8,7 +8,7 @@
 ---
 
 ## 1. DECLARACIÓN FORMAL DE CONFORMIDAD
-La especificación de requerimientos contenida en el archivo `hu_01_menu_navegacion_experiencia.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_menu_navegacion_perfil.md`) y el contexto técnico consolidado en `legacy_ecosystem.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión operativa frente al ecosistema base (cero FOUT, soporte a Light/Dark Mode) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto los flujos ideales de navegación como los escenarios de contingencia y retorno.
+La especificación de requerimientos contenida en el archivo `hu_01_menu_navegacion_experiencia.md` ha sido auditada exhaustivamente contra el Product Brief original (`pb_menu_navegacion_perfil.md`) y el contexto técnico consolidado en `constitution.md` (Modo Brownfield). Se certifica que la historia cumple con el estándar INVEST, respeta rigurosamente las fronteras de alcance del MVP, garantiza la no-regresión operativa frente al ecosistema base (cero FOUT, soporte a Light/Dark Mode) y cuenta con Criterios de Aceptación Gherkin testeables que cubren tanto los flujos ideales de navegación como los escenarios de contingencia y retorno.
 
 ---
 
@@ -21,7 +21,7 @@ La especificación de requerimientos contenida en el archivo `hu_01_menu_navegac
 | **3. Cobertura BDD / Gherkin** | ✅ CUMPLE | Happy Paths (CA-01 renderizado armónico, CA-02 navegación estática fluida) y Sad Path/Fallback (CA-03 retorno seguro y preservación de estado) completamente testeables. |
 | **4. Consistencia Lógica** | ✅ CUMPLE | Flujo del diagrama Mermaid coherente con las precondiciones, acciones y resultados BDD. |
 | **5. Separación Negocio/Técnica** | ✅ CUMPLE | Especificación orientada a capacidades funcionales y experiencia de usuario sin polución técnica de implementación. |
-| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Respeto a las directivas de `legacy_ecosystem.md` (arquitectura estática, preservación de tema `theme_preference` y script anti-FOUT). Criterio de no-regresión explícito en DoD. |
+| **6. Ecosistema Legacy (Brownfield)** | ✅ CUMPLE | Respeto a las directivas de `constitution.md` (arquitectura estática, preservación de tema `theme_preference` y script anti-FOUT). Criterio de no-regresión explícito en DoD. |
 
 ---
 

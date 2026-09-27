@@ -4,18 +4,20 @@
 
 ---
 
-## 🌟 Capacidades Principales
-
+* **Integración Nativa SDD (Spec-Driven Development vía GitHub Spec Kit):** El framework incorpora el puente determinista con GitHub Spec Kit. Tras la aprobación de requisitos por parte del QA Documental, el orquestador activa una pausa lógica interceptora (**SDD Gatekeeper**) para transitar el ciclo interactivo de especificación formal (`/speckit.specify -> /speckit.clarify -> /speckit.plan -> /speckit.tasks -> /speckit.analyze`), cuya liberación controlada mediante `utils/approve_step.py` nutre directamente a la Fase de Arquitectura y UX (`spec.md`, `tasks.md`, `plan.md`). La ejecución en Fase D es gatillada por `/speckit.implement`.
+* **Estrategia Dual-Output de Requisitos (Business Analyst):** Generación simultánea y determinista de dos variantes de Historias de Usuario:
+  - **HU Técnica (Spec Kit Ready):** Formato aséptico, metadatos estructurados y sintaxis Gherkin pura guardada en `files/business-analyst/hu_[ID]_[nombre].md` para consumo directo por `/speckit.specify`.
+  - **HU para Stakeholders:** Enfoque de negocio, narrativa en primera persona y criterios funcionales amigables archivados en `files/business-analyst/HUs-stakeholders/hu_[ID]_[nombre].md`.
+* **Capacitación CLI en Fase D (Terminal Execution):** Equipamiento de la herramienta canónica de terminal (`execute_command`) en los agentes de implementación (`dev-backend`, `dev-frontend`, `qa-auto` y `devops`) para permitir la compilación, ejecución de tests y despacho coordinado de tareas comandado por `/speckit.implement`.
 * **El Tracker como Único Bus de Datos y Comunicación:** Los agentes **NO** se comunican entre sí por chat ni APIs directas. Toda la coordinación y paso de entregables fluye exclusivamente mediante eventos anexados al final de `files/tracker_bmad.md` bajo el patrón estricto de adición (*read -> concat -> write*).
-* **Roster Oficial de 15 Agentes:** Flota especializada dividida en 4 fases metodológicas: Fase B (Business: `business-storyteller`, `product-analyst`), Fase M (Management: `product-manager`, `business-analyst`, `qa-documental`, `designer-ux`), Fase A (Architecture: `solutions-architect`, `data-architect`, `api-architect`, `qa-tech`) y Fase D (Development & Delivery: `dev-backend`, `dev-frontend`, `qa-auto`, `code-review`, `devops`).
-* **Fase D (Development & Delivery) Especializada:** Segregación estricta entre Constructores (`dev-backend` en .NET VSA y `dev-frontend` en Angular 22 Zoneless) y Auditores (`qa-auto` con xUnit/Testcontainers/Jest y `code-review` como compuerta SecOps/OWASP). La infraestructura es aprovisionada en paralelo por `devops` (Docker rootless, compose resiliente y GitHub Actions).
+* **Fase D (Ingeniería de Software & Delivery) como Cartucho Intercambiable:** Arquitectura desacoplada (*Plug & Play*) con segregación estricta entre Constructores (`dev-backend` para lógica de negocio de servidor y `dev-frontend` para clientes e interfaces visuales) y Auditores (`qa-auto` para pruebas automatizadas no-tautológicas y `code-review` como compuerta SecOps/OWASP). La infraestructura es aprovisionada en paralelo por `devops` (contenedores multi-stage, compose resiliente y CI/CD). El stack tecnológico (ej. .NET, Java, Python, Go) es 100% intercambiable sin tocar el motor de orquestación.
 * **Lógica de Bypass (Headless vs UI):** El ecosistema reconoce la naturaleza del proyecto:
-  - **Proyectos con UI:** Transitan el pipeline visual completo: `BA -> QA -> UX -> SA -> DA -> API -> QT -> (DEV-BACK / DEV-FRONT) -> QA-AUTO -> CODE-REVIEW`.
-  - **Proyectos Headless (ETL, SSIS, APIs puras, Pipelines de Datos):** Saltan automáticamente la fase de diseño UX: `BA -> QA -> SA -> DA -> QT -> DEV-BACK -> QA-AUTO -> CODE-REVIEW`.
-* **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `files/context/legacy_ecosystem.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
-* **Auto-Evolución y Destilación de Contexto (Context Distillation):** El QA Tech (`qa-tech`) actúa como **Bibliotecario de Arquitectura**. Al compilar el Tech Design Document (TDD), evalúa si hubo cambios estructurales y genera o actualiza automáticamente el archivo `files/context/legacy_ecosystem.md`. Esto cierra el ciclo de vida arquitectónico, permitiendo que un proyecto nacido como *Greenfield* destile sus propias invariantes y prepare el terreno para futuras iteraciones evolutivas (*Brownfield*) de manera 100% desatendida.
+  - **Proyectos con UI:** Transitan el pipeline visual completo: `BA -> QA -> [SDD Gatekeeper: Spec Kit] -> UX -> SA -> DA -> API -> QT -> /speckit.implement -> (DEV-BACK / DEV-FRONT) -> QA-AUTO -> CODE-REVIEW`.
+  - **Proyectos Headless (ETL, SSIS, APIs puras, Pipelines de Datos):** Saltan automáticamente la fase de diseño UX: `BA -> QA -> [SDD Gatekeeper: Spec Kit] -> SA -> DA -> QT -> /speckit.implement -> DEV-BACK -> QA-AUTO -> CODE-REVIEW`.
+* **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `files/context/constitution.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
+* **Auto-Evolución y Destilación de Contexto (Context Distillation):** El QA Tech (`qa-tech`) actúa como **Bibliotecario de Arquitectura**. Al compilar el Tech Design Document (TDD), evalúa si hubo cambios estructurales y genera o actualiza automáticamente el archivo `files/context/constitution.md`. Esto cierra el ciclo de vida arquitectónico, permitiendo que un proyecto nacido como *Greenfield* destile sus propias invariantes y prepare el terreno para futuras iteraciones evolutivas (*Brownfield*) de manera 100% desatendida.
 * **Auditoría Adversarial Zero-Trust (Quality Gate Técnico):** El QA Tech no valida ciegamente; aplica duda metódica por defecto, audita trazabilidad forzosa UI-Data (cero campos huérfanos), detector de mentiras en ADRs (cazando alternativas absurdas o trade-offs cosméticos) y clasifica hallazgos en una matriz de severidad (Crítico, Advertencia, Sugerencia) con auto-sanación agéntica.
-* **Gobernanza Arquitectónica Automatizada (Lex Superior) y Blindaje Anti-Sycophancy:** Blindaje institucional contra la complacencia de los LLMs (*sycophancy*). Las invariantes técnicas del archivo físico `files/context/legacy_ecosystem.md` tienen jerarquía constitucional sobre peticiones informales en el tracker. Si un usuario solicita tecnologías incompatibles sin una Cláusula de Excepción formal en el archivo físico, el SA, DA y API están obligados a ignorar la solicitud, y el QA Tech actúa como guardián adversarial rechazando sumariamente cualquier diseño complaciente con severidad 🔴 CRÍTICO.
+* **Gobernanza Arquitectónica Automatizada (Lex Superior) y Blindaje Anti-Sycophancy:** Blindaje institucional contra la complacencia de los LLMs (*sycophancy*). Las invariantes técnicas del archivo físico `files/context/constitution.md` tienen jerarquía constitucional sobre peticiones informales en el tracker. Si un usuario solicita tecnologías incompatibles sin una Cláusula de Excepción formal en el archivo físico, el SA, DA y API están obligados a ignorar la solicitud, y el QA Tech actúa como guardián adversarial rechazando sumariamente cualquier diseño complaciente con severidad 🔴 CRÍTICO.
 * **Aprobación Manual Obligatoria (HITL):** Soporte para interrupciones controladas (`@HUMANO:`), donde la activación del `@PM:` depende obligatoriamente de la aprobación humana del Product Brief mediante `utils/approve_step.py`, garantizando control de alcance antes del desglose de épicas.
 * **Arquitectura Modular de Agentes:** Cada agente define su rol (`agents/*.agent.md`) y reglas satélite (`instructions/*.instructions.md`), auto-ensambladas en tiempo de ejecución (`AGENTS.md`) por el orquestador.
 * **Inyección Atómica en Terminales (TTY):** Resolución dinámica de IDs de paneles en tiempo de ejecución para inyectar comandos directamente a los procesos mediante `herdr pane run`.
@@ -48,6 +50,7 @@
 ├── GUIDE.md                          # Guía de uso paso a paso y solución de problemas
 ├── SETUP.md                          # Manual de instanciación y clonado en nuevas rutas
 ├── QUESTIONS.md                      # Compendio de preguntas y respuestas técnicas
+├── PLUGGABLE_PHASE_D.md              # Especificación de Cartucho Intercambiable (Fase D Plug & Play)
 ├── BMAD_AUDIT_REPORT.md              # Reporte de auditoría y health check de consistencia
 ├── manifest.yaml                     # Manifiesto de capacidades y gobernanza del plugin
 ├── catalog-info.yaml                 # Definición para el catálogo Backstage
@@ -55,6 +58,7 @@
 ├── /skills                           # Repositorio global de habilidades (tracker-logger, export-pdf, etc.)
 ├── /utils                            # Scripts de automatización y mantenimiento
 │   ├── start_agents.py               # Despliega la flota en 3 pestañas temáticas en Herdr (Rutas dinámicas)
+│   ├── stop_agents.py                # Cierra limpiamente todas las pestañas y paneles de los agentes en Herdr
 │   ├── approve_step.py               # Script HITL para autorizar transiciones (@PM:, @DEV:)
 │   ├── clean_files.py                # Limpia interactivamente los entregables en files/
 │   └── delete_agents.py              # Elimina los archivos AGENTS.md auto-compilados
@@ -71,22 +75,23 @@
 ├── /data-architect                   # Agente DA: Modelo Entidad-Relación (MER) y persistencia
 ├── /api-architect                    # Agente API: Contratos de integración REST/GraphQL
 ├── /qa-tech                          # Agente QT: Auditoría cruzada y compilación del TDD
-├── /dev-backend                      # Agente DEV-BACK: Senior Backend Dev (.NET 8/10 VSA)
-├── /dev-frontend                     # Agente DEV-FRONT: Senior Frontend Dev (Angular 22 Zoneless)
-├── /qa-auto                          # Agente QA-AUTO: Senior QA Automation (xUnit, Testcontainers, Jest)
-├── /code-review                      # Agente CR: Tech Lead & SecOps Reviewer (OWASP, Gates)
-├── /devops                           # Agente DEVOPS: Cloud, Docker & SRE Engineer
+├── /dev-backend                      # Agente DEV-BACK: Construcción de lógica de negocio y servidor
+├── /dev-frontend                     # Agente DEV-FRONT: Construcción de interfaz de usuario y clientes
+├── /qa-auto                          # Agente QA-AUTO: Automatización de pruebas (Zero-Tautology)
+├── /code-review                      # Agente CR: Auditoría SecOps, calidad y gatekeeper final
+├── /devops                           # Agente DEVOPS: Infraestructura, contenedores y CI/CD
 │
 ├── /prompts                          # Prompts monolíticos de referencia (Legacy)
 │
 └── /files                            # Directorio de Entregables (Aislamiento de Datos)
     ├── tracker_bmad.md               # Único bus de eventos y cola de orquestación
     ├── /context                      # Contexto opcional de ecosistema heredado (Brownfield)
-    │   └── legacy_ecosystem.md       # Interruptor físico con directrices del sistema preexistente
+    │   └── constitution.md       # Interruptor físico con directrices del sistema preexistente
     ├── /business-storyteller         # Salidas BS: ideas estructuradas (idea_*.md)
     ├── /product-analyst              # Salidas PA: product briefs (pb_*.md)
     ├── /product-manager              # Salidas PM: planes de gestión / MVP (mvp_*.md)
-    ├── /business-analyst             # Salidas BA: historias de usuario (hu_*.md)
+    ├── /business-analyst             # Salidas BA: historias de usuario técnicas (hu_*.md)
+    │   └── /HUs-stakeholders         # Salidas BA: historias de usuario funcionales para negocio
     ├── /qa-documental                # Salidas QA: reportes de auditoría (aprobado_qa_*.md, feedback_qa_*.md)
     ├── /designer-ux                  # Salidas UX: especificaciones UI/UX (ux_*.md)
     ├── /solutions-architect          # Salidas SA: gobernanza técnica (tech_guidelines.md)
@@ -102,20 +107,59 @@
 
 ---
 
-## 🚀 Puesta en Marcha Rápida
+## 🚀 Puesta en Marcha y Flujo de Ejecución
 
+### 1. Inicialización y Arranque
 1. **Configuración Inicial:** Ejecutar `python init_bmad.py "Nombre del Proyecto"` (o actualizar rutas en `config_bmad.json`, ver [SETUP.md](./SETUP.md)).
-   - **Modo Greenfield (Proyecto Nuevo):** Operación estándar sin precondiciones (verificar que `files/context/legacy_ecosystem.md` no exista).
-   - **Modo Brownfield (Sistema Existente):** Crear `files/context/legacy_ecosystem.md` documentando el dominio, tecnologías, bases de datos y restricciones del sistema legado.
-2. **Terminal 1 - Watcher:**
+   - **Modo Greenfield (Proyecto Nuevo):** Operación estándar sin precondiciones (verificar que `files/context/constitution.md` no exista).
+   - **Modo Brownfield (Sistema Existente):** Crear `files/context/constitution.md` documentando el dominio, tecnologías, bases de datos y restricciones del sistema legado.
+2. **Terminal 1 - Watcher (Orquestador y Compilador):**
    ```bash
    python watcher_bmad.py
    ```
-3. **Terminal 2 - Herdr:**
+3. **Terminal 2 - Herdr (Flota de Agentes):**
    ```bash
    python utils/start_agents.py
    ```
 4. **Disparo:** Ingresar la idea en la terminal de `@BS:` o mediante el tracker.
+
+### 2. Flujo de Ejecución Paso a Paso
+
+1. **Discovery e Ideación (`@BS:` -> `@PA:`):** `business-storyteller` refina la idea y delega a `product-analyst`, quien redacta el Product Brief (`pb_*.md`).
+2. **Pausa Obligatoria HITL (Product Brief):** El PA detiene el avance emitiendo `@HUMANO:`. El operador revisa el Product Brief y ejecuta:
+   ```bash
+   python utils/approve_step.py
+   ```
+   Selecciona la opción `[2] Product Analyst` para autorizar a `@PM:`.
+3. **Estrategia Dual-Output de Requisitos (`@PM:` -> `@BA:` -> `@QA:`):** 
+   - `product-manager` prioriza el MVP (`mvp_*.md`) y delega al `business-analyst`.
+   - `business-analyst` genera simultáneamente dos entregables: la **HU Técnica** en Gherkin estricto (`files/business-analyst/hu_*.md`) y la **HU para Stakeholders** (`files/business-analyst/HUs-stakeholders/hu_*.md`).
+   - `qa-documental` audita la trazabilidad contra el Product Brief.
+4. **🛑 Pausa Lógica del SDD Gatekeeper (GitHub Spec Kit):**
+   Tras la emisión del certificado de aprobación documental por parte de QA Documental, **la consola de `watcher_bmad.py` se pausará automáticamente** (interceptor SDD Gatekeeper), indicando al operador humano que debe ejecutar los comandos CLI de GitHub Spec Kit para el refinamiento formal:
+   ```bash
+   /speckit.specify files/business-analyst/hu_[ID]_[nombre].md
+   /speckit.clarify
+   /speckit.plan
+   /speckit.tasks
+   /speckit.analyze
+   ```
+5. **Reanudación del Orquestador hacia la Fase A (Arquitectura):**
+   Una vez concluido y analizado el ciclo SDD con `/speckit.analyze`, el operador reanuda el orquestador ejecutando:
+   ```bash
+   python utils/approve_step.py
+   ```
+   Selecciona la opción **`[5] Spec Kit (SDD Bridge) -> UX`** (o **`[6] Spec Kit -> SA`** si es un proyecto Headless). Los agentes de arquitectura (`designer-ux`, `solutions-architect`, `data-architect`, `api-architect`, `qa-tech`) consumirán directamente `spec.md`, `tasks.md` y `plan.md` como fuente de la verdad inmutable.
+6. **Compilación de Arquitectura y Gatillo de Implementación (`/speckit.implement`):**
+   `qa-tech` realiza la auditoría cruzada (MER vs APIs vs Spec Kit), compila el `tech-design_*.md` y emite `@SPEC-KIT:`. El operador o el pipeline gatilla `/speckit.implement` (o `approve_step.py` opción `[10]`).
+7. **Fase D con Capacidad de Terminal (`execute_command`):**
+   Los agentes constructores y de soporte (`dev-backend`, `dev-frontend`, `qa-auto`, `devops`) están dotados de la herramienta **`execute_command`**. Esto les otorga capacidad de ejecución real en terminal para:
+   - Compilar proyectos y restaurar dependencias.
+   - Ejecutar migraciones de bases de datos.
+   - Correr suites de pruebas automatizadas no-tautológicas (`qa-auto`).
+   - Aprovisionar y validar contenedores Docker / Compose (`devops`).
+8. **Quality Gate y Cierre (`code-review`):**
+   `code-review` realiza la inspección física de código y pruebas, emitiendo el veredicto formal `[APROBADO]`.
 
 ---
 
@@ -127,28 +171,44 @@ flowchart TD
     BS -->|idea_*.md| PA["2. Product Analyst (PA)<br><i>Product Brief (PRD)</i>"]
     PA -->|pb_*.md| HITL["👤 Pausa Obligatoria HITL<br><i>(approve_step.py -> @PM:)</i>"]
     HITL -->|Aprobado por Humano| PM["3. Product Manager (PM)<br><i>MVP y Backlog de Épicas</i>"]
-    PM -->|mvp_*.md| BA["4. Business Analyst (BA)<br><i>Historias de Usuario (Gherkin)</i>"]
+    PM -->|mvp_*.md| BA["4. Business Analyst (BA)<br><i>Dual-Output (Técnica & Stakeholders)</i>"]
     BA -->|hu_*.md| QA{"5. QA Documental (QA)<br><i>Auditoría de Requisitos</i>"}
     QA -->|Rechazo / Feedback| BA
-    QA -->|Aprobado: Tiene UI| UX["6. Designer UX (UX)<br><i>Wireframes ASCII y Estados</i>"]
+    
+    %% Puente SDD Gatekeeper
+    QA -->|Aprobado: Pausa SDD Gatekeeper| SDD_PAUSE["🛑 Pausa Lógica SDD (Watcher)<br><i>Comandos CLI de Spec Kit</i>"]
+    subgraph SPEC_SUITE ["⚙️ GitHub Spec Kit"]
+        direction TB
+        SDD_PAUSE --> SPEC_CMD["/speckit.specify -> /clarify -> /plan -> /tasks -> /analyze"]
+    end
+    SPEC_CMD -->|Liberación: python utils/approve_step.py| ROUTE{"Ruta de Proyecto"}
+    
+    ROUTE -->|Ruta con UI| UX["6. Designer UX (UX)<br><i>Wireframes ASCII (tasks.md)</i>"]
     UX -->|Épicas Pendientes| PM
-    UX -->|MVP Concluido| SA["7. Solutions Architect (SA)<br><i>Stack y Gobernanza (Q&A o Contexto Legacy)</i>"]
-    QA -->|Aprobado: Bypass Headless| SA
-    SA -->|tech_guidelines.md| DA["8. Data Architect (DA)<br><i>MER y Diccionario de Datos</i>"]
+    UX -->|MVP Concluido| SA["7. Solutions Architect (SA)<br><i>Stack, Gobernanza & ADRs (plan.md)</i>"]
+    ROUTE -->|Bypass Headless| SA
+    
+    SA -->|tech_guidelines.md| DA["8. Data Architect (DA)<br><i>MER y Persistencia (spec.md)</i>"]
     DA -->|Requiere APIs| API["9. API Architect (API)<br><i>Contratos REST/GraphQL</i>"]
-    API -->|api_*.md| QT
-    QT -->|tech-design_*.md| HITLD["👤 Pausa HITL Fase D<br><i>(approve_step.py)</i>"]
-    HITLD -->|Aprobado Backend| DevBack["11. Dev Backend (DEV-BACK)<br><i>.NET 8/10 Modulith & VSA</i>"]
-    HITLD -->|Aprobado Frontend| DevFront["12. Dev Frontend (DEV-FRONT)<br><i>Angular 22 Zoneless & PrimeNG</i>"]
-    DevBack & DevFront --> QAAuto["13. QA Automation (QA-AUTO)<br><i>xUnit, Testcontainers & Jest</i>"]
-    QAAuto -->|Pruebas Verificadas| CR{"14. Code Review (CR)<br><i>Quality Gate & SecOps</i>"}
+    API -->|api_*.md| QT["10. QA-Tech (QT)<br><i>Auditoría Cruzada TDD</i>"]
+    DA -->|Headless sin APIs| QT
+    
+    QT -->|tech-design_*.md (@SPEC-KIT:)| IMP["⚡ /speckit.implement<br><i>(Gatillo Fase D / approve_step.py #10)</i>"]
+    
+    subgraph FASE_D ["🤖 Fase D: Ingeniería con execute_command"]
+        direction TB
+        IMP --> DevBack["11. Dev Backend (DEV-BACK)<br><i>Lógica & Endpoints (execute_command)</i>"]
+        IMP --> DevFront["12. Dev Frontend (DEV-FRONT)<br><i>UI & Clientes (execute_command)</i>"]
+        IMP --> DevOps["13. DevOps & SRE (DEVOPS)<br><i>Compose & CI/CD (execute_command)</i>"]
+        DevBack & DevFront --> QAAuto["14. QA Automation (QA-AUTO)<br><i>Tests Zero-Tautology (execute_command)</i>"]
+        QAAuto -->|Pruebas Verificadas| CR{"15. Code Review (CR)<br><i>Quality Gate & SecOps</i>"}
+    end
+    
     CR -->|Rechazo de Calidad| DevBack
     CR -->|Rechazo de Calidad| DevFront
     CR -->|Rechazo de Pruebas| QAAuto
-    CR -->|Aprobado| DevOps["15. DevOps & SRE (DEVOPS)<br><i>Docker Compose & CI/CD</i>"]
-    DevOps --> Fin["🚀 Software en Producción Certificado"]
-    QT -.->|Aprovisionamiento Paralelo| DevOps
-    QT -.->|Context Distillation<br><i>Crea o actualiza snapshot</i>| Legacy[("🏛️ files/context/legacy_ecosystem.md<br><i>Memoria Invariante para Iteraciones Brownfield</i>")]
+    CR -->|Aprobado| Fin["🚀 Software en Producción Certificado"]
+    QT -.->|Context Distillation<br><i>Crea o actualiza snapshot</i>| Legacy[("🏛️ files/context/constitution.md<br><i>Memoria Invariante para Iteraciones Brownfield</i>")]
 ```
 
 ---
@@ -167,7 +227,7 @@ flowchart LR
         DA1 --> API1["API Architect\n(Contratos REST/GraphQL)"]
         API1 --> QT1["QA-Tech Senior\n(Compilador & Auditor)"]
         QT1 -->|tech-design.md| TDD1["Tech Design Document Maestro"]
-        QT1 ==>|Context Distillation| Snapshot[("🏛️ files/context/legacy_ecosystem.md\n(Stack, Topología DB, ADRs MADR)")]
+        QT1 ==>|Context Distillation| Snapshot[("🏛️ files/context/constitution.md\n(Stack, Topología DB, ADRs MADR)")]
     end
 
     subgraph Iteracion2 ["Iteraciones Futuras (Brownfield Automático)"]
@@ -183,7 +243,7 @@ flowchart LR
 ### ⚙️ Protocolo Operativo del Bibliotecario de Arquitectura:
 
 1. **Génesis Greenfield (Creación Autónoma del Snapshot Fundacional):**
-   * Si el proyecto arrancó sin precondiciones (`files/context/legacy_ecosystem.md` no existía), el QA Tech, tras auditar y compilar exitosamente el `tech-design_*.md`, destila automáticamente las **invariantes duras del sistema**:
+   * Si el proyecto arrancó sin precondiciones (`files/context/constitution.md` no existía), el QA Tech, tras auditar y compilar exitosamente el `tech-design_*.md`, destila automáticamente las **invariantes duras del sistema**:
      * **Stack tecnológico base:** Runtimes, frameworks, nube y directivas de despliegue.
      * **Topología de base de datos:** Motor de persistencia, dialecto relacional y entidades de dominio core.
      * **Patrones de comunicación:** Protocolos de red, estándares de payload y convenciones de endpoints.
@@ -215,7 +275,7 @@ Para erradicar este riesgo y dotar al enjambre de autoridad técnica real, el fr
 flowchart TD
     subgraph JerarquiaNormativa ["Pirámide de Jerarquía Normativa (Lex Superior)"]
         direction TB
-        L1["🏛️ Nivel 1 (Constitución Inviolable):<br><b>files/context/legacy_ecosystem.md</b><br><i>(Stack, Motores DB, Patrones Base)</i>"]
+        L1["🏛️ Nivel 1 (Constitución Inviolable):<br><b>files/context/constitution.md</b><br><i>(Stack, Motores DB, Patrones Base)</i>"]
         L2["📐 Nivel 2 (Directiva de Solución):<br><b>files/solutions-architect/tech_guidelines.md</b><br><i>(ADRs MADR subordinados al Nivel 1)</i>"]
         L3["💾 Nivel 3 (Diseño de Persistencia y Red):<br><b>db_*.md / api_*.md</b><br><i>(Modelado MER y Contratos REST/GraphQL)</i>"]
         L4["💬 Nivel 4 (Peticiones Transitorias):<br><b>files/tracker_bmad.md</b><br><i>(Instrucciones de usuario o prompts informales)</i>"]
@@ -229,17 +289,17 @@ flowchart TD
 ### 🧱 Las Tres Barreras de Defensa en Profundidad:
 
 1. **Barrera 1 - Solutions Architect (SA):** 
-   Si el usuario solicita en el tracker una tecnología divergente (por ejemplo, *"Diseña el módulo de mensajería usando Node.js y MongoDB"* cuando el ecosistema base documentado en `legacy_ecosystem.md` es *.NET 10 y SQL Server*), el SA verifica si existe una excepción formal registrada. Al no existir, **anula de plano la solicitud del tracker**, adapta la solución al stack oficial (C# / SQL Server) y deja constancia del rechazo en el log del tracker.
+   Si el usuario solicita en el tracker una tecnología divergente (por ejemplo, *"Diseña el módulo de mensajería usando Node.js y MongoDB"* cuando el ecosistema base documentado en `constitution.md` es *.NET 10 y SQL Server*), el SA verifica si existe una excepción formal registrada. Al no existir, **anula de plano la solicitud del tracker**, adapta la solución al stack oficial (C# / SQL Server) y deja constancia del rechazo en el log del tracker.
 2. **Barrera 2 - Data Architect (DA) y API Architect (API):** 
-   Si por alguna anomalía de razonamiento el SA sufriera de complacencia e incluyera una tecnología no autorizada en `tech_guidelines.md`, el DA y el API Architect cuentan con **inmunidad jerárquica**: subordinan su diseño directamente al archivo físico `legacy_ecosystem.md`, desobedeciendo la directiva del SA y modelando exclusivamente sobre los motores aprobados.
+   Si por alguna anomalía de razonamiento el SA sufriera de complacencia e incluyera una tecnología no autorizada en `tech_guidelines.md`, el DA y el API Architect cuentan con **inmunidad jerárquica**: subordinan su diseño directamente al archivo físico `constitution.md`, desobedeciendo la directiva del SA y modelando exclusivamente sobre los motores aprobados.
 3. **Barrera 3 - QA Tech (QT - Guardián Constitucional Inflexible):** 
-   Durante la auditoría adversarial del TDD, el QA Tech realiza el cruce contra `files/context/legacy_ecosystem.md`. Si detecta cualquier componente tecnológico no homologado introducido sin respaldo físico, emite una no conformidad con severidad 🔴 **CRÍTICO: Complacencia Ilegal (Sycophancy Breach)**, rechaza el Tech Design Document y devuelve el control al responsable con feedback corrector.
+   Durante la auditoría adversarial del TDD, el QA Tech realiza el cruce contra `files/context/constitution.md`. Si detecta cualquier componente tecnológico no homologado introducido sin respaldo físico, emite una no conformidad con severidad 🔴 **CRÍTICO: Complacencia Ilegal (Sycophancy Breach)**, rechaza el Tech Design Document y devuelve el control al responsable con feedback corrector.
 
 ---
 
 ### 📝 Cómo habilitar una excepción tecnológica: La Cláusula de Excepción
 
-En BMAD, la arquitectura **no se altera mediante conversaciones de chat ni instrucciones en el tracker**. La única vía legítima para autorizar la introducción de un nuevo motor de base de datos, lenguaje o framework en un entorno existente es editando **físicamente** el archivo `files/context/legacy_ecosystem.md` e incorporando una **Cláusula de Excepción Arquitectónica**:
+En BMAD, la arquitectura **no se altera mediante conversaciones de chat ni instrucciones en el tracker**. La única vía legítima para autorizar la introducción de un nuevo motor de base de datos, lenguaje o framework en un entorno existente es editando **físicamente** el archivo `files/context/constitution.md` e incorporando una **Cláusula de Excepción Arquitectónica**:
 
 ````markdown
 ## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA: [ID_EXCEPCION]
@@ -263,6 +323,7 @@ Cuando los agentes detectan este bloque en el archivo físico, la divergencia qu
 | [**`ARCHITECTURE.md`**](./ARCHITECTURE.md) | **Arquitectura detallada, diagramas de componentes y de secuencia completos.** |
 | [**`GUIDE.md`**](./GUIDE.md) | **Guía operativa paso a paso, matriz de entradas/salidas y solución de problemas.** |
 | [**`SETUP.md`**](./SETUP.md) | **Guía de parametrización e instanciación para nuevos proyectos.** |
+| [**`PLUGGABLE_PHASE_D.md`**](./PLUGGABLE_PHASE_D.md) | **Especificación de Cartucho Intercambiable (Fase D Plug & Play y cambio de stack).** |
 | [**`QUESTIONS.md`**](./QUESTIONS.md) | **Compendio de preguntas técnicas y arquitectónicas explicadas.** |
 | [**`BMAD_AUDIT_REPORT.md`**](./BMAD_AUDIT_REPORT.md) | **Reporte de auditoría profunda de consistencia metodológica.** |
 | [**`manifest.yaml`**](./manifest.yaml) | **Manifiesto de capacidades y gobernanza del plugin.** |
