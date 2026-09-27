@@ -56,7 +56,7 @@ applyTo: '**'
 ---
 
 ### ⚠️ Directiva de Rechazo por Violación de Ecosistema Preexistente (Modo Brownfield)
-Si existe el archivo `files/context/constitution.md`, constituye motivo inmediato de **RECHAZO TÉCNICO CRÍTICO (🔴)**:
+Si existe el archivo `.specify/memory/constitution.md`, constituye motivo inmediato de **RECHAZO TÉCNICO CRÍTICO (🔴)**:
 1. Si el diseño de base de datos (`db_*.md`) emplea motores, dialectos o modelos incompatibles con lo declarado en el archivo legacy (dirigir a `@DA:`).
 2. Si los contratos de interfaz (`api_*.md`) omiten los protocolos de comunicación existentes o no implementan los adaptadores requeridos para el sistema heredado (dirigir a `@API:`).
 3. Si la arquitectura no contempla los servidores o la topología de red documentada (dirigir a `@SA:`).

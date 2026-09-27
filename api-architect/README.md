@@ -11,7 +11,7 @@ Su responsabilidad exclusiva es el estado de los datos "en movimiento". Asume la
 * **Entradas (Lectura):**
   * `db_*.md` (Modelo Entidad-Relación y diccionario de datos generado por el Data Architect en `data-architect`).
   * `hu_*.md` (Historias de Usuario aprobadas en `business-analyst` con Criterios Gherkin).
-  * `files/context/constitution.md` (opcional: protocolos de comunicación y servicios del sistema legado).
+  * `.specify/memory/constitution.md` (opcional: protocolos de comunicación y servicios del sistema legado).
   * Directivas del `@DA:` leídas desde el `tracker_bmad.md`.
 * **Artefacto Generado:** `api_[nombre_corto].md` (El documento maestro de contratos, rutas, endpoints, esquemas JSON y códigos HTTP).
 * **Handoff:** Transfiere el control mediante el tracker al **QA Técnico (`@QT:`)** para la auditoría cruzada de coherencia y compilación del Tech Design Document (TDD).
@@ -23,7 +23,7 @@ Su responsabilidad exclusiva es el estado de los datos "en movimiento". Asume la
   * Estructura los cuerpos de petición (*Request*) y respuesta (*Response*) en JSON puro y determinista, definiendo tipos de datos que el Developer Agent deberá programar.
 
 * **2. Subordinación a Protocolos Legacy (Modo Brownfield)**
-  * Si existe `files/context/constitution.md`, subordina los contratos a los protocolos, servicios preexistentes y topología de red documentada, diseñando las capas de adaptación (BFF / Facade) y el mapeo formal de códigos de error hacia respuestas HTTP estándar.
+  * Si existe `.specify/memory/constitution.md`, subordina los contratos a los protocolos, servicios preexistentes y topología de red documentada, diseñando las capas de adaptación (BFF / Facade) y el mapeo formal de códigos de error hacia respuestas HTTP estándar.
 
 * **3. Traducción de Contingencias (Gherkin a HTTP)**
   * Toma los escenarios de fallo descritos en el BDD de la Historia de Usuario y los mapea directamente al estándar de red con códigos de estado HTTP precisos: 400 (Bad Request), 401/403 (Seguridad), 404 (Not Found), y 409 (Conflict).

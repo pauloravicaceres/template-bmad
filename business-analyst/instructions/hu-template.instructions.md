@@ -140,7 +140,7 @@ Si el proyecto no tiene interfaz de usuario (ej. ETL, SSIS, Webhooks, APIs puras
 - **Enfoque Backend:** Los escenarios `Given / When / Then` deben enfocarse en estados de persistencia, respuestas de red, códigos HTTP, logs de error, validación de esquemas (JSON/XML) y tolerancia a fallos.
 
 ### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/constitution.md`:
+Si existe el archivo `.specify/memory/constitution.md`:
 - **Subordinación de Escenarios:** Léelo en su totalidad. Los escenarios Gherkin deben subordinarse estrictamente a las reglas de negocio, validaciones y máquinas de estado del sistema existente.
 - **Enfoque de No-Regresión en DoD:** En la sección `## 6. DEFINITION OF DONE (TÉCNICA)`, incluir obligatoriamente:
   - [ ] La funcionalidad respeta las reglas de negocio y restricciones del ecosistema preexistente documentado.

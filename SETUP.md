@@ -14,7 +14,7 @@ Antes de inicializar un entorno, ten presentes las reglas de arquitectura:
    - **Proyectos con UI:** Transitan el pipeline completo: `PA -> PM -> BA -> QA -> UX -> SA -> DA -> API -> QT`.
    - **Proyectos Headless (ETL, SSIS, APIs puras):** Saltan dinámicamente la etapa de diseño UX: `PA -> PM -> BA -> QA -> SA -> DA -> QT`.
 4. **Pausa Obligatoria Human-in-the-Loop (HITL):** Al finalizar el Product Brief, el flujo entra en pausa obligatoria (`@HUMANO:`). El inicio del PM depende formalmente de la ejecución de `python utils/approve_step.py`.
-5. **Estrategia Dual Greenfield / Brownfield:** El framework es completamente agnóstico y soporta tanto proyectos nuevos desde cero como la subordinación a sistemas preexistentes mediante el interruptor físico opcional `files/context/constitution.md`.
+5. **Estrategia Dual Greenfield / Brownfield:** El framework es completamente agnóstico y soporta tanto proyectos nuevos desde cero como la subordinación a sistemas preexistentes mediante el interruptor físico opcional `.specify/memory/constitution.md`.
 6. **Puente SDD y SDD Gatekeeper:** Al aprobar QA Documental la HU, el orquestador `watcher_bmad.py` activa una pausa lógica interceptora. El operador transita el ciclo interactivo de Spec Kit (`/speckit.specify -> /speckit.clarify -> /speckit.plan -> /speckit.tasks -> /speckit.analyze`) y reanuda el avance hacia Arquitectura ejecutando `python utils/approve_step.py` (opciones 5 o 6). La implementación en Fase D se gatilla mediante `/speckit.implement`.
 
 ---
@@ -62,7 +62,7 @@ Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
   "project_name": "Nuevo-Proyecto",
   "created_at": "2026-09-23 12:00:00",
   "tracker": "D:\\Ruta\\Al\\Proyecto\\files\\tracker_bmad.md",
-  "context": "D:\\Ruta\\Al\\Proyecto\\files\\context\\constitution.md",
+  "context": "D:\\Ruta\\Al\\Proyecto\\.specify\\memory\\constitution.md",
   "routes_bmad": {
     "business-storyteller": "D:\\Ruta\\Al\\Proyecto\\files\\business-storyteller\\",
     "product-analyst": "D:\\Ruta\\Al\\Proyecto\\files\\product-analyst\\",
@@ -84,14 +84,14 @@ Reemplaza las rutas base por las correspondientes a tu nueva ubicación:
 ```
 
 > **Parámetro `"context"` (Opcional para Brownfield):**
-> Apunta al archivo `files/context/constitution.md`. Si el archivo existe físicamente y contiene directrices de sistemas preexistentes, los agentes operarán en modo subordinado (Brownfield). Si el archivo no existe o se elimina, el ecosistema corre en modo Greenfield estándar sin restricciones ni fallos.
+> Apunta al archivo `.specify/memory/constitution.md`. Si el archivo existe físicamente y contiene directrices de sistemas preexistentes, los agentes operarán en modo subordinado (Brownfield). Si el archivo no existe o se elimina, el ecosistema corre en modo Greenfield estándar sin restricciones ni fallos.
 
 ### 3.2. Vaciado del Bus de Mensajes (`files/tracker_bmad.md`)
 Asegura que el archivo exista físicamente pero su contenido sea una cadena vacía (0 bytes) antes de encender el Watcher.
 
 ### 3.3. Selección de Stack Tecnológico (Fase D como Cartucho Intercambiable)
 El enjambre BMAD es 100% agnóstico de tecnologías. Para definir o cambiar el stack de programación (ej. Java, Python, Go, Node, .NET):
-1. Documenta los lenguajes, frameworks y bases de datos en `files/context/constitution.md`.
+1. Documenta los lenguajes, frameworks y bases de datos en `.specify/memory/constitution.md`.
 2. Adapta las directrices de código (`.instructions.md`) en las carpetas de los 5 agentes de la Fase D (`dev-backend/`, `dev-frontend/`, `qa-auto/`, `code-review/`, `devops/`).
 3. El motor de orquestación en Python **no se toca**, ya que opera mediante tokens agnósticos (`@DEV-BACK:`, `@QA-AUTO:`, etc.). Consulta [`PLUGGABLE_PHASE_D.md`](./PLUGGABLE_PHASE_D.md) para más detalles.
 
@@ -166,7 +166,7 @@ Para poner en marcha un nuevo proyecto desde cero:
 
 - [ ] **Paso 1: Clonar plantilla:** Copiar el repositorio a la carpeta de destino.
 - [ ] **Paso 2: Inicializar entorno:** Ejecutar `python init_bmad.py "Nombre del Proyecto"` para crear las carpetas de `files/`, generar `config_bmad.json` y vaciar `tracker_bmad.md`.
-- [ ] **Paso 2.1 (Opcional - Proyectos Brownfield):** Si la solución debe coexistir con un sistema o base de datos preexistente, crear `files/context/constitution.md` y documentar la arquitectura, motores relacionales, protocolos y restricciones heredadas. Para proyectos 100% nuevos (Greenfield), omitir este paso asegurando que dicho archivo no exista.
+- [ ] **Paso 2.1 (Opcional - Proyectos Brownfield):** Si la solución debe coexistir con un sistema o base de datos preexistente, crear `.specify/memory/constitution.md` y documentar la arquitectura, motores relacionales, protocolos y restricciones heredadas. Para proyectos 100% nuevos (Greenfield), omitir este paso asegurando que dicho archivo no exista.
 - [ ] **Paso 3: Arrancar el Orquestador:**
   ```bash
   python watcher_bmad.py

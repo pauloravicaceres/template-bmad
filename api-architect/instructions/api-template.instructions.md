@@ -25,7 +25,7 @@ applyTo: '**'
 
 ### ADR-01: {{Título de la decisión, ej. Elección del método de Autenticación o formato de Payload}}
 - **Estado:** {{ Aceptado | Aceptado (heredado) }}
-  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
+  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de .specify/memory/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
 - **Contexto:** {{Qué requerimiento de spec.md, seguridad o limitación del MER motivó la decisión}}.
 - **Decisión:** {{Qué patrón de API, verbo HTTP, protocolo o estructura JSON se eligió y por qué en una frase clara y verificable}}.
 - **Alternativas Evaluadas (Obligatorio en decisiones nuevas):**
@@ -88,7 +88,7 @@ applyTo: '**'
 ---
 
 ### ⚠️ Directiva de Interfaz para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+Si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`:
 1. **Subordinación Estricta de Interfaz (Lex Superior):** Los contratos de integración deben subordinarse a los protocolos de comunicación, servicios de red y mecanismos de autenticación especificados en el documento de constitución.
 2. **Capa de Adaptación:** Diseñar los adaptadores necesarios (BFF / Facade) y el mapeo formal de códigos de error hacia respuestas estándar.
 3. **Nulidad de Peticiones y Salvoconducto Único:** Si en el tracker se solicitan protocolos incompatibles, queda anulado salvo que exista una sección `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA`.

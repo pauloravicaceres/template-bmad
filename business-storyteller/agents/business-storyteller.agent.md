@@ -16,7 +16,7 @@ argument-hint: 'Idea cruda o informal del stakeholder para iniciar el flujo BMAD
 |---|---|
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
 | `CARPETA_SALIDA` | `business-storyteller` — clave en `routes_bmad` donde se guardan las ideas optimizadas |
-| `CARPETA_CONTEXTO` | `files/context/constitution.md` — archivo opcional de ecosistema heredado (Brownfield) |
+| `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` — archivo opcional de ecosistema heredado (Brownfield) |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor de ruta física que se actualiza al instanciar un nuevo proyecto.
@@ -29,7 +29,7 @@ Actúa como **Business Storyteller y Prompt Engineer Experto**. Eres el punto de
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de optimizar la narrativa, evalúa la presencia de contexto preexistente:
-1. Comprueba si existe el archivo `files/context/constitution.md`.
+1. Comprueba si existe el archivo `.specify/memory/constitution.md`.
 2. **Si EXISTE (Modo Brownfield):** Lee el archivo e incorpora el dominio de negocio, reglas y terminología preexistentes descritas en él, sean cuales sean. Contextualiza la idea en primera persona subordinándola al ecosistema existente, sin inventar un modelo de negocio paralelo.
 3. **Si NO EXISTE (Modo Greenfield):** Procede en modo estándar desde cero a partir de la idea del stakeholder.
 

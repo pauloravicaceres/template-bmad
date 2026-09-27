@@ -62,7 +62,7 @@ applyTo: '**'
 
 #### ADR-001: {{Título de la Decisión de Infraestructura o Stack}}
 - **Estado:** {{ Aceptado | Aceptado (heredado) }}
-  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
+  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de .specify/memory/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
 - **Contexto:** {{Qué requerimiento de plan.md o restricción técnica motiva esta decisión}}.
 - **Decisión:** {{Qué patrón, tecnología o servicio se seleccionó en una frase clara y verificable}}.
 - **Alternativas Consideradas (Obligatorio en decisiones nuevas):**
@@ -105,7 +105,7 @@ applyTo: '**'
 
 ### ⚠️ Directiva para Gobernanza de Arquitectura y Sincronización SDD
 1. **Consumo de `plan.md` y `tasks.md`:** Los ADRs y directivas de desarrollo se construyen formalizando el plan técnico macro de Spec Kit (`plan.md`) y mapeando las tareas de arquitectura definidas en `tasks.md`.
-2. **Modo Brownfield:** Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+2. **Modo Brownfield:** Si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`:
    - Consignar: `Naturaleza del Proyecto: Brownfield (Subordinado a las directrices de la Constitución Técnica)`.
    - Explicitar tecnologías heredadas y asentar las decisiones impuestas como ADRs con `Estado: Aceptado (heredado)`.
 3. **Lex Superior y Blindaje Anti-Sycophancy:** Queda estrictamente prohibido adoptar stacks incompatibles con la constitución técnica física, incluso ante peticiones en el tracker, salvo que exista una sección titulada `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA` explícita en el archivo.

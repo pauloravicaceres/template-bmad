@@ -16,7 +16,7 @@ El framework BMAD está diseñado para guiar una iniciativa de software desde su
    - **Ruta Headless (ETL, SSIS, Pipelines de Datos, APIs puras):** El flujo salta automáticamente el diseño visual de interfaces: `BS -> PA -> (HITL) -> PM -> BA -> QA -> SA -> DA -> QT`.
 4. **Política Anti-Alucinación:** Ningún agente asume alcances no definidos en el Product Brief o en las Historias de Usuario. Todo supuesto debe marcarse explícitamente con `⚠️ [PROPUESTO]` o `❓ No documentado`.
 5. **Auditoría Cruzada:** El agente `qa-tech` es el compilador final. Audita matemáticamente que el diseño de base de datos (`db_*.md`) y los contratos (`api_*.md`) no se contradigan antes de generar el Technical Design Document (TDD).
-6. **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** El framework soporta de manera nativa tanto iniciativas completamente nuevas como sistemas preexistentes mediante el interruptor físico `files/context/constitution.md`. Si dicho archivo existe, todos los agentes (de negocio y arquitectura) subordinan obligatoriamente sus entregables al dominio, reglas y restricciones tecnológicas descritas en él. Si no existe, operan en modo Greenfield estándar sin precondiciones.
+6. **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** El framework soporta de manera nativa tanto iniciativas completamente nuevas como sistemas preexistentes mediante el interruptor físico `.specify/memory/constitution.md`. Si dicho archivo existe, todos los agentes (de negocio y arquitectura) subordinan obligatoriamente sus entregables al dominio, reglas y restricciones tecnológicas descritas en él. Si no existe, operan en modo Greenfield estándar sin precondiciones.
 7. **Puente SDD (Spec-Driven Development con GitHub Spec Kit):** Tras la aprobación de requisitos por QA Documental, el orquestador aplica una pausa lógica obligatoria (**SDD Gatekeeper**) para permitir el ciclo interactivo de especificación formal (`/speckit.specify -> /speckit.clarify -> /speckit.plan -> /speckit.tasks -> /speckit.analyze`). Su liberación controlada mediante `utils/approve_step.py` provee como fuente de la verdad los artefactos `spec.md`, `tasks.md` y `plan.md` a la Fase de Arquitectura y UX. La ejecución en Fase D es gatillada por `/speckit.implement`.
 8. **Estrategia Dual-Output de Requisitos:** El `business-analyst` genera dos versiones de HU: Técnica (Gherkin estricto para Spec Kit en `files/business-analyst/`) y de Stakeholders (orientada a valor y usuarios clave en `files/business-analyst/HUs-stakeholders/`).
 
@@ -25,7 +25,7 @@ El framework BMAD está diseñado para guiar una iniciativa de software desde su
 ### Conceptos Clave de la Fase 2 (SDD)
 
 - **🏛️ Gobernanza Transversal (Lex Superior como System Prompts):**
-  El archivo físico `files/context/constitution.md` (reflejado en `.specify/memory/constitution.md`) y las políticas transversales `*.instructions.md` actúan como *System Prompts* inmutables que auditan todas las fases del ciclo de vida (Discovery, SDD Planning, Arquitectura y Delivery). Ningún agente ni usuario humano en el tracker puede relajar o contradecir esta constitución técnica sin una Cláusula de Excepción formalmente escrita en el archivo físico.
+  El archivo físico `.specify/memory/constitution.md` (reflejado en `.specify/memory/constitution.md`) y las políticas transversales `*.instructions.md` actúan como *System Prompts* inmutables que auditan todas las fases del ciclo de vida (Discovery, SDD Planning, Arquitectura y Delivery). Ningún agente ni usuario humano en el tracker puede relajar o contradecir esta constitución técnica sin una Cláusula de Excepción formalmente escrita en el archivo físico.
 
 - **📑 Estrategia Dual-Output (Fase M - Management):**
   El agente `business-analyst` (`@BA:`) ya no redacta un único documento libre. Ejecuta un desdoblamiento determinista en dos artefactos complementarios:
@@ -346,7 +346,7 @@ El framework desacopla el almacenamiento de los entregables en subdirectorios ex
 | Entregable / Dominio | Ubicación Física | Agente Creador | Consumidores Principales |
 |---|---|---|---|
 | Rutas Absolutas del Proyecto | `config_bmad.json` | `init_bmad.py` / Operador | Todos los agentes vía `read_file` |
-| Contexto Ecosistema Heredado | `files/context/constitution.md` | Operador / Stakeholder | Todos los agentes vía `read_file` (Modo Brownfield) |
+| Contexto Ecosistema Heredado | `.specify/memory/constitution.md` | Operador / Stakeholder | Todos los agentes vía `read_file` (Modo Brownfield) |
 | Bus Central de Handoffs | `files/tracker_bmad.md` | Todos los agentes vía MCP | `watcher_bmad.py` y agentes |
 | Ideas de Negocio Refinadas | `files/business-storyteller/idea_*.md` | `business-storyteller` | `product-analyst` |
 | Product Briefs (PRD Canónico) | `files/product-analyst/pb_*.md` | `product-analyst` | `product-manager`, `business-analyst`, `qa-documental`, `solutions-architect` |
@@ -377,7 +377,7 @@ El framework desacopla el almacenamiento de los entregables en subdirectorios ex
    - El PM y el Diseñador UX reconstruyen el estado del backlog leyendo directamente `tracker_bmad.md` y `mvp_*.md`.
    - Solutions Architect lee el historial del tracker para determinar si se encuentra en fase Q&A o en fase de consolidación.
 5. **Inyección Dinámica de Skills:** Mediante la sintaxis `[IMPORT_SKILL: skills/ruta/SKILL.md]`, el compilador inyecta capacidades reutilizables (como `tracker-logger` y `export-pdf`) en el `AGENTS.md` de cada agente sin duplicar texto.
-6. **Detección Condicional No Bloqueante (Dualidad Greenfield / Brownfield):** Todos los agentes consultan la existencia de `files/context/constitution.md` mediante MCP Filesystem. Si no existe o la carpeta está vacía, no emiten errores ni bloqueos: continúan su ejecución en modo Greenfield limpio con paridad absoluta. Si existe, subordinan automáticamente sus decisiones y entregables a dicho contexto.
+6. **Detección Condicional No Bloqueante (Dualidad Greenfield / Brownfield):** Todos los agentes consultan la existencia de `.specify/memory/constitution.md` mediante MCP Filesystem. Si no existe o la carpeta está vacía, no emiten errores ni bloqueos: continúan su ejecución en modo Greenfield limpio con paridad absoluta. Si existe, subordinan automáticamente sus decisiones y entregables a dicho contexto.
 
 ---
 
@@ -388,7 +388,7 @@ El framework BMAD implementa el principio de **Desacoplamiento Tecnológico Tota
 1. **Inmutabilidad del Core (Fases B, M, A):** Los requerimientos de negocio (`pb_*.md`), los desgloses BDD (`hu_*.md`), los wireframes de interfaz (`ux_*.md`), el diseño relacional (`db_*.md`) y los contratos de integración (`api_*.md`) son especificaciones universales, puras y agnósticas de cualquier lenguaje.
 2. **La Fase D como Cartucho:** La construcción, testing y entrega de software (`dev-backend`, `dev-frontend`, `qa-auto`, `code-review`, `devops`) funciona como un cartucho *Plug & Play*.
 3. **Mecanismo de Reemplazo sin Fricción:** Para cambiar de stack (por ejemplo, de *.NET / Angular* a *Java Spring Boot / React*, *Python / Vue* o *Go / Svelte*), **el motor de orquestación en Python NO se modifica**. El intercambio se realiza en 2 pasos:
-   - **Paso 1 (Memoria Tecnológica):** Modificar `files/context/constitution.md` indicando el nuevo lenguaje, frameworks, base de datos y librerías mandatorias.
+   - **Paso 1 (Memoria Tecnológica):** Modificar `.specify/memory/constitution.md` indicando el nuevo lenguaje, frameworks, base de datos y librerías mandatorias.
    - **Paso 2 (Instrucciones de Agente):** Actualizar los archivos `.instructions.md` dentro de las carpetas de la Fase D (`dev-backend/`, `dev-frontend/`, `qa-auto/`, `code-review/`, `devops/`).
 4. **Transparencia en el Enrutamiento:** El motor Python despacha el flujo basándose exclusivamente en tokens abstractos (`@DEV-BACK:`, `@DEV-FRONT:`, `@QA-AUTO:`, `@CODE-REVIEW:`, `@DEVOPS:`). El enrutador ignora el lenguaje de destino, garantizando estabilidad operativa infinita frente a la evolución tecnológica.
 

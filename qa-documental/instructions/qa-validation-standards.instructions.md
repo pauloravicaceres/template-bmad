@@ -63,7 +63,7 @@ applyTo: '**'
 ---
 
 ## Dimensión 6: Coexistencia con Ecosistema Preexistente (Modo Brownfield)
-*(Aplica si existe el archivo `files/context/constitution.md`)*
+*(Aplica si existe el archivo `.specify/memory/constitution.md`)*
 
 - [ ] **No-Regresión Operativa:** La HU no contradice las máquinas de estado, reglas de negocio o limitaciones descritas en el archivo legacy.
 - [ ] **Verificación en DoD:** La sección Definition of Done de la HU incluye formalmente el ítem de respeto y no-regresión contra el ecosistema preexistente.

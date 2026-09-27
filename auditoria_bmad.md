@@ -44,8 +44,8 @@ Se identificaron **3 brechas de grado medio** que no bloquean la operación bás
 | Verificación | Estado | Evidencia |
 |---|---|---|
 | `constitution.md` en `.specify/memory/constitution.md` | ✅ Cumple | Archivo físico existe con contenido válido (Stack: Astro 4.x, Node 20, Tailwind 3.x, TypeScript 5.x, Vitest, Playwright) |
-| `files/context/constitution.md` (ruta canónica del AGENTS.md raíz) | ❌ No Cumple | El `AGENTS.md` raíz (Principio 6 y 8) referencia `files/context/constitution.md` como interruptor Greenfield/Brownfield. **El directorio `files/context/` no existe físicamente.** Solo existe en `.specify/memory/`. |
-| Agentes SA, DA, QT referencian ambas rutas | ✅ Cumple | Los agentes SA, DA y QT buscan `files/context/constitution.md` **O** `.specify/memory/constitution.md` (con fallback implementado) |
+| `.specify/memory/constitution.md` (ruta canónica del AGENTS.md raíz) | ❌ No Cumple | El `AGENTS.md` raíz (Principio 6 y 8) referencia `.specify/memory/constitution.md` como interruptor Greenfield/Brownfield. **El directorio `files/context/` no existe físicamente.** Solo existe en `.specify/memory/`. |
+| Agentes SA, DA, QT referencian ambas rutas | ✅ Cumple | Los agentes SA, DA y QT buscan `.specify/memory/constitution.md` **O** `.specify/memory/constitution.md` (con fallback implementado) |
 | `AGENTS.md` raíz del proyecto compilado | ⚠️ Advertencia | Existe `AGENTS.md` en raíz pero representa únicamente el perfil del `bmad-architect` (meta-agente CTO). No es un directorio compilado de los 15 agentes. El motor `compilar_agentes_modulares()` genera `AGENTS.md` *dentro de cada carpeta de agente*, no un AGENTS.md consolidado en la raíz. La documentación es ambigua sobre si el AGENTS.md raíz debe ser el índice maestro. |
 | 15 agentes reconocidos por el motor watcher | ✅ Cumple | `agentes_modulares` hardcodeado (líneas 33–38) lista los 15: `business-storyteller`, `product-analyst`, `product-manager`, `business-analyst`, `qa-documental`, `designer-ux`, `solutions-architect`, `data-architect`, `api-architect`, `qa-tech`, `dev-backend`, `dev-frontend`, `qa-auto`, `code-review`, `devops` |
 
@@ -131,7 +131,7 @@ git commit -m "fix(bmad): crear directorio de salida HUs-stakeholders para Estra
 ### 🟡 ACCIÓN 2 — Subsanar G-01 (MEDIO): Alinear ruta canónica de la constitución
 
 **Actualizar AGENTS.md raíz para documentar `.specify/memory/` como ruta única canónica**
-- Actualizar los Principios 6 y 8 del `AGENTS.md` raíz para reemplazar la referencia a `files/context/constitution.md` por `.specify/memory/constitution.md`.
+- Actualizar los Principios 6 y 8 del `AGENTS.md` raíz para reemplazar la referencia a `.specify/memory/constitution.md` por `.specify/memory/constitution.md`.
 
 ---
 
@@ -172,7 +172,7 @@ git commit -m "feat(bmad): inyectar directiva cli-headless-execution en qa-auto 
 ║                                                                              ║
 ║  Acciones correctivas aplicadas:                                             ║
 ║   ✅ G-02 [RESUELTO]: files/business-analyst/HUs-stakeholders/ creado       ║
-║   ✅ G-01 [RESUELTO]: files/context/constitution.md alineado (Lex Superior) ║
+║   ✅ G-01 [RESUELTO]: .specify/memory/constitution.md alineado (Lex Superior) ║
 ║   ✅ G-03 [RESUELTO]: cli-headless-execution.instructions.md en             ║
 ║                        qa-auto/instructions/ y devops/instructions/          ║
 ║                                                                              ║

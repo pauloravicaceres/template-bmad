@@ -14,10 +14,10 @@
 * **Lógica de Bypass (Headless vs UI):** El ecosistema reconoce la naturaleza del proyecto:
   - **Proyectos con UI:** Transitan el pipeline visual completo: `BA -> QA -> [SDD Gatekeeper: Spec Kit] -> UX -> SA -> DA -> API -> QT -> /speckit.implement -> (DEV-BACK / DEV-FRONT) -> QA-AUTO -> CODE-REVIEW`.
   - **Proyectos Headless (ETL, SSIS, APIs puras, Pipelines de Datos):** Saltan automáticamente la fase de diseño UX: `BA -> QA -> [SDD Gatekeeper: Spec Kit] -> SA -> DA -> QT -> /speckit.implement -> DEV-BACK -> QA-AUTO -> CODE-REVIEW`.
-* **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `files/context/constitution.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
-* **Auto-Evolución y Destilación de Contexto (Context Distillation):** El QA Tech (`qa-tech`) actúa como **Bibliotecario de Arquitectura**. Al compilar el Tech Design Document (TDD), evalúa si hubo cambios estructurales y genera o actualiza automáticamente el archivo `files/context/constitution.md`. Esto cierra el ciclo de vida arquitectónico, permitiendo que un proyecto nacido como *Greenfield* destile sus propias invariantes y prepare el terreno para futuras iteraciones evolutivas (*Brownfield*) de manera 100% desatendida.
+* **Estrategia Dual Greenfield / Brownfield (Agnosticismo Total):** Capacidad nativa para operar en proyectos desde cero o sobre sistemas preexistentes mediante el interruptor físico `.specify/memory/constitution.md`. Si el archivo existe, todos los agentes (negocio, requisitos y arquitectura) subordinan de forma autónoma y sin fricción sus diseños a las reglas, dominio y tecnologías descritas allí. Si no existe, operan en modo Greenfield estándar sin precondiciones.
+* **Auto-Evolución y Destilación de Contexto (Context Distillation):** El QA Tech (`qa-tech`) actúa como **Bibliotecario de Arquitectura**. Al compilar el Tech Design Document (TDD), evalúa si hubo cambios estructurales y genera o actualiza automáticamente el archivo `.specify/memory/constitution.md`. Esto cierra el ciclo de vida arquitectónico, permitiendo que un proyecto nacido como *Greenfield* destile sus propias invariantes y prepare el terreno para futuras iteraciones evolutivas (*Brownfield*) de manera 100% desatendida.
 * **Auditoría Adversarial Zero-Trust (Quality Gate Técnico):** El QA Tech no valida ciegamente; aplica duda metódica por defecto, audita trazabilidad forzosa UI-Data (cero campos huérfanos), detector de mentiras en ADRs (cazando alternativas absurdas o trade-offs cosméticos) y clasifica hallazgos en una matriz de severidad (Crítico, Advertencia, Sugerencia) con auto-sanación agéntica.
-* **Gobernanza Arquitectónica Automatizada (Lex Superior) y Blindaje Anti-Sycophancy:** Blindaje institucional contra la complacencia de los LLMs (*sycophancy*). Las invariantes técnicas del archivo físico `files/context/constitution.md` tienen jerarquía constitucional sobre peticiones informales en el tracker. Si un usuario solicita tecnologías incompatibles sin una Cláusula de Excepción formal en el archivo físico, el SA, DA y API están obligados a ignorar la solicitud, y el QA Tech actúa como guardián adversarial rechazando sumariamente cualquier diseño complaciente con severidad 🔴 CRÍTICO.
+* **Gobernanza Arquitectónica Automatizada (Lex Superior) y Blindaje Anti-Sycophancy:** Blindaje institucional contra la complacencia de los LLMs (*sycophancy*). Las invariantes técnicas del archivo físico `.specify/memory/constitution.md` tienen jerarquía constitucional sobre peticiones informales en el tracker. Si un usuario solicita tecnologías incompatibles sin una Cláusula de Excepción formal en el archivo físico, el SA, DA y API están obligados a ignorar la solicitud, y el QA Tech actúa como guardián adversarial rechazando sumariamente cualquier diseño complaciente con severidad 🔴 CRÍTICO.
 * **Aprobación Manual Obligatoria (HITL):** Soporte para interrupciones controladas (`@HUMANO:`), donde la activación del `@PM:` depende obligatoriamente de la aprobación humana del Product Brief mediante `utils/approve_step.py`, garantizando control de alcance antes del desglose de épicas.
 * **Arquitectura Modular de Agentes:** Cada agente define su rol (`agents/*.agent.md`) y reglas satélite (`instructions/*.instructions.md`), auto-ensambladas en tiempo de ejecución (`AGENTS.md`) por el orquestador.
 * **Inyección Atómica en Terminales (TTY):** Resolución dinámica de IDs de paneles en tiempo de ejecución para inyectar comandos directamente a los procesos mediante `herdr pane run`.
@@ -111,8 +111,8 @@
 
 ### 1. Inicialización y Arranque
 1. **Configuración Inicial:** Ejecutar `python init_bmad.py "Nombre del Proyecto"` (o actualizar rutas en `config_bmad.json`, ver [SETUP.md](./SETUP.md)).
-   - **Modo Greenfield (Proyecto Nuevo):** Operación estándar sin precondiciones (verificar que `files/context/constitution.md` no exista).
-   - **Modo Brownfield (Sistema Existente):** Crear `files/context/constitution.md` documentando el dominio, tecnologías, bases de datos y restricciones del sistema legado.
+   - **Modo Greenfield (Proyecto Nuevo):** Operación estándar sin precondiciones (verificar que `.specify/memory/constitution.md` no exista).
+   - **Modo Brownfield (Sistema Existente):** Crear `.specify/memory/constitution.md` documentando el dominio, tecnologías, bases de datos y restricciones del sistema legado.
 2. **Terminal 1 - Watcher (Orquestador y Compilador):**
    ```bash
    python watcher_bmad.py
@@ -208,7 +208,7 @@ flowchart TD
     CR -->|Rechazo de Calidad| DevFront
     CR -->|Rechazo de Pruebas| QAAuto
     CR -->|Aprobado| Fin["🚀 Software en Producción Certificado"]
-    QT -.->|Context Distillation<br><i>Crea o actualiza snapshot</i>| Legacy[("🏛️ files/context/constitution.md<br><i>Memoria Invariante para Iteraciones Brownfield</i>")]
+    QT -.->|Context Distillation<br><i>Crea o actualiza snapshot</i>| Legacy[("🏛️ .specify/memory/constitution.md<br><i>Memoria Invariante para Iteraciones Brownfield</i>")]
 ```
 
 ---
@@ -227,7 +227,7 @@ flowchart LR
         DA1 --> API1["API Architect\n(Contratos REST/GraphQL)"]
         API1 --> QT1["QA-Tech Senior\n(Compilador & Auditor)"]
         QT1 -->|tech-design.md| TDD1["Tech Design Document Maestro"]
-        QT1 ==>|Context Distillation| Snapshot[("🏛️ files/context/constitution.md\n(Stack, Topología DB, ADRs MADR)")]
+        QT1 ==>|Context Distillation| Snapshot[("🏛️ .specify/memory/constitution.md\n(Stack, Topología DB, ADRs MADR)")]
     end
 
     subgraph Iteracion2 ["Iteraciones Futuras (Brownfield Automático)"]
@@ -243,7 +243,7 @@ flowchart LR
 ### ⚙️ Protocolo Operativo del Bibliotecario de Arquitectura:
 
 1. **Génesis Greenfield (Creación Autónoma del Snapshot Fundacional):**
-   * Si el proyecto arrancó sin precondiciones (`files/context/constitution.md` no existía), el QA Tech, tras auditar y compilar exitosamente el `tech-design_*.md`, destila automáticamente las **invariantes duras del sistema**:
+   * Si el proyecto arrancó sin precondiciones (`.specify/memory/constitution.md` no existía), el QA Tech, tras auditar y compilar exitosamente el `tech-design_*.md`, destila automáticamente las **invariantes duras del sistema**:
      * **Stack tecnológico base:** Runtimes, frameworks, nube y directivas de despliegue.
      * **Topología de base de datos:** Motor de persistencia, dialecto relacional y entidades de dominio core.
      * **Patrones de comunicación:** Protocolos de red, estándares de payload y convenciones de endpoints.
@@ -275,7 +275,7 @@ Para erradicar este riesgo y dotar al enjambre de autoridad técnica real, el fr
 flowchart TD
     subgraph JerarquiaNormativa ["Pirámide de Jerarquía Normativa (Lex Superior)"]
         direction TB
-        L1["🏛️ Nivel 1 (Constitución Inviolable):<br><b>files/context/constitution.md</b><br><i>(Stack, Motores DB, Patrones Base)</i>"]
+        L1["🏛️ Nivel 1 (Constitución Inviolable):<br><b>.specify/memory/constitution.md</b><br><i>(Stack, Motores DB, Patrones Base)</i>"]
         L2["📐 Nivel 2 (Directiva de Solución):<br><b>files/solutions-architect/tech_guidelines.md</b><br><i>(ADRs MADR subordinados al Nivel 1)</i>"]
         L3["💾 Nivel 3 (Diseño de Persistencia y Red):<br><b>db_*.md / api_*.md</b><br><i>(Modelado MER y Contratos REST/GraphQL)</i>"]
         L4["💬 Nivel 4 (Peticiones Transitorias):<br><b>files/tracker_bmad.md</b><br><i>(Instrucciones de usuario o prompts informales)</i>"]
@@ -293,13 +293,13 @@ flowchart TD
 2. **Barrera 2 - Data Architect (DA) y API Architect (API):** 
    Si por alguna anomalía de razonamiento el SA sufriera de complacencia e incluyera una tecnología no autorizada en `tech_guidelines.md`, el DA y el API Architect cuentan con **inmunidad jerárquica**: subordinan su diseño directamente al archivo físico `constitution.md`, desobedeciendo la directiva del SA y modelando exclusivamente sobre los motores aprobados.
 3. **Barrera 3 - QA Tech (QT - Guardián Constitucional Inflexible):** 
-   Durante la auditoría adversarial del TDD, el QA Tech realiza el cruce contra `files/context/constitution.md`. Si detecta cualquier componente tecnológico no homologado introducido sin respaldo físico, emite una no conformidad con severidad 🔴 **CRÍTICO: Complacencia Ilegal (Sycophancy Breach)**, rechaza el Tech Design Document y devuelve el control al responsable con feedback corrector.
+   Durante la auditoría adversarial del TDD, el QA Tech realiza el cruce contra `.specify/memory/constitution.md`. Si detecta cualquier componente tecnológico no homologado introducido sin respaldo físico, emite una no conformidad con severidad 🔴 **CRÍTICO: Complacencia Ilegal (Sycophancy Breach)**, rechaza el Tech Design Document y devuelve el control al responsable con feedback corrector.
 
 ---
 
 ### 📝 Cómo habilitar una excepción tecnológica: La Cláusula de Excepción
 
-En BMAD, la arquitectura **no se altera mediante conversaciones de chat ni instrucciones en el tracker**. La única vía legítima para autorizar la introducción de un nuevo motor de base de datos, lenguaje o framework en un entorno existente es editando **físicamente** el archivo `files/context/constitution.md` e incorporando una **Cláusula de Excepción Arquitectónica**:
+En BMAD, la arquitectura **no se altera mediante conversaciones de chat ni instrucciones en el tracker**. La única vía legítima para autorizar la introducción de un nuevo motor de base de datos, lenguaje o framework en un entorno existente es editando **físicamente** el archivo `.specify/memory/constitution.md` e incorporando una **Cláusula de Excepción Arquitectónica**:
 
 ````markdown
 ## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA: [ID_EXCEPCION]

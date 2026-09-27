@@ -30,7 +30,7 @@ El agente **`code-review`** es el Tech Lead y Auditor de Seguridad de élite del
 |---|---|---|
 | **Código Fuente del Feature** | `src/backend-modulith-template/` y `src/template-base/` | Archivos de lógica, endpoints, componentes y configuración. |
 | **Pruebas Automatizadas** | Directorios de testing (`*Tests.cs`, `*.spec.ts`) | Batería de pruebas diseñada por el `@QA-AUTO:`. |
-| **Constitución Técnica** | `files/context/constitution.md` | Invariantes inmutables contra las cuales auditar el código. |
+| **Constitución Técnica** | `.specify/memory/constitution.md` | Invariantes inmutables contra las cuales auditar el código. |
 
 ---
 

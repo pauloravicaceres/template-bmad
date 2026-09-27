@@ -13,7 +13,7 @@ A diferencia del QA Documental que valida el valor de negocio, el QA-Tech opera 
   * `db_*.md` (Modelo Entidad-Relación y diccionario del Data Architect en `data-architect`).
   * `api_*.md` (Contratos de integración y endpoints del API Architect en `api-architect`).
   * `ux_*.md` (Diseño de interfaces del UX Designer en `designer-ux`, si existe).
-  * `files/context/constitution.md` (opcional: directrices y restricciones de arquitectura preexistente).
+  * `.specify/memory/constitution.md` (opcional: directrices y restricciones de arquitectura preexistente).
   * Directivas del `@API:` o `@DA:` en el `tracker_bmad.md`.
 * **Salida de Rechazo:** `feedback_tech_[nombre_corto].md` (Reporte de auditoría adversarial clasificado por severidad que devuelve el turno a `@DA:`, `@API:` o `@SA:`).
 * **Salida de Aprobación:** `tech-design_[nombre_corto].md` (El TDD compilado que integra la arquitectura consolidada, el MER, la API, la matriz consolidada de ADRs MADR y los diagramas generados).
@@ -32,7 +32,7 @@ A diferencia del QA Documental que valida el valor de negocio, el QA-Tech opera 
   * Duda de las alternativas y justificaciones: rechaza opciones falsas (tecnologías absurdas o "no hacer nada") y trade-offs cosméticos ("toma tiempo programarlo"). Exige alternativas viables y costos reales de ingeniería.
 
 * **3. Árbitro de Cumplimiento Legacy (Modo Brownfield)**
-  * Si existe `files/context/constitution.md`, audita con severidad que ni el MER ni la API hayan violado las restricciones del sistema heredado (ej. motores no autorizados o protocolos omitidos). Sus diagramas de arquitectura reflejan explícitamente los servidores y la infraestructura preexistente.
+  * Si existe `.specify/memory/constitution.md`, audita con severidad que ni el MER ni la API hayan violado las restricciones del sistema heredado (ej. motores no autorizados o protocolos omitidos). Sus diagramas de arquitectura reflejan explícitamente los servidores y la infraestructura preexistente.
 
 * **4. Postura de Seguridad y SecOps**
   * Inspecciona la superficie de ataque del diseño: exige estrategias de autorización en endpoints destructivos (`DELETE`, `PUT`), enmascaramiento de datos sensibles (PII) y mecanismos de idempotencia.

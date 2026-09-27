@@ -116,7 +116,7 @@ applyTo: '**'
 ---
 
 ### ⚠️ Directiva de Compilación para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+Si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`:
 1. **Auditoría Cruzada de Restricciones Legacy:** Verificar que el modelo de persistencia (`db_*.md`) y los contratos de red (`api_*.md`) respeten estrictamente las tecnologías, protocolos y motores especificados en la constitución.
 2. **Registro MADR Heredado:** Asegurar que las decisiones técnicas provenientes del sistema existente estén registradas con estado `Aceptado (heredado)`.
 3. **Diagramas de Arquitectura (Sección 5):** Los diagramas de componentes y despliegue deben representar explícitamente la convivencia entre la nueva solución y la infraestructura heredada.

@@ -26,7 +26,7 @@ applyTo: '**'
 
 ### ADR-01: {{Título de la decisión, ej. Motor de Persistencia o Tipo de Llave Primaria}}
 - **Estado:** {{ Aceptado | Aceptado (heredado) }}
-  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de files/context/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
+  > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de .specify/memory/constitution.md o .specify/memory/constitution.md. Las decisiones heredadas no requieren alternativas consideradas.*
 - **Contexto:** {{Qué necesidad de modelado de spec.md o restricción del constitution.md motiva la elección}}.
 - **Decisión:** {{Tipo de dato, motor, particionamiento o normalización seleccionada en una frase clara y verificable}}.
 - **Alternativas Evaluadas (Obligatorio en decisiones nuevas):**
@@ -89,7 +89,7 @@ erDiagram
 ---
 
 ### ⚠️ Directiva de Persistencia para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+Si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`:
 1. **Subordinación Estricta de Persistencia (Lex Superior):** El motor de persistencia, dialecto SQL, tipos de datos y esquemas deben subordinarse estrictamente a lo establecido en la constitución técnica.
 2. **Prohibición de Incompatibilidad y Complacencia:** Queda estrictamente prohibido proponer o modelar motores incompatibles sin la sección física `## ⚠️ CLÁUSULA DE EXCEPCIÓN ARQUITECTÓNICA`.
 3. **ADR Obligatorio de Coexistencia (MADR):** Redactar un ADR justificando la integración o extensión de tablas heredadas con estado `Aceptado (heredado)`.

@@ -19,7 +19,7 @@ argument-hint: 'Instrucción del @DA: leída desde el tracker_bmad.md'
 | `CARPETA_SPECS` | `.specify/` o directorio de especificaciones — fuente de `spec.md` y `tasks.md` de Spec Kit |
 | `CARPETA_ENTRADA_HU` | `business-analyst` — clave donde residen las Historias de Usuario técnicas |
 | `CARPETA_ENTRADA_DB` | `data-architect` — clave donde reside el modelo de base de datos `db_*.md` |
-| `CARPETA_CONTEXTO` | `files/context/constitution.md` / `.specify/memory/constitution.md` — gobernanza técnica (Brownfield) |
+| `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` / `.specify/memory/constitution.md` — gobernanza técnica (Brownfield) |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 ---
@@ -30,7 +30,7 @@ Actúa como **Arquitecto de API Senior (API)**. Eres el puente de comunicación 
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de diseñar los contratos de interfaz y endpoints:
-1. Comprueba si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`.
+1. Comprueba si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`.
 2. **Si EXISTE (Modo Brownfield):** Léelo y subordina los contratos de integración a los protocolos, servicios preexistentes y topología de red descritos en él. Documenta ADRs en formato MADR con estado `Aceptado (heredado)` sin inventar alternativas ficticias.
 3. **Si NO EXISTE (Modo Greenfield):** Diseña contratos de API estándar basados en el MER y `spec.md`, documentando ADRs con alternativas técnicas viables reales.
 

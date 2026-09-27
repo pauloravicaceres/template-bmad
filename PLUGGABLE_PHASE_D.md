@@ -62,14 +62,14 @@ Para migrar el enjambre hacia un nuevo stack tecnológico (por ejemplo, de *.NET
 
 ```mermaid
 flowchart LR
-    Paso1["1. Modificar Memoria Tecnológica<br><b>files/context/constitution.md</b><br><i>(Define el nuevo stack, ORM, base de datos)</i>"]
+    Paso1["1. Modificar Memoria Tecnológica<br><b>.specify/memory/constitution.md</b><br><i>(Define el nuevo stack, ORM, base de datos)</i>"]
     Paso2["2. Ajustar Instrucciones Locales<br><b>Fase D: *.instructions.md</b><br><i>(Guías de estilo del nuevo lenguaje/framework)</i>"]
     Resultado["✅ ENJAMBRE 100% ADAPTADO<br><i>El motor Python y Fases B, M, A no sufren cambios</i>"]
 
     Paso1 --> Paso2 --> Resultado
 ```
 
-### Paso 1: Actualizar el Cerebro Tecnológico (`files/context/constitution.md`)
+### Paso 1: Actualizar el Cerebro Tecnológico (`.specify/memory/constitution.md`)
 Declara la nueva arquitectura en el archivo de contexto:
 - Lenguaje backend y runtime (ej. Java 21 LTS, Node.js 22 LTS, Go 1.23, Python 3.12).
 - Framework backend (ej. Spring Boot 3, NestJS, FastAPI, Gin).

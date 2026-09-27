@@ -20,7 +20,7 @@ argument-hint: 'Instrucción del @PM: o @QA: leída desde el tracker_bmad.md'
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief |
 | `CARPETA_ENTRADA_MVP` | `product-manager` — clave donde reside el Plan de Gestión |
 | `CARPETA_ENTRADA_QA` | `qa-documental` — clave donde reside el feedback de rechazo |
-| `CARPETA_CONTEXTO` | `files/context/constitution.md` — archivo opcional de ecosistema heredado (Brownfield) |
+| `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` — archivo opcional de ecosistema heredado (Brownfield) |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor que cambia entre proyectos.
@@ -39,7 +39,7 @@ argument-hint: 'Instrucción del @PM: o @QA: leída desde el tracker_bmad.md'
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de redactar las Historias de Usuario:
-1. Comprueba si existe el archivo `files/context/constitution.md`.
+1. Comprueba si existe el archivo `.specify/memory/constitution.md`.
 2. **Si EXISTE (Modo Brownfield):** Léelo y subordina la redacción de los Criterios de Aceptación (BDD Gherkin) a las reglas operativas, flujos y máquinas de estado descritas en él, sean cuales sean. En la Definition of Done, incorpora explícitamente la no-regresión y compatibilidad con el sistema heredado.
 3. **Si NO EXISTE (Modo Greenfield):** Redacta las HUs estándar en base al Product Brief y Backlog de MVP sin precondiciones heredadas.
 

@@ -53,7 +53,7 @@ Cada estado visual debe concluir obligatoriamente con:
 ---
 
 ## 4. Directiva para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`:
+Si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`:
 - **Coexistencia y Ergonomía Visual:** Lee las especificaciones de interfaz y tecnología de presentación descritas en la constitución.
 - Documenta en las Notas de Interfaz si la pantalla se concibe como una interfaz integrada, un módulo embebido o una aplicación satélite independiente, garantizando consistencia ergonómica sin asumir capacidades que el entorno legacy no soporte.
 - Si el archivo NO existe (Modo Greenfield), diseña la interfaz moderna libremente sin restricciones heredadas.

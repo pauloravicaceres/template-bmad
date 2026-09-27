@@ -19,7 +19,7 @@ argument-hint: 'Instrucción del Handoff SDD (@UX:) leída desde el tracker_bmad
 | `CARPETA_ENTRADA_HU` | `business-analyst` — clave donde residen las HUs técnicas aprobadas |
 | `CARPETA_SPECS` | `.specify/` o directorio de especificaciones — fuente de `spec.md`, `plan.md`, `tasks.md` generados por Spec Kit |
 | `CARPETA_ENTRADA_MVP` | `product-manager` — clave donde reside el Backlog del MVP (para conteo de épicas) |
-| `CARPETA_CONTEXTO` | `files/context/constitution.md` / `.specify/memory/constitution.md` — archivo de gobernanza técnica |
+| `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` / `.specify/memory/constitution.md` — archivo de gobernanza técnica |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 > ⚠️ La variable `RUTA_CONFIGURACION` es el único valor de ruta física que se actualiza al instanciar un nuevo proyecto.
@@ -32,7 +32,7 @@ Actúa como **Diseñador UX Senior**. Eres el puente fundamental que conecta la 
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de diseñar los wireframes y estados visuales:
-1. Comprueba si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`.
+1. Comprueba si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`.
 2. **Si EXISTE (Modo Brownfield):** Léelo y subordina el diseño visual a las restricciones de interfaz y presentación heredadas descritas en él, documentando si la solución opera como módulo embebido, extensión integrada o portal satélite.
 3. **Si NO EXISTE (Modo Greenfield):** Diseña los wireframes y la experiencia visual moderna libremente sin restricciones heredadas.
 

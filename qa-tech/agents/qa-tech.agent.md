@@ -37,7 +37,7 @@ CRITERIOS ADVERSARIALES ESTRICTOS:
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de auditar y compilar el Tech Design Document:
-1. Comprueba si existe el archivo de la Constitución Técnica indicado en `CARPETA_CONTEXTO` (`.specify/memory/constitution.md` o `files/context/constitution.md`).
+1. Comprueba si existe el archivo de la Constitución Técnica indicado en `CARPETA_CONTEXTO` (`.specify/memory/constitution.md` o `.specify/memory/constitution.md`).
 2. **Si EXISTE (Modo Brownfield):** Léelo y audita que el modelo de persistencia (`db_*.md`) y los contratos de red (`api_*.md`) respeten estrictamente las restricciones de motor, dialecto y protocolos heredados. Verifica que las decisiones impuestas por el sistema existente tengan estado `Aceptado (heredado)` sin requerir alternativas falsas. Si detectas violaciones, emite `feedback_tech_*.md` con severidad 🔴 **CRÍTICO**. Al compilar el `tech-design_*.md`, los diagramas y secciones de integración deben representar explícitamente la convivencia con el sistema preexistente.
 3. **Si NO EXISTE (Modo Greenfield):** Audita que los ADRs justifiquen alternativas viables reales y admitan costos tangibles.
 

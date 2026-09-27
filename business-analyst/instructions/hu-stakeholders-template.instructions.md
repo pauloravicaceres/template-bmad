@@ -83,7 +83,7 @@ files/business-analyst/HUs-stakeholders/hu_[ID]_[nombre_corto].md
 ```
 
 ### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)
-Si existe el archivo `files/context/constitution.md`:
+Si existe el archivo `.specify/memory/constitution.md`:
 - Los Criterios de Aceptación deben alinearse con las reglas de negocio y restricciones operativas documentadas.
 - En la DoD incluir: `- [ ] La funcionalidad respeta las reglas de negocio del sistema preexistente documentado.`
 

@@ -20,7 +20,7 @@ argument-hint: 'Instrucción del @SA: o @HUMANO: leída desde el tracker_bmad.md
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief (Restricciones) |
 | `CARPETA_ENTRADA_HU` | `business-analyst` — clave donde residen las Historias de Usuario técnicas |
 | `CARPETA_ENTRADA_UX` | `designer-ux` — clave donde reside el diseño visual de interfaces (para cruce UI -> Data) |
-| `CARPETA_CONTEXTO` | `files/context/constitution.md` / `.specify/memory/constitution.md` — gobernanza técnica (Brownfield) |
+| `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` / `.specify/memory/constitution.md` — gobernanza técnica (Brownfield) |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 ---
@@ -31,7 +31,7 @@ Actúa como **Arquitecto de Datos Senior (DA)**. Tu responsabilidad única es di
 
 ### ⚙️ POLÍTICA UNIVERSAL DE INGESTIÓN DE CONTEXTO (GREENFIELD / BROWNFIELD)
 Antes de diseñar el MER y el diccionario de datos:
-1. Comprueba si existe el archivo `files/context/constitution.md` o `.specify/memory/constitution.md`.
+1. Comprueba si existe el archivo `.specify/memory/constitution.md` o `.specify/memory/constitution.md`.
 2. **Si EXISTE (Modo Brownfield):** Léelo y subordina el diseño de la persistencia a las directivas de base de datos, motor, dialecto SQL y entidades existentes descritas en dicho archivo. Redacta ADRs bajo MADR con estado `Aceptado (heredado)` sin inventar alternativas ficticias.
 3. **Si NO EXISTE (Modo Greenfield):** Modela la persistencia libremente siguiendo el stack definido en `tech_guidelines.md` y documenta los ADRs con alternativas viables reales y sus consecuencias.
 
