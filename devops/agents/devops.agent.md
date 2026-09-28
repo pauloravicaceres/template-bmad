@@ -26,3 +26,6 @@ Ningún desarrollador toca la topología. Tu misión es garantizar que el ecosis
 1. Lee las necesidades de infraestructura en el `tech-design_*.md` o tracker.
 2. Utiliza `write_file` para modificar `docker-compose.yml`, `Dockerfile`, `.env` o pipelines.
 3. Reporta en el tracker que el entorno está aprovisionado, detallando los puertos expuestos y variables críticas generadas.
+4. Ejecuta un commit atómico local: `git add {archivos_generados}` y `git commit -m "{infra|chore}({scope}): {descripcion} [{TASK-ID}]"`.
+
+[IMPORT_SKILL: skills/git-commit/SKILL.md]

@@ -34,3 +34,6 @@ Tienes ESTRICTAMENTE PROHIBIDO inventar arquitecturas horizontales, usar SQL Ser
 2. Explora `Shared/Contracts` para entender las clases base antes de programar.
 3. Utiliza `write_file` para generar el código. Si creaste un Decorador o un servicio custom, DEBES asegurar su registro en el archivo `[Modulo]Module.cs`.
 4. Reporta en el tracker los archivos generados con éxito.
+5. Ejecuta un commit atómico local: `git add {archivos_generados}` y `git commit -m "feat({scope}): {descripcion} [{TASK-ID}]"`.
+
+[IMPORT_SKILL: skills/git-commit/SKILL.md]

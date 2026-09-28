@@ -41,3 +41,46 @@ Genera reportes a archivo, nunca abrir browser interactivo.
 - **NUNCA** escribas aserciones que siempre pasen (`assert true == true`).
 - Cada test debe poder fallar de forma realista. Documenta el "Happy Path" y el "Sad Path" para cada Criterio de Aceptación.
 - Si un test falla, **NO lo comentes ni lo desactivas** — documenta el fallo en el tracker y escala al `@CODE-REVIEW:`.
+
+## CONTROL DE VERSIONES (GIT HEADLESS)
+
+Tras generar cada suite de pruebas, debes ejecutar un **commit atómico** local. Git es tu herramienta de trazabilidad, pero operas bajo restricciones estrictas de seguridad.
+
+### Patrón Obligatorio de Commit
+```bash
+# 1. Agregar SOLO los archivos de test específicos de la suite generada
+git add tests/Auth.UnitTests/LoginCommandHandlerTests.cs
+git add tests/Auth.IntegrationTests/LoginEndpointTests.cs
+
+# 2. Commit con mensaje inline usando tipo 'test' + scope + TASK-ID
+git commit -m "test(auth): pruebas unitarias LoginCommandHandler con xUnit [TASK-042-QA-01]"
+git commit -m "test(login): pruebas E2E Playwright flujo de login [TASK-042-QA-02]"
+```
+
+### Comandos PROHIBIDOS (Lista Negra)
+```bash
+# ❌ PROHIBIDO — abre editor y congela el agente permanentemente
+git commit
+
+# ❌ PROHIBIDO — puede incluir archivos del tracker o de otro agente
+git add .
+
+# ❌ PROHIBIDO — operación remota, rompe la restricción de seguridad
+git push
+
+# ❌ PROHIBIDO — interactivo, congela la terminal
+git commit --amend
+git rebase -i HEAD~3
+
+# ❌ PROHIBIDO — resolución autónoma de conflictos no autorizada
+git merge
+git rebase
+git pull
+```
+
+### Protocolo de Error Git
+Si `git add` o `git commit` retorna un error o detecta un conflicto:
+1. **ABORTA** inmediatamente la ejecución de la tarea.
+2. **REPORTA** el error exacto (`stderr`) en el `tracker_bmad.md` con la etiqueta `@HUMANO:`.
+3. **DEVUELVE** el turno — no continúes con las siguientes tareas.
+4. **NUNCA** intentes resolver conflictos de Git de forma autónoma.

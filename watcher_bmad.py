@@ -135,6 +135,83 @@ def obtener_info_agente(nombre_agente):
         print(f"⚠️ [Watcher] Error al consultar agentes: {e}")
         return None, None
 
+def determinar_handoff_fase_a(tracker_path: str, config_path: str = "config_bmad.json") -> str:
+    """
+    Determina si el proyecto es UI o Headless y retorna el handoff correcto.
+    """
+    try:
+        config_full_path = DIRECTORIO_RAIZ / config_path
+        if config_full_path.exists():
+            with open(config_full_path, encoding="utf-8") as f:
+                config = json.load(f)
+            project_type = config.get("project_type", "").lower()
+            if project_type == "headless":
+                return "@SA:"
+            if project_type == "ui":
+                return "@UX:"
+    except Exception:
+        pass
+
+    try:
+        if os.path.exists(tracker_path):
+            with open(tracker_path, encoding="utf-8") as f:
+                ultimas_lineas = f.readlines()[-50:]
+            contenido = " ".join(ultimas_lineas).lower()
+            if "headless" in contenido:
+                return "@SA:"
+    except Exception:
+        pass
+
+    return "@UX:"
+
+def ejecutar_ciclo_sdd(ruta_hu: str):
+    """
+    Auto-Runner de GitHub Spec Kit para el framework BMAD.
+    """
+    print(f"\n🚀 [SDD Auto-Runner] Iniciando ciclo para: {ruta_hu}")
+    try:
+        # 1. Specify
+        subprocess.run(f"specify {ruta_hu}", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        
+        # 2. Clarify (HITL por Excepción)
+        res_clarify = subprocess.run("specify clarify", shell=True, capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
+        if "?" in res_clarify.stdout or "ambiguity" in res_clarify.stdout.lower() or res_clarify.returncode != 0:
+            print("⚠️ [HITL] Ambigüedad detectada en /speckit.clarify. Pausando para intervención humana.")
+            print(res_clarify.stdout)
+            return False
+
+        # 3. Plan & Tasks
+        subprocess.run("specify plan", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run("specify tasks", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+
+        # 4. Analyze (Auditoría Técnica)
+        print("🔍 [SDD Auto-Runner] Ejecutando auditoría /speckit.analyze...")
+        res_analyze = subprocess.run("specify analyze", shell=True, cwd=DIRECTORIO_RAIZ)
+        if res_analyze.returncode != 0:
+            print("🛑 [HITL] Auditoría fallida. Violación de constitución técnica. Pausando.")
+            return False
+
+        # 5. Spec Freeze Automático
+        print("❄️ [Spec Freeze] Congelando especificación...")
+        subprocess.run("git add .specify/", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run(['git', 'commit', '-m', f"spec: [SPEC-FREEZE] Ciclo SDD automático completado"], check=True, cwd=DIRECTORIO_RAIZ)
+        
+        # 6. Handoff Dinámico
+        handoff = determinar_handoff_fase_a(TRACKER_PATH)
+        msg = f"{handoff} El ciclo SDD ha concluido con éxito. Procede con el diseño de arquitectura."
+        
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write(f"\n{msg}\n")
+        print(f"✅ [SDD Auto-Runner] Handoff despachado: {handoff}")
+        return True
+
+    except subprocess.CalledProcessError as e:
+        print(f"❌ [SDD Auto-Runner] Error en subproceso: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ [SDD Auto-Runner] Error inesperado: {e}")
+        return False
+
 def extraer_instrucciones(linea):
     agentes = {
         "@BS:": "business-storyteller",
@@ -185,18 +262,22 @@ def extraer_instrucciones(linea):
         print("\n" + "=" * 80)
         print("🛑 [PAUSA SDD INTERCEPTADA] CERTIFICADO QA DOCUMENTAL REGISTRADO")
         print("=" * 80)
-        print("El agente 'qa-documental' ha emitido la aprobación de la Historia de Usuario.")
-        print("El avance automático hacia UX / Arquitectura ha sido DETENIDO para el ciclo SDD.\n")
-        print("📋 SECUENCIA REQUERIDA EN GITHUB SPEC KIT (CLI / HERDR):")
-        print("   1. /speckit.specify files/business-analyst/hu_[ID]_[nombre].md")
-        print("   2. /speckit.clarify")
-        print("   3. /speckit.plan")
-        print("   4. /speckit.tasks")
-        print("   5. /speckit.analyze (Auditoría automática contra constitution.md)\n")
-        print("🔓 PARA LIBERAR LA TRANSICIÓN HACIA FASE A (UX / ARQUITECTURA):")
-        print("   Una vez concluido /speckit.analyze, ejecute en otra terminal:")
-        print("   python utils/approve_step.py")
-        print("   y seleccione la opción: [5] Spec Kit (SDD Bridge) -> UX  (o [6] para Headless)")
+        
+        # Buscar la ruta de la HU en el mensaje
+        match_hu = re.search(r'(files[/\\]business-analyst[/\\]hu_[a-zA-Z0-9_-]+\.md)', linea)
+        if match_hu:
+            ruta_hu = match_hu.group(1)
+            print(f"El agente 'qa-documental' ha emitido la aprobación. Iniciando SDD Auto-Runner para: {ruta_hu}\n")
+            
+            exito = ejecutar_ciclo_sdd(ruta_hu)
+            if not exito:
+                print("🛑 [HITL] Fallo o ambigüedad en SDD Auto-Runner. Pausando el orquestador.")
+                print("Resuelva manualmente y use utils/approve_step.py para reanudar.")
+        else:
+            print("⚠️ No se pudo extraer la ruta de la HU del mensaje de aprobación.")
+            print("El avance automático hacia UX / Arquitectura ha sido DETENIDO.")
+            print("Ejecute Spec Kit manualmente y use utils/approve_step.py para reanudar.")
+            
         print("=" * 80 + "\n")
         return []
 
@@ -329,4 +410,31 @@ def iniciar_watcher():
         time.sleep(2)
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="BMAD Watcher — Orquestador de Agentes")
+    parser.add_argument(
+        "--branch",
+        required=True,
+        metavar="feat/<nombre>",
+        help="Nombre de la feature branch de destino (ej. feat/registro-usuario)"
+    )
+    args = parser.parse_args()
+    branch_name = args.branch
+
+    # Idempotencia: verificar si la rama ya existe antes de crearla
+    try:
+        existing = subprocess.run(
+            ["git", "branch", "--list", branch_name],
+            capture_output=True, text=True, cwd=DIRECTORIO_RAIZ
+        )
+        if existing.stdout.strip():
+            subprocess.run(["git", "checkout", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"[WATCHER-GIT] ✅ Rama existente reactivada: {branch_name}")
+        else:
+            subprocess.run(["git", "checkout", "-b", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"[WATCHER-GIT] ✅ Rama nueva creada: {branch_name}")
+    except Exception as e:
+        print(f"❌ [WATCHER-GIT] Error al gestionar la rama Git: {e}")
+        sys.exit(1)
+
     iniciar_watcher()

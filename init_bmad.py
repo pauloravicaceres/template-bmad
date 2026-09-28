@@ -45,22 +45,23 @@ def init_project(nombre_proyecto):
     (DIR_FILES / "business-analyst" / "HUs-stakeholders").mkdir(parents=True, exist_ok=True)
 
     # Asegurar carpeta de contexto para la constitución del sistema (Gobernanza)
-    dir_context = DIR_FILES / "context"
+    dir_context = DIRECTORIO_RAIZ / ".specify" / "memory"
     dir_context.mkdir(parents=True, exist_ok=True)
     constitution_path = dir_context / "constitution.md"
         
     # 2. Generar Archivo de Configuración (Single Source of Truth de Rutas)
     config_data = {
         "project_name": nombre_proyecto,
+        "project_type": "ui",  # Por defecto 'ui', puede ser 'headless'
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "tracker": str(TRACKER_PATH.resolve()),
         "context": str(constitution_path.resolve()),
+        "tracker": str(TRACKER_PATH.resolve()),
         "routes_bmad": rutas_absolutas
     }
     
     with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
         json.dump(config_data, f, indent=4, ensure_ascii=False)
-    print(f"\n⚙️ Archivo de configuración enlazado: config_bmad.json")
+    print(f"\n⚙️ Archivo de configuración enlazado: config_bmad.json (Tipo: UI)")
     
     # 3. Formateo y Reseteo del Tracker (Creación de archivo en blanco)
     # Se genera un archivo vacío para evitar errores de lectura (FileNotFoundError) en los agentes.
