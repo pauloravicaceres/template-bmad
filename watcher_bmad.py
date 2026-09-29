@@ -4,7 +4,7 @@ import sys
 import json
 import subprocess
 import random
-import re  # NUEVO: Necesario para procesar las etiquetas de inyección de Skills
+import re
 from pathlib import Path
 
 # Configuración de codificación UTF-8 para stdout/stderr en Windows
@@ -264,9 +264,10 @@ def extraer_instrucciones(linea):
         print("=" * 80)
         
         # Buscar la ruta de la HU en el mensaje
-        match_hu = re.search(r'(files[/\\]business-analyst[/\\]hu_[a-zA-Z0-9_-]+\.md)', linea)
+        match_hu = re.search(r'(?:files[/\\]business-analyst[/\\])?(hu_[a-zA-Z0-9_-]+\.md)', linea)
         if match_hu:
-            ruta_hu = match_hu.group(1)
+            nombre_hu = match_hu.group(1)
+            ruta_hu = f"files/business-analyst/{nombre_hu}"
             print(f"El agente 'qa-documental' ha emitido la aprobación. Iniciando SDD Auto-Runner para: {ruta_hu}\n")
             
             exito = ejecutar_ciclo_sdd(ruta_hu)
@@ -309,13 +310,144 @@ def extraer_instrucciones(linea):
             
     return tareas
 
+# ==========================================
+# GITOPS EVENT SOURCING CONTROLLER
+# ==========================================
+def get_current_branch():
+    try:
+        result = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, check=True, cwd=DIRECTORIO_RAIZ)
+        return result.stdout.strip()
+    except subprocess.CalledProcessError:
+        return None
+
+def get_all_branches():
+    try:
+        result = subprocess.run(["git", "branch", "--format=%(refname:short)"], capture_output=True, text=True, check=True, cwd=DIRECTORIO_RAIZ)
+        return [b for b in result.stdout.split('\n') if b.strip()]
+    except subprocess.CalledProcessError:
+        return []
+
+def get_base_branch():
+    branches = get_all_branches()
+    if "dev" in branches:
+        return "dev"
+    elif "main" in branches:
+        return "main"
+    elif "master" in branches:
+        return "master"
+    return "main"
+
+def check_working_directory_clean():
+    res = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
+    return len(res.stdout.strip()) == 0
+
+def auto_commit_security():
+    if not check_working_directory_clean():
+        print("🔒 [GITOPS] Cambios sin guardar detectados. Realizando auto-commit de seguridad...")
+        subprocess.run(["git", "add", "."], check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run(["git", "commit", "-m", "chore: auto-commit pre-branch switch"], check=True, cwd=DIRECTORIO_RAIZ)
+
+def gitops_branch_create(branch_name):
+    print(f"\n🌿 [GITOPS] Interceptada macro de creación de rama: {branch_name}")
+    auto_commit_security()
+    
+    base_branch = get_base_branch()
+    current = get_current_branch()
+    if current != base_branch:
+        subprocess.run(["git", "checkout", base_branch], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+    try:
+        existing = subprocess.run(["git", "branch", "--list", branch_name], capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
+        if existing.stdout.strip() and branch_name in existing.stdout:
+            subprocess.run(["git", "checkout", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"✅ [GITOPS] Rama {branch_name} existente reactivada.")
+        else:
+            subprocess.run(["git", "checkout", "-b", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"✅ [GITOPS] Rama {branch_name} creada y activa.")
+    except Exception as e:
+        print(f"⚠️ [WATCHER-GIT] Error al crear la rama: {e}")
+
+def gitops_merge_close(branch_name):
+    print(f"\n🔀 [GITOPS] Interceptada macro de fusión (merge-close): {branch_name}")
+    auto_commit_security()
+    
+    base_branch = get_base_branch()
+    subprocess.run(["git", "checkout", base_branch], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        subprocess.run(["git", "merge", "--no-ff", branch_name], check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run(["git", "branch", "-d", branch_name], check=True, cwd=DIRECTORIO_RAIZ)
+        print(f"✅ [GITOPS] Fusión exitosa. Rama {branch_name} eliminada.")
+    except subprocess.CalledProcessError:
+        print("🚨 [GITOPS] Conflicto de fusión detectado. Abortando merge...")
+        subprocess.run(["git", "merge", "--abort"], cwd=DIRECTORIO_RAIZ)
+        subprocess.run(["git", "checkout", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write(f"\n@HUMANO: 🚨 ALERTA GITOPS: Conflicto de fusión detectado al intentar cerrar la rama {branch_name}.\nEl Watcher ha abortado el merge por seguridad y se ha detenido.\nPASOS DE RECUPERACIÓN PARA EL HUMANO:\n1. Abre tu terminal y ejecuta manualmente el merge o rebase hacia `dev`.\n2. Resuelve los conflictos en tu editor y haz el commit final.\n3. Vuelve a encender el Watcher (`python watcher_bmad.py`).\nNota: NO necesitas borrar ni agregar ninguna línea en este tracker. El sistema asumirá el cierre exitoso y continuará su operación normal.\n")
+        print(f"🛑 [HITL] Se requiere intervención humana. Pausando el orquestador.")
+        sys.exit(1)
+
+def hydration_gitops():
+    if not os.path.exists(TRACKER_PATH):
+        return None
+    with open(TRACKER_PATH, "r", encoding="utf-8", errors="replace") as f:
+        lineas = f.readlines()
+    
+    orphaned_branch = None
+    for linea in lineas:
+        if "@WATCHER: GITOPS-BRANCH-CREATE" in linea:
+            match = re.search(r"@WATCHER:\s*GITOPS-BRANCH-CREATE\s+([^\s]+)", linea)
+            if match:
+                orphaned_branch = match.group(1)
+        elif "@WATCHER: GITOPS-MERGE-CLOSE" in linea:
+            match = re.search(r"@WATCHER:\s*GITOPS-MERGE-CLOSE\s+([^\s]+)", linea)
+            if match and match.group(1) == orphaned_branch:
+                orphaned_branch = None
+    return orphaned_branch
+
+def validar_constitucion_gitops():
+    const_dir = DIRECTORIO_RAIZ / ".specify" / "memory"
+    const_dir.mkdir(parents=True, exist_ok=True)
+    const_path = const_dir / "constitution.md"
+    
+    template_path = DIRECTORIO_RAIZ / "utils" / "gitops_constitution_template.md"
+    if not template_path.exists():
+        return
+        
+    plantilla_gitops = template_path.read_text(encoding='utf-8')
+    if const_path.exists():
+        contenido = const_path.read_text(encoding='utf-8')
+        if "ESTÁNDAR GITOPS" not in contenido:
+            print("🛡️ [GITOPS] Restaurando cláusula constitucional de Feature Branching...")
+            with open(const_path, "a", encoding="utf-8") as f:
+                f.write("\n" + plantilla_gitops)
+    else:
+        print("🛡️ [GITOPS] Creando constitución técnica inicial...")
+        with open(const_path, "w", encoding="utf-8") as f:
+            f.write("# 📜 Constitución Técnica Global de BMAD\n" + plantilla_gitops)
+
 def iniciar_watcher():
     compilar_agentes_modulares()
+    validar_constitucion_gitops()
     print("-" * 50)
     
     print(f"👁️ Watcher BMAD (Sequential Token-Passing) iniciado.")
     print(f"📂 Escuchando cambios en: {TRACKER_PATH}")
     
+    # State Hydration
+    orphaned = hydration_gitops()
+    if orphaned:
+        current = get_current_branch()
+        if current != orphaned:
+            print(f"🔄 [GITOPS] Retomando estado no finalizado. Cambiando a rama {orphaned}")
+            auto_commit_security()
+            try:
+                subprocess.run(["git", "checkout", orphaned], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+        else:
+            print(f"✅ [GITOPS] Estado sincronizado. Continuando en la rama {orphaned}")
+
     num_lineas_leidas = 0
     cola_tareas = []
     hash_tareas_historicas = set()
@@ -329,14 +461,19 @@ def iniciar_watcher():
             print(f"\n📂 Tracker detectado con {len(lineas)} eventos históricos.")
             print(f"Última instrucción registrada:\n>> {ultima_linea}\n")
             
-            respuesta = input("🔄 ¿Deseas reanudar la ejecución desde esta última instrucción? (s/n): ")
-            
-            if respuesta.lower() == 's':
-                num_lineas_leidas = len(lineas) - 1
-                print("🔓 Modo Recuperación: Re-encolando la última tarea...\n")
+            # Autoclick skip resume if orphaned for seamless automation
+            if orphaned:
+                 num_lineas_leidas = len(lineas)
+                 print("🔓 Modo Recuperación GitOps: Histórico pre-procesado automáticamente.\n")
             else:
-                num_lineas_leidas = len(lineas)
-                print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
+                respuesta = input("🔄 ¿Deseas reanudar la ejecución desde esta última instrucción? (s/n): ")
+                
+                if respuesta.lower() == 's':
+                    num_lineas_leidas = len(lineas) - 1
+                    print("🔓 Modo Recuperación: Re-encolando la última tarea...\n")
+                else:
+                    num_lineas_leidas = len(lineas)
+                    print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
         else:
             num_lineas_leidas = 0
             
@@ -349,6 +486,17 @@ def iniciar_watcher():
                     if len(lineas) > num_lineas_leidas:
                         nuevas_lineas = lineas[num_lineas_leidas:]
                         for idx, linea in enumerate(nuevas_lineas):
+                            
+                            # GITOPS Live Interception
+                            if "@WATCHER: GITOPS-BRANCH-CREATE" in linea:
+                                match = re.search(r"@WATCHER:\s*GITOPS-BRANCH-CREATE\s+([^\s]+)", linea)
+                                if match:
+                                    gitops_branch_create(match.group(1))
+                            elif "@WATCHER: GITOPS-MERGE-CLOSE" in linea:
+                                match = re.search(r"@WATCHER:\s*GITOPS-MERGE-CLOSE\s+([^\s]+)", linea)
+                                if match:
+                                    gitops_merge_close(match.group(1))
+
                             nuevas_tareas = extraer_instrucciones(linea)
                             numero_linea_absoluta = num_lineas_leidas + idx
                             
@@ -410,31 +558,4 @@ def iniciar_watcher():
         time.sleep(2)
 
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser(description="BMAD Watcher — Orquestador de Agentes")
-    parser.add_argument(
-        "--branch",
-        required=True,
-        metavar="feat/<nombre>",
-        help="Nombre de la feature branch de destino (ej. feat/registro-usuario)"
-    )
-    args = parser.parse_args()
-    branch_name = args.branch
-
-    # Idempotencia: verificar si la rama ya existe antes de crearla
-    try:
-        existing = subprocess.run(
-            ["git", "branch", "--list", branch_name],
-            capture_output=True, text=True, cwd=DIRECTORIO_RAIZ
-        )
-        if existing.stdout.strip():
-            subprocess.run(["git", "checkout", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print(f"[WATCHER-GIT] ✅ Rama existente reactivada: {branch_name}")
-        else:
-            subprocess.run(["git", "checkout", "-b", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print(f"[WATCHER-GIT] ✅ Rama nueva creada: {branch_name}")
-    except Exception as e:
-        print(f"❌ [WATCHER-GIT] Error al gestionar la rama Git: {e}")
-        sys.exit(1)
-
     iniciar_watcher()

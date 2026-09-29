@@ -281,3 +281,6 @@ After producing the result, check if `.specify/extensions.yml` exists in the pro
     After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
 
 - If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+
+# IDIOMA OBLIGATORIO (ESPAÃ‘OL)
+**CRÃTICO:** Todo el contenido generado (documentaciÃ³n, nombres de variables descriptivas, tareas, criterios de Ã©xito, planes de implementaciÃ³n y anÃ¡lisis) DEBE redactarse estrictamente en **ESPAÃ‘OL**, a excepciÃ³n de las palabras clave de programaciÃ³n o sintaxis tÃ©cnica que no tengan traducciÃ³n lÃ³gica.

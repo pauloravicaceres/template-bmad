@@ -71,13 +71,13 @@ Si tu proyecto no es nuevo y debe conectarse a bases de datos heredadas o sistem
 Con el repositorio listo y las rutas configuradas, es hora de encender el motor de IA.
 
 ### Paso 6: Arrancar el Orquestador (Watcher)
-El orquestador de BMAD v2.0 **exige** que le pases el nombre de la rama en la que vas a trabajar. De este modo aislará todo el trabajo del enjambre y nunca ensuciará la rama `main`.
+El orquestador de BMAD ya no exige selección manual de ramas. Gracias al nuevo estándar **GitOps Feature Branching**, el orquestador gestiona la creación y fusión de ramas de manera 100% autónoma.
 
 Abre una terminal en la raíz de tu proyecto y ejecuta:
 ```bash
-python watcher_bmad.py --branch feat/mi-nueva-funcionalidad
+python watcher_bmad.py
 ```
-*(El Watcher verificará que la rama exista, hará `git checkout -b` de forma segura, compilará las skills en `AGENTS.md` y quedará escuchando indefinidamente).*
+*(El Watcher compilará las skills en `AGENTS.md`, realizará State Hydration para recuperar operaciones inconclusas, y quedará escuchando indefinidamente. Las ramas aisladas `feat/HU_...` se crearán automáticamente durante el ciclo de vida del tracker).*
 
 ### Paso 7: Levantar la Interfaz de Agentes (Herdr)
 Abre una **segunda terminal** en la raíz del proyecto. Aquí encenderemos a los 15 agentes divididos en 3 pestañas temáticas.
@@ -107,3 +107,4 @@ El orquestador detectará tu mensaje, despertará al Business Storyteller y come
 - `python utils/approve_step.py`: Úsalo cuando el framework te etiquete (`@HUMANO:`) pidiendo aprobación para transicionar de fase (HITL) o si ocurre una ambigüedad en el Spec-Driven Development.
 - `python utils/stop_agents.py`: Ejecútalo cuando termines tu día de trabajo para cerrar limpiamente todos los agentes sin dejar procesos colgando en la terminal.
 - `python utils/clean_files.py`: Herramienta de mantenimiento para vaciar los entregables de `/files/` interactivamente si deseas purgar pruebas y volver a empezar.
+

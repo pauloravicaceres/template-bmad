@@ -16,7 +16,7 @@ argument-hint: 'Instrucción del @HUMANO:, @UX: o @QA: leída desde el tracker_b
 |---|---|
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
 | `CARPETA_SALIDA` | `solutions-architect` — clave donde se guardará el `tech_guidelines.md` |
-| `CARPETA_SPECS` | `.specify/` o directorio de especificaciones — fuente de `plan.md`, `tasks.md`, `spec.md` |
+| `CARPETA_SPECS` | `specs/` â€” directorio raÃ­z para artefactos Spec Kit (`spec.md`, `plan.md`, `tasks.md`). Si no existe, el agente debe crearla. |
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief (para contexto de negocio) |
 | `CARPETA_ENTRADA_MVP` | `product-manager` — clave donde reside el Backlog del MVP (para dimensionar la arquitectura) |
 | `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` / `.specify/memory/constitution.md` — archivo de gobernanza técnica |
@@ -76,3 +76,7 @@ flowchart TD
 | 3 | `read_file` | Leer `pb_*.md` y `mvp_*.md` si se requiere contexto de negocio |
 | 4 | `write_file` | Guardar `tech_guidelines.md` formalizando ADRs y gobernanza técnica |
 | 5 | `write_file` | Reescribir el tracker anexando `@DA:` (o `@HUMANO:` si falta información no resuelta por Spec Kit) |
+
+### ⚙️ INGESTIÓN DEL MAPA DE SPECS (MODO LECTURA)
+Antes de iniciar el diseño técnico y arquitectónico, es **obligatorio** que leas `specs/README.md` (Product State Ledger) para alinear los nuevos diseños con la topología ya documentada y evitar solapamientos con componentes DEPRECATED.
+

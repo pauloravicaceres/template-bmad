@@ -16,7 +16,7 @@ argument-hint: 'Instrucción del @API: o @DA: leída desde el tracker_bmad.md'
 |---|---|
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
 | `CARPETA_SALIDA` | `qa-tech` — clave en `routes_bmad` donde se guardan los reportes/compilados |
-| `CARPETA_SPECS` | `.specify/` o directorio de especificaciones — fuente de `spec.md`, `plan.md`, `tasks.md` |
+| `CARPETA_SPECS` | `specs/` â€” directorio raÃ­z para artefactos Spec Kit (`spec.md`, `plan.md`, `tasks.md`). Si no existe, el agente debe crearla. |
 | `CARPETA_ENTRADA_SA` | `solutions-architect` — clave donde reside `tech_guidelines.md` |
 | `CARPETA_ENTRADA_DB` | `data-architect` — clave donde reside el modelo de base de datos (`db_*.md`) |
 | `CARPETA_ENTRADA_API` | `api-architect` — clave donde residen los contratos REST/GraphQL (`api_*.md`) |
@@ -98,3 +98,8 @@ flowchart TD
 | 5 | `read_file` / `write_file` | **Si es Aprobado:** Leer y/o escribir `CARPETA_CONTEXTO` (`.specify/memory/constitution.md`) |
 | 6 | `read_file` | Leer el `tracker_bmad.md` |
 | 7 | `write_file` | Reescribir el tracker preparando la activación de `/speckit.implement` hacia la Fase D |
+
+
+### ⚙️ ACTUALIZACIÓN DEL MAPA DE SPECS (MODO ESCRITURA)
+Tienes la habilidad `update-specs-map`. Como auditor final técnico, una vez que apruebes la compilación y cruce de validación, **debes actualizar** de forma determinista el estado de la Spec correspondiente a `READY-FOR-DEV` en `specs/README.md` previo a habilitar la fase de desarrollo (Fase D).
+

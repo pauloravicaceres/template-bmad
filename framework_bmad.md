@@ -16,11 +16,12 @@ En su versión 2.0, el framework integra **Spec-Driven Development (SDD)** nativ
 
 El corazón de BMAD v2.0 es el `watcher_bmad.py`, que actúa no solo como orquestador del tracker, sino como un **Compilador Modular** y **Gatekeeper**.
 
-### A. Integración Git Segura y Autonómica
-El framework impone políticas *Zero-Trust* sobre el control de versiones para proteger el repositorio:
-1. **Arranque Aislado (`--branch`):** El orquestador requiere obligatoriamente que el humano especifique una rama al arrancar (`python watcher_bmad.py --branch feat/mi-rama`). El script ejecuta la verificación de idempotencia, y crea/reactiva la rama automáticamente. Ningún agente opera sobre `main`.
-2. **Spec Freeze:** Al completar el diseño técnico, el propio orquestador realiza un commit congelando las especificaciones (`git commit -m "spec: [SPEC-FREEZE]"`).
-3. **Commits Atómicos Headless:** Durante la Fase de Desarrollo, los agentes no pueden usar prompts interactivos, resolver conflictos de merge, ni hacer `git push`. Usan el skill inyectado (`git-commit`) para ejecutar estrictamente `git add {archivos}` y `git commit -m "{convencion} [{TASK-ID}]"`. El push al remoto se reserva como el privilegio final e indelegable del humano.
+### A. Integración Git Segura y Autonómica (GitOps)
+El framework impone políticas *Zero-Trust* sobre el control de versiones, delegando toda mutación del VCS al orquestador principal mediante *Event-Sourcing*:
+1. **Arranque con State Hydration:** Al iniciar, el orquestador escanea la historia del `tracker_bmad.md`. Si detecta que una sesión fue interrumpida en plena creación de una feature, reanuda automáticamente comprobando y saltando a la rama huérfana.
+2. **Feature Branching Automatizado:** El Watcher intercepta directivas macro en el tracker (ej. `@WATCHER: GITOPS-BRANCH-CREATE feat/hu`). Antes de procesarlas, verifica la limpieza del *working directory* (`git status --porcelain`), realiza auto-commits de seguridad (`chore: auto-commit pre-branch switch`) y bifurca el repositorio para aislar el diseño de la nueva HU.
+3. **Auto-Merge Seguro y Degradación Elegante:** Al finalizar la auditoría (cuando el QT dicta `READY-FOR-DEV`), el Watcher intercepta la directiva `@WATCHER: GITOPS-MERGE-CLOSE`. Realiza la fusión a `dev` de manera síncrona mediante `try/except`. Si hay conflictos, aplica `git merge --abort` y solicita intervención humana inyectando un protocolo instruccional en el tracker. El sistema entra en "Amnesia Estratégica", delegando la jurisdicción de resolución al humano, quien completará el merge y simplemente reiniciará el Watcher sin manipular el bus de datos.
+4. **Commits Atómicos Headless:** Durante la Fase de Desarrollo, los agentes no resuelven conflictos ni hacen push. Usan el skill inyectado (`git-commit`) para ejecutar estrictamente `git add {archivos}` y `git commit -m "{convencion} [{TASK-ID}]"`.
 
 ### B. SDD Auto-Runner y HITL por Excepción
 En la versión 2.0, la transición entre el análisis de negocio y el diseño arquitectónico ya no es manual.
@@ -111,7 +112,7 @@ flowchart TD
     Gobernanza -. "Dicta Reglas a" .-> Delivery
 ```
 
-### II. Flujo de Trabajo Secuencial (Git + Agentes)
+### II. Flujo de Trabajo Secuencial (GitOps + Agentes)
 ```mermaid
 sequenceDiagram
     actor H as 🧑 Humano
@@ -122,9 +123,11 @@ sequenceDiagram
     participant D as 💻 Agentes Delivery
     participant G as 🌿 Repositorio Git
 
-    H->>W: python watcher_bmad.py --branch feat/hu-01
-    W->>G: git checkout -b feat/hu-01 (Idempotente)
-    W->>B: Despierta Fase de Ideación
+    H->>W: Inicia Watcher
+    W->>B: Despierta Fase de Ideación (@BS -> @PA -> @PM)
+    B->>W: @PM inyecta @WATCHER: GITOPS-BRANCH-CREATE feat/hu-01
+    W->>G: git checkout -b feat/hu-01 (Transaccional)
+    W->>B: Pasa token a @BA (Diseño de HU)
     B-->>W: Escribe HU en tracker (Aprobada por QA)
     
     note over W,S: SDD Auto-Runner (Intercepción)
@@ -136,21 +139,23 @@ sequenceDiagram
         H->>W: Resuelve y aprueba paso
     else Cero Fricción (analyze == 0)
         W->>G: git add .specify/ && git commit "spec: [FREEZE]"
-        W->>A: Despierta Fase de Arquitectura
+        W->>A: Despierta Fase de Arquitectura (@UX -> @SA -> @DA -> @API -> @QT)
     end
     
-    A-->>H: Entrega tech-design_maestro.md
-    H->>G: git commit "arch: Diseño Técnico Aprobado"
-    H->>W: /speckit.implement (Activa Fase D)
+    A->>W: @QT compila TDD y actualiza Ledger a READY-FOR-DEV
+    A->>W: @QT inyecta @WATCHER: GITOPS-MERGE-CLOSE feat/hu-01
+    W->>G: git merge --no-ff feat/hu-01 (Auto-Merge)
+    W->>H: ⚠️ HITL (Opcional): Conflicto de Merge (si aplica)
     
+    A-->>W: @QT inyecta @SPEC-KIT: para Implementación
     W->>D: Despacha Tareas del tasks.md
     loop Cada Tarea Completada
         D->>G: git add {archivos} && git commit -m "feat: [TASK-ID]"
     end
     
     D->>W: Certificado Code-Review (Aprobado)
-    W->>H: Turno de Push
-    H->>G: git push origin feat/hu-01
+    W->>H: Turno de Push al remoto
+    H->>G: git push origin dev
 ```
 
 ### III. Capa Transversal (Modelo de Capas de Restricción)
@@ -183,4 +188,76 @@ flowchart TD
     style L2 fill:#ffe6cc,stroke:#ff9900,stroke-width:2px,color:#000
     style L1 fill:#ffffcc,stroke:#cccc00,stroke-width:2px,color:#000
     style L0 fill:#e6ffcc,stroke:#33cc33,stroke-width:2px,color:#000
+```
+
+## 5. Ledger de Estado del Producto (Mapa de Specs)
+
+El ecosistema BMAD implementa un **Mapa de Specs** (ubicado en `specs/README.md`) que actúa como un Ledger inmutable del ciclo de vida de las funcionalidades. Este artefacto soluciona la pérdida de contexto en proyectos de larga duración.
+
+### Gobernanza del Ledger:
+1. **Lectura Obligatoria:** Los agentes de diseño (`@BA`, `@SA`) consumen este mapa antes de cualquier iteración para alinear las nuevas HUs con la topología existente y evitar solapamientos.
+2. **Escritura Orquestada:** Los agentes de validación y gestión (`@PM`, `@QT`) utilizan la habilidad `update-specs-map` para actualizar determinísticamente el estado de las funcionalidades (ACTIVE, IN-PROGRESS, DEPRECATED) mediante manipulaciones precisas de Markdown.
+
+Este mecanismo garantiza una fuente única de verdad libre de alucinaciones algorítmicas, esencial para la correcta transición de Modos Greenfield a Brownfield.
+
+## 6. Ciclo de Vida de Ramas (GitOps Workflow)
+
+El siguiente diagrama detalla cómo el ecosistema aisla el trabajo en ramas de *feature* y cómo el **Watcher** orquesta los cambios de estado en el control de versiones, incluyendo el protocolo de resiliencia ante conflictos (Amnesia Estratégica).
+
+```mermaid
+flowchart TD
+    DEV(("Rama Base\n(dev/main)"))
+    
+    subgraph FASE_IDEACION ["Ideación (En rama base)"]
+        PM["@PM estructura el MVP"]
+    end
+    
+    subgraph INTERCEPCION_CREATE ["Watcher: Branch Create"]
+        W1["Intercepta GITOPS-BRANCH-CREATE"]
+        W2["Auto-Commit Seguridad"]
+        W3["git checkout dev"]
+        W4["git checkout -b feat/HU_x"]
+    end
+    
+    subgraph FASE_DISENO ["Diseño Aislado (feat/HU_x)"]
+        BA["@BA: Historias de Usuario"]
+        QA["@QA: Aprobación Documental"]
+        SA["@SA: Arquitectura (SDD Auto-Runner)"]
+        QT["@QT: Aprobación Técnica (Tech Design)"]
+    end
+    
+    subgraph INTERCEPCION_CLOSE ["Watcher: Merge Close"]
+        W5["Intercepta GITOPS-MERGE-CLOSE"]
+        W6["git checkout dev"]
+        W7{"¿Hay Conflictos?"}
+        W8["git merge --no-ff feat/HU_x\ngit branch -d feat/HU_x"]
+        W9["git merge --abort"]
+    end
+    
+    subgraph HUMANO ["Amnesia Estratégica (Fallback)"]
+        H1["Humano resuelve conflicto en terminal"]
+        H2["Humano fusiona a dev manualmente"]
+        H3["Humano reinicia Watcher"]
+    end
+    
+    DEV --> FASE_IDEACION
+    PM -- "Emite macro" --> W1
+    W1 --> W2 --> W3 --> W4
+    W4 -- "Bifurcación exitosa" --> BA
+    BA --> QA --> SA --> QT
+    QT -- "Emite macro" --> W5
+    W5 --> W6 --> W7
+    
+    W7 -- "Fusión Limpia (No)" --> W8
+    W8 -- "Retorna control" --> DEV
+    
+    W7 -- "Sí (Colisión)" --> W9
+    W9 -- "Emite @HUMANO: 🚨 ALERTA" --> H1
+    H1 --> H2 --> H3
+    H3 -- "Reanuda limpio" --> DEV
+
+    style DEV fill:#f9f,stroke:#333,stroke-width:2px,color:#000
+    style INTERCEPCION_CREATE fill:#d4edda,stroke:#28a745,stroke-dasharray: 5 5,color:#000
+    style INTERCEPCION_CLOSE fill:#cce5ff,stroke:#007bff,stroke-dasharray: 5 5,color:#000
+    style HUMANO fill:#f8d7da,stroke:#dc3545,color:#000
 ```

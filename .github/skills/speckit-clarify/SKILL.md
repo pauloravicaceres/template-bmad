@@ -289,3 +289,6 @@ Report completion (after questioning loop ends or early termination):
 - [ ] Spec quality checklist re-validated against updated spec (if `FEATURE_DIR/checklists/requirements.md` exists)
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with questions answered, sections touched, checklist status, and coverage summary
+
+# IDIOMA OBLIGATORIO (ESPAÃ‘OL)
+**CRÃTICO:** Todo el contenido generado (documentaciÃ³n, nombres de variables descriptivas, tareas, criterios de Ã©xito, planes de implementaciÃ³n y anÃ¡lisis) DEBE redactarse estrictamente en **ESPAÃ‘OL**, a excepciÃ³n de las palabras clave de programaciÃ³n o sintaxis tÃ©cnica que no tengan traducciÃ³n lÃ³gica.

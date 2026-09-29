@@ -29,10 +29,9 @@ def copy_template(target_dir):
         "code-review", "devops", "skills", "utils", ".specify", ".github"
     ]
 
-    # Nota: Ya no copiamos "setup.py". Como este script ahora vive en "utils/", se copiará automáticamente con la carpeta "utils"
     archivos_permitidos = [
         "watcher_bmad.py", "init_bmad.py", "config_bmad.json", 
-        "AGENTS.md", "README.md", "SETUP.md", "framework_bmad.md",
+        "README.md", "SETUP.md", "framework_bmad.md",
         "GUIDE.md", "PLUGGABLE_PHASE_D.md", "ARCHITECTURE.md"
     ]
 
@@ -57,6 +56,16 @@ def copy_template(target_dir):
             shutil.copy2(src, dst)
             print(f"📄 Copiado: {archivo}")
 
+    # 4. Inicializar Mapa de Specs (Ledger)
+    specs_dir = target_path / "specs"
+    specs_dir.mkdir(parents=True, exist_ok=True)
+    template_readme = source_dir / "utils" / "template-readme-specs.md"
+    if template_readme.exists():
+        shutil.copy2(template_readme, specs_dir / "README.md")
+        print("✓ Creado: specs/README.md (Copiado desde template)")
+    else:
+        print("⚠️ No se encontró template-readme-specs.md")
+
     # 3. Limpiar Constitución Técnica (Evita heredar reglas de la plantilla)
     constitution_path = target_path / ".specify" / "memory" / "constitution.md"
     if constitution_path.exists():
@@ -70,7 +79,7 @@ def copy_template(target_dir):
     print(f"  1. cd {target_path}")
     print("  2. git init && git add . && git commit -m \"chore: inicialización BMAD v2.0\"")
     print("  3. python init_bmad.py \"Nombre de mi Proyecto\"")
-    print("  4. python watcher_bmad.py --branch feat/mi-rama\n")
+    print("  4. python watcher_bmad.py (Usa el menú interactivo para crear tu rama)\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Clonador seguro de la plantilla BMAD.")
@@ -78,3 +87,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     copy_template(args.destino)
+

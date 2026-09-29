@@ -40,3 +40,6 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
   - ✅ **CORRECTO:** `@HUMANO: Por favor aprueba para autorizar la transición hacia el product-manager.`
 - **Preguntas al Humano (Obligatoriedad de Inclusión):**
   Si el handoff al `@HUMANO:` solicita responder un cuestionario, preguntas de arquitectura o decisiones estratégicas, **ESTÁ ESTRICTAMENTE PROHIBIDO** pedir respuestas sin proporcionar las preguntas. El agente debe listar obligatoriamente las preguntas de forma explícita, clara y numerada inmediatamente debajo de la línea del handoff.
+- **Orquestación Automática de Git (GitOps Macros):**
+  Ciertos agentes (ej. `product-manager` y `qa-tech`) poseen directivas explícitas para comandar el flujo del repositorio. Cuando sea el caso, las macros `@WATCHER: GITOPS-BRANCH-CREATE [rama]` y `@WATCHER: GITOPS-MERGE-CLOSE [rama]` son comandos transaccionales válidos.
+  - **Uso estricto:** Estas macros deben inyectarse en el texto como una **línea independiente** ubicada siempre justo antes del Handoff final de derivación, asegurando que el *watcher* ejecute la mutación del entorno (`checkout`, `merge`) *antes* de despachar la instrucción al siguiente agente.

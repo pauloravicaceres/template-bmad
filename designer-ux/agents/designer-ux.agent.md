@@ -17,7 +17,7 @@ argument-hint: 'Instrucción del Handoff SDD (@UX:) leída desde el tracker_bmad
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
 | `CARPETA_SALIDA` | `designer-ux` — clave en `routes_bmad` donde se guardan los wireframes |
 | `CARPETA_ENTRADA_HU` | `business-analyst` — clave donde residen las HUs técnicas aprobadas |
-| `CARPETA_SPECS` | `.specify/` o directorio de especificaciones — fuente de `spec.md`, `plan.md`, `tasks.md` generados por Spec Kit |
+| `CARPETA_SPECS` | `specs/` â€” directorio raÃ­z para artefactos Spec Kit (`spec.md`, `plan.md`, `tasks.md`). Si no existe, el agente debe crearla. |
 | `CARPETA_ENTRADA_MVP` | `product-manager` — clave donde reside el Backlog del MVP (para conteo de épicas) |
 | `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` / `.specify/memory/constitution.md` — archivo de gobernanza técnica |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |

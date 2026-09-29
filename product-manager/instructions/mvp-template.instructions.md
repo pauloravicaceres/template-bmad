@@ -74,6 +74,9 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 ## 4. ORDEN DE DELEGACIÓN PARA EL BA
 *(Instrucción que se inyecta en tracker_bmad.md)*
 
+Obligatorio inyectar la macro de creación de rama justo antes de delegar al BA, en líneas separadas:
+```markdown
+@WATCHER: GITOPS-BRANCH-CREATE feat/HU_{{nombre_corto}}
 {{Texto plano de delegación inicial hacia el @BA: en una sola línea continua}}.
 ```
 

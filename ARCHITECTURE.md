@@ -159,7 +159,23 @@ BMAD no utiliza bases de datos para su estado; el sistema de archivos local es l
 
 ---
 
-## 5. Invariantes y Mecanismos de Resiliencia del Motor
+## 5. Control de Repositorio (GitOps) y Product State Ledger
+
+BMAD controla las transiciones del repositorio de código mediante un paradigma estricto de GitOps orquestado por macros.
+
+### Product State Ledger (`specs/README.md`)
+El estado macroscópico del producto (qué está en construcción, qué está listo para desarrollo, qué está en producción) se gobierna a través de un archivo de estado tabular inmutable llamado `Ledger`. Los agentes consultan obligatoriamente el Ledger para evitar solapamientos y lo mutan (`update-specs-map`) de `IN-PROGRESS` a `READY-FOR-DEV` conforme avanzan las aprobaciones.
+
+### Feature Branching Transaccional
+El ecosistema aísla por defecto todo el trabajo de Fase de Diseño de nuevas Historias de Usuario (HU).
+- **Creación Transaccional:** El PM inyecta la macro `@WATCHER: GITOPS-BRANCH-CREATE feat/HU_[nombre]` en el tracker, lo que hace que el Watcher síncronamente audite el directorio (`git status --porcelain`), aplique *commits* preventivos y salte a la rama aislada.
+- **Fusión (Auto-Merge) Segura:** Cuando el QT aprueba el diseño técnico y el Ledger, inyecta `@WATCHER: GITOPS-MERGE-CLOSE feat/HU_[nombre]`. El Watcher ejecuta un `git merge --no-ff`.
+- **Degradación ante Conflictos:** Si el `git merge` falla por conflictos, el Watcher emite un `git merge --abort`, retorna a la rama *feat* y detiene la máquina enviando un token `@HUMANO:` al tracker con un Procedimiento Operativo Estándar. El sistema asume una "Amnesia Estratégica"; es decir, la resolución es de jurisdicción estrictamente humana, y tras completar el merge manualmente en la terminal, el usuario solo debe reiniciar el Watcher sin manipular el historial del tracker.
+- **State Hydration:** En caso de reinicio de la terminal, el Watcher recorre históricamente el tracker, identifica macros de apertura huérfanas y reanuda el estado de Git en la rama correcta automáticamente.
+
+---
+
+## 6. Invariantes y Mecanismos de Resiliencia del Motor
 
 1. **El Tracker como Event Sourcing Inmutable:** La comunicación fluye exclusivamente mediante adición (*Append-Only*) en `tracker_bmad.md`. Se penaliza la sobrescritura.
 2. **Backpressure en Watcher:** El orquestador sondea el estado de cada panel TTY en Herdr. Si el agente está ocupado (`working`), la tarea se retiene en memoria evitando colisiones.

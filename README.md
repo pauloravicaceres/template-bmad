@@ -20,7 +20,7 @@ El ecosistema v2.0 asume control estricto de repositorios. Para instanciar y cor
    ```
 3. **Arrancar el Motor Orquestador:**
    ```bash
-   python watcher_bmad.py --branch feat/modulo-registro
+   python watcher_bmad.py  # Desplegará un menú interactivo para seleccionar o crear la rama
    ```
 4. **Levantar la Flota de Agentes en Herdr (en otra terminal):**
    ```bash
@@ -47,6 +47,7 @@ La carpeta `utils/` contiene los scripts operativos que le dan al humano el cont
 
 ## 🌟 Características Fundamentales
 
+* **Mapa de Specs (Product State Ledger):** Base de datos determinista en texto plano (`specs/README.md`) que rastrea el ciclo de vida inmutable de las historias de usuario y requerimientos arquitectónicos. Actúa como fuente de verdad anti-alucinación, forzando a los agentes a ingerir este contexto histórico antes de proponer nuevos diseños.
 * **Integración Nativa SDD (Spec-Driven Development vía GitHub Spec Kit):** El framework incorpora un puente determinista llamado **SDD Auto-Runner**. Tras la validación de QA Documental, el orquestador congela automáticamente el diseño (`git commit -m "[SPEC-FREEZE]"`) ejecutando de manera desatendida `/speckit.specify -> /clarify -> /plan -> /tasks -> /analyze`.
 * **Commits Atómicos Headless:** Durante la Fase D, los agentes programadores carecen de capacidades interactivas. Ejecutan código e inyectan commits en Git aislando lógicamente cada característica (`git add . && git commit -m "feat: [TASK-ID]"`).
 * **Estrategia Dual-Output de Requisitos (Business Analyst):** Generación simultánea de Historias Técnicas (Gherkin puro para Spec Kit) y Funcionales (Narrativas amigables para Stakeholders).
@@ -140,3 +141,5 @@ flowchart TD
 | [**`GUIDE.md`**](./GUIDE.md) | Manual operativo paso a paso y solución de incidentes del día a día. |
 | [**`PLUGGABLE_PHASE_D.md`**](./PLUGGABLE_PHASE_D.md) | Especificación de Cartucho Intercambiable (Cambio de Lenguaje/Stack de los agentes programadores). |
 | [**`BMAD_AUDIT_REPORT.md`**](./BMAD_AUDIT_REPORT.md) | Reporte interno de certificación de salud arquitectónica del framework. |
+
+

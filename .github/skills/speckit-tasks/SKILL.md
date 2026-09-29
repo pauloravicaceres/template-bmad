@@ -213,3 +213,6 @@ Every task MUST strictly follow this format:
 - [ ] tasks.md generated with all phases, task IDs, and file paths
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with task count, story breakdown, and MVP scope
+
+# IDIOMA OBLIGATORIO (ESPAÃ‘OL)
+**CRÃTICO:** Todo el contenido generado (documentaciÃ³n, nombres de variables descriptivas, tareas, criterios de Ã©xito, planes de implementaciÃ³n y anÃ¡lisis) DEBE redactarse estrictamente en **ESPAÃ‘OL**, a excepciÃ³n de las palabras clave de programaciÃ³n o sintaxis tÃ©cnica que no tengan traducciÃ³n lÃ³gica.
