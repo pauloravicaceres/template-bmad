@@ -112,5 +112,7 @@ Si existe el archivo `.specify/memory/constitution.md`:
 
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]
+
 [IMPORT_SKILL: skills/pb-validator/SKILL.md]
+
 [IMPORT_SKILL: skills/export-pdf/SKILL.md]
