@@ -22,9 +22,9 @@ Toda HU Técnica generada por el agente BA usa esta estructura aséptica y deter
 
 ## Convención de Nombres de Archivo y Ruta
 ```
-files/business-analyst/hu_[ID]_[nombre_corto].md
+files/business-analyst/XXX-HU_[nombre_corto].md
 ```
-- `ID`: Número secuencial de dos dígitos (`01`, `02`, …).
+- `XXX`: Identificador secuencial de 3 dígitos (ej. `001`, `002`) provisto exactamente por el `@PM` en el Handoff. Queda estrictamente PROHIBIDO que el BA invente un nombre genérico; debe respetar el prefijo numérico de la orden recibida.
 - `nombre_corto`: snake_case, máximo 4 palabras, agnóstico al dominio.
 
 ## Esqueleto Completo (rellenar desde el Product Brief; nunca inventar)
@@ -39,7 +39,7 @@ files/business-analyst/hu_[ID]_[nombre_corto].md
 - **Tipo:** {{Feature | Enhancement | Bugfix | Refactor}}
 - **Prioridad:** {{Alta | Media | Baja}}
 - **Tags:** [{{TAG_1}}, {{TAG_2}}, {{TAG_3}}]
-- **Consumo SDD:** `/speckit.specify files/business-analyst/hu_{{ID}}_{{nombre_corto}}.md`
+- **Consumo SDD:** `/speckit.specify files/business-analyst/{{XXX}}-HU_{{nombre_corto}}.md`
 
 ---
 
@@ -131,7 +131,7 @@ sequenceDiagram
 ## 7. ORDEN DE DELEGACIÓN PARA EL QA
 *(Generar como una sola línea de texto continuo, sin saltos de línea internos)*
 
-@QA: La Historia de Usuario Técnica {{TITULO_HU}} está lista en el archivo hu_{{ID}}_{{nombre_corto}}.md (y su versión de stakeholders en files/business-analyst/HUs-stakeholders/hu_{{ID}}_{{nombre_corto}}.md). Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
+@QA: La Historia de Usuario Técnica {{TITULO_HU}} está lista en el archivo {{XXX}}-HU_{{nombre_corto}}.md (y su versión de stakeholders en files/business-analyst/HUs-stakeholders/{{XXX}}-HU_{{nombre_corto}}.md). Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 ```
 
 ### ⚠️ Directiva para Proyectos Headless / Procesamiento de Datos

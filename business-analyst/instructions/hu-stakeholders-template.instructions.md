@@ -25,9 +25,9 @@ Toda HU de Stakeholders generada por el agente BA usa esta estructura. Enfatiza 
 
 ## Convención de Nombres de Archivo y Ruta
 ```
-files/business-analyst/HUs-stakeholders/hu_[ID]_[nombre_corto].md
+files/business-analyst/HUs-stakeholders/XXX-HU_[nombre_corto].md
 ```
-- `ID`: Número secuencial de dos dígitos (`01`, `02`, …).
+- `XXX`: Identificador secuencial de 3 dígitos provisto exactamente por el `@PM` en el Handoff. El nombre debe ser EXACTAMENTE el mismo que el archivo técnico para asegurar simetría, preservando el prefijo numérico ordenado (ej. `002-HU_login.md`).
 - `nombre_corto`: snake_case, máximo 4 palabras, agnóstico al dominio.
 
 ## Esqueleto Completo (rellenar desde el Product Brief; nunca inventar)
@@ -35,7 +35,7 @@ files/business-analyst/HUs-stakeholders/hu_[ID]_[nombre_corto].md
 ```markdown
 # HISTORIA DE USUARIO (STAKEHOLDERS): {{TITULO_HU}}
 
-- **ID de Historia:** HU-{{ID}}
+- **ID de Historia:** {{XXX}}-HU
 - **Épica:** {{NOMBRE_EPICA}}
 - **Audiencia:** Stakeholders, Product Owner, Usuarios Clave
 

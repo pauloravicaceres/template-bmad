@@ -14,3 +14,10 @@ El ecosistema BMAD opera bajo un modelo automatizado de integración continua lo
 ### Protocolo de Resolución de Conflictos (Fallback)
 La resolución de conflictos de control de versiones (VCS) es de **jurisdicción estrictamente humana**. Tras un fallo en la fusión automática, el sistema asume una **"Amnesia Estratégica"**. 
 Esto significa que el humano solo debe resolver el conflicto en Git manualmente (fusionando o haciendo rebase hacia la rama base) y luego **reiniciar el orquestador sin manipular el historial del tracker**. El orquestador, por diseño, asumirá que la rama problemática ha sido procesada exitosamente y continuará su operación normal de forma resiliente.
+
+### Identificador Secuencial Universal (SSOT)
+Para asegurar una trazabilidad absoluta entre el modelo de negocio, el control de versiones y los artefactos físicos (crítico en escenarios Brownfield), el ecosistema emplea la convención estricta `XXX-HU_[nombre_corto]`, donde `XXX` es un correlativo numérico de 3 dígitos (ej. `001`, `002`).
+Esta nomenclatura nace obligatoriamente en el **Product State Ledger** (`specs/README.md`) calculado por el `@PM`, y debe permear simétricamente en:
+1. El nombre de la rama GitOps (`feat/XXX-HU_[nombre]`).
+2. El nombre del archivo físico de la Historia de Usuario en el disco (`files/business-analyst/XXX-HU_[nombre].md`).
+3. Los Hand-offs y registros en el Tracker.

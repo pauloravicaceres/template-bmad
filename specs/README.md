@@ -18,7 +18,6 @@ Para mantener el determinismo del *Ledger*, los agentes mutadores y lectores uti
 
 | N° | Spec / Nombre | HU / Épica Origen | Qué aporta | Estado | Rama |
 |----|---------------|-------------------|------------|--------|------|
-| 01 | Template Base BMAD | Init | Inicialización de la arquitectura base | ACTIVE | main |
 
 ---
 

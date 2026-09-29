@@ -264,7 +264,7 @@ def extraer_instrucciones(linea):
         print("=" * 80)
         
         # Buscar la ruta de la HU en el mensaje
-        match_hu = re.search(r'(?:files[/\\]business-analyst[/\\])?(hu_[a-zA-Z0-9_-]+\.md)', linea)
+        match_hu = re.search(r'(?:files[/\\]business-analyst[/\\])?((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
         if match_hu:
             nombre_hu = match_hu.group(1)
             ruta_hu = f"files/business-analyst/{nombre_hu}"

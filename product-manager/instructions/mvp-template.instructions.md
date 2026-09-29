@@ -71,13 +71,25 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 
 ---
 
-## 4. ORDEN DE DELEGACIÓN PARA EL BA
+## 4. ORDEN DE DELEGACIÓN PARA EL BA Y GITOPS
 *(Instrucción que se inyecta en tracker_bmad.md)*
 
-Obligatorio inyectar la macro de creación de rama justo antes de delegar al BA, en líneas separadas:
+⚠️ **REGLA ESTRICTA DE NOMENCLATURA (IDENTIFICADOR SECUENCIAL):**
+Antes de generar la macro GitOps o el Handoff, el `@PM` DEBE leer obligatoriamente el archivo `specs/README.md` (Product State Ledger).
+1. Analiza la columna "N°" de la tabla de funcionalidades para encontrar el correlativo numérico más alto.
+2. Suma +1 a ese número y formatéalo con 3 dígitos (ej. si el último es `002`, el nuevo será `003`).
+3. Este prefijo debe usarse obligatoriamente para crear el identificador universal de la Historia: `XXX-HU_[nombre_corto]`.
+4. Si la tabla está vacía o es la primera funcionalidad, inicia en `001-HU_[nombre_corto]`.
+
+Este identificador exacto debe inyectarse obligatoriamente en TRES (3) lugares:
+1. En el registro de la nueva fila que actualizarás en `specs/README.md` (Ledger).
+2. En la macro GitOps del Watcher para la creación de la rama aislada.
+3. En la orden de delegación explícita para el `@BA`.
+
+Obligatorio inyectar en el tracker en líneas separadas:
 ```markdown
-@WATCHER: GITOPS-BRANCH-CREATE feat/HU_{{nombre_corto}}
-{{Texto plano de delegación inicial hacia el @BA: en una sola línea continua}}.
+@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_{{nombre_corto}}
+{{Texto de delegación donde explícitamente se le ordena al @BA crear el archivo físico `XXX-HU_{nombre_corto}.md`}}.
 ```
 
 
