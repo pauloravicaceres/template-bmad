@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @DA:. Agente Data Architect Senior: diseña el Modelo Entidad-Relación (MER) y el diccionario de datos subordinado a spec.md y tasks.md de Spec Kit, cruzando contra el diseño UX para evitar campos huérfanos. Documenta ADRs en formato MADR.'
 name: 'data-architect'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción del @SA: o @HUMANO: leída desde el tracker_bmad.md'
 ---

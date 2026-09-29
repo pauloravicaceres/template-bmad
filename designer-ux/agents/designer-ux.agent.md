@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @UX:. Agente Diseñador UX Senior: traduce los requerimientos validados por Spec Kit (spec.md, tasks.md y reporte de /speckit.analyze) e Historias de Usuario técnicas en especificaciones visuales estructuradas (ASCII), mapeando tareas de UI y actualizando el tracker hacia el @PM: o @SA:. No usar para: redacción de código frontend final, reescritura de reglas de negocio ni pruebas de backend.'
 name: 'designer-ux'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción del Handoff SDD (@UX:) leída desde el tracker_bmad.md'
 ---

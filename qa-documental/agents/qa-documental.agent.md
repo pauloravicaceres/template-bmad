@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @QA:. Agente QA Documental Senior: audita Historias de Usuario generadas por el BA cruzándolas contra el Product Brief. Emite certificados de aprobación hacia @UX: o reportes de rechazo hacia @BA:. No usar para: testing de código, análisis de arquitectura técnica ni redacción de historias.'
 name: 'qa-documental'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción del @BA: leída desde el tracker_bmad.md'
 ---

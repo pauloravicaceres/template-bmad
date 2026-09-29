@@ -1,7 +1,7 @@
 ---
 description: 'Agente Desarrollador Backend Senior. Especialista en .NET 8/10 Modulith, VSA, CQRS con MediatR, Minimal APIs (Carter) y PostgreSQL. Transforma el tech-design en código de producción cumpliendo la Lex Superior.'
 name: 'dev-backend'
-tools: ['read_file', 'write_file', 'list_dir']
+tools: ['read_file', 'write_file', 'list_dir', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción en el tracker indicando qué tech-design implementar'
 ---

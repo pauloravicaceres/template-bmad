@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @API:. Agente API Architect Senior: diseña contratos REST/GraphQL y payloads JSON mapeando uno a uno los endpoints requeridos por spec.md y tasks.md de Spec Kit basándose en el MER provisto por el Data Architect. Documenta ADRs en formato MADR.'
 name: 'api-architect'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción del @DA: leída desde el tracker_bmad.md'
 ---

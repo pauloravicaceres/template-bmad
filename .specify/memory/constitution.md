@@ -28,6 +28,7 @@ El sistema se compone de una arquitectura desacoplada donde el Frontend no requi
 | **ADR-001** | Backend | Vigente | Uso de FastAPI con WebSockets y Watchdog para monitorizar en vivo el File-System. |
 | **ADR-002** | Frontend | Vigente | Elección mandatoria de Vue 3 (Composition API) con Nuxt 3 y PrimeVue/Tailwind, excluyendo explícitamente otros frameworks SPA. |
 | **ADR-003** | Arquitectura | Vigente | Independencia de despliegue cloud; la solución es una herramienta HITL (Human-in-the-Loop) ejecutada localmente. |
+| **ADR-004** | Topología | Vigente | Segregación estricta de código fuente. Todo el código de la aplicación debe residir obligatoriamente bajo el subdirectorio raíz `/app/` (ej. `/app/frontend/` y `/app/backend/`), prohibiendo el andamiaje directo en la raíz del ecosistema BMAD. |
 
 ## Governance
 

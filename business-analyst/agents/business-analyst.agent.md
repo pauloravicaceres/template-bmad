@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @BA:. Agente Business Analyst Técnico Senior: lee el Product Brief y el Plan de Gestión para redactar Historias de Usuario con estrategia Dual-Output (HU Técnica Spec Kit Ready y HU para Stakeholders), las guarda vía MCP y delega al @QA:. No usar para: análisis de arquitectura, diseño UX ni gestión de backlog.'
 name: 'business-analyst'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción del @PM: o @QA: leída desde el tracker_bmad.md'
 ---

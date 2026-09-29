@@ -48,12 +48,12 @@ applyTo: '**'
 
 - **Escenario A: Con acceso a la skill `archify` (Modo Dual Enriquecido):**
   - Si la skill `archify` está disponible en tu entorno, debes generar **AMBOS** formatos para cada diagrama:
-    1. Genera los artefactos interactivos de `archify` (archivos HTML interactivos y especificaciones JSON) en la carpeta `files/qa-tech/diagrams/`.
+    1. Genera los artefactos interactivos de `archify` (archivos HTML interactivos y especificaciones JSON) en la carpeta `{{CARPETA_SALIDA_DIAGRAMAS}}`.
     2. Incrusta obligatoriamente debajo de las referencias a los artefactos el bloque nativo en sintaxis `mermaid` correspondiente, garantizando visualización inmediata tanto en visores Markdown estándar como en navegadores web interactivos.
   - **Formato canónico obligatorio por diagrama en Escenario A:**
     ### 5.X. [Título del Diagrama] (`[tipo: sequence | workflow | component]`)
-    - 🌐 **Visor Interactivo HTML:** [`diagrams/[nombre].html`](file:///D:/Paulo/Cursos/DMC/template-bmad/files/qa-tech/diagrams/[nombre].html)
-    - 📄 **Especificación Fuente JSON:** [`diagrams/[nombre].[tipo].json`](file:///D:/Paulo/Cursos/DMC/template-bmad/files/qa-tech/diagrams/[nombre].[tipo].json)
+    - 🌐 **Visor Interactivo HTML:** [`diagrams/[nombre].html`]({{CARPETA_SALIDA_DIAGRAMAS}}/[nombre].html)
+    - 📄 **Especificación Fuente JSON:** [`diagrams/[nombre].[tipo].json`]({{CARPETA_SALIDA_DIAGRAMAS}}/[nombre].[tipo].json)
     - **Estado de Validación:** ✅ *Showcase Pass (N/N checks)*
 
     ```mermaid

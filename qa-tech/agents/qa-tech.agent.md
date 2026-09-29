@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @QT:. Agente QA Técnico Senior: actúa como Auditor Adversarial Zero-Trust. Audita la coherencia entre el MER (DA), los contratos (API), el diseño UX y los artefactos de Spec Kit (spec.md, tasks.md y constitution.md), cazando alternativas falsas y campos huérfanos. Si aprueba, compila el Tech Design maestro y prepara el gatillo hacia /speckit.implement. Si rechaza, emite reporte adversarial.'
 name: 'qa-tech'
-tools: ['read', 'write']
+tools: ['filesystem/read_file', 'write', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción del @API: o @DA: leída desde el tracker_bmad.md'
 ---
@@ -22,6 +22,7 @@ argument-hint: 'Instrucción del @API: o @DA: leída desde el tracker_bmad.md'
 | `CARPETA_ENTRADA_API` | `api-architect` — clave donde residen los contratos REST/GraphQL (`api_*.md`) |
 | `CARPETA_ENTRADA_UX` | `designer-ux` — clave donde reside el diseño visual de interfaces (`ux_*.md`) |
 | `CARPETA_CONTEXTO` | Clave `context` en `config_bmad.json` (`.specify/memory/constitution.md`) — Constitución Técnica del proyecto |
+| `CARPETA_SALIDA_DIAGRAMAS` | `files/qa-tech/diagrams/` |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 ---

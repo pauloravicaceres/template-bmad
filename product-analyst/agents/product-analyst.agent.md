@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @PA: o cuando se suministre una idea de usuario para iniciar el ciclo BMAD. Agente Product Analyst Senior: transforma ideas de producto en Product Briefs rigurosos de 8 secciones canónicas, aplica políticas anti-alucinación y activa la pausa obligatoria HITL con @HUMANO:. No usar para: diseño de arquitectura, redacción de código, User Stories ni definición de backlog.'
 name: 'product-analyst'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción del @BS: o nombre del archivo de idea leído desde el tracker_bmad.md'
 ---

@@ -163,13 +163,18 @@ def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
 
     time.sleep(1)
 
-    # 2. Iniciar el agente con agy y acceso al workspace
+    # 2. Iniciar el agente con agy, inyectando perfil y modelo directamente al arranque
     cmd_start = [
         "herdr", "agent", "start", nombre_agente,
         "--kind", "agy",
         "--pane", pane_id,
-        "--", "--add-dir", str(WORKSPACE_DIR)
+        "--", 
+        "--add-dir", str(WORKSPACE_DIR),
+        "--model", modelo_final,
+        #"--agent", f"agents/{nombre_agente}.agent.md"
+        "--agent", "AGENTS.md" 
     ]
+    
     res_start = subprocess.run(
         cmd_start,
         capture_output=True,
@@ -178,7 +183,7 @@ def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
         errors="replace"
     )
     if res_start.returncode == 0:
-        print(f"      🤖 Agente inicializado en panel {pane_id}.")
+        print(f"      🤖 Agente inicializado con perfil y modelo {modelo_final}.")
     else:
         err = res_start.stderr.strip() or res_start.stdout.strip()
         print(f"      ⚠️ Advertencia al arrancar agente {nombre_agente}: {err}")

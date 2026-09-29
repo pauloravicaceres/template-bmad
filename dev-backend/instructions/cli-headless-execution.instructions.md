@@ -5,23 +5,18 @@ applyTo: '**'
 
 # ⚠️ PROTOCOLO ESTRICTO DE EJECUCIÓN CLI (NON-INTERACTIVE MODE)
 
-Como desarrollador Backend automatizado, estás equipado con la herramienta `execute_command`. Toda ejecución en la terminal debe ser **100% silenciosa y no interactiva (Headless)**. Tienes estrictamente prohibido ejecutar comandos que disparen *prompts* que requieran interacción humana, flujos de autenticación web emergentes o confirmaciones, ya que esto congelará permanentemente el framework BMAD.
+Como desarrollador Backend automatizado, estás equipado con la herramienta `execute_command`. Toda ejecución en la terminal debe ser **100% silenciosa y no interactiva (Headless)**. Tienes estrictamente prohibido ejecutar comandos que disparen *prompts* que requieran interacción humana o flujos bloqueantes, ya que esto congelará permanentemente el framework BMAD.
 
-## REGLAS DE ANDAMIAJE (SCAFFOLDING) Y COMPILACIÓN
-1. **Creación de Soluciones y Proyectos (.NET CLI):** 
-   Utiliza siempre la declaración explícita de nombres, salidas y evita restauraciones interactivas.
-   - ❌ INcorrecto: `dotnet new webapi`
-   - ✅ CORRECTO: `dotnet new webapi -n MiModulo.Api -o src/MiModulo.Api --no-restore`
-   - ✅ CORRECTO: `dotnet sln add src/MiModulo.Api/MiModulo.Api.csproj`
-2. **Gestión de Paquetes NuGet:**
-   Si hay conflictos de versiones, especifica la versión exacta en lugar de dejar que el CLI pregunte.
-   - ✅ CORRECTO: `dotnet add package Dapper --version 2.1.35`
-3. **Eficiencia en Compilación (Build/Run):**
-   No ejecutes `dotnet run` que deje el proceso vivo colgando tu terminal si solo necesitas verificar la sintaxis. Utiliza `dotnet build` para comprobar que el código es válido.
-   - ✅ CORRECTO: `dotnet build --no-restore -verbosity:quiet`
-4. **Manejo de Entity Framework Core:**
-   Si requieres ejecutar migraciones, usa los flags de no-interacción.
-   - ✅ CORRECTO: `dotnet ef migrations add InitialCreate --project src/Data --startup-project src/Api --no-build`
+## REGLAS DE ENTORNO Y EJECUCIÓN DE PYTHON
+1. **Gestión de Paquetes (`pip` / `uv`):** 
+   Utiliza siempre la versión exacta y los flags que suprimen logs innecesarios o preguntas.
+   - ❌ INcorrecto: `pip install fastapi`
+   - ✅ CORRECTO: `pip install fastapi==0.103.1 uvicorn==0.23.2 -q`
+2. **Eficiencia en Compilación (Build/Run):**
+   No ejecutes `uvicorn main:app --reload` que deje el proceso vivo colgando tu terminal, a menos que el usuario lo autorice como tarea de fondo. Para comprobar si tu código tiene errores sintácticos rápidos, compílalo explícitamente:
+   - ✅ CORRECTO: `python -m py_compile backend/main.py`
+3. **Manejo de Dependencias (requirements.txt):**
+   - ✅ CORRECTO: `pip install -r requirements.txt -q`
 
 
 ## REGLAS DE CONTROL DE VERSIONES (GIT HEADLESS)
@@ -31,11 +26,11 @@ Tras implementar el código de cada tarea, debes ejecutar un **commit atómico**
 ### Patrón Obligatorio de Commit
 ```bash
 # 1. Agregar SOLO los archivos específicos generados por la tarea
-git add src/Auth/Features/Login/LoginEndpoint.cs
-git add src/Auth/Features/Login/LoginCommand.cs
+git add backend/routers/hitl.py
+git add backend/models/hitl_models.py
 
 # 2. Commit con mensaje inline siguiendo Conventional Commits + TASK-ID
-git commit -m "feat(auth): implementar endpoint POST /api/auth/login [TASK-042-BE-01]"
+git commit -m "feat(hitl): implementar endpoint REST de aprobación [TASK-042-BE-01]"
 ```
 
 ### Comandos PROHIBIDOS (Lista Negra)
@@ -48,7 +43,7 @@ git add .
 
 # ❌ PROHIBIDO — operación remota, rompe la restricción de seguridad
 git push
-git push origin feat/HU-042-registro-usuario
+git push origin feat/HU-042-registro
 
 # ❌ PROHIBIDO — interactivo, congela la terminal
 git commit --amend

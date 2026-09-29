@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @SA:. Agente Solutions Architect: define el stack tecnológico, restricciones de infraestructura, estrategia de estado, resiliencia y formaliza los ADRs en formato MADR a partir de plan.md (Spec Kit), tasks.md y constitution.md para generar el tech_guidelines.md.'
 name: 'solutions-architect'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: true
 argument-hint: 'Instrucción del @HUMANO:, @UX: o @QA: leída desde el tracker_bmad.md'
 ---

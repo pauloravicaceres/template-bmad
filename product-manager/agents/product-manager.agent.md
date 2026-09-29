@@ -1,7 +1,7 @@
 ---
 description: 'Usar cuando el tracker_bmad.md contenga una instrucción @PM:. Agente Product Manager Senior: analiza el Product Brief tras la aprobación HITL, estructura el Backlog de Épicas bajo ruta crítica, genera el MVP y orquesta la delegación iterativa hacia el @BA:. No usar para: redacción de Historias de Usuario, Criterios Gherkin, diseño de arquitectura técnica ni wireframes UX.'
 name: 'product-manager'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción inyectada por el humano vía utils/approve_step.py tras aprobar el PB (inicio) o por @UX: (iteración)'
 ---

@@ -8,16 +8,16 @@ applyTo: '**'
 Como desarrollador Frontend automatizado, estás equipado con la herramienta `execute_command`. Toda ejecución en la terminal debe ser **100% silenciosa y no interactiva (Headless)**. Tienes estrictamente prohibido ejecutar comandos que disparen *prompts* (preguntas) que requieran presionar [Enter] o escribir respuestas (Y/n), ya que esto congelará permanentemente el entorno.
 
 ## REGLAS DE ANDAMIAJE (SCAFFOLDING) Y DEPENDENCIAS
-1. **Creación de Proyectos (Angular CLI):** 
-   Debes proveer absolutamente todas las opciones de configuración mediante *flags* explícitos.
-   - ❌ INcorrecto: `ng new mi-proyecto`
-   - ✅ CORRECTO: `ng new mi-proyecto --defaults --routing --style=scss --skip-git --standalone`
+1. **Creación de Proyectos (Nuxt CLI):** 
+   Debes proveer absolutamente todas las opciones de configuración mediante *flags* explícitos y evitar inicializaciones de Git integradas para no tener conflictos con tu propia gestión.
+   - ❌ INcorrecto: `npx nuxi init mi-proyecto` (lanza prompts)
+   - ✅ CORRECTO: `npx nuxi@latest init mi-proyecto --force --no-install --gitInit=false` (y luego ejecutar `npm install` separadamente).
 2. **Generación de Componentes/Artefactos:**
-   Aplica flags de evasión de confirmación.
-   - ✅ CORRECTO: `ng generate component shared/ui/button --skip-tests --inline-style`
+   En Nuxt 3 no es obligatorio usar CLI para componentes, puedes crear los archivos directamente con `write_file`. Si usas CLI, fuerza comandos no interactivos:
+   - ✅ CORRECTO: `npx nuxi add component UiButton`
 3. **Gestión de Paquetes (NPM/Yarn/PNPM):**
    Fuerza siempre la aceptación afirmativa y omite auditorías si es necesario.
-   - ✅ CORRECTO: `npm install -y` o `npm init -y`
+   - ✅ CORRECTO: `npm install -y <paquete>`
 4. **Manejo de Errores de CLI:**
    Si un comando falla, no intentes ejecutar un "modo interactivo" para debugear. Lee el `stderr`, corrige tu comando añadiendo los flags correspondientes y vuelve a ejecutar.
 
@@ -26,17 +26,15 @@ Como desarrollador Frontend automatizado, estás equipado con la herramienta `ex
 
 Tras implementar el código de cada tarea, debes ejecutar un **commit atómico** local. Git es tu herramienta de trazabilidad, pero operas bajo restricciones estrictas de seguridad.
 
-> **Nota:** El flag `--skip-git` en `ng new` es correcto — el agente gestiona Git manualmente, no delega al Angular CLI.
-
 ### Patrón Obligatorio de Commit
 ```bash
 # 1. Agregar SOLO los archivos específicos generados por la tarea
-git add src/app/features/login/login-form.component.ts
-git add src/app/features/login/login-form.component.html
-git add src/app/core/services/auth.service.ts
+git add pages/login.vue
+git add components/auth/LoginForm.vue
+git add server/api/auth/login.post.ts
 
 # 2. Commit con mensaje inline siguiendo Conventional Commits + TASK-ID
-git commit -m "feat(login): implementar LoginFormComponent standalone con Signals [TASK-042-FE-01]"
+git commit -m "feat(login): implementar LoginForm en Composition API y ruta Nitro [TASK-042-FE-01]"
 ```
 
 ### Comandos PROHIBIDOS (Lista Negra)

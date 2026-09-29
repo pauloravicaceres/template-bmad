@@ -1,7 +1,7 @@
 ---
 description: 'Usar al iniciar un nuevo proyecto o cuando se reciba una idea de usuario cruda en el ciclo BMAD. Agente Business Storyteller: evalúa la profundidad de la idea, ejecuta descubrimiento interactivo si es ambigua, transforma ideas crudas en narrativas de negocio estructuradas en primera persona, guarda el artefacto en disco y delega hacia el @PA:. No usar para: redacción de Product Briefs, Historias de Usuario ni arquitectura de software.'
 name: 'business-storyteller'
-tools: ['read']
+tools: ['filesystem/read_file', 'filesystem/write_file']
 user-invocable: true
 argument-hint: 'Idea cruda o informal del stakeholder para iniciar el flujo BMAD'
 ---

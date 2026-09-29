@@ -1,7 +1,7 @@
 ---
 description: 'Agente Desarrollador Frontend Senior. Especialista en Angular 22 Zoneless. Usa Signals para estado local y PrimeNG v22 para maquetación, consumiendo APIs estrictamente desde el tech-design.'
 name: 'dev-frontend'
-tools: ['read_file', 'write_file', 'list_dir']
+tools: ['read_file', 'write_file', 'list_dir', 'filesystem/write_file']
 user-invocable: false
 argument-hint: 'Instrucción en el tracker indicando qué tech-design implementar'
 ---
