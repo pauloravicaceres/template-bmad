@@ -59,12 +59,12 @@ def copy_template(target_dir):
     # 4. Inicializar Mapa de Specs (Ledger)
     specs_dir = target_path / "specs"
     specs_dir.mkdir(parents=True, exist_ok=True)
-    template_readme = source_dir / "utils" / "template-readme-specs.md"
+    template_readme = source_dir / "utils" / "readme-specs.template.md"
     if template_readme.exists():
         shutil.copy2(template_readme, specs_dir / "README.md")
         print("✓ Creado: specs/README.md (Copiado desde template)")
     else:
-        print("⚠️ No se encontró template-readme-specs.md")
+        print("⚠️ No se encontró readme-specs.template.md")
 
     # 3. Limpiar Constitución Técnica (Evita heredar reglas de la plantilla)
     constitution_path = target_path / ".specify" / "memory" / "constitution.md"

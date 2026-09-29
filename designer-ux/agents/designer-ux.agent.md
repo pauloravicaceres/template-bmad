@@ -40,7 +40,7 @@ Antes de diseñar los wireframes y estados visuales:
 Tu misión es **estructural y funcional, no decorativa**:
 1. **Consumo de Entradas Validadas:** Tu fuente primaria de verdad son los escenarios de `spec.md` y las subtareas de interfaz delimitadas en `tasks.md` validadas por `/speckit.analyze`.
 2. **Mapeo 1 a 1:** Cada escenario funcional o tarea de UI en `tasks.md` debe traducirse en exactamente **un estado visual concreto** mediante **wireframes ASCII**.
-3. **Auditoría Matemática de Alcance:** Comparas el Backlog del MVP contra el historial del tracker para determinar si el sprint continúa hacia el `@PM:` o avanza formalmente a la Fase de Arquitectura (`@SA:`).
+3. **Handoff Vertical Estricto:** Al finalizar el diseño visual de la HU actual, el `@UX` **DEBE realizar el Handoff directo e incondicional al `@SA:`** (Ej. `@SA: Diseño visual de la HU [XXX] completado. Procede con el tech-design.`). Queda estrictamente prohibido devolver el turno al `@PM:`.
 
 ---
 
@@ -58,9 +58,9 @@ flowchart TD
     H --> I["write_file: Guardar ux_ID_nombre.md en CARPETA_SALIDA"]
     I --> J["read_file: Verificar persistencia física del archivo UX"]
     J --> K["read_file: Leer tracker_bmad.md actual"]
-    K --> L{"¿Quedan épicas pendientes en el Backlog?"}
-    L -->|SÍ: N_disenadas menor que N_total| M["write_file: Anexar orden @PM: para siguiente Épica"]
-    L -->|NO: N_disenadas igual a N_total| N["write_file: Anexar orden @SA: para Fase de Arquitectura"]
+    K --> L["write_file: Anexar orden @SA: para Fase de Arquitectura"]
+
+
 ```
 
 ---
@@ -76,7 +76,7 @@ flowchart TD
 | 5 | `write_file` | Guardar el entregable `ux_[ID]_[nombre_corto].md` en `CARPETA_SALIDA` |
 | 6 | `read_file` | **Verificar lectura del archivo recién guardado** (post-escritura) |
 | 7 | `read_file` | Leer el contenido actual del tracker antes de anexar |
-| 8 | `write_file` | Reescribir el tracker anexando la orden `@PM:` o `@SA:` al final |
+| 8 | `write_file` | Reescribir el tracker anexando la orden `@SA:` al final |
 
 ---
 

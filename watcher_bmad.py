@@ -171,22 +171,22 @@ def ejecutar_ciclo_sdd(ruta_hu: str):
     print(f"\n🚀 [SDD Auto-Runner] Iniciando ciclo para: {ruta_hu}")
     try:
         # 1. Specify
-        subprocess.run(f"specify {ruta_hu}", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run(f'agy --dangerously-skip-permissions --print "/speckit.specify {ruta_hu}"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
         
         # 2. Clarify (HITL por Excepción)
-        res_clarify = subprocess.run("specify clarify", shell=True, capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
+        res_clarify = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.clarify"', shell=True, capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
         if "?" in res_clarify.stdout or "ambiguity" in res_clarify.stdout.lower() or res_clarify.returncode != 0:
             print("⚠️ [HITL] Ambigüedad detectada en /speckit.clarify. Pausando para intervención humana.")
             print(res_clarify.stdout)
             return False
 
         # 3. Plan & Tasks
-        subprocess.run("specify plan", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
-        subprocess.run("specify tasks", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run('agy --dangerously-skip-permissions --print "/speckit.plan"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run('agy --dangerously-skip-permissions --print "/speckit.tasks"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
 
         # 4. Analyze (Auditoría Técnica)
         print("🔍 [SDD Auto-Runner] Ejecutando auditoría /speckit.analyze...")
-        res_analyze = subprocess.run("specify analyze", shell=True, cwd=DIRECTORIO_RAIZ)
+        res_analyze = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.analyze"', shell=True, cwd=DIRECTORIO_RAIZ)
         if res_analyze.returncode != 0:
             print("🛑 [HITL] Auditoría fallida. Violación de constitución técnica. Pausando.")
             return False
@@ -410,7 +410,7 @@ def validar_constitucion_gitops():
     const_dir.mkdir(parents=True, exist_ok=True)
     const_path = const_dir / "constitution.md"
     
-    template_path = DIRECTORIO_RAIZ / "utils" / "gitops_constitution_template.md"
+    template_path = DIRECTORIO_RAIZ / "utils" / "gitops-constitution.template.md"
     if not template_path.exists():
         return
         
@@ -461,19 +461,15 @@ def iniciar_watcher():
             print(f"\n📂 Tracker detectado con {len(lineas)} eventos históricos.")
             print(f"Última instrucción registrada:\n>> {ultima_linea}\n")
             
-            # Autoclick skip resume if orphaned for seamless automation
-            if orphaned:
-                 num_lineas_leidas = len(lineas)
-                 print("🔓 Modo Recuperación GitOps: Histórico pre-procesado automáticamente.\n")
+            # Preguntar siempre al usuario si desea reanudar la ejecución (incluso si está en GitOps)
+            respuesta = input("🔄 ¿Deseas reanudar la ejecución desde esta última instrucción? (s/n): ")
+            
+            if respuesta.lower() == 's':
+                num_lineas_leidas = len(lineas) - 1
+                print("🔓 Modo Recuperación: Re-encolando la última tarea...\n")
             else:
-                respuesta = input("🔄 ¿Deseas reanudar la ejecución desde esta última instrucción? (s/n): ")
-                
-                if respuesta.lower() == 's':
-                    num_lineas_leidas = len(lineas) - 1
-                    print("🔓 Modo Recuperación: Re-encolando la última tarea...\n")
-                else:
-                    num_lineas_leidas = len(lineas)
-                    print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
+                num_lineas_leidas = len(lineas)
+                print("🔒 Candado activado: Histórico ignorado. Esperando nuevas instrucciones...\n")
         else:
             num_lineas_leidas = 0
             

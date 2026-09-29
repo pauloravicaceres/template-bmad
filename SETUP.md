@@ -108,3 +108,13 @@ El orquestador detectará tu mensaje, despertará al Business Storyteller y come
 - `python utils/stop_agents.py`: Ejecútalo cuando termines tu día de trabajo para cerrar limpiamente todos los agentes sin dejar procesos colgando en la terminal.
 - `python utils/clean_files.py`: Herramienta de mantenimiento para vaciar los entregables de `/files/` interactivamente si deseas purgar pruebas y volver a empezar.
 
+
+---
+
+## 🛑 Regla de Oro: Principio de Vertical Slicing Estricto
+
+El ecosistema BMAD v2.0 opera bajo un modelo de **Vertical Slicing Estricto** para garantizar la salud del State Ledger y evitar divergencias arquitectónicas.
+
+*   **Prohibición de Desarrollo Horizontal:** Queda estrictamente prohibido abrir o diseñar múltiples Historias de Usuario (HUs) a la vez. No se puede avanzar al diseño de una nueva característica si la anterior no ha cerrado su ciclo.
+*   **Ciclo de Vida de Rebanada Vertical:** Toda HU debe atravesar el ciclo completo antes de iniciar la siguiente: `PM -> BA -> QA -> UX -> SA -> (Fases Técnicas) -> QT -> Retorno a PM`.
+*   **Regla de Ramas GitOps:** Queda terminantemente prohibido que el `@PM` inicie una nueva historia y emita un `GITOPS-BRANCH-CREATE` si la historia anterior no ha sido debidamente compilada y fusionada en el código base principal por el `@QT` mediante `GITOPS-MERGE-CLOSE`.

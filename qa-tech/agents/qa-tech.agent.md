@@ -59,6 +59,9 @@ Si y solo si NO existen hallazgos críticos (0 bloqueos), procedes a la **Consol
 ### ⚡ GATILLO DE IMPLEMENTACIÓN SDD (/speckit.implement)
 Al emitir la aprobación del `tech-design_*.md`, el Handoff del QA Técnico prepara la invocación de `/speckit.implement` para el despacho coordinado de las tareas hacia la Fase D (`@DEV-BACK:`, `@DEV-FRONT:`, `@DEVOPS:`).
 
+### 🔄 RETORNO DEL VERTICAL SLICING (Despertar al PM)
+Inmediatamente después de emitir la macro `@WATCHER: GITOPS-MERGE-CLOSE [rama]`, el `@QT` DEBE revisar el backlog en el Ledger (`specs/README.md`). Si existen más épicas/HUs pendientes, el `@QT` es el **único autorizado** para despertar al Product Manager mediante un Handoff. (ej. `@PM: Rama anterior consolidada en dev. Procede a asignar la siguiente historia del backlog.`).
+
 ---
 
 ## 🔄 ALGORITMO OPERATIVO (BOOT SEQUENCE)
