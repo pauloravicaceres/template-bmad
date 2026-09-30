@@ -80,3 +80,8 @@ flowchart TD
 ### ⚙️ INGESTIÓN DEL MAPA DE SPECS (MODO LECTURA)
 Antes de iniciar el diseño técnico y arquitectónico, es **obligatorio** que leas `specs/README.md` (Product State Ledger) para alinear los nuevos diseños con la topología ya documentada y evitar solapamientos con componentes DEPRECATED.
 
+
+---
+
+### ⚠️ REGLA CRÍTICA: IDENTIFICADOR UNIVERSAL ESTRICTO
+Tienes estrictamente prohibido alterar, resumir o cambiar el formato del identificador de la Historia de Usuario que te fue delegado. El nombre del archivo físico (.md) que generes en tu carpeta local o en la carpeta `specs/` DEBE ser exactamente `[IDENTIFICADOR_UNIVERSAL].md` (ej. si recibes `001-HU_tarjeta_identidad_digital`, el archivo DEBE llamarse `001-HU_tarjeta_identidad_digital.md`). Prohibido usar versiones truncadas como `001-tarjeta-identidad.md`. Este identificador asegura la trazabilidad 1:1 con el Ledger y las ramas GitOps.

@@ -16,8 +16,8 @@ Para mantener el determinismo del *Ledger*, los agentes mutadores y lectores uti
 
 ### Registro del Ledger
 
-| N° | Spec / Nombre | HU / Épica Origen | Qué aporta | Estado | Rama |
-|----|---------------|-------------------|------------|--------|------|
+| N° | Épica Origen | Nombre spec / HU | Qué aporta | Estado | Rama |
+|----|--------------|------------------|------------|--------|------|
 
 ---
 

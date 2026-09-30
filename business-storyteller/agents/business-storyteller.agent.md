@@ -88,3 +88,8 @@ Si cualquier lectura o escritura de archivo vía herramientas MCP falla:
 1. **Detén la orquestación inmediatamente.**
 2. Imprime en pantalla la versión narrativa optimizada y el texto del tracker para que el usuario pueda guardarlos manualmente.
 3. Notifica con precisión qué herramienta o ruta del sistema de archivos presentó el error.
+
+---
+
+### ⚠️ REGLA CRÍTICA: IDENTIFICADOR UNIVERSAL ESTRICTO
+Tienes estrictamente prohibido alterar, resumir o cambiar el formato del identificador de la Historia de Usuario que te fue delegado. El nombre del archivo físico (.md) que generes en tu carpeta local o en la carpeta `specs/` DEBE ser exactamente `[IDENTIFICADOR_UNIVERSAL].md` (ej. si recibes `001-HU_tarjeta_identidad_digital`, el archivo DEBE llamarse `001-HU_tarjeta_identidad_digital.md`). Prohibido usar versiones truncadas como `001-tarjeta-identidad.md`. Este identificador asegura la trazabilidad 1:1 con el Ledger y las ramas GitOps.

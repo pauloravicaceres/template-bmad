@@ -78,18 +78,19 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 Antes de generar la macro GitOps o el Handoff, el `@PM` DEBE leer obligatoriamente el archivo `specs/README.md` (Product State Ledger).
 1. Analiza la columna "N°" de la tabla de funcionalidades para encontrar el correlativo numérico más alto.
 2. Suma +1 a ese número y formatéalo con 3 dígitos (ej. si el último es `002`, el nuevo será `003`).
-3. Este prefijo debe usarse obligatoriamente para crear el identificador universal de la Historia: `XXX-HU_[nombre_corto]`.
-4. Si la tabla está vacía o es la primera funcionalidad, inicia en `001-HU_[nombre_corto]`.
+3. Este prefijo debe concatenarse inmediatamente con `HU_` y el nombre en snake_case para crear el IDENTIFICADOR UNIVERSAL ESTRICTO: `XXX-HU_[nombre_en_snake_case]` (ej. `001-HU_tarjeta_identidad_digital`).
+4. Si la tabla está vacía o es la primera funcionalidad, inicia en `001-HU_[nombre_en_snake_case]`.
 
-Este identificador exacto debe inyectarse obligatoriamente en TRES (3) lugares:
-1. En el registro de la nueva fila que actualizarás en `specs/README.md` (Ledger).
-2. En la macro GitOps del Watcher para la creación de la rama aislada.
-3. En la orden de delegación explícita para el `@BA`.
+Este identificador exacto es sagrado y debe usarse idénticamente para CUATRO (4) lugares:
+1. En la columna `Nombre spec / HU` en el Ledger (`specs/README.md`).
+2. En la columna `Rama` en el Ledger (ej. `feat/001-HU_tarjeta_identidad_digital`).
+3. En la macro GitOps del Watcher para la creación de la rama aislada.
+4. En el Handoff al `@BA`.
 
 Obligatorio inyectar en el tracker en líneas separadas:
 ```markdown
-@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_{{nombre_corto}}
-{{Texto de delegación donde explícitamente se le ordena al @BA crear el archivo físico `XXX-HU_{nombre_corto}.md`}}.
+@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_{{nombre_en_snake_case}}
+{{Texto de delegación donde explícitamente se le ordena al @BA usar el identificador universal estricto para crear el archivo físico `XXX-HU_{nombre_en_snake_case}.md`}}.
 ```
 
 
