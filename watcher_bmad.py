@@ -420,23 +420,23 @@ def gitops_branch_create(branch_name):
         print(f"⚠️ [WATCHER-GIT] Error al crear la rama: {e}")
 
 def gitops_merge_close(branch_name):
-    print(f"\n🔀 [GITOPS] Interceptada macro de fusión (merge-close): {branch_name}")
+    print(f"\n🚀 [GITOPS] Interceptada macro de fusión (merge-close): {branch_name}")
     auto_commit_security()
     
     base_branch = get_base_branch()
-    subprocess.run(["git", "checkout", base_branch], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(["git", "checkout", "-f", base_branch], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
-        subprocess.run(["git", "merge", "--no-ff", branch_name], check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run(["git", "merge", "--no-ff", "--no-edit", branch_name], check=True, cwd=DIRECTORIO_RAIZ)
         subprocess.run(["git", "branch", "-d", branch_name], check=True, cwd=DIRECTORIO_RAIZ)
         print(f"✅ [GITOPS] Fusión exitosa. Rama {branch_name} eliminada.")
     except subprocess.CalledProcessError:
-        print("🚨 [GITOPS] Conflicto de fusión detectado. Abortando merge...")
-        subprocess.run(["git", "merge", "--abort"], cwd=DIRECTORIO_RAIZ)
-        subprocess.run(["git", "checkout", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print("🛑 [GITOPS] Conflicto de fusión detectado. Abortando merge...")
+        subprocess.run(["git", "merge", "--abort"], cwd=DIRECTORIO_RAIZ, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "checkout", "-f", branch_name], cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-            f.write(f"\n@HUMANO: 🚨 ALERTA GITOPS: Conflicto de fusión detectado al intentar cerrar la rama {branch_name}.\nEl Watcher ha abortado el merge por seguridad y se ha detenido.\nPASOS DE RECUPERACIÓN PARA EL HUMANO:\n1. Abre tu terminal y ejecuta manualmente el merge o rebase hacia `dev`.\n2. Resuelve los conflictos en tu editor y haz el commit final.\n3. Vuelve a encender el Watcher (`python watcher_bmad.py`).\nNota: NO necesitas borrar ni agregar ninguna línea en este tracker. El sistema asumirá el cierre exitoso y continuará su operación normal.\n")
-        print(f"🛑 [HITL] Se requiere intervención humana. Pausando el orquestador.")
+            f.write(f"\n@HUMANO: ⚠️ ALERTA GITOPS: Conflicto de fusión detectado al intentar cerrar la rama {branch_name}.\nEl Watcher ha abortado el merge por seguridad y se ha detenido.\nPASOS DE RECUPERACIÓN PARA EL HUMANO:\n1. Abre tu terminal y ejecuta manualmente el merge o rebase hacia dev o main.\n2. Resuelve los conflictos en tu editor y haz el commit final.\n3. Vuelve a encender el Watcher (python watcher_bmad.py).\nNota: NO necesitas borrar ni agregar ninguna línea en este tracker. El sistema asumirá el cierre exitoso y continuará su operación normal.\n")
+        print(f"⏸️ [HITL] Se requiere intervención humana. Pausando el orquestador.")
         sys.exit(1)
 
 def hydration_gitops():
@@ -607,3 +607,4 @@ def iniciar_watcher():
 
 if __name__ == "__main__":
     iniciar_watcher()
+

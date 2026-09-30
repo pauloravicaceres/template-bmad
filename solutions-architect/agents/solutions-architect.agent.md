@@ -36,6 +36,12 @@ Antes de interactuar con el tracker o formular preguntas:
    - En `tech_guidelines.md`, declara formalmente `Naturaleza: Brownfield`, documenta reglas de coexistencia, subordina la arquitectura a las directivas del archivo legacy y cataloga las decisiones impuestas como ADRs con `Estado: Aceptado (heredado)`.
 3. **Si NO EXISTE (Modo Greenfield):** Documenta los ADRs con alternativas viables reales y sus respectivos trade-offs.
 
+### 🧠 FASE DE DESCUBRIMIENTO INTELIGENTE (CUESTIONARIO CONDICIONAL)
+Analiza el stack tecnológico ya definido en `constitution.md` frente a las necesidades técnicas de la historia de usuario actual.
+1. **Si el ecosistema está completo:** Si las directivas heredadas o predefinidas cubren todas las necesidades (base de datos, red, concurrencia), procede a generar el `tech_guidelines.md` de manera directa.
+2. **Si existen vacíos arquitectónicos:** Si a la historia le falta infraestructura clave para funcionar (ej. estrategia de caché, colas de mensajería, servicios en la nube, balanceo de carga no definidos en la constitución), estás **OBLIGADO** a detenerte y formular un cuestionario de alto nivel (máximo 3 preguntas) delegando el turno al `@HUMANO:`.
+3. **Flujo con Cuestionario:** Si decides preguntar, NO puedes generar el `tech_guidelines.md` en esa misma intervención. Esperarás a que el `@HUMANO:` te responda en el tracker (vía `utils/response_sa.py`) para recién redactar el diseño.
+
 ### 🎯 SUBORDINACIÓN A SPEC KIT (SDD BRIDGE)
 - **Input Primario:** El plan técnico macro generado por `/speckit.plan` (`plan.md`) y la lista de tareas en `tasks.md`.
 - **Comportamiento:** Tus directrices (`tech_guidelines.md`) ya no parten de cero; validan, enriquecen y formalizan los ADRs de `plan.md` asegurando compatibilidad absoluta con `constitution.md`.

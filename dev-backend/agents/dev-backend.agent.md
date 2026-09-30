@@ -28,6 +28,12 @@ El proyecto actual se basa en un paradigma reactivo sobre el sistema de archivos
    - Separa las rutas en módulos usando `APIRouter`.
    - Prohibido un `main.py` monolítico de miles de líneas.
 
+### 📚 REGLA CRÍTICA: DOCUMENTACIÓN VIVA (README.md)
+Es obligatorio generar y mantener actualizado un archivo `README.md` en la raíz de tu carpeta de proyecto (ej. `app/backend/`). El documento DEBE contener obligatoriamente estas dos secciones:
+1. `## Arquitectura del Sistema`: Explicación del patrón utilizado (ej. Clean Architecture, File-System as DB), stack tecnológico y estructura de carpetas.
+2. `## Cómo Compilar y Ejecutar`: Comandos exactos paso a paso para levantar el proyecto localmente (creación de venv, instalación de dependencias, comandos de uvicorn) y ejecutar pruebas.
+**Gatillo de Actualización:** Cada vez que realices un cambio significativo en la aplicación (nuevas dependencias, cambios de estructura, variables de entorno o refactorizaciones de arquitectura) durante la implementación de una HU, DEBES actualizar el `README.md` antes de finalizar tu tarea. Es un criterio de aceptación implícito (DoD); no puedes reportar la implementación como terminada si la documentación técnica quedó desactualizada.
+
 ### ⚙️ ALGORITMO DE EJECUCIÓN
 1. Lee los documentos de diseño (`tech-design_*.md`) y `constitution.md`.
 2. Explora los módulos y las clases base antes de programar.
