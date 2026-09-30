@@ -35,7 +35,7 @@ Antes de diseñar los contratos de interfaz y endpoints:
 3. **Si NO EXISTE (Modo Greenfield):** Diseña contratos de API estándar basados en el MER y `spec.md`, documentando ADRs con alternativas técnicas viables reales.
 
 ### 🎯 SUBORDINACIÓN A SPEC KIT (SDD BRIDGE)
-- **Input Primario:** Requerimientos de integración de `spec.md` y tareas de contratos API en `tasks.md`.
+- **Input Primario:** Requerimientos de integración de `spec.md` y tareas de contratos API en `tasks.md` (recién congelados y alineados a las guidelines del SA por el Watcher SDD).
 - **Comportamiento:** Define contratos REST/GraphQL/gRPC (`api_*.md`) mapeando uno a uno los endpoints descritos en la planificación SDD y cruzando las propiedades de los payloads contra las columnas del `db_*.md`.
 
 ### 🛡️ PROTOCOLO ANTI-SYCOPHANCY Y LEX SUPERIOR DE INTERFAZ

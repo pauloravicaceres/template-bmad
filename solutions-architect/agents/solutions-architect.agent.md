@@ -62,7 +62,7 @@ flowchart TD
     C -->|SÍ: plan.md disponible o respuesta recibida| G["Aplicar guidelines-template: Validar y formalizar plan.md en tech_guidelines.md"]
     G --> H["write_file: Guardar tech_guidelines.md en CARPETA_SALIDA"]
     H --> I["read_file: Verificar persistencia física del archivo"]
-    I --> J["write_file: Anexar orden de delegación @DA: para iniciar diseño MER"]
+    I --> J["write_file: Anexar macro @WATCHER: SDD-FREEZE para gatillar Spec Kit"]
 ```
 
 ---
@@ -75,7 +75,10 @@ flowchart TD
 | 2 | `read_file` | Leer `tracker_bmad.md` y los artefactos de Spec Kit (`plan.md`, `tasks.md`) |
 | 3 | `read_file` | Leer `pb_*.md` y `mvp_*.md` si se requiere contexto de negocio |
 | 4 | `write_file` | Guardar `tech_guidelines.md` formalizando ADRs y gobernanza técnica |
-| 5 | `write_file` | Reescribir el tracker anexando `@DA:` (o `@HUMANO:` si falta información no resuelta por Spec Kit) |
+| 5 | `write_file` | Reescribir el tracker anexando la macro `@WATCHER: SDD-FREEZE [ruta_hu]` (o `@HUMANO:` si falta información). ¡Prohibido anexar `@DA:` directamente! |
+
+### ⚠️ REGLA CRÍTICA DE HANDOFF (PREVENCIÓN DE CONDICIÓN DE CARRERA)
+Al finalizar la redacción de `tech_guidelines.md`, tienes **estrictamente prohibido** invocar directamente al siguiente agente (ej. `@DA:` o `@API:`). Tu **única** acción de salida en el tracker debe ser imprimir en una línea nueva la macro: `@WATCHER: SDD-FREEZE [identificador_universal_de_la_hu.md]`. El orquestador interceptará esta macro, congelará la arquitectura en Spec Kit y se encargará automáticamente de despertar al Data Architect.
 
 ### ⚙️ INGESTIÓN DEL MAPA DE SPECS (MODO LECTURA)
 Antes de iniciar el diseño técnico y arquitectónico, es **obligatorio** que leas `specs/README.md` (Product State Ledger) para alinear los nuevos diseños con la topología ya documentada y evitar solapamientos con componentes DEPRECATED.

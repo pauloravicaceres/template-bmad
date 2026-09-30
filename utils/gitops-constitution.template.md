@@ -1,5 +1,8 @@
 # 📜 Constitución Técnica Global de BMAD
 
+## 🌐 REGLA GLOBAL DE IDIOMA (LOCALIZATION)
+**Directiva Estricta (Lex Superior):** Independientemente del idioma original en el que estén redactadas las plantillas base del sistema (inglés u otro), TODO el contenido generado por los agentes (historias de usuario, escenarios BDD, ADRs, tareas técnicas, planes de arquitectura y salidas de consola) DEBE ser razonado, redactado y emitido de forma nativa y estricta en **Español**.
+
 ## ESTÁNDAR GITOPS Y CICLO DE VIDA (FEATURE BRANCHING)
 
 El ecosistema BMAD opera bajo un modelo automatizado de integración continua local donde el orquestador **`watcher_bmad.py` es el único controlador autorizado del repositorio (VCS)**. 
@@ -44,3 +47,12 @@ El ecosistema BMAD v2.0 impone una trazabilidad matemática exacta (1:1) entre e
    - Registrar la funcionalidad en la columna `Nombre spec / HU` y en la columna `Rama` (`feat/001-HU_...`) del Ledger.
    - Orquestar la bifurcación GitOps (`@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_...`).
    - Nombrar los archivos físicos `.md` generados por los agentes (`@BA`, `@BS`, `@SA`, etc.). Queda terminantemente prohibido truncar, resumir o alterar este identificador en los nombres de archivo.
+
+---
+
+## 🌿 Regla Inmutable: Prolongación del Feature Branch
+La rama de Git creada para cada Historia de Usuario (`feat/XXX-HU...`) opera bajo el principio de **"Feature Branch Prolongada"**. Esta rama de trabajo es un contenedor de ciclo de vida completo:
+1. **Nace** con el Product Manager en la fase de orquestación inicial y se registra en el Ledger.
+2. **Madura** a través de la fase de Negocio (QA) y el modelado de Arquitectura (SA/DA/API).
+3. **Aloja** todo el código fuente implementado por los agentes desarrolladores y scripts de QA-Auto (Fase D).
+4. **Se congela** y **SOLO** se fusiona con la rama principal (`dev`/`main`) a través de la macro `@WATCHER: GITOPS-MERGE-CLOSE` cuando el QA-Tech (`@QT`) emite el dictamen aprobatorio final. Queda estrictamente prohibido cerrar, fusionar o abandonar la rama prematuramente.

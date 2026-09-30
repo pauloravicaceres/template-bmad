@@ -164,11 +164,11 @@ def determinar_handoff_fase_a(tracker_path: str, config_path: str = "config_bmad
 
     return "@UX:"
 
-def ejecutar_ciclo_sdd(ruta_hu: str):
+def ejecutar_sdd_fase_negocio(ruta_hu: str):
     """
-    Auto-Runner de GitHub Spec Kit para el framework BMAD.
+    Hito 1 del SDD Auto-Runner: Fase de Negocio (Post-QA).
     """
-    print(f"\n🚀 [SDD Auto-Runner] Iniciando ciclo para: {ruta_hu}")
+    print(f"\n🚀 [SDD Negocio] Iniciando specify/clarify para: {ruta_hu}")
     try:
         # 1. Specify
         subprocess.run(f'agy --dangerously-skip-permissions --print "/speckit.specify {ruta_hu}"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
@@ -180,36 +180,58 @@ def ejecutar_ciclo_sdd(ruta_hu: str):
             print(res_clarify.stdout)
             return False
 
-        # 3. Plan & Tasks
+        # 3. Handoff Dinámico (UX o SA)
+        handoff = determinar_handoff_fase_a(TRACKER_PATH)
+        msg = f"{handoff} La especificación inicial SDD ha concluido con éxito. Procede con tu diseño."
+        
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write(f"\n{msg}\n")
+        print(f"✅ [SDD Negocio] Handoff despachado: {handoff}")
+        return True
+
+    except subprocess.CalledProcessError as e:
+        print(f"❌ [SDD Negocio] Error en subproceso: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ [SDD Negocio] Error inesperado: {e}")
+        return False
+
+def ejecutar_sdd_fase_arquitectura(ruta_hu: str = ""):
+    """
+    Hito 2 del SDD Auto-Runner: Fase de Arquitectura (Post-SA).
+    """
+    print(f"\n🚀 [SDD Arquitectura] Iniciando plan/tasks/analyze...")
+    try:
+        # 1. Plan & Tasks
         subprocess.run('agy --dangerously-skip-permissions --print "/speckit.plan"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
         subprocess.run('agy --dangerously-skip-permissions --print "/speckit.tasks"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
 
-        # 4. Analyze (Auditoría Técnica)
-        print("🔍 [SDD Auto-Runner] Ejecutando auditoría /speckit.analyze...")
+        # 2. Analyze (Auditoría Técnica)
+        print("🔍 [SDD Arquitectura] Ejecutando auditoría /speckit.analyze...")
         res_analyze = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.analyze"', shell=True, cwd=DIRECTORIO_RAIZ)
         if res_analyze.returncode != 0:
             print("🛑 [HITL] Auditoría fallida. Violación de constitución técnica. Pausando.")
             return False
 
-        # 5. Spec Freeze Automático
-        print("❄️ [Spec Freeze] Congelando especificación...")
+        # 3. Spec Freeze Automático
+        print("❄️ [Spec Freeze] Congelando especificación (Plan & Tasks)...")
         subprocess.run("git add .specify/", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
-        subprocess.run(['git', 'commit', '-m', f"spec: [SPEC-FREEZE] Ciclo SDD automático completado"], check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run(['git', 'commit', '-m', f"spec: [SPEC-FREEZE] Ciclo SDD Arquitectura completado"], check=True, cwd=DIRECTORIO_RAIZ)
         
-        # 6. Handoff Dinámico
-        handoff = determinar_handoff_fase_a(TRACKER_PATH)
-        msg = f"{handoff} El ciclo SDD ha concluido con éxito. Procede con el diseño de arquitectura."
+        # 4. Handoff a DA
+        handoff = "@DA:"
+        msg = f"{handoff} El plan técnico y las tareas han sido congeladas. Procede con el diseño de persistencia basándote en los nuevos archivos."
         
         with open(TRACKER_PATH, "a", encoding="utf-8") as f:
             f.write(f"\n{msg}\n")
-        print(f"✅ [SDD Auto-Runner] Handoff despachado: {handoff}")
+        print(f"✅ [SDD Arquitectura] Handoff despachado: {handoff}")
         return True
 
     except subprocess.CalledProcessError as e:
-        print(f"❌ [SDD Auto-Runner] Error en subproceso: {e}")
+        print(f"❌ [SDD Arquitectura] Error en subproceso: {e}")
         return False
     except Exception as e:
-        print(f"❌ [SDD Auto-Runner] Error inesperado: {e}")
+        print(f"❌ [SDD Arquitectura] Error inesperado: {e}")
         return False
 
 def extraer_instrucciones(linea):
@@ -246,7 +268,7 @@ def extraer_instrucciones(linea):
             return []
 
     # ==========================================
-    # SDD GATEKEEPER: Intercepción de Aprobación de QA Documental
+    # SDD GATEKEEPER 1: Intercepción de Aprobación de QA Documental (Negocio)
     # ==========================================
     linea_lower = linea.lower()
     es_transicion_a_arquitectura = "@UX:" in linea or "@SA:" in linea
@@ -260,7 +282,7 @@ def extraer_instrucciones(linea):
 
     if es_transicion_a_arquitectura and es_aprobacion_qa:
         print("\n" + "=" * 80)
-        print("🛑 [PAUSA SDD INTERCEPTADA] CERTIFICADO QA DOCUMENTAL REGISTRADO")
+        print("🛑 [PAUSA SDD INTERCEPTADA - NEGOCIO] CERTIFICADO QA REGISTRADO")
         print("=" * 80)
         
         # Buscar la ruta de la HU en el mensaje
@@ -268,17 +290,35 @@ def extraer_instrucciones(linea):
         if match_hu:
             nombre_hu = match_hu.group(1)
             ruta_hu = f"files/business-analyst/{nombre_hu}"
-            print(f"El agente 'qa-documental' ha emitido la aprobación. Iniciando SDD Auto-Runner para: {ruta_hu}\n")
+            print(f"Iniciando SDD Fase de Negocio para: {ruta_hu}\n")
             
-            exito = ejecutar_ciclo_sdd(ruta_hu)
+            exito = ejecutar_sdd_fase_negocio(ruta_hu)
             if not exito:
-                print("🛑 [HITL] Fallo o ambigüedad en SDD Auto-Runner. Pausando el orquestador.")
+                print("🛑 [HITL] Fallo o ambigüedad en SDD Negocio. Pausando el orquestador.")
                 print("Resuelva manualmente y use utils/approve_step.py para reanudar.")
         else:
             print("⚠️ No se pudo extraer la ruta de la HU del mensaje de aprobación.")
-            print("El avance automático hacia UX / Arquitectura ha sido DETENIDO.")
             print("Ejecute Spec Kit manualmente y use utils/approve_step.py para reanudar.")
             
+        print("=" * 80 + "\n")
+        return []
+
+    # ==========================================
+    # SDD GATEKEEPER 2: Intercepción de SA (Arquitectura)
+    # ==========================================
+    if "@watcher: sdd-freeze" in linea_lower:
+        print("\n" + "=" * 80)
+        print("🛑 [PAUSA SDD INTERCEPTADA - ARQUITECTURA] GUIDELINES SA REGISTRADOS")
+        print("=" * 80)
+        
+        match_hu = re.search(r'((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
+        ruta_hu = match_hu.group(1) if match_hu else ""
+        
+        print(f"Iniciando SDD Fase de Arquitectura...\n")
+        exito = ejecutar_sdd_fase_arquitectura(ruta_hu)
+        if not exito:
+            print("🛑 [HITL] Fallo en SDD Arquitectura. Pausando el orquestador.")
+            print("Resuelva manualmente y envíe un handoff a @DA: para reanudar.")
         print("=" * 80 + "\n")
         return []
 

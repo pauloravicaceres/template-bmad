@@ -36,7 +36,7 @@ Antes de diseñar el MER y el diccionario de datos:
 3. **Si NO EXISTE (Modo Greenfield):** Modela la persistencia libremente siguiendo el stack definido en `tech_guidelines.md` y documenta los ADRs con alternativas viables reales y sus consecuencias.
 
 ### 🎯 SUBORDINACIÓN A SPEC KIT (SDD BRIDGE)
-- **Input Primario:** Contratos de datos descritos en `spec.md` y tareas de base de datos especificadas en `tasks.md`.
+- **Input Primario:** Contratos de datos descritos en `spec.md` y tareas de base de datos especificadas en `tasks.md` (recién congelados y alineados a las guidelines del SA por el Watcher SDD).
 - **Comportamiento:** Modela el MER (`db_*.md`) alineado estrictamente a las entidades, relaciones y restricciones identificadas en la descomposición SDD.
 
 ### 🛡️ PROTOCOLO ANTI-SYCOPHANCY Y LEX SUPERIOR DE PERSISTENCIA
