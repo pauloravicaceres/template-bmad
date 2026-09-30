@@ -26,7 +26,7 @@ def copy_template(target_dir):
         "business-storyteller", "product-analyst", "product-manager", "business-analyst",
         "qa-documental", "designer-ux", "solutions-architect", "data-architect",
         "api-architect", "qa-tech", "dev-backend", "dev-frontend", "qa-auto",
-        "code-review", "devops", "skills", "utils", ".specify", ".github"
+        "code-review", "devops", "skills", "utils", ".specify", ".github", "app"
     ]
 
     archivos_permitidos = [

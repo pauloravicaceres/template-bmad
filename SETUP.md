@@ -22,7 +22,7 @@ Para instanciar un proyecto limpio sin arrastrar configuraciones legacy, basura,
 
 En tu terminal (estando dentro de la carpeta `template-bmad`), ejecuta:
 ```bash
-python utils/clone_template.py "D:\ruta\a\mi-nuevo-proyecto"
+python3.14 utils/clone_template.py "D:\ruta\a\mi-nuevo-proyecto"
 ```
 > **¿Qué hace este script?** Utiliza un enfoque de "Lista Blanca" para copiar exclusivamente las 15 carpetas de agentes, el motor orquestador (`watcher_bmad.py`), las herramientas (`utils/`, `skills/`), y la infraestructura de Spec Kit (`.specify/`). Ignorará automáticamente la carpeta `.git/`, la carpeta `files/` y cualquier archivo Markdown residual.
 
@@ -44,7 +44,7 @@ En lugar de reconfigurar rutas absolutas manualmente, el framework incluye un sc
 ### Paso 3: Ejecutar `init_bmad.py`
 En la raíz de tu nuevo proyecto, ejecuta:
 ```bash
-python init_bmad.py "Nombre de Mi Sistema"
+python3.14 init_bmad.py "Nombre de Mi Sistema"
 ```
 **¿Qué hace este script?**
 - Crea las carpetas de salida en `/files/` para los 15 agentes.
@@ -75,14 +75,14 @@ El orquestador de BMAD ya no exige selección manual de ramas. Gracias al nuevo 
 
 Abre una terminal en la raíz de tu proyecto y ejecuta:
 ```bash
-python watcher_bmad.py
+python3.14 watcher_bmad.py
 ```
 *(El Watcher compilará las skills en `AGENTS.md`, realizará State Hydration para recuperar operaciones inconclusas, y quedará escuchando indefinidamente. Las ramas aisladas `feat/HU_...` se crearán automáticamente durante el ciclo de vida del tracker).*
 
 ### Paso 7: Levantar la Interfaz de Agentes (Herdr)
 Abre una **segunda terminal** en la raíz del proyecto. Aquí encenderemos a los 15 agentes divididos en 3 pestañas temáticas.
 ```bash
-python utils/start_agents.py
+python3.14 utils/start_agents.py
 ```
 *(Verás cómo los paneles se abren y los agentes quedan a la espera).*
 
@@ -104,9 +104,9 @@ El orquestador detectará tu mensaje, despertará al Business Storyteller y come
 
 ### 🧯 Comandos de Utilidad Diaria (`/utils`)
 
-- `python utils/approve_step.py`: Úsalo cuando el framework te etiquete (`@HUMANO:`) pidiendo aprobación para transicionar de fase (HITL) o si ocurre una ambigüedad en el Spec-Driven Development.
-- `python utils/stop_agents.py`: Ejecútalo cuando termines tu día de trabajo para cerrar limpiamente todos los agentes sin dejar procesos colgando en la terminal.
-- `python utils/clean_files.py`: Herramienta de mantenimiento para vaciar los entregables de `/files/` interactivamente si deseas purgar pruebas y volver a empezar.
+- `python3.14 utils/approve_step.py`: Úsalo cuando el framework te etiquete (`@HUMANO:`) pidiendo aprobación para transicionar de fase (HITL) o si ocurre una ambigüedad en el Spec-Driven Development.
+- `python3.14 utils/stop_agents.py`: Ejecútalo cuando termines tu día de trabajo para cerrar limpiamente todos los agentes sin dejar procesos colgando en la terminal.
+- `python3.14 utils/clean_files.py`: Herramienta de mantenimiento para vaciar los entregables de `/files/` interactivamente si deseas purgar pruebas y volver a empezar.
 
 
 ---

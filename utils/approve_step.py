@@ -212,7 +212,17 @@ def main():
             
         print("\n✅ Aprobación registrada con éxito en el tracker.")
         print(f"📝 Se ha añadido al bus de eventos:\n>> {mensaje_final}\n")
-        print("🚀 El Watcher detectará este evento y activará al siguiente agente automáticamente.")
+        
+        # Intercepción para auto-gatillar Spec Kit Implement
+        if opcion == "10":
+            print("\n🚀 [Auto-Runner] Lanzando '/speckit.implement' automáticamente hacia la Fase D...")
+            try:
+                subprocess.run('agy --dangerously-skip-permissions --print "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+                print("\n✅ Implementación despachada con éxito. Los agentes desarrolladores tomarán el control.")
+            except subprocess.CalledProcessError as e:
+                print(f"\n❌ Error al intentar ejecutar /speckit.implement: {e}")
+        else:
+            print("🚀 El Watcher detectará este evento y activará al siguiente agente automáticamente.")
     else:
         print("\n🛑 Aprobación cancelada. El flujo permanece en pausa HITL segura.")
 

@@ -1,7 +1,8 @@
 # 📜 Constitución Técnica Global de BMAD
 
-## 🌐 REGLA GLOBAL DE IDIOMA (LOCALIZATION)
-**Directiva Estricta (Lex Superior):** Independientemente del idioma original en el que estén redactadas las plantillas base del sistema (inglés u otro), TODO el contenido generado por los agentes (historias de usuario, escenarios BDD, ADRs, tareas técnicas, planes de arquitectura y salidas de consola) DEBE ser razonado, redactado y emitido de forma nativa y estricta en **Español**.
+## 🌐 REGLAS DE COMPORTAMIENTO Y LOCALIZATION (LEX SUPERIOR)
+1. **Idioma Estricto:** Independientemente del idioma original en el que estén redactadas las plantillas base del sistema, TODO el contenido generado (escenarios BDD, ADRs, tareas técnicas) DEBE redactarse en **Español**.
+2. **Modo Máquina (Anti-Conversacional):** Tienes ESTRICTAMENTE PROHIBIDO actuar de forma conversacional. Nunca saludes, nunca te despidas, ni ofrezcas ayuda adicional. No hagas preguntas al usuario al finalizar una tarea (ej. prohibido preguntar "¿Te gustaría que asuma el rol de...?"). Limítate a emitir el contenido técnico requerido como un compilador silencioso.
 
 ## ESTÁNDAR GITOPS Y CICLO DE VIDA (FEATURE BRANCHING)
 
@@ -56,3 +57,12 @@ La rama de Git creada para cada Historia de Usuario (`feat/XXX-HU...`) opera baj
 2. **Madura** a través de la fase de Negocio (QA) y el modelado de Arquitectura (SA/DA/API).
 3. **Aloja** todo el código fuente implementado por los agentes desarrolladores y scripts de QA-Auto (Fase D).
 4. **Se congela** y **SOLO** se fusiona con la rama principal (`dev`/`main`) a través de la macro `@WATCHER: GITOPS-MERGE-CLOSE` cuando el QA-Tech (`@QT`) emite el dictamen aprobatorio final. Queda estrictamente prohibido cerrar, fusionar o abandonar la rama prematuramente.
+
+---
+
+## 📁 ESTRUCTURA DE CARPETAS DEL REPOSITORIO (WORKSPACE)
+Para mantener un orden estricto y evitar archivos dispersos en la raíz del proyecto, todos los agentes constructores (Spec-Kit, `@DEV-BACK`, `@DEV-FRONT`, `@QA-AUTO`) deben respetar la siguiente partición física:
+1. **Backend:** Todo el código fuente, pruebas, configuraciones y binarios correspondientes al lado del servidor (API, persistencia, lógica de negocio) DEBEN generarse y residir exclusivamente dentro de la carpeta `app/backend/`.
+2. **Frontend:** Todo el código fuente, componentes UI, assets y configuraciones del cliente (SPA, interfaces) DEBEN generarse y residir exclusivamente dentro de la carpeta `app/frontend/`.
+
+> **Directiva de Handoff:** Cuando los agentes planificadores (`@SA`, `@QT`, Spec-Kit) generen el `plan.md`, `tasks.md` o el `tech-design_*.md`, las rutas físicas propuestas para cada archivo deben estar obligatoriamente prefijadas con `app/backend/` o `app/frontend/` según corresponda. Ningún archivo de código de producción debe crearse en la raíz del repositorio.

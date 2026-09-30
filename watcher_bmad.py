@@ -171,9 +171,13 @@ def ejecutar_sdd_fase_negocio(ruta_hu: str):
     print(f"\n🚀 [SDD Negocio] Iniciando specify/clarify para: {ruta_hu}")
     try:
         # 1. Specify
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Ejecutando análisis funcional (/speckit.specify)...\n")
         subprocess.run(f'agy --dangerously-skip-permissions --print "/speckit.specify {ruta_hu}"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
         
         # 2. Clarify (HITL por Excepción)
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Verificando ambigüedades (/speckit.clarify)...\n")
         res_clarify = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.clarify"', shell=True, capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
         if "?" in res_clarify.stdout or "ambiguity" in res_clarify.stdout.lower() or res_clarify.returncode != 0:
             print("⚠️ [HITL] Ambigüedad detectada en /speckit.clarify. Pausando para intervención humana.")
@@ -203,11 +207,18 @@ def ejecutar_sdd_fase_arquitectura(ruta_hu: str = ""):
     print(f"\n🚀 [SDD Arquitectura] Iniciando plan/tasks/analyze...")
     try:
         # 1. Plan & Tasks
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Estructurando plan de arquitectura técnica (/speckit.plan)...\n")
         subprocess.run('agy --dangerously-skip-permissions --print "/speckit.plan"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Desglosando tareas de implementación (/speckit.tasks)...\n")
         subprocess.run('agy --dangerously-skip-permissions --print "/speckit.tasks"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
 
         # 2. Analyze (Auditoría Técnica)
         print("🔍 [SDD Arquitectura] Ejecutando auditoría /speckit.analyze...")
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Ejecutando auditoría técnica (/speckit.analyze)...\n")
         res_analyze = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.analyze"', shell=True, cwd=DIRECTORIO_RAIZ)
         if res_analyze.returncode != 0:
             print("🛑 [HITL] Auditoría fallida. Violación de constitución técnica. Pausando.")
@@ -215,8 +226,9 @@ def ejecutar_sdd_fase_arquitectura(ruta_hu: str = ""):
 
         # 3. Spec Freeze Automático
         print("❄️ [Spec Freeze] Congelando especificación (Plan & Tasks)...")
-        subprocess.run("git add .specify/", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
-        subprocess.run(['git', 'commit', '-m', f"spec: [SPEC-FREEZE] Ciclo SDD Arquitectura completado"], check=True, cwd=DIRECTORIO_RAIZ)
+        subprocess.run("git add specs/ .specify/", shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+        # Asegurar que el commit no falle si no hay cambios (permitir empty si es necesario, pero agregando specs/ debería haberlos)
+        subprocess.run(['git', 'commit', '-m', f"spec: [SPEC-FREEZE] Ciclo SDD Arquitectura completado"], check=False, cwd=DIRECTORIO_RAIZ)
         
         # 4. Handoff a DA
         handoff = "@DA:"
