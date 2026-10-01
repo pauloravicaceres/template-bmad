@@ -52,16 +52,16 @@ APPROVAL_CONFIG = {
         "message": "@QA: La Historia de Usuario ha sido revisada en el archivo {file}. Por favor, procede con la auditoría documental contra el Product Brief."
     },
     "5": {
-        "name": "Spec Kit (SDD Bridge / analyze) -> UX [Diseño de Interfaces]",
+        "name": "Spec Kit (SDD Bridge / clarify) -> UX [Diseño de Interfaces]",
         "folder": "qa-documental",
-        "file_regex": r"(tasks\.md|spec\.md|aprobado_qa_[\w_]+\.md)",
-        "message": "@UX: El ciclo SDD (/specify -> /plan -> /tasks -> /analyze) ha concluido con éxito. Procede con el diseño visual y wireframes tomando como Fuente de la Verdad los artefactos tasks.md y spec.md."
+        "file_regex": r"(requirements\.md|spec\.md|aprobado_qa_[\w_]+\.md)",
+        "message": "@UX: El ciclo SDD (/specify -> /clarify) ha concluido con éxito. Procede con el diseño visual y wireframes tomando como Fuente de la Verdad los artefactos spec.md y requirements.md."
     },
     "6": {
-        "name": "Spec Kit (SDD Bridge / analyze) -> SA [Bypass Headless]",
+        "name": "Spec Kit (SDD Bridge / clarify) -> SA [Bypass Headless]",
         "folder": "qa-documental",
-        "file_regex": r"(tasks\.md|plan\.md|aprobado_qa_[\w_]+\.md)",
-        "message": "@SA: El ciclo SDD ha concluido con éxito. Al ser un proyecto Headless, el diseño UX se omite. Procede con las directrices de arquitectura técnica basadas en tasks.md y plan.md."
+        "file_regex": r"(requirements\.md|spec\.md|aprobado_qa_[\w_]+\.md)",
+        "message": "@SA: El ciclo SDD (/specify -> /clarify) ha concluido con éxito. Al ser un proyecto Headless, el diseño UX se omite. Procede con las directrices de arquitectura técnica basadas en spec.md y requirements.md."
     },
     "7": {
         "name": "Designer UX (UX) -> Siguiente Épica hacia PM",
@@ -88,13 +88,19 @@ APPROVAL_CONFIG = {
         "message": "@SPEC-KIT: La arquitectura técnica ha sido compilada y aprobada en {file}. Gatillar /speckit.implement para despacho de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS)."
     },
     "11": {
-        "name": "QA Técnico (QT) -> Despacho Directo Backend (@DEV-BACK:) [Fallback]",
+        "name": "QA Técnico (QT) -> Despacho Directo Backend (@DEV-BACK:) [Enjambre Clásico BMAD]",
         "folder": "qa-tech",
         "file_regex": r"(tech-design_[\w_]+\.md)",
         "message": "@DEV-BACK: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Backend según los contratos y directrices arquitectónicas vigentes."
     },
+    "11b": {
+        "name": "QA Técnico (QT) -> Despacho Paralelo Full-Stack (@DEV-BACK y @DEV-FRONT) [Fork-Join BMAD]",
+        "folder": "qa-tech",
+        "file_regex": r"(tech-design_[\w_]+\.md)",
+        "message": "@DEV-BACK: La arquitectura técnica ha sido validada. Inicia la implementación del Backend.\n@DEV-FRONT: La arquitectura técnica ha sido validada. Inicia la implementación del Frontend."
+    },
     "12": {
-        "name": "QA Técnico (QT) -> Despacho Directo Frontend (@DEV-FRONT:) [Fallback]",
+        "name": "QA Técnico (QT) -> Despacho Directo Frontend (@DEV-FRONT:) [Enjambre Clásico BMAD]",
         "folder": "qa-tech",
         "file_regex": r"(tech-design_[\w_]+\.md)",
         "message": "@DEV-FRONT: La arquitectura técnica consolidada ha sido verificada y aprobada formalmente en el archivo {file}. Procede con la implementación del Frontend según el diseño UX y los contratos de integración vigentes."

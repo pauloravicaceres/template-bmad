@@ -119,7 +119,7 @@ def guardar_historial(agente_id, instruccion):
 
 def obtener_info_agente(nombre_agente):
     try:
-        resultado = subprocess.run("herdr agent list", shell=True, capture_output=True, text=True)
+        resultado = subprocess.run("herdr agent list", shell=True, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if resultado.returncode != 0:
             return None, None
 
@@ -178,7 +178,7 @@ def ejecutar_sdd_fase_negocio(ruta_hu: str):
         # 2. Clarify (HITL por Excepción)
         with open(TRACKER_PATH, "a", encoding="utf-8") as f:
             f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Verificando ambigüedades (/speckit.clarify)...\n")
-        res_clarify = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.clarify"', shell=True, capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
+        res_clarify = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.clarify"', shell=True, capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=DIRECTORIO_RAIZ)
         if "?" in res_clarify.stdout or "ambiguity" in res_clarify.stdout.lower() or res_clarify.returncode != 0:
             print("⚠️ [HITL] Ambigüedad detectada en /speckit.clarify. Pausando para intervención humana.")
             print(res_clarify.stdout)
@@ -367,14 +367,14 @@ def extraer_instrucciones(linea):
 # ==========================================
 def get_current_branch():
     try:
-        result = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, check=True, cwd=DIRECTORIO_RAIZ)
+        result = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, encoding="utf-8", errors="replace", check=True, cwd=DIRECTORIO_RAIZ)
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return None
 
 def get_all_branches():
     try:
-        result = subprocess.run(["git", "branch", "--format=%(refname:short)"], capture_output=True, text=True, check=True, cwd=DIRECTORIO_RAIZ)
+        result = subprocess.run(["git", "branch", "--format=%(refname:short)"], capture_output=True, text=True, encoding="utf-8", errors="replace", check=True, cwd=DIRECTORIO_RAIZ)
         return [b for b in result.stdout.split('\n') if b.strip()]
     except subprocess.CalledProcessError:
         return []
@@ -390,7 +390,7 @@ def get_base_branch():
     return "main"
 
 def check_working_directory_clean():
-    res = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
+    res = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=DIRECTORIO_RAIZ)
     return len(res.stdout.strip()) == 0
 
 def auto_commit_security():
@@ -409,7 +409,7 @@ def gitops_branch_create(branch_name):
         subprocess.run(["git", "checkout", base_branch], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
     try:
-        existing = subprocess.run(["git", "branch", "--list", branch_name], capture_output=True, text=True, cwd=DIRECTORIO_RAIZ)
+        existing = subprocess.run(["git", "branch", "--list", branch_name], capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=DIRECTORIO_RAIZ)
         if existing.stdout.strip() and branch_name in existing.stdout:
             subprocess.run(["git", "checkout", branch_name], check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"✅ [GITOPS] Rama {branch_name} existente reactivada.")
@@ -607,4 +607,5 @@ def iniciar_watcher():
 
 if __name__ == "__main__":
     iniciar_watcher()
+
 

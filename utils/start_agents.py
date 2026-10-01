@@ -169,9 +169,9 @@ def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
         "--kind", "agy",
         "--pane", pane_id,
         "--", 
+        "--dangerously-skip-permissions",
         "--add-dir", str(WORKSPACE_DIR),
         "--model", modelo_final,
-        #"--agent", f"agents/{nombre_agente}.agent.md"
         "--agent", "AGENTS.md" 
     ]
     

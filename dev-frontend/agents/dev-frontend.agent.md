@@ -37,6 +37,7 @@ Es obligatorio generar y mantener actualizado un archivo `README.md` en la raíz
    - `server/api/` para endpoints de Nitro (BFF) si la arquitectura lo exige.
 4. Reporta en el tracker los componentes/páginas generadas con éxito.
 5. Ejecuta un commit atómico local: `git add {archivos_generados}` y `git commit -m "feat({scope}): {descripcion} [{TASK-ID}]"`.
+6. Al terminar tu implementación, realiza el handoff emitiendo obligatoriamente la etiqueta `@QA-AUTO: Frontend implementado para la HU-XXX`.
 
 [IMPORT_SKILL: skills/git-commit/SKILL.md]
 

@@ -40,6 +40,7 @@ Es obligatorio generar y mantener actualizado un archivo `README.md` en la raíz
 3. Utiliza `write_file` para generar el código.
 4. Reporta en el tracker los archivos generados con éxito.
 5. Ejecuta un commit atómico local: `git add {archivos_generados}` y `git commit -m "feat({scope}): {descripcion} [{TASK-ID}]"`.
+6. Al terminar tu implementación, realiza el handoff emitiendo obligatoriamente la etiqueta `@QA-AUTO: Backend implementado para la HU-XXX`.
 
 [IMPORT_SKILL: skills/git-commit/SKILL.md]
 
