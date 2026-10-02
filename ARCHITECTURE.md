@@ -1,4 +1,4 @@
-# 🏛️ BMAD Multi-Agent Ecosystem — Arquitectura Técnica Detallada
+﻿# 🏛️ BMAD Multi-Agent Ecosystem — Arquitectura Técnica Detallada
 
 > **Nota Preliminar:** Para la visión estratégica del ecosistema, el motor Git Headless y la filosofía operativa del SDD Auto-Runner, consulta el documento maestro **[`framework_bmad.md`](./framework_bmad.md)**.
 > Este documento se enfoca exclusivamente en la topología de almacenamiento físico, la gestión de estado de los artefactos, los mecanismos de resiliencia del orquestador Python y la especificación del cartucho de Fase D.
@@ -115,19 +115,12 @@ sequenceDiagram
     Herdr->>T: @SA genera Guidelines -> @DA genera MER -> @API genera Contratos -> @QT compila TDD
     Herdr->>T: @QT emite @SPEC-KIT:
     
-    Note over W, Herdr: Gatillo de Implementación Headless
-    Herdr->>Herdr: Invocación CLI `/speckit.implement`
-    
-    par Despacho Paralelo Fase D
-        W->>Herdr: herdr pane run [@DEV-BACK:]
-        Herdr->>G: git add . && git commit -m "feat: Backend Task"
-    and
-        W->>Herdr: herdr pane run [@DEV-FRONT:]
-        Herdr->>G: git add . && git commit -m "feat: Frontend Task"
-    and
-        W->>Herdr: herdr pane run [@DEVOPS:]
-        Herdr->>G: git add . && git commit -m "infra: Docker config"
-    end
+    Note over W, S: Gatillo de Implementación Headless (Fase D)
+    W->>W: Soul Mounting (@DEV-BACK) a .specify/memory/
+    W->>S: Ejecuta `/speckit.implement` (Backend)
+    W->>W: Soul Mounting (@DEV-FRONT) a .specify/memory/
+    W->>S: Ejecuta `/speckit.implement` (Frontend)
+    W->>T: Emite Handoff a @CODE-REVIEW y @QA-AUTO
 
     W->>Herdr: herdr pane run [@QA-AUTO:]
     Herdr->>G: git commit -m "test: Automatización BDD"
@@ -225,6 +218,6 @@ El orquestador BMAD implementa un "Two-Stage Gatekeeper" para fraccionar la ejec
 
 *   **Compuerta 1 (Negocio):** Al recibir la aprobación del `@QA` (QA Documental), el Watcher intercepta la ejecución para lanzar de forma independiente `/speckit.specify` y `/speckit.clarify`. Esto detalla funcionalmente el comportamiento sin inferir el stack.
 *   **Compuerta 2 (Arquitectura):** Tras el diseño de gobernanza del `@SA` (Solutions Architect), este agente emite la macro `@WATCHER: SDD-FREEZE`. El orquestador pausa el flujo nuevamente y ejecuta `/speckit.plan`, `/speckit.tasks` y `/speckit.analyze`. En esta fase, Spec-Kit asimila las guidelines inyectadas por el Arquitecto para generar un plan técnico realista y congelarlo (`[SPEC-FREEZE]`).
-*   **Compuerta 3 (Implementación / HITL):** Tras la compilación del Tech Design maestro por el `@QT` (QA Tech), el flujo sufre una última pausa humana. El usuario puede optar por **delegar a Antigravity (Opción 10)** para autogatillar `/speckit.implement`, o **despachar a los agentes clásicos de Herdr** (Backend/Frontend) utilizando las opciones de `approve_step.py`. Si elige el Despacho Paralelo Full-Stack (Opción 11b), el orquestador implementa un patrón **Fork-Join**: despacha asíncronamente a los desarrolladores en paralelo, y el agente `@QA-AUTO` actúa como barrera de sincronización, esperando que AMBOS finalicen antes de iniciar las pruebas.
+*   **Compuerta 3 (Implementación):** Tras la compilación del Tech Design maestro por el `@QT` (QA Tech), este emite la señal `@SPEC-KIT:`. El Watcher intercepta esta señal y ejecuta de manera totalmente aislada y secuencial la Fase D. Mediante la inyección de la "Tarea Fantasma", SpecKit programa bajo la identidad del agente y, obligatoriamente, debe generar y actualizar la documentación de **Arquitectura Viva** antes de devolver el control y hacer handoff a `@CODE-REVIEW`.
 
 > **Nota Operativa:** Durante el desarrollo asistido, el usuario notará que el Watcher (`watcher_bmad.py`) detiene el avance automático en estos dos hitos exactos de la línea de tiempo, delegando silenciosamente la ejecución hacia el puente SDD antes de reanudar el Handoff hacia los desarrolladores.

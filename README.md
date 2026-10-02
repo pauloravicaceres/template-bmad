@@ -1,4 +1,4 @@
-# 🏛️ Ecosistema Multi-Agente BMAD v2.0 (con SDD y Herdr)
+﻿# 🏛️ Ecosistema Multi-Agente BMAD v2.0 (con SDD y Herdr)
 
 > Framework y plugin organizacional para la definición integral, autónoma y desacoplada de software bajo metodología BMAD (Business, Management, Architecture, Development). Orquestado sobre terminales independientes en **Herdr**, automatización Git Headless y herramientas MCP.
 
@@ -43,6 +43,26 @@ La carpeta `utils/` contiene los scripts operativos que le dan al humano el cont
 | **`delete_agents.py`** | Limpiador del Meta-Agente. Borra los archivos `AGENTS.md` compilados dinámicamente para forzar al orquestador a re-inyectar las skills (`[IMPORT_SKILL]`) en el siguiente arranque. |
 | **`response_sa.py`** | Herramienta de *mocking* o debugging interno utilizada para simular las respuestas del Arquitecto de Soluciones y destrabar cuellos de botella en la fase de pruebas de handoff. |
 
+---
+
+## 🔧 Ejecución Manual de Agentes DEV (Modo Fallback / Micro-mantenimiento)
+
+Por diseño arquitectónico (BMAD v2.0), el script `utils/start_agents.py` **no inicia** terminales interactivas para los desarrolladores (`@DEV-BACK` y `@DEV-FRONT`). La Fase D masiva es asimilada al 100% por el motor de ejecución automatizada (`/speckit.implement`) mediante la técnica de *Soul Mounting*.
+
+Sin embargo, si necesitas realizar micro-ajustes rápidos, refactorizaciones menores o correcciones puntuales ignorando el flujo pesado de SpecKit (por ejemplo: `@DEV-FRONT: cambia el color de este botón`), debes instanciar al agente en su propia terminal.
+
+**Para despertar a un DEV manualmente en Herdr:**
+
+1. Selecciona la pestaña de "Desarrollo y Delivery" en la UI de Herdr.
+2. Abre un panel nuevo apuntando al directorio del agente:
+   ```bash
+   herdr pane split --direction right --cwd dev-frontend
+   ```
+3. Ejecuta el agente con su "Alma" (Archivo de Reglas Maestro) inyectada:
+   ```bash
+   herdr agent start dev-frontend --kind agy -- --dangerously-skip-permissions --add-dir . --agent AGENTS.md
+   ```
+*(Sustituye `dev-frontend` por `dev-backend` según corresponda). Una vez en línea, el orquestador (`watcher_bmad.py`) o tú mismo podrán despacharle instrucciones directas.*
 ---
 
 ## 🌟 Características Fundamentales

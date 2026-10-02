@@ -1,4 +1,4 @@
-# Arquitectura de Cartucho Intercambiable (Pluggable Phase D)
+﻿# Arquitectura de Cartucho Intercambiable (Pluggable Phase D)
 
 > **Principio de Diseño BMAD:** El framework central, el ciclo de vida metodológico y el motor de orquestación en Python son **100% agnósticos de tecnología**. La Fase D (Ingeniería de Software y Entrega) opera como un **Cartucho Intercambiable (Plug & Play)** que puede acoplarse y desacoplarse a cualquier ecosistema tecnológico sin alterar el flujo general.
 
@@ -86,16 +86,10 @@ Dentro de las carpetas de los 5 agentes de la Fase D, actualiza o adapta sus arc
 - `devops/instructions/`: Adapta los Dockerfiles multi-stage para compilar los nuevos artefactos (ej. JAR, wheels, binarios estáticos).
 
 ### Paso 3: Cero Modificaciones en el Motor de Orquestación
-El motor Python (`watcher_bmad.py`, `utils/approve_step.py`, `utils/start_agents.py`):
-- **Permanece intacto**: El enrutamiento depende exclusivamente de los tags canónicos abstractos:
-  - `@DEV-BACK:`
-  - `@DEV-FRONT:`
-  - `@QA-AUTO:`
-  - `@CODE-REVIEW:`
-  - `@DEVOPS:`
-- Los agentes se comunican por el tracker exactamente de la misma forma, independientemente de si compilan C#, Java, TypeScript, Python o Rust.
-
----
+El motor Python (watcher_bmad.py):
+- **Permanece intacto**: El orquestador depende exclusivamente de la señal @SPEC-KIT: emitida por QA-Tech.
+- Al activarse, aplica la técnica de **Montaje de Alma (Soul Mounting)**: lee el cartucho tecnológico que hayas definido (tus .agent.md e .instructions.md de C#, Java, Python, etc.) y lo inyecta temporalmente en la memoria del motor masivo SpecKit.
+- SpecKit genera la implementación respetando tu cartucho al 100%, documenta la arquitectura viva, y el Watcher realiza el handoff transparente hacia @QA-AUTO y @CODE-REVIEW.
 
 ## 4. Ejemplos de Cartuchos Tecnológicos Homologados
 

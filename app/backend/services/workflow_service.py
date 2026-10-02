@@ -1,4 +1,4 @@
-import re
+﻿import re
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +17,10 @@ CANONICAL_STAGES = [
     {"key": "DA", "name": "Data Architect", "role": "Data Architect", "order": 6},
     {"key": "API", "name": "API Architect", "role": "API Architect", "order": 7},
     {"key": "QT", "name": "QA-Tech Senior", "role": "QA-Tech Senior", "order": 8},
+    {"key": "DEV-BACK", "name": "Dev Backend", "role": "Senior Backend Developer", "order": 9},
+    {"key": "DEV-FRONT", "name": "Dev Frontend", "role": "Senior Frontend Developer", "order": 10},
+    {"key": "QA-AUTO", "name": "QA Automation", "role": "QA Automation", "order": 11},
+    {"key": "CR", "name": "Code Review", "role": "SecOps", "order": 12},
 ]
 
 ROLE_TO_KEY = {
@@ -29,6 +33,10 @@ ROLE_TO_KEY = {
     "API Architect": "API",
     "QA-Tech Senior": "QT",
     "QA-Tech": "QT",
+    "Senior Backend Developer": "DEV-BACK",
+    "Senior Frontend Developer": "DEV-FRONT",
+    "QA Automation": "QA-AUTO",
+    "SecOps": "CR",
 }
 
 TOKEN_TO_KEY = {
@@ -40,6 +48,11 @@ TOKEN_TO_KEY = {
     "DA": "DA",
     "API": "API",
     "QT": "QT",
+    "DEV-BACK": "DEV-BACK",
+    "DEV-FRONT": "DEV-FRONT",
+    "QA-AUTO": "QA-AUTO",
+    "CODE-REVIEW": "CR",
+    "CR": "CR",
     "HUMANO": "HUMANO",
 }
 
@@ -127,7 +140,7 @@ class WorkflowService:
                 active_agent_role=None,
                 active_artifact_in_progress=None,
                 last_updated=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-                total_stages=8,
+                total_stages=len(CANONICAL_STAGES),
                 completed_stages=0,
                 sync_channel="WEBSOCKET_LIVE",
                 stages=steps,
@@ -167,8 +180,8 @@ class WorkflowService:
             last_updated = last_block["timestamp"]
             target = last_block.get("target_token")
 
-            # Check if all completed (e.g. QT hands off to SPEC-KIT or DEV-BACK)
-            if last_block["author_role"] in ["QA-Tech Senior", "QA-Tech"] and target in ["SPEC-KIT", "DEV-BACK", "DEV-FRONT", "WATCHER", "PM"]:
+            # Check if all completed
+            if last_block["author_role"] == "SecOps" and target in ["WATCHER", "PM"]:
                 overall_status = "COMPLETED"
                 active_stage_key = "COMPLETED"
                 active_agent_role = None
@@ -195,7 +208,7 @@ class WorkflowService:
         # Build 8 canonical steps
         stage_steps: List[WorkflowStageStep] = []
         completed_count = len(completed_stage_map)
-        if completed_count == 8:
+        if completed_count >= len(CANONICAL_STAGES):
             overall_status = "COMPLETED"
 
         for stage in CANONICAL_STAGES:
@@ -261,7 +274,7 @@ class WorkflowService:
             active_agent_role=active_agent_role,
             active_artifact_in_progress=active_artifact,
             last_updated=last_updated or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-            total_stages=8,
+            total_stages=len(CANONICAL_STAGES),
             completed_stages=completed_count,
             sync_channel="WEBSOCKET_LIVE",
             stages=stage_steps,

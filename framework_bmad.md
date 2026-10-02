@@ -50,13 +50,13 @@ El ciclo de vida del software en BMAD atraviesa 4 grandes fases cronológicas:
 *   **`@API` (API Architect):** Define los contratos REST o GraphQL, mapeando las fronteras del backend.
 *   **`@QT` (QA Tech):** Actúa como el Compilador Humano. Cruza contratos y modelos, y genera el `tech-design.md` maestro. Tras su aprobación, se gatilla el implementador de la Fase D.
 
-### FASE D (Delivery, Ejecución Headless)
-Los constructores reciben tareas granulares del archivo `tasks.md` generado en el Spec Kit. Trabajan localmente y efectúan commits atómicos asíncronos.
-*   **`@DEVOPS`:** Aprovisiona la infraestructura asíncrona (Docker, DBs, Keycloak) mediante scripts no interactivos.
-*   **`@DEV-BACK`:** Modela los endpoints, la lógica de dominio (VSA) y la persistencia EF Core.
-*   **`@DEV-FRONT`:** Desarrolla los componentes UI (ej. Angular 22 Zoneless) respetando el esqueleto dictado por UX.
-*   **`@QA-AUTO`:** Escribe pruebas end-to-end e integración (xUnit, Jest, Playwright) con cobertura de casos felices y tristes.
-*   **`@CODE-REVIEW`:** El Gatekeeper final. Audita seguridad (SecOps), adherencia a las reglas y decide si la rama puede ser liberada.
+### FASE D (Delivery, Ejecución Masiva Headless)
+La fase de construcción masiva se delega enteramente al motor de **SpecKit (`/speckit.implement`)**, que opera como "obrero", pero controlado bajo el paradigma de **Montaje de Alma (Soul Mounting)**. El Watcher copia dinámicamente las directrices de los agentes hacia la memoria de SpecKit antes de ejecutarlo.
+*   **`@DEVOPS`:** Define los contenedores y pipelines asíncronos.
+*   **`@DEV-BACK`:** Ejerce como la "Constitución del Backend". No programa manualmente archivo por archivo, sino que inyecta sus reglas innegociables (ej. VSA, Carter) al motor SpecKit y exige la actualización de la Arquitectura Viva (`backend-architecture.md`).
+*   **`@DEV-FRONT`:** Ejerce como la "Constitución del Frontend". Inyecta las reglas de interfaces (ej. Angular Zoneless, PrimeNG) al motor SpecKit y exige la actualización de la Arquitectura Viva (`frontend-architecture.md`).
+*   **`@QA-AUTO`:** Escribe pruebas end-to-end e integración (xUnit, Jest, Playwright) con cobertura de casos felices y tristes. Recibe el handoff cuando SpecKit termina.
+*   **`@CODE-REVIEW`:** El Gatekeeper final. Audita seguridad (SecOps), adherencia a las reglas arquitectónicas y documenta el análisis de impacto antes de autorizar la fusión (`GITOPS-MERGE-CLOSE`).
 
 ---
 
@@ -292,6 +292,6 @@ El orquestador BMAD implementa un "Two-Stage Gatekeeper" para fraccionar la ejec
 
 *   **Compuerta 1 (Negocio):** Al recibir la aprobación del `@QA` (QA Documental), el Watcher intercepta la ejecución para lanzar de forma independiente `/speckit.specify` y `/speckit.clarify`. Esto detalla funcionalmente el comportamiento sin inferir el stack.
 *   **Compuerta 2 (Arquitectura):** Tras el diseño de gobernanza del `@SA` (Solutions Architect), este agente emite la macro `@WATCHER: SDD-FREEZE`. El orquestador pausa el flujo nuevamente y ejecuta `/speckit.plan`, `/speckit.tasks` y `/speckit.analyze`. En esta fase, Spec-Kit asimila las guidelines inyectadas por el Arquitecto para generar un plan técnico realista y congelarlo (`[SPEC-FREEZE]`).
-*   **Compuerta 3 (Implementación / HITL):** Tras la compilación del Tech Design maestro por el `@QT` (QA Tech), el flujo sufre una última pausa humana. El usuario puede optar por **delegar a Antigravity (Opción 10)** para autogatillar `/speckit.implement`, o **despachar a los agentes clásicos de Herdr** (Backend/Frontend) utilizando las opciones de `approve_step.py`. Si elige el Despacho Paralelo Full-Stack (Opción 11b), el orquestador implementa un patrón **Fork-Join**: despacha asíncronamente a los desarrolladores en paralelo, y el agente `@QA-AUTO` actúa como barrera de sincronización, esperando que AMBOS finalicen antes de iniciar las pruebas.
+*   **Compuerta 3 (Implementación):** Tras la compilación del Tech Design maestro por el `@QT` (QA Tech), este emite la señal `@SPEC-KIT:`. El Watcher intercepta esta señal y ejecuta de manera totalmente aislada y secuencial la Fase D. Mediante la inyección de la "Tarea Fantasma", SpecKit programa bajo la identidad del agente y, obligatoriamente, debe generar y actualizar la documentación de **Arquitectura Viva** antes de devolver el control y hacer handoff a `@CODE-REVIEW`.
 
 > **Nota Operativa:** Durante el desarrollo asistido, el usuario notará que el Watcher (`watcher_bmad.py`) detiene el avance automático en estos dos hitos exactos de la línea de tiempo, delegando silenciosamente la ejecución hacia el puente SDD antes de reanudar el Handoff hacia los desarrolladores.

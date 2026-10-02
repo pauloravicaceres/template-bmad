@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 start_agents.py
 Despliega la flota completa de 15 agentes de BMAD organizada en 3 pestañas temáticas en Herdr:
@@ -47,20 +47,12 @@ TABS_CONFIG = {
         {"name": "qa-tech",             "model": "Gemini 3.7 Flash", "effort": "high", "target": "data-architect", "direction": "down"},
     ],
     "Desarrollo y Delivery": [
-        # 1. Root (Arriba Izquierda): Ocupa toda la pantalla inicialmente
-        {"name": "dev-backend",  "model": "Gemini 3.7 Flash", "effort": "high"},
-        
-        # 2. Cortamos la pantalla a la mitad (Abajo Izquierda). Esto crea la línea horizontal perfecta.
-        {"name": "qa-auto",      "model": "Gemini 3.7 Flash", "effort": "high", "target": "dev-backend", "direction": "down"},
-        
-        # 3. Cortamos la mitad superior en dos (Arriba Derecha)
-        {"name": "dev-frontend", "model": "Gemini 3.7 Flash", "effort": "high", "target": "dev-backend", "direction": "right"},
-        
-        # 4. Cortamos la mitad inferior (Abajo Medio)
+        # Fase D automatizada: @DEV-BACK y @DEV-FRONT son asimilados por SpecKit.
+        # Solo mantenemos a los auditores e infraestructura.
+        {"name": "qa-auto",      "model": "Gemini 3.7 Flash", "effort": "high"},
         {"name": "code-review",  "model": "Gemini 3.7 Flash", "effort": "high", "target": "qa-auto", "direction": "right"},
-        
-        # 5. Volvemos a cortar el último panel inferior para el 3er bloque (Abajo Derecha)
-        {"name": "devops",       "model": "Gemini 3.7 Flash", "effort": "medium", "target": "code-review", "direction": "right"},
+        {"name": "devops",       "model": "Gemini 3.7 Flash", "effort": "medium", "target": "code-review", "direction": "down"},
+    ]
     ]
 }
 
@@ -338,7 +330,7 @@ def inicializar_flota():
     print("🎉 DESPLIEGUE MULTI-TAB COMPLETADO CON ÉXITO")
     print("   • Tab 1: Negocio y Producto (6 agentes - Grilla 2x3)")
     print("   • Tab 2: Arquitectura e Ingeniería (4 agentes)")
-    print("   • Tab 3: Desarrollo y Delivery (5 agentes)")
+    print("   • Tab 3: Desarrollo y Delivery (3 agentes de Auditoría e Infraestructura)")
     print("=" * 65 + "\n")
 
 if __name__ == "__main__":
