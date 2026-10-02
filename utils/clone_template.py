@@ -45,7 +45,7 @@ def copy_template(target_dir):
         if src.exists() and src.is_dir():
             if dst.exists():
                 shutil.rmtree(dst)
-            shutil.copytree(src, dst)
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("node_modules", ".venv", "__pycache__"))
             print(f"📁 Copiado: {carpeta}/")
 
     # 2. Copiar Archivos
