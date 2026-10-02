@@ -17,6 +17,10 @@ export const CANONICAL_STAGES: Array<{ key: StageKey; name: string; role: string
   { key: 'DA', name: 'Data Architect', role: 'Data Architect', order: 6 },
   { key: 'API', name: 'API Architect', role: 'API Architect', order: 7 },
   { key: 'QT', name: 'QA-Tech Senior', role: 'QA-Tech Senior', order: 8 },
+  { key: 'DEV-BACK', name: 'Dev Backend', role: 'Senior Backend Developer', order: 9 },
+  { key: 'DEV-FRONT', name: 'Dev Frontend', role: 'Senior Frontend Developer', order: 10 },
+  { key: 'QA-AUTO', name: 'QA Automation', role: 'QA Automation', order: 11 },
+  { key: 'CR', name: 'Code Review', role: 'SecOps', order: 12 },
 ]
 
 export function buildDefaultStages(activeStageKey?: string): WorkflowStageStep[] {
@@ -60,7 +64,7 @@ export function useWorkflow(apiBase?: string) {
     () => workflowState.value?.active_artifact_in_progress || null
   )
   const completedStages = computed<number>(() => workflowState.value?.completed_stages || 0)
-  const totalStages = computed<number>(() => workflowState.value?.total_stages || 8)
+  const totalStages = computed<number>(() => workflowState.value?.total_stages || 12)
   const syncChannel = computed<string>(() => workflowState.value?.sync_channel || 'WEBSOCKET_LIVE')
 
   const stages = computed<WorkflowStageStep[]>(() => {
@@ -88,7 +92,7 @@ export function useWorkflow(apiBase?: string) {
     const agentRole = ('agent_role' in payload ? payload.agent_role : null) || payload.active_agent_role || null
     const artifactPath = ('last_artifact_path' in payload ? payload.last_artifact_path : null) || ('active_artifact_in_progress' in payload ? payload.active_artifact_in_progress : null) || null
     const completedStages = payload.completed_stages !== undefined ? payload.completed_stages : 0
-    const totalStages = payload.total_stages !== undefined ? payload.total_stages : 8
+    const totalStages = payload.total_stages !== undefined ? payload.total_stages : 12
 
     if (!workflowState.value) {
       workflowState.value = {

@@ -96,10 +96,11 @@ export async function fetchArtifactContent(
   filePath: string,
   apiBase = DEFAULT_API_BASE
 ): Promise<ArtifactContent> {
-  const url = `${apiBase}/artifacts/content?path=${encodeURIComponent(filePath)}`
-  const response = await fetch(url, {
-    headers: { Accept: 'application/json' },
-  })
+  const url = `${apiBase}/artifacts/content?path=${encodeURIComponent(filePath)}&_t=${Date.now()}`
+    const response = await fetch(url, {
+      headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+      cache: 'no-store'
+    })
   if (!response.ok) {
     let errorData: Partial<ApiErrorResponse> = {}
     try {

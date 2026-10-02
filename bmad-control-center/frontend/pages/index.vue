@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="min-h-screen bg-gray-100 flex flex-col font-sans">
     <!-- Barra Superior de Control Center (UX Header con WebSocketStatusBadge y DebounceIndicator) -->
     <header class="bg-gray-900 text-white px-6 py-3 shadow-md flex items-center justify-between border-b border-gray-800">
@@ -103,11 +103,12 @@
     <!-- Sub-header: Workflow Pipeline Monitor (Stepper de 8 etapas con pulso reactivo) -->
     <section class="p-4 bg-gray-50 border-b border-gray-200">
       <WorkflowStepper
-        :stages="stages"
-        :active-stage-key="activeStage"
-        @select-stage="handleSelectStage"
-        @select-artifact="handleSelectArtifactPath"
-      />
+          :stages="stages"
+          :active-stage-key="activeStage"
+          :selected-path="selectedPath"
+          @select-stage="handleSelectStage"
+          @select-artifact="handleSelectArtifactPath"
+        />
     </section>
 
     <!-- Panel Colapsible de Telemetría y Observabilidad (EventLogStream & PerimeterSecurityCard) -->
@@ -368,11 +369,13 @@ const overallStatusText = computed<string>(() => {
 // Handlers de Interacción
 const handleSelectStage = (stage: WorkflowStageStep): void => {
   if (stage.generated_artifact_path) {
+    activeView.value = 'artifacts'
     selectArtifact(stage.generated_artifact_path)
   }
 }
 
 const handleSelectArtifactPath = (path: string): void => {
+  activeView.value = 'artifacts'
   selectArtifact(path)
 }
 

@@ -23,6 +23,15 @@ if sys.platform.startswith('win'):
 # ==========================================
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent
 TRACKER_PATH = str(DIRECTORIO_RAIZ / "files" / "tracker_bmad.md")
+
+def write_watcher_log(mensaje):
+    from datetime import datetime
+    dt_str = datetime.now().strftime("%d-%m-%Y")
+    hr_str = datetime.now().strftime("%H:%M:%S")
+    block = f"\n### [{dt_str}] WATCHER\n- **Hora:** {hr_str}\n- **Mensaje:** {mensaje}\n"
+    with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+        f.write(block)
+
 SKILLS_DIR = DIRECTORIO_RAIZ / "skills"  # NUEVO: Directorio global de habilidades
 
 # ==========================================
@@ -171,13 +180,11 @@ def ejecutar_sdd_fase_negocio(ruta_hu: str):
     print(f"\n🚀 [SDD Negocio] Iniciando specify/clarify para: {ruta_hu}")
     try:
         # 1. Specify
-        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Ejecutando análisis funcional (/speckit.specify)...\n")
+        write_watcher_log("⚙️ [SDD Auto-Runner] Ejecutando análisis funcional (/speckit.specify)...")
         subprocess.run(f'agy --dangerously-skip-permissions --print "/speckit.specify {ruta_hu}"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
         
         # 2. Clarify (HITL por Excepción)
-        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Verificando ambigüedades (/speckit.clarify)...\n")
+        write_watcher_log("⚙️ [SDD Auto-Runner] Verificando ambigüedades (/speckit.clarify)...")
         res_clarify = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.clarify"', shell=True, capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=DIRECTORIO_RAIZ)
         if "?" in res_clarify.stdout or "ambiguity" in res_clarify.stdout.lower() or res_clarify.returncode != 0:
             print("⚠️ [HITL] Ambigüedad detectada en /speckit.clarify. Pausando para intervención humana.")
@@ -207,18 +214,15 @@ def ejecutar_sdd_fase_arquitectura(ruta_hu: str = ""):
     print(f"\n🚀 [SDD Arquitectura] Iniciando plan/tasks/analyze...")
     try:
         # 1. Plan & Tasks
-        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Estructurando plan de arquitectura técnica (/speckit.plan)...\n")
+        write_watcher_log("⚙️ [SDD Auto-Runner] Estructurando plan de arquitectura técnica (/speckit.plan)...")
         subprocess.run('agy --dangerously-skip-permissions --print "/speckit.plan"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
         
-        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Desglosando tareas de implementación (/speckit.tasks)...\n")
+        write_watcher_log("⚙️ [SDD Auto-Runner] Desglosando tareas de implementación (/speckit.tasks)...")
         subprocess.run('agy --dangerously-skip-permissions --print "/speckit.tasks"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
 
         # 2. Analyze (Auditoría Técnica)
         print("🔍 [SDD Arquitectura] Ejecutando auditoría /speckit.analyze...")
-        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-            f.write("\n@WATCHER: ⚙️ [SDD Auto-Runner] Ejecutando auditoría técnica (/speckit.analyze)...\n")
+        write_watcher_log("⚙️ [SDD Auto-Runner] Ejecutando auditoría técnica (/speckit.analyze)...")
         res_analyze = subprocess.run('agy --dangerously-skip-permissions --print "/speckit.analyze"', shell=True, cwd=DIRECTORIO_RAIZ)
         if res_analyze.returncode != 0:
             print("🛑 [HITL] Auditoría fallida. Violación de constitución técnica. Pausando.")
@@ -285,8 +289,7 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
             
             try:
                 print("🏃 [SpecKit] Ejecutando implementación de Backend...")
-                with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-                    f.write("\n@WATCHER: ⚡ [SDD Auto-Runner] Ejecutando implementación Backend (/speckit.implement)...\n")
+                write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Backend (/speckit.implement)...")
                 
                 subprocess.run('agy --dangerously-skip-permissions --print "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
                 
@@ -325,8 +328,7 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
             
             try:
                 print("🏃 [SpecKit] Ejecutando implementación de Frontend...")
-                with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-                    f.write("\n@WATCHER: ⚡ [SDD Auto-Runner] Ejecutando implementación Frontend (/speckit.implement)...\n")
+                write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Frontend (/speckit.implement)...")
                 
                 subprocess.run('agy --dangerously-skip-permissions --print "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
                 
@@ -375,15 +377,10 @@ def extraer_instrucciones(linea):
         "@DA:": "data-architect",
         "@API:": "api-architect",
         "@QT:": "qa-tech",
-        "@DEV-BACK:": "dev-backend",
-        "@DEV-BACKEND:": "dev-backend",
-        "@DEV-FRONT:": "dev-frontend",
-        "@DEV-FRONTEND:": "dev-frontend",
         "@QA-AUTO:": "qa-auto",
         "@CODE-REVIEW:": "code-review",
         "@CR:": "code-review",
         "@DEVOPS:": "devops",
-        "@DEV:": "dev-backend"
     }
 
     tareas = []
@@ -451,16 +448,19 @@ def extraer_instrucciones(linea):
         print("=" * 80 + "\n")
         return []
 
-    # Notificación informativa para gatillo de implementacion Spec Kit
-    if "@SPEC-KIT:" in linea:
+    # ==========================================
+    # SDD GATEKEEPER 3: Intercepción de QT (Implementación Automática)
+    # ==========================================
+    if ("@dev-back:" in linea_lower or "@dev-front:" in linea_lower) and "arquitectura" in linea_lower:
         print("\n" + "=" * 80)
-        print("⚡ [GATILLO SDD DETECTADO] ARQUITECTURA TÉCNICA LISTA PARA IMPLEMENTACIÓN")
+        print("💡 [GATILLO SDD DETECTADO] INICIANDO FASE D AUTOMÁTICA")
         print("=" * 80)
-        print("El QA Técnico ha certificado y compilado el Tech Design maestro.")
-        print("Ejecute en la terminal / CLI de Spec Kit:")
-        print("   /speckit.implement")
-        print("para iniciar el despacho coordinado de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS).")
+        print(f"Iniciando SDD Fase de Implementación...\n")
+        exito = ejecutar_sdd_fase_implementacion()
+        if not exito:
+            print("❌ [HITL] Fallo en SDD Implementación. Pausando el orquestador.")
         print("=" * 80 + "\n")
+        return []
 
     
     for etiqueta, agente_nombre in agentes.items():

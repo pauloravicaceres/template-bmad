@@ -91,7 +91,14 @@ const segments = computed<Segment[]>(() => {
     return []
   }
 
-  const raw = props.artifact.raw_content
+  let raw = props.artifact.raw_content
+
+  // [REQUERIMIENTO] Invertir orden del tracker (acciones recientes primero)
+  if (props.artifact.filename === 'tracker_bmad.md' || props.artifact.relative_path.includes('tracker_bmad.md')) {
+    const blocks = raw.split(/(?=^###\s+\[)/m)
+    // Reordenar: bloques con ### primero (en orden inverso), y cualquier texto inicial al final
+    raw = blocks.reverse().join('\n---\n\n') // Add a separator for better readability if desired, or just join('\n')
+  }
   // Si no es markdown, se renderiza preformateado
   if (props.artifact.detected_format !== 'MARKDOWN') {
     return [
@@ -125,7 +132,7 @@ const segments = computed<Segment[]>(() => {
         const sanitizedPart = part.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, (match) => escapeHtml(match))
                                   .replace(/<script\b([^>]*)>/gi, '&lt;script$1&gt;')
                                   .replace(/<\/script>/gi, '&lt;/script&gt;')
-        const html = marked.parse(sanitizedPart) as string
+        const html = marked.parse(sanitizedPart, { breaks: true, gfm: true }) as string
         result.push({
           id: `html-block-${index}`,
           type: 'html',

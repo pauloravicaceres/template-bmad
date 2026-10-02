@@ -18,7 +18,7 @@ Para mantener el determinismo del *Ledger*, los agentes mutadores y lectores uti
 
 | N° | Épica Origen | Nombre spec / HU | Qué aporta | Estado | Rama |
 |----|--------------|------------------|------------|--------|------|
-| 001 | [P1] Catálogo de Servicios | 001-HU_catalogo_servicios_tarifario | Registro y mantenimiento del catálogo reutilizable de servicios, componentes y tarifas base | IN-PROGRESS | feat/001-HU_catalogo_servicios_tarifario |
+| 001 | [P1] Catálogo de Servicios | 001-HU_catalogo_servicios_tarifario | Registro y mantenimiento del catálogo reutilizable de servicios, componentes y tarifas base | ACTIVE | feat/001-HU_catalogo_servicios_tarifario |
 
 ---
 

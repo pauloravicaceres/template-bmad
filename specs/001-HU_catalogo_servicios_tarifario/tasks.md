@@ -10,10 +10,10 @@
 
 **Propósito**: Inicialización del proyecto y definición de la estructura base en `app/backend/` y `app/frontend/`.
 
-- [ ] T001 Inicializar la estructura base del proyecto con directorios app/backend/ y app/frontend/ en `app/`
-- [ ] T002 Configurar las dependencias de Node.js, Express, TypeScript y Prisma ORM en `app/backend/package.json` y `app/backend/tsconfig.json`
-- [ ] T003 [P] Configurar el cliente React 18, Vite y TypeScript en `app/frontend/package.json` y `app/frontend/vite.config.ts`
-- [ ] T004 [P] Configurar herramientas de linting y formateo de código en `app/backend/.eslintrc.json` y `app/frontend/.eslintrc.json`
+- [x] T001 Inicializar la estructura base del proyecto con directorios app/backend/ y app/frontend/ en `app/`
+- [x] T002 Configurar las dependencias de Node.js, Express, TypeScript y Prisma ORM en `app/backend/package.json` y `app/backend/tsconfig.json`
+- [x] T003 [P] Configurar el cliente React 18, Vite y TypeScript en `app/frontend/package.json` y `app/frontend/vite.config.ts`
+- [x] T004 [P] Configurar herramientas de linting y formateo de código en `app/backend/.eslintrc.json` y `app/frontend/.eslintrc.json`
 
 ---
 
@@ -21,12 +21,12 @@
 
 **Propósito**: Infraestructura central que DEBE completarse antes de implementar cualquier Historia de Usuario.
 
-- [ ] T005 Diseñar el esquema de base de datos relacional Prisma con modelo Servicio, restricción `UNIQUE(nombre, categoria)` y columna `estado` en `app/backend/prisma/schema.prisma`
-- [ ] T006 Generar y ejecutar migraciones iniciales de PostgreSQL en `app/backend/prisma/migrations/`
-- [ ] T007 [P] Configurar la carga y validación de variables de entorno en `app/backend/src/config/env.ts`
-- [ ] T008 [P] Implementar middleware global de captura de errores y formateo de respuestas JSON estructuradas en `app/backend/src/middlewares/errorHandler.ts`
-- [ ] T009 Configurar el servidor Express, middlewares centrales y montaje de rutas en `app/backend/src/app.ts` y `app/backend/src/server.ts`
-- [ ] T010 [P] Configurar el cliente HTTP Axios/Fetch con timeout máximo de 5000ms en `app/frontend/src/services/apiClient.ts`
+- [x] T005 Diseñar el esquema de base de datos relacional Prisma con modelo Servicio, restricción `UNIQUE(nombre, categoria)` y columna `estado` en `app/backend/prisma/schema.prisma`
+- [x] T006 Generar y ejecutar migraciones iniciales de PostgreSQL en `app/backend/prisma/migrations/`
+- [x] T007 [P] Configurar la carga y validación de variables de entorno en `app/backend/src/config/env.ts`
+- [x] T008 [P] Implementar middleware global de captura de errores y formateo de respuestas JSON estructuradas en `app/backend/src/middlewares/errorHandler.ts`
+- [x] T009 Configurar el servidor Express, middlewares centrales y montaje de rutas en `app/backend/src/app.ts` y `app/backend/src/server.ts`
+- [x] T010 [P] Configurar el cliente HTTP Axios/Fetch con timeout máximo de 5000ms en `app/frontend/src/services/apiClient.ts`
 
 ---
 
@@ -37,21 +37,21 @@
 
 ### Pruebas para User Story 1
 
-- [ ] T011 [P] [US1] Crear pruebas automatizadas de integración HTTP para el endpoint de creación de servicios en `app/backend/tests/integration/servicios.create.test.ts`
+- [x] T011 [P] [US1] Crear pruebas automatizadas de integración HTTP para el endpoint de creación de servicios en `app/backend/tests/integration/servicios.create.test.ts`
 
 ### Implementación Backend para User Story 1
 
-- [ ] T012 [P] [US1] Definir esquema de validación Zod con reglas de dominio (tarifa_base > 0, código ISO de 3 letras, campos requeridos) en `app/backend/src/schemas/servicio.schema.ts`
-- [ ] T013 [P] [US1] Implementar métodos de persistencia y consultas ORM para servicios en `app/backend/src/models/servicio.model.ts`
-- [ ] T014 [US1] Implementar lógica de negocio y verificación de unicidad por categoría en `app/backend/src/services/servicios.service.ts`
-- [ ] T015 [US1] Crear controlador HTTP `POST /api/v1/servicios` para recepción de solicitudes y respuestas RESTful en `app/backend/src/controllers/servicios.controller.ts`
-- [ ] T016 [US1] Registrar la ruta `POST /api/v1/servicios` en `app/backend/src/routes/servicios.routes.ts`
+- [x] T012 [P] [US1] Definir esquema de validación Zod con reglas de dominio (tarifa_base > 0, código ISO de 3 letras, campos requeridos) en `app/backend/src/schemas/servicio.schema.ts`
+- [x] T013 [P] [US1] Implementar métodos de persistencia y consultas ORM para servicios en `app/backend/src/models/servicio.model.ts`
+- [x] T014 [US1] Implementar lógica de negocio y verificación de unicidad por categoría en `app/backend/src/services/servicios.service.ts`
+- [x] T015 [US1] Crear controlador HTTP `POST /api/v1/servicios` para recepción de solicitudes y respuestas RESTful en `app/backend/src/controllers/servicios.controller.ts`
+- [x] T016 [US1] Registrar la ruta `POST /api/v1/servicios` en `app/backend/src/routes/servicios.routes.ts`
 
 ### Implementación Frontend para User Story 1
 
-- [ ] T017 [P] [US1] Crear módulo de consumo API para creación de servicios en `app/frontend/src/services/serviciosApi.ts`
-- [ ] T018 [P] [US1] Crear componente Modal de formulario con validaciones client-side para registro de servicios en `app/frontend/src/components/FormularioServicioModal.tsx`
-- [ ] T019 [US1] Integrar el modal de creación y la actualización reactiva en la página principal `app/frontend/src/pages/CatalogoServiciosPage.tsx`
+- [x] T017 [P] [US1] Crear módulo de consumo API para creación de servicios en `app/frontend/src/services/serviciosApi.ts`
+- [x] T018 [P] [US1] Crear componente Modal de formulario con validaciones client-side para registro de servicios en `app/frontend/src/components/FormularioServicioModal.tsx`
+- [x] T019 [US1] Integrar el modal de creación y la actualización reactiva en la página principal `app/frontend/src/pages/CatalogoServiciosPage.tsx`
 
 ---
 
@@ -62,21 +62,21 @@
 
 ### Pruebas para User Story 2
 
-- [ ] T020 [P] [US2] Crear pruebas automatizadas de integración HTTP para la consulta y filtrado de servicios en `app/backend/tests/integration/servicios.get.test.ts`
+- [x] T020 [P] [US2] Crear pruebas automatizadas de integración HTTP para la consulta y filtrado de servicios en `app/backend/tests/integration/servicios.get.test.ts`
 
 ### Implementación Backend para User Story 2
 
-- [ ] T021 [P] [US2] Definir esquema de validación Zod para parámetros de consulta `categoria`, `estado`, `page` y `limit` en `app/backend/src/schemas/servicioQuery.schema.ts`
-- [ ] T022 [US2] Implementar consultas paginadas y filtradas en el modelo ORM `app/backend/src/models/servicio.model.ts`
-- [ ] T023 [US2] Extender el servicio de negocio para soportar filtrado y paginación en `app/backend/src/services/servicios.service.ts`
-- [ ] T024 [US2] Crear controlador HTTP `GET /api/v1/servicios` en `app/backend/src/controllers/servicios.controller.ts`
-- [ ] T025 [US2] Registrar la ruta `GET /api/v1/servicios` en `app/backend/src/routes/servicios.routes.ts`
+- [x] T021 [P] [US2] Definir esquema de validación Zod para parámetros de consulta `categoria`, `estado`, `page` y `limit` en `app/backend/src/schemas/servicioQuery.schema.ts`
+- [x] T022 [US2] Implementar consultas paginadas y filtradas en el modelo ORM `app/backend/src/models/servicio.model.ts`
+- [x] T023 [US2] Extender el servicio de negocio para soportar filtrado y paginación en `app/backend/src/services/servicios.service.ts`
+- [x] T024 [US2] Crear controlador HTTP `GET /api/v1/servicios` en `app/backend/src/controllers/servicios.controller.ts`
+- [x] T025 [US2] Registrar la ruta `GET /api/v1/servicios` en `app/backend/src/routes/servicios.routes.ts`
 
 ### Implementación Frontend para User Story 2
 
-- [ ] T026 [P] [US2] Implementar componente de tabla paginada con indicadores de tarifa y estado en `app/frontend/src/components/TablaServicios.tsx`
-- [ ] T027 [P] [US2] Crear componente de filtros por categoría y estado en `app/frontend/src/components/FiltrosCatalogo.tsx`
-- [ ] T028 [US2] Conectar los filtros y la tabla en la página del catálogo `app/frontend/src/pages/CatalogoServiciosPage.tsx`
+- [x] T026 [P] [US2] Implementar componente de tabla paginada con indicadores de tarifa y estado en `app/frontend/src/components/TablaServicios.tsx`
+- [x] T027 [P] [US2] Crear componente de filtros por categoría y estado en `app/frontend/src/components/FiltrosCatalogo.tsx`
+- [x] T028 [US2] Conectar los filtros y la tabla en la página del catálogo `app/frontend/src/pages/CatalogoServiciosPage.tsx`
 
 ---
 
@@ -84,9 +84,9 @@
 
 **Propósito**: Tareas de configuración final, datos semilla y documentación general.
 
-- [ ] T029 [P] Crear script de inicialización con datos de prueba (seeding) en `app/backend/prisma/seed.ts`
-- [ ] T030 [P] Configurar el archivo de orquestación Docker Compose para servicios de desarrollo en `docker-compose.yml`
-- [ ] T031 Actualizar la documentación de instalación y guía de uso de endpoints en `README.md`
+- [x] T029 [P] Crear script de inicialización con datos de prueba (seeding) en `app/backend/prisma/seed.ts`
+- [x] T030 [P] Configurar el archivo de orquestación Docker Compose para servicios de desarrollo en `docker-compose.yml`
+- [x] T031 Actualizar la documentación de instalación y guía de uso de endpoints en `README.md`
 
 ---
 
