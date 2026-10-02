@@ -4,7 +4,7 @@ start_agents.py
 Despliega la flota completa de 15 agentes de BMAD organizada en 3 pestañas temáticas en Herdr:
   1. Negocio y Producto (6 agentes en grilla 2x3)
   2. Arquitectura e Ingeniería (4 agentes)
-  3. Desarrollo y Deployment (5 agentes)
+  3. Desarrollo y Despliegue (3 agentes)
 
 Aplica estrategia FinOps (modelo y esfuerzo de razonamiento) y sandbox con --add-dir.
 """
@@ -46,7 +46,7 @@ TABS_CONFIG = {
         {"name": "api-architect",       "model": "Gemini 3.6 Flash", "effort": "low", "target": "solutions-architect", "direction": "down"},
         {"name": "qa-tech",             "model": "Gemini 3.6 Flash", "effort": "low", "target": "data-architect", "direction": "down"},
     ],
-    "Desarrollo y Deployment": [
+    "Desarrollo y Despliegue": [
         # Fase D automatizada: @DEV-BACK y @DEV-FRONT son asimilados por SpecKit.
         # Solo mantenemos a los auditores e infraestructura.
         {"name": "qa-auto",      "model": "Gemini 3.6 Flash", "effort": "low"},
@@ -329,7 +329,7 @@ def inicializar_flota():
     print("🎉 DESPLIEGUE MULTI-TAB COMPLETADO CON ÉXITO")
     print("   • Tab 1: Negocio y Producto (6 agentes - Grilla 2x3)")
     print("   • Tab 2: Arquitectura e Ingeniería (4 agentes)")
-    print("   • Tab 3: Desarrollo y Deployment (3 agentes de Auditoría e Infraestructura)")
+    print("   • Tab 3: Desarrollo y Despliegue (3 agentes de Auditoría e Infraestructura)")
     print("=" * 65 + "\n")
 
 if __name__ == "__main__":

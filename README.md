@@ -53,7 +53,7 @@ Sin embargo, si necesitas realizar micro-ajustes rápidos, refactorizaciones men
 
 **Para despertar a un DEV manualmente en Herdr:**
 
-1. Selecciona la pestaña de "Desarrollo y Deployment" en la UI de Herdr.
+1. Selecciona la pestaña de "Desarrollo y Despliegue" en la UI de Herdr.
 2. Abre un panel nuevo apuntando al directorio del agente:
    ```bash
    herdr pane split --direction right --cwd dev-frontend

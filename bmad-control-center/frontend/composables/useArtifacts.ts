@@ -134,7 +134,7 @@ export function useArtifacts(apiBase?: string) {
   }
 
   const handleArtifactChanged = async (payload: ArtifactChangedPayload): Promise<void> => {
-    // Registrar path mutado para el tag [✨ NUEVO] (Estado 2 UX)
+    // Registrar path mutado para el tag [? NUEVO] (Estado 2 UX)
     recentlyMutatedPaths.value.add(payload.relative_path)
     setTimeout(() => {
       recentlyMutatedPaths.value.delete(payload.relative_path)
@@ -144,7 +144,7 @@ export function useArtifacts(apiBase?: string) {
     await loadTree()
 
     // Manejo de eliminacion en caliente
-    if (payload.change_type === 'deleted' && selectedPath.value === payload.relative_path) {
+    if (payload.change_type === 'deleted' && (selectedPath.value === payload.relative_path || (selectedPath.value && payload.relative_path.endsWith('/' + selectedPath.value)))) {
       artifactContent.value = null
       contentError.value = new ApiClientError(
         `El artefacto '${payload.relative_path}' fue eliminado.`,
@@ -159,7 +159,7 @@ export function useArtifacts(apiBase?: string) {
     // Manejo de archivo masivo (>5MB / Metadata-Only ADR-012)
     if (
       (payload.file_metadata?.is_large_file || payload.file_metadata?.metadata_only) &&
-      selectedPath.value === payload.relative_path
+      (selectedPath.value === payload.relative_path || (selectedPath.value && payload.relative_path.endsWith('/' + selectedPath.value)))
     ) {
       largeFileMetadata.value = payload.file_metadata
       artifactContent.value = null
@@ -167,8 +167,10 @@ export function useArtifacts(apiBase?: string) {
     }
 
     // Si el usuario tiene el visor abierto en el archivo modificado, recargar en caliente (SC-02)
-    if (selectedPath.value && payload.relative_path === selectedPath.value) {
-      await selectArtifact(selectedPath.value, selectedNode.value || undefined)
+    // Usamos endsWith para tolerar paths parciales como "tracker_bmad.md" vs "files/tracker_bmad.md"
+    const currentPath = selectedPath.value
+    if (currentPath && (payload.relative_path === currentPath || payload.relative_path.endsWith('/' + currentPath) || currentPath.endsWith('/' + payload.relative_path))) {
+      await selectArtifact(currentPath, selectedNode.value || undefined)
     }
   }
 

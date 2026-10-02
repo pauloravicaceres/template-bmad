@@ -22,7 +22,7 @@ class TestTrackerService:
         # Arrange
         tracker_file = tmp_path / "tracker_bmad.md"
         service = TrackerService(str(tracker_file))
-        decision_entry = "DECISION [001]: APPROVE"
+        decision_entry = "### [02-10-2026] HUMANO\n- **Estado:** APPROVE"
 
         # Act
         service.append_decision(decision_entry)
@@ -39,7 +39,7 @@ class TestTrackerService:
         initial_history = "### [30-09-2026] Product Analyst\n- **Estado:** Especificación lista\n"
         service.replace_tracker_content(initial_history)
         decision_1 = "DECISION [001]: REJECT\nFeedback: Corregir criterios"
-        decision_2 = "DECISION [002]: APPROVE"
+        decision_2 = "### [02-10-2026] HUMANO\n- **Estado:** APPROVE"
 
         # Act
         service.append_decision(decision_1)

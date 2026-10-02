@@ -77,7 +77,7 @@ class TestGatesApproveDecision:
         assert response.json()["message"] == "Decision recorded"
         # Verificar mutación atómica en el tracker
         tracker_content = service.read_tracker()
-        assert f"DECISION [{gate_id}]: APPROVE" in tracker_content
+        assert "### [" in tracker_content and "] HUMANO" in tracker_content
 
     def test_MakeDecision_ConAccionApproveYFeedbackOpcional_DebeRegistrarAmbosYRetornar200(self, client_with_isolated_tracker):
         # Arrange
@@ -91,8 +91,8 @@ class TestGatesApproveDecision:
         # Assert
         assert response.status_code == 200
         tracker_content = service.read_tracker()
-        assert f"DECISION [{gate_id}]: APPROVE" in tracker_content
-        assert "Feedback: Excelente trabajo del equipo" in tracker_content
+        assert "### [" in tracker_content and "] HUMANO" in tracker_content
+        assert "**Feedback:** Excelente trabajo del equipo" in tracker_content
 
 
 class TestGatesRejectDecision:
@@ -111,8 +111,8 @@ class TestGatesRejectDecision:
         assert response.status_code == 200
         assert response.json()["message"] == "Decision recorded"
         tracker_content = service.read_tracker()
-        assert f"DECISION [{gate_id}]: REJECT" in tracker_content
-        assert "Feedback: Subsanar criterios de aceptación BDD" in tracker_content
+        assert "### [" in tracker_content and "] HUMANO" in tracker_content and "REJECT" in tracker_content
+        assert "**Feedback:** Subsanar criterios de aceptación BDD" in tracker_content
 
     def test_MakeDecision_ConAccionRejectYTokenReservadoEnFeedback_DebeSanitizarTokenYRetornar200(self, client_with_isolated_tracker):
         # Arrange

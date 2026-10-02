@@ -4,7 +4,7 @@ stop_agents.py
 Detiene y cierra automáticamente todas las pestañas y paneles de la flota BMAD en Herdr:
   1. Tab "Negocio y Producto"
   2. Tab "Arquitectura e Ingeniería"
-  3. Tab "Desarrollo y Deployment"
+  3. Tab "Desarrollo y Despliegue"
   4. Paneles individuales remanentes con agentes BMAD activos.
 
 Protege de forma inteligente el panel/tab actual donde se ejecuta el script.
@@ -30,7 +30,7 @@ if sys.platform == "win32":
 TARGET_TABS = [
     "Negocio y Producto",
     "Arquitectura e Ingeniería",
-    "Desarrollo y Deployment"
+    "Desarrollo y Despliegue"
 ]
 
 BMAD_AGENTS = [

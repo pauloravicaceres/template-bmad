@@ -49,18 +49,16 @@ async def get_gate_status():
 @router.post("/gates/{gate_id}/decision")
 async def make_decision(gate_id: str, payload: DecisionPayload):
     """Records human decision with token sanitization into tracker (HU-001)."""
-    decision_text = f"DECISION [{gate_id}]: {payload.action.value}"
+    from datetime import datetime
+    dt_str = datetime.now().strftime("%d-%m-%Y")
+    hr_str = datetime.now().strftime("%H:%M:%S")
     
-    if payload.feedback:
-        sanitized = sanitize_feedback(payload.feedback)
-        decision_text += f"\nFeedback: {sanitized}"
-    
-    # Si la acción es APPROVE, derivar el mensaje de Handoff apropiado al siguiente agente
+    handoff_text = None
     if payload.action.value == "APPROVE":
-        content = tracker_service.read_tracker()
+        content_tracker = tracker_service.read_tracker()
         from services.workflow_service import WorkflowService
         ws = WorkflowService()
-        blocks = ws._parse_blocks(content)
+        blocks = ws._parse_blocks(content_tracker)
         
         if blocks:
             last_block = blocks[-1]
@@ -68,34 +66,52 @@ async def make_decision(gate_id: str, payload: DecisionPayload):
             art = last_block.get("generated_artifact") or ""
             filename = art.split("/")[-1] if art else "artefacto.md"
             
-            # Matriz de handoff según approve_step.py
-            handoff_msg = None
             if author in ["Product Analyst", "PA"]:
-                handoff_msg = f"- **Handoff:** @PM: El Product Brief ha sido auditado y aprobado formalmente en el archivo {filename}. Procede con el análisis estratégico y la creación del Backlog del MVP."
+                handoff_text = f"@PM: El Product Brief ha sido auditado y aprobado formalmente en el archivo {filename}. Procede con el análisis estratégico y la creación del Backlog del MVP."
             elif author in ["Business Storyteller", "BS"]:
-                handoff_msg = f"- **Handoff:** @PA: La idea de usuario ha sido auditada y aprobada por negocio en el archivo {filename}. Procede con la creación del PRODUCT BRIEF."
+                handoff_text = f"@PA: La idea de usuario ha sido auditada y aprobada por negocio en el archivo {filename}. Procede con la creación del PRODUCT BRIEF."
             elif author in ["Product Manager", "PM"]:
-                handoff_msg = f"- **Handoff:** @BA: El MVP y Backlog han sido aprobados en el archivo {filename}. Procede con el análisis de negocio y redacción de Historias de Usuario."
+                handoff_text = f"@BA: El MVP y Backlog han sido aprobados en el archivo {filename}. Procede con el análisis de negocio y redacción de Historias de Usuario."
             elif author in ["Business Analyst", "BA"]:
-                handoff_msg = f"- **Handoff:** @QA: La Historia de Usuario ha sido revisada en el archivo {filename}. Procede con la auditoría documental."
+                handoff_text = f"@QA: La Historia de Usuario ha sido revisada en el archivo {filename}. Procede con la auditoría documental."
             elif author in ["QA Documental", "QA"]:
-                handoff_msg = f"- **Handoff:** @UX: El ciclo SDD ha concluido con éxito en {filename}. Procede con el diseño visual y wireframes."
+                handoff_text = f"@UX: El ciclo SDD ha concluido con éxito en {filename}. Procede con el diseño visual y wireframes."
             elif author in ["Designer UX", "UX"]:
-                handoff_msg = f"- **Handoff:** @SA: El diseño visual ha sido aprobado en {filename}. Define el stack tecnológico y reglas arquitectónicas."
+                handoff_text = f"@SA: El diseño visual ha sido aprobado en {filename}. Define el stack tecnológico y reglas arquitectónicas."
             elif author in ["Solutions Architect", "SA"]:
-                handoff_msg = f"- **Handoff:** @DA: Las directrices de arquitectura técnica han sido aprobadas en {filename}. Procede con el MER."
+                handoff_text = f"@DA: Las directrices de arquitectura técnica han sido aprobadas en {filename}. Procede con el MER."
             elif author in ["QA-Tech Senior", "QA-Tech", "QT"]:
-                handoff_msg = f"- **Handoff:** @DEV-BACK: La arquitectura técnica ha sido verificada en {filename}. Procede con la implementación del Backend."
-            
-            if handoff_msg:
-                decision_text += f"\n{handoff_msg}"
-
-    tracker_service.append_decision(decision_text)
+                handoff_text = f"@DEV-BACK: La arquitectura técnica ha sido verificada en {filename}. Procede con la implementación del Backend."
     
-    # Broadcast state change
-    await manager.broadcast({
-        "event": "GATE_STATE_CHANGED",
-        "gate_id": gate_id,
-        "action": payload.action.value
-    })
+    lines = [f"\n### [{dt_str}] HUMANO"]
+    lines.append(f"- **Hora:** {hr_str}")
+    lines.append(f"- **Estado:** {payload.action.value}")
+    
+    if payload.feedback:
+        sanitized = sanitize_feedback(payload.feedback)
+        lines.append(f"- **Feedback:** {sanitized}")
+        
+    if handoff_text:
+        lines.append(f"- **Handoff:** {handoff_text}")
+        
+    decision_text = "\n".join(lines)
+    tracker_service.append_decision(decision_text.strip())
+    
+    # Emitir evento por WebSocket si est configurado
+    try:
+        from api.websockets import manager
+        from services.workflow_service import WorkflowService
+        wf_service = WorkflowService()
+        wf_status = wf_service.get_workflow_status()
+        
+        import asyncio
+        asyncio.create_task(
+            manager.broadcast_workflow_updated(
+                wf_status.model_dump(),
+                coalesced_count=len(wf_status.history)
+            )
+        )
+    except Exception as e:
+        print(f"Error emitiendo evento de WorkflowUpdated tras decision: {e}")
+        
     return {"message": "Decision recorded"}
