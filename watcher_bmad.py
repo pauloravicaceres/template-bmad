@@ -283,7 +283,7 @@ def ejecutar_sdd_fase_implementacion():
                 # TAREA FANTASMA PARA BACKEND
                 tarea_fantasma_back = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
-Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-architecture-template.md (si existe) o básate en tus reglas. Luego, abre el archivo backend-architecture.md. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
+Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'files/dev-backend/backend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
 """
                 active_directive_path.write_text(alma_backend + tarea_fantasma_back, encoding="utf-8")
             
@@ -291,7 +291,7 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
                 print("🏃 [SpecKit] Ejecutando implementación de Backend...")
                 write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Backend (/speckit.implement)...")
                 
-                subprocess.run('agy --dangerously-skip-permissions --print "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+                subprocess.run('agy --dangerously-skip-permissions "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 
                 from datetime import datetime
                 dt_str = datetime.now().strftime("%d-%m-%Y")
@@ -322,7 +322,7 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
                 # TAREA FANTASMA PARA FRONTEND
                 tarea_fantasma_front = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
-Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-architecture-template.md (si existe) o básate en tus reglas. Luego, abre el archivo frontend-architecture.md. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
+Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'files/dev-frontend/frontend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
 """
                 active_directive_path.write_text(alma_frontend + tarea_fantasma_front, encoding="utf-8")
             
@@ -330,7 +330,7 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
                 print("🏃 [SpecKit] Ejecutando implementación de Frontend...")
                 write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Frontend (/speckit.implement)...")
                 
-                subprocess.run('agy --dangerously-skip-permissions --print "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
+                subprocess.run('agy --dangerously-skip-permissions "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 
                 from datetime import datetime
                 dt_str = datetime.now().strftime("%d-%m-%Y")
@@ -338,7 +338,7 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
                 block = f"""
 ### [{dt_str}] Senior Frontend Developer
 - **Hora:** {hr_str}
-- **Artefacto generado:** `frontend-architecture.md`
+- **Artefacto generado:** `files/dev-frontend/frontend-architecture.md`
 - **Estado:** Implementación frontend finalizada exitosamente mediante SDD SpecKit.
 - **Handoff:** @CODE-REVIEW: Procede con la auditoría de seguridad y GitOps.
 """
