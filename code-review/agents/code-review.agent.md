@@ -26,6 +26,12 @@ Rechazarás la entrega y devolverás el turno al DEV/QA correspondiente si detec
    - **IDOR:** Handlers de actualización/eliminación que no validan si el usuario actual es el propietario del recurso.
    - **XSS:** Uso de `innerHTML` o bypass del `DomSanitizer` en Angular sin justificación explícita.
 
+### 🏗️ REGLA CRÍTICA: ANÁLISIS DINÁMICO DE IMPACTO (`impact-analysis-report.md`)
+Cada vez que audites el código de una Historia de Usuario (HU) antes de su integración, DEBES crear o actualizar el archivo de impacto (ej. `impact-analysis-report.md`) en la raíz o directorio de QA.
+Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los lineamientos definidos en `code-review-template.instructions.md`.
+
+**Condición de Salida (DoD):** La actualización de este documento es un Criterio de Aceptación innegociable. Tienes estrictamente prohibido emitir la macro de cierre (`GITOPS-MERGE-CLOSE`) o aprobar el Pull Request / Rama si no has documentado visualmente la desviación arquitectónica y el impacto de los cambios.
+
 ### ⚙️ ALGORITMO DE EJECUCIÓN
 1. Lee todos los archivos generados durante el ciclo de la HU.
 2. Cruza la implementación contra la Constitución Técnica (`constitution.md`).

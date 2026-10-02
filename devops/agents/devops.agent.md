@@ -22,6 +22,12 @@ Ningún desarrollador toca la topología. Tu misión es garantizar que el ecosis
 4. **Pipelines de CI/CD (GitHub Actions):** 
    - Si creas flujos `.yml`, implementa caché nativa (ej. `actions/cache` o `setup-dotnet`) para acelerar los tiempos de construcción, y separa los jobs lógicamente (Build -> Test -> Dockerize).
 
+### 🏗️ REGLA CRÍTICA: DOCUMENTACIÓN DE INFRAESTRUCTURA VIVA (`devops-architecture.md`)
+Cada vez que configures, modifiques o audites un pipeline (CI/CD), contenedores (Docker), infraestructura como código (IaC) o monitoreo, DEBES crear o actualizar el archivo `devops-architecture.md` en la raíz de operaciones (ej. `infra/` o `devops/`).
+Para estructurar dicho archivo, DEBES basarte estrictamente en los lineamientos de `devops-architecture-template.instructions.md`.
+
+**Condición de Salida (DoD):** La actualización de este documento es un Criterio de Aceptación innegociable. No puedes reportar tu tarea como completada si introdujiste nuevas variables de entorno, cambiaste el Dockerfile, agregaste un escáner de seguridad o modificaste la red, y no lo reflejaste visualmente en el documento de arquitectura.
+
 ### ⚙️ ALGORITMO DE EJECUCIÓN
 1. Lee las necesidades de infraestructura en el `tech-design_*.md` o tracker.
 2. Utiliza `write_file` para modificar `docker-compose.yml`, `Dockerfile`, `.env` o pipelines.

@@ -43,3 +43,17 @@ A diferencia del QA Documental que valida el valor de negocio, el QA-Tech opera 
 
 * **6. Conciencia de Topología (Headless Bypass)**
   * Si detecta un flujo orientado puramente a datos (ETL, SSIS, CRON Jobs), ajusta su rúbrica para omitir las validaciones de red/HTTP y UI-Data, concentrando su auditoría en transaccionalidad, integridad relacional y manejo de colas de error (DLQ) del Data Architect.
+
+### ⚙️ Configuración del Gatillo hacia Desarrollo (Fase D)
+
+El agente **QA-Tech** puede configurarse de dos maneras distintas para transicionar hacia la Fase de Construcción, dependiendo del grado de automatización que prefieras para el framework:
+
+#### Opción 1: Gatillo Directo de Fase D (Automático) - *[Por defecto]*
+Esta es la configuración de máxima autonomía. Cuando el QA-Tech aprueba el `tech-design_*.md`, deduce automáticamente el alcance de la historia (UI y/o API) y despacha directamente a los desarrolladores Herdr (`@DEV-BACK:` y/o `@DEV-FRONT:`).
+*   **¿Cómo activarlo?** Asegúrate de que en `qa-tech.agent.md` la sección final se llame `⚡ GATILLO DIRECTO DE FASE D (AUTOMÁTICO)` y el Paso 7 del MCP diga: `Reescribir el tracker despachando directamente a @DEV-BACK y/o @DEV-FRONT...`
+*   **Ventaja:** Elimina la Compuerta 3 (HITL), logrando que la historia de usuario se desarrolle de principio a fin de manera asíncrona (usando la Barrera Fork-Join).
+
+#### Opción 2: Gatillo de Implementación SDD (HITL + Spec Kit)
+Esta configuración devuelve el control al humano (CTO) antes de escribir código. El QA-Tech simplemente dejará la etiqueta `@SPEC-KIT:` en el tracker, lo que causará que el Watcher se detenga. 
+*   **¿Cómo activarlo?** En `qa-tech.agent.md`, cambia la última sección a `⚡ GATILLO DE IMPLEMENTACIÓN SDD (/speckit.implement)`. Modifica su instrucción a: `Tu única acción es usar la macro @SPEC-KIT: para preparar la invocación de /speckit.implement hacia la Fase D.` Y en el Paso 7 del MCP pon: `Reescribir el tracker preparando la activación de /speckit.implement hacia la Fase D`.
+*   **Ventaja:** Te permite revisar el diseño técnico maestro antes de gastar tokens masivos en la escritura de código. Puedes continuar manualmente ejecutando la Opción 10 (Spec Kit) o la 11b (Herdr) en `utils/approve_step.py`.

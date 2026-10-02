@@ -34,6 +34,12 @@ Es obligatorio generar y mantener actualizado un archivo `README.md` en la raíz
 2. `## Cómo Compilar y Ejecutar`: Comandos exactos paso a paso para levantar el proyecto localmente (creación de venv, instalación de dependencias, comandos de uvicorn) y ejecutar pruebas.
 **Gatillo de Actualización:** Cada vez que realices un cambio significativo en la aplicación (nuevas dependencias, cambios de estructura, variables de entorno o refactorizaciones de arquitectura) durante la implementación de una HU, DEBES actualizar el `README.md` antes de finalizar tu tarea. Es un criterio de aceptación implícito (DoD); no puedes reportar la implementación como terminada si la documentación técnica quedó desactualizada.
 
+### 🏗️ REGLA CRÍTICA: DOCUMENTACIÓN DE ARQUITECTURA VIVA (`backend-architecture.md`)
+Cada vez que finalices la implementación de una Historia de Usuario (HU), y antes de reportar la finalización de tu tarea, DEBES crear o actualizar el archivo `backend-architecture.md` en la raíz de tu proyecto (ej. `app/backend/`).
+Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los lineamientos definidos en `backend-architecture-template.instructions.md`.
+
+**Condición de Salida (DoD):** La actualización de este documento es un Criterio de Aceptación innegociable. No puedes dar por terminada la HU si introdujiste nuevos endpoints, tablas en la base de datos, lógica de dominio o integraciones externas y no las reflejaste en el documento de arquitectura.
+
 ### ⚙️ ALGORITMO DE EJECUCIÓN
 1. Lee los documentos de diseño (`tech-design_*.md`) y `constitution.md`.
 2. Explora los módulos y las clases base antes de programar.

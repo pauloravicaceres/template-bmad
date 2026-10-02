@@ -56,9 +56,11 @@ Tu evaluación analiza 6 ejes críticos:
 
 Si y solo si NO existen hallazgos críticos (0 bloqueos), procedes a la **Consolidación (El Compilador)**: compilas el `tech-design_*.md` maestro unificando componentes, MER, API, matriz de ADRs MADR y los diagramas de arquitectura en la Sección 5. Generas bloques nativos `mermaid` con degradación elegante sin detener el flujo.
 
-### ⚡ GATILLO DE IMPLEMENTACIÓN SDD (/speckit.implement)
-Al emitir la aprobación del `tech-design_*.md`, tienes ESTRICTAMENTE PROHIBIDO cerrar la rama (GITOPS-MERGE-CLOSE). La rama debe seguir abierta.
-Tu única acción es usar la macro `@SPEC-KIT:` para preparar la invocación de `/speckit.implement` hacia la Fase D (`@DEV-BACK:`, `@DEV-FRONT:`, `@DEVOPS:`).
+### ⚡ GATILLO DIRECTO DE FASE D (AUTOMÁTICO)
+Al emitir la aprobación del `tech-design_*.md`, tienes ESTRICTAMENTE PROHIBIDO invocar a `@SPEC-KIT:` o al `@HUMANO:`. Debes analizar el alcance de la HU y la constitución técnica para despachar automáticamente a los agentes desarrolladores escribiendo las siguientes etiquetas en el tracker:
+*   **Si la HU es Full-Stack (requiere backend y frontend):** Escribe en el tracker dos líneas separadas: `@DEV-BACK: La arquitectura técnica ha sido validada. Inicia la implementación del Backend.` y `@DEV-FRONT: La arquitectura técnica ha sido validada. Inicia la implementación del Frontend.`
+*   **Si la HU es Headless / Solo Backend:** Escribe únicamente la orden para `@DEV-BACK:`.
+*   **Si la HU es estrictamente visual:** Escribe únicamente la orden para `@DEV-FRONT:`.
 
 
 
@@ -85,7 +87,7 @@ flowchart TD
     L --> M["write_file: Guardar documento maestro en CARPETA_SALIDA"]
     M --> N["Context Distillation: Gestionar .specify/memory/constitution.md"]
     N --> O["Aplicar constitution-template.instructions.md"]
-    O --> P["write_file: Notificar en tracker para gatillar /speckit.implement hacia Fase D"]
+    O --> P["write_file: Notificar en tracker despachando directo a @DEV-BACK y/o @DEV-FRONT"]
 ```
 
 ---
@@ -100,7 +102,7 @@ flowchart TD
 | 4 | `write_file` | Guardar `tech-design_[nombre_corto].md` (Aprobado) o `feedback_tech_*.md` (Rechazado) |
 | 5 | `read_file` / `write_file` | **Si es Aprobado:** Leer y/o escribir `CARPETA_CONTEXTO` (`.specify/memory/constitution.md`) |
 | 6 | `read_file` | Leer el `tracker_bmad.md` |
-| 7 | `write_file` | Reescribir el tracker preparando la activación de `/speckit.implement` hacia la Fase D |
+| 7 | `write_file` | Reescribir el tracker despachando directamente a `@DEV-BACK` y/o `@DEV-FRONT` según el alcance de la HU |
 
 
 ### ⚙️ ACTUALIZACIÓN DEL MAPA DE SPECS (MODO ESCRITURA)

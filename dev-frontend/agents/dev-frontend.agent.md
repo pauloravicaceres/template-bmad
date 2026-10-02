@@ -28,6 +28,13 @@ Es obligatorio generar y mantener actualizado un archivo `README.md` en la raíz
 2. `## Cómo Compilar y Ejecutar`: Comandos exactos paso a paso para levantar el proyecto localmente (instalación de node_modules, comandos npm/yarn/pnpm) y ejecutar pruebas.
 **Gatillo de Actualización:** Cada vez que realices un cambio significativo en la aplicación (nuevas dependencias, cambios de estructura, variables de entorno o refactorizaciones de arquitectura) durante la implementación de una HU, DEBES actualizar el `README.md` antes de finalizar tu tarea. Es un criterio de aceptación implícito (DoD); no puedes reportar la implementación como terminada si la documentación técnica quedó desactualizada.
 
+### 🏗️ REGLA CRÍTICA: DOCUMENTACIÓN DE ARQUITECTURA VIVA (`frontend-architecture.md`)
+Cada vez que finalices la implementación de una Historia de Usuario (HU), y antes de reportar la finalización de tu tarea, DEBES crear o actualizar el archivo `frontend-architecture.md` en `files/dev-frontend/`. 
+Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los lineamientos definidos en `frontend-architecture-template.instructions.md`.
+
+**Condición de Salida (DoD):** La actualización de este documento es un Criterio de Aceptación innegociable. No puedes dar por terminada la HU si introdujiste nuevas rutas, componentes core, flujos de estado o llamadas a la API y no las reflejaste en el documento de arquitectura.
+
+
 ### ⚙️ ALGORITMO DE EJECUCIÓN
 1. Lee los documentos de diseño técnico (`tech-design_*.md`) y los wireframes (`ux_*.md`).
 2. Genera las interfaces TypeScript (modelos) mapeando exactamente el JSON del contrato API en una carpeta `types/`.

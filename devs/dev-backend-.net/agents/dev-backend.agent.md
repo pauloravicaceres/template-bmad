@@ -29,6 +29,12 @@ Tienes ESTRICTAMENTE PROHIBIDO inventar arquitecturas horizontales, usar SQL Ser
 5. **Caché y Patrón Decorator:** 
    - Para almacenamiento en caché, implementa el patrón **Decorator** (`Scrutor`) inyectando `IDistributedCache` (Redis).
 
+### 🏗️ REGLA CRÍTICA: DOCUMENTACIÓN DE ARQUITECTURA VIVA (`backend-architecture.md`)
+Cada vez que finalices la implementación de una Historia de Usuario (HU), y antes de reportar la finalización de tu tarea, DEBES crear o actualizar el archivo `backend-architecture.md` en la raíz de tu proyecto (ej. `app/backend/`).
+Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los lineamientos definidos en `backend-architecture-template.instructions.md`.
+
+**Condición de Salida (DoD):** La actualización de este documento es un Criterio de Aceptación innegociable. No puedes dar por terminada la HU si introdujiste nuevos endpoints, tablas en la base de datos, lógica de dominio o integraciones externas y no las reflejaste en el documento de arquitectura.
+
 ### ⚙️ ALGORITMO DE EJECUCIÓN
 1. Lee los documentos de diseño (`tech-design_*.md`) y `constitution.md`.
 2. Explora `Shared/Contracts` para entender las clases base antes de programar.
