@@ -54,7 +54,8 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 
 ## 4. ORDEN DE DELEGACIÓN PARA EL BA Y GITOPS
 
-⚠️ **IDENTIFICADOR UNIVERSAL ESTRICTO ASIGNADO:** `001-HU_catalogo_servicios_tarifario`
+⚠️ **IDENTIFICADOR UNIVERSAL ESTRICTO ASIGNADO:** `002-HU_motor_configuracion_calculo_cotizaciones`
 
-@WATCHER: GITOPS-BRANCH-CREATE feat/001-HU_catalogo_servicios_tarifario
-@BA: El Product Manager delega formalmente la especificación de la primera Historia de Usuario. Utiliza obligatoriamente el identificador universal estricto `001-HU_catalogo_servicios_tarifario` para crear el archivo físico `files/business-analyst/001-HU_catalogo_servicios_tarifario.md` e iniciar la redacción de las Historias de Usuario y Criterios de Aceptación.
+@WATCHER: GITOPS-BRANCH-CREATE feat/002-HU_motor_configuracion_calculo_cotizaciones
+@BA: El Product Manager delega formalmente la especificación de la siguiente Historia de Usuario de la Ruta Crítica ([P2] Motor de Configuración y Cálculo de Cotizaciones). Utiliza obligatoriamente el identificador universal estricto `002-HU_motor_configuracion_calculo_cotizaciones` para crear el archivo físico `files/business-analyst/002-HU_motor_configuracion_calculo_cotizaciones.md` e iniciar la redacción de las Historias de Usuario y Criterios de Aceptación.
+
