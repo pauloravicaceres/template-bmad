@@ -36,7 +36,7 @@ La carpeta `utils/` contiene los scripts operativos que le dan al humano el cont
 | Script | Propósito y Comportamiento |
 |---|---|
 | **`clone_template.py`** | Script automatizado de *Scaffolding*. Utiliza una lista blanca estricta para clonar el motor BMAD hacia una nueva ruta. Evita arrastrar historiales (`.git/`), archivos transitorios (`plan.md`) o cachés de proyectos anteriores. |
-| **`start_agents.py`** | Despliega simultáneamente a los 15 agentes de IA. Crea 3 pestañas temáticas en **Herdr** (Negocio, Arquitectura y Delivery), divide los paneles inyectando el contexto de las instrucciones y arranca los bucles de escucha. |
+| **`start_agents.py`** | Despliega simultáneamente a los 15 agentes de IA. Crea 3 pestañas temáticas en **Herdr** (Negocio, Arquitectura y Deployment), divide los paneles inyectando el contexto de las instrucciones y arranca los bucles de escucha. |
 | **`stop_agents.py`** | *Kill-switch* controlado. Busca y cierra limpiamente todas las pestañas, paneles y procesos residuales de Herdr asociados al ecosistema para liberar memoria de la terminal. |
 | **`approve_step.py`** | Motor del *Human-in-the-Loop (HITL)*. Cuando el framework se pausa obligatoriamente (ej. tras el Product Brief o la auditoría Spec Kit), este script permite al humano revisar los artefactos y autorizar matemáticamente la transición hacia el siguiente agente en el tracker. |
 | **`clean_files.py`** | Utilidad interactiva de mantenimiento. Permite purgar selectivamente los entregables (Markdowns, PDFs, Códigos) generados en la carpeta `files/` para resetear un pipeline fallido, conservando intactos el Tracker y la Constitución. |
@@ -53,7 +53,7 @@ Sin embargo, si necesitas realizar micro-ajustes rápidos, refactorizaciones men
 
 **Para despertar a un DEV manualmente en Herdr:**
 
-1. Selecciona la pestaña de "Desarrollo y Delivery" en la UI de Herdr.
+1. Selecciona la pestaña de "Desarrollo y Deployment" en la UI de Herdr.
 2. Abre un panel nuevo apuntando al directorio del agente:
    ```bash
    herdr pane split --direction right --cwd dev-frontend

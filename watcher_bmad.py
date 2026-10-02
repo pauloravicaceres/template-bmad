@@ -247,11 +247,10 @@ def ejecutar_sdd_fase_arquitectura(ruta_hu: str = ""):
         return False
 
 def ejecutar_sdd_fase_implementacion():
-    " " "
+    """
     Hito 3 del SDD Auto-Runner: Fase D (Implementación) usando SpecKit + Soul Mounting.
-    " " "
-    print(f"
-⚙️ [SDD Implementación] Iniciando Fase D (Fuerza Bruta + Alma Agéntica)...")
+    """
+    print(f"\n⚙️ [SDD Implementación] Iniciando Fase D (Fuerza Bruta + Alma Agéntica)...")
     import json
     import subprocess
     try:

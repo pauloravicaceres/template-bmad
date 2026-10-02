@@ -61,7 +61,7 @@ flowchart TD
 
     IMP -- "Enruta Trabajo (Lee AGENTS.md)" --> SPLIT{{"Paralelismo<br>de Ejecución"}}:::router
 
-    subgraph DELIVERY ["Fábrica de Código (BMAD Fase D)"]
+    subgraph DEPLOYMENT ["Fábrica de Código (BMAD Fase D)"]
         direction TB
         SPLIT --> DEVOPS(["devops: devops"]):::agent
         SPLIT --> DEV_B(["dev-back: dev-backend"]):::agent
@@ -89,7 +89,7 @@ flowchart TD
     GOVERNANCE -. "Rige Calidad y Seguridad" .-> DELIVERY
     GOVERNANCE -. "Indica a quién asignar la tarea" .-> IMP
 
-    class DISCOVERY,ARCHITECTURE,DELIVERY bmad
+    class DISCOVERY,ARCHITECTURE,DEPLOYMENT bmad
 ```
 
 ---
@@ -145,7 +145,7 @@ flowchart TD
 
     IMP["⚡ /speckit.implement<br>(Motor de Orquestación de Tareas)"]:::speckit
 
-    subgraph DELIVERY ["🤖 BMAD — Fase D (Ingeniería y Entrega)"]
+    subgraph DEPLOYMENT ["🤖 BMAD — Fase D (Ingeniería y Entrega)"]
         direction TB
         DEVOPS(["devops: devops"]):::agent
         DEV_B(["dev-back: dev-backend"]):::agent
@@ -170,7 +170,7 @@ flowchart TD
     CR --> DONE
 
     %% Líneas de Gobernanza Transversal
-    GOVERNANCE -. "Audita Reglas de Negocio y Calidad" .-> DISCOVERY & SPECKIT_PLAN & ARCHITECTURE & DELIVERY
+    GOVERNANCE -. "Audita Reglas de Negocio y Calidad" .-> DISCOVERY & SPECKIT_PLAN & ARCHITECTURE & DEPLOYMENT
 ```
 
 ---
@@ -223,7 +223,7 @@ flowchart TD
 
     IMP["⚡ /speckit.implement<br/>Ejecutar las tareas"]
 
-    subgraph DELIVERY["🤖 BMAD — DELIVERY"]
+    subgraph DEPLOYMENT["🤖 BMAD — DEPLOYMENT"]
         DEVOPS["devops: devops"]
         DEV_B["dev-back: dev-backend"]
         DEV_F["dev-front: dev-frontend"]

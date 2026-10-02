@@ -4,7 +4,7 @@ start_agents.py
 Despliega la flota completa de 15 agentes de BMAD organizada en 3 pestañas temáticas en Herdr:
   1. Negocio y Producto (6 agentes en grilla 2x3)
   2. Arquitectura e Ingeniería (4 agentes)
-  3. Desarrollo y Delivery (5 agentes)
+  3. Desarrollo y Deployment (5 agentes)
 
 Aplica estrategia FinOps (modelo y esfuerzo de razonamiento) y sandbox con --add-dir.
 """
@@ -31,28 +31,27 @@ WORKSPACE_DIR = Path(__file__).resolve().parent.parent
 TABS_CONFIG = {
     "Negocio y Producto": [
         # Fila 1
-        {"name": "business-storyteller", "model": "Gemini 3.7 Flash", "effort": "low"},
-        {"name": "product-analyst",     "model": "Gemini 3.7 Flash", "effort": "medium", "target": "business-storyteller", "direction": "right"},
-        {"name": "product-manager",     "model": "Gemini 3.7 Flash", "effort": "medium", "target": "product-analyst", "direction": "right"},
+        {"name": "business-storyteller", "model": "Gemini 3.6 Flash", "effort": "low"},
+        {"name": "product-analyst",     "model": "Gemini 3.6 Flash", "effort": "low", "target": "business-storyteller", "direction": "right"},
+        {"name": "product-manager",     "model": "Gemini 3.6 Flash", "effort": "low", "target": "product-analyst", "direction": "right"},
 
         # Fila 2
-        {"name": "business-analyst",    "model": "Gemini 3.7 Flash", "effort": "medium", "target": "business-storyteller", "direction": "down"},
-        {"name": "qa-documental",       "model": "Gemini 3.7 Flash", "effort": "medium", "target": "product-analyst", "direction": "down"},
-        {"name": "designer-ux",         "model": "Gemini 3.7 Flash", "effort": "medium", "target": "product-manager", "direction": "down"},
+        {"name": "business-analyst",    "model": "Gemini 3.6 Flash", "effort": "low", "target": "business-storyteller", "direction": "down"},
+        {"name": "qa-documental",       "model": "Gemini 3.6 Flash", "effort": "low", "target": "product-analyst", "direction": "down"},
+        {"name": "designer-ux",         "model": "Gemini 3.6 Flash", "effort": "low", "target": "product-manager", "direction": "down"},
     ],
     "Arquitectura e Ingeniería": [
-        {"name": "solutions-architect", "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "data-architect",      "model": "Gemini 3.7 Flash", "effort": "high", "target": "solutions-architect", "direction": "right"},
-        {"name": "api-architect",       "model": "Gemini 3.7 Flash", "effort": "high", "target": "solutions-architect", "direction": "down"},
-        {"name": "qa-tech",             "model": "Gemini 3.7 Flash", "effort": "high", "target": "data-architect", "direction": "down"},
+        {"name": "solutions-architect", "model": "Gemini 3.6 Flash", "effort": "low"},
+        {"name": "data-architect",      "model": "Gemini 3.6 Flash", "effort": "low", "target": "solutions-architect", "direction": "right"},
+        {"name": "api-architect",       "model": "Gemini 3.6 Flash", "effort": "low", "target": "solutions-architect", "direction": "down"},
+        {"name": "qa-tech",             "model": "Gemini 3.6 Flash", "effort": "low", "target": "data-architect", "direction": "down"},
     ],
-    "Desarrollo y Delivery": [
+    "Desarrollo y Deployment": [
         # Fase D automatizada: @DEV-BACK y @DEV-FRONT son asimilados por SpecKit.
         # Solo mantenemos a los auditores e infraestructura.
-        {"name": "qa-auto",      "model": "Gemini 3.7 Flash", "effort": "high"},
-        {"name": "code-review",  "model": "Gemini 3.7 Flash", "effort": "high", "target": "qa-auto", "direction": "right"},
-        {"name": "devops",       "model": "Gemini 3.7 Flash", "effort": "medium", "target": "code-review", "direction": "down"},
-    ]
+        {"name": "qa-auto",      "model": "Gemini 3.6 Flash", "effort": "low"},
+        {"name": "code-review",  "model": "Gemini 3.6 Flash", "effort": "low", "target": "qa-auto", "direction": "right"},
+        {"name": "devops",       "model": "Gemini 3.6 Flash", "effort": "low", "target": "code-review", "direction": "right"},
     ]
 }
 
@@ -131,7 +130,7 @@ def extraer_id_pane(salida_cruda):
 
 def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
     """Renombra el panel, inicia el agente AGY con sandboxing y asigna modelo/esfuerzo FinOps."""
-    modelo_base = config_agente.get("model", "Gemini 3.7 Flash")
+    modelo_base = config_agente.get("model", "Gemini 3.6 Flash")
     esfuerzo = config_agente.get("effort", "low")
     esfuerzo_cap = esfuerzo.capitalize()
 
@@ -164,7 +163,7 @@ def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
         "--dangerously-skip-permissions",
         "--add-dir", str(WORKSPACE_DIR),
         "--model", modelo_final,
-        "--agent", "AGENTS.md" 
+        "--agent", f"{nombre_agente}/AGENTS.md" 
     ]
     
     res_start = subprocess.run(
@@ -330,7 +329,7 @@ def inicializar_flota():
     print("🎉 DESPLIEGUE MULTI-TAB COMPLETADO CON ÉXITO")
     print("   • Tab 1: Negocio y Producto (6 agentes - Grilla 2x3)")
     print("   • Tab 2: Arquitectura e Ingeniería (4 agentes)")
-    print("   • Tab 3: Desarrollo y Delivery (3 agentes de Auditoría e Infraestructura)")
+    print("   • Tab 3: Desarrollo y Deployment (3 agentes de Auditoría e Infraestructura)")
     print("=" * 65 + "\n")
 
 if __name__ == "__main__":

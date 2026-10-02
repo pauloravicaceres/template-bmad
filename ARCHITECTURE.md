@@ -73,8 +73,8 @@ flowchart TB
 | `data-architect` | Architecture | Modela persistencia física (MER, esquemas) mapeado a `spec.md`. | `spec.md`, `tasks.md` | `db_*.md` |
 | `api-architect` | Architecture | Diseña contratos REST/GraphQL mapeando endpoints. | `spec.md`, `db_*.md` | `api_*.md` |
 | `qa-tech` | Architecture | Auditoría cruzada TDD vs Spec Kit; compila TDD maestro. | `db_*.md`, `api_*.md` | `tech-design_*.md` |
-| `dev-backend` | Delivery | Construye backend vía CLI (`execute_command`) y realiza Commits Atómicos. | `tech-design_*.md` | Código fuente backend |
-| `dev-frontend` | Delivery | Construye frontend vía CLI (`execute_command`) y realiza Commits Atómicos. | `tech-design_*.md`, `ux_*.md` | Código fuente frontend |
+| `dev-backend` | Deployment | Construye backend vía CLI (`execute_command`) y realiza Commits Atómicos. | `tech-design_*.md` | Código fuente backend |
+| `dev-frontend` | Deployment | Construye frontend vía CLI (`execute_command`) y realiza Commits Atómicos. | `tech-design_*.md`, `ux_*.md` | Código fuente frontend |
 | `qa-auto` | QA | Diseña/ejecuta tests automáticos (`execute_command`) Zero-Tautology. | `hu_*.md`, código | Suites de pruebas |
 | `code-review` | SecOps | Quality Gatekeeper final. Audita físicamente el código fuente (OWASP). | Código fuente y tests | Dictamen `[APROBADO]` |
 | `devops` | SRE | Aprovisiona contenedores y CI/CD vía CLI (`execute_command`). | `tech-design_*.md` | Dockerfiles, Compose |

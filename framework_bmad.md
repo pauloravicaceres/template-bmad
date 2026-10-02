@@ -50,7 +50,7 @@ El ciclo de vida del software en BMAD atraviesa 4 grandes fases cronológicas:
 *   **`@API` (API Architect):** Define los contratos REST o GraphQL, mapeando las fronteras del backend.
 *   **`@QT` (QA Tech):** Actúa como el Compilador Humano. Cruza contratos y modelos, y genera el `tech-design.md` maestro. Tras su aprobación, se gatilla el implementador de la Fase D.
 
-### FASE D (Delivery, Ejecución Masiva Headless)
+### FASE D (Deployment, Ejecución Masiva Headless)
 La fase de construcción masiva se delega enteramente al motor de **SpecKit (`/speckit.implement`)**, que opera como "obrero", pero controlado bajo el paradigma de **Montaje de Alma (Soul Mounting)**. El Watcher copia dinámicamente las directrices de los agentes hacia la memoria de SpecKit antes de ejecutarlo.
 *   **`@DEVOPS`:** Define los contenedores y pipelines asíncronos.
 *   **`@DEV-BACK`:** Ejerce como la "Constitución del Backend". No programa manualmente archivo por archivo, sino que inyecta sus reglas innegociables (ej. VSA, Carter) al motor SpecKit y exige la actualización de la Arquitectura Viva (`backend-architecture.md`).
@@ -90,7 +90,7 @@ flowchart TD
         API --> QT[QA Tech]
     end
 
-    subgraph Delivery["Fase D: Delivery y Git"]
+    subgraph Deployment["Fase D: Deployment y Git"]
         DEV_B[Dev Backend]
         DEV_F[Dev Frontend]
         DEVOPS[DevOps]
@@ -104,12 +104,12 @@ flowchart TD
     Humano --> Arq
     HITL -- "Éxito (Spec Freeze)" --> Arq
     
-    QT -- "/speckit.implement" --> Delivery
-    Delivery --> CR
+    QT -- "/speckit.implement" --> Deployment
+    Deployment --> CR
 
     Gobernanza -. "Dicta Reglas a" .-> Ideacion
     Gobernanza -. "Dicta Reglas a" .-> Arq
-    Gobernanza -. "Dicta Reglas a" .-> Delivery
+    Gobernanza -. "Dicta Reglas a" .-> Deployment
 ```
 
 ### II. Flujo de Trabajo Secuencial (GitOps + Agentes)
@@ -120,7 +120,7 @@ sequenceDiagram
     participant B as 🏢 Agentes de Negocio
     participant S as ⚙️ GitHub Spec Kit
     participant A as 📐 Agentes de Arquitectura
-    participant D as 💻 Agentes Delivery
+    participant D as 💻 Agentes Deployment
     participant G as 🌿 Repositorio Git
 
     H->>W: Inicia Watcher

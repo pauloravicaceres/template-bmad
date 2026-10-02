@@ -10,7 +10,7 @@ El ecosistema BMAD divide la creación de software en 4 fases canónicas:
 - **Fase B (Business):** Descubrimiento y definición del producto (`pb_*.md`).
 - **Fase M (Management):** Alcance, desglose BDD/Gherkin y wireframes (`mvp_*.md`, `hu_*.md`, `ux_*.md`).
 - **Fase A (Architecture):** Persistencia, contratos de red y TDD compilado (`db_*.md`, `api_*.md`, `tech-design_*.md`).
-- **Fase D (Development & Delivery):** Construcción, pruebas automatizadas, auditoría SecOps e infraestructura.
+- **Fase D (Development & Deployment):** Construcción, pruebas automatizadas, auditoría SecOps e infraestructura.
 
 Las **Fases B, M y A** producen especificaciones funcionales y técnicas puras (contratos de datos, esquemas de endpoints, wireframes y criterios de aceptación) que son universales e independientes del lenguaje de programación.
 
