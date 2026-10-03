@@ -121,7 +121,7 @@ Load only the minimal necessary context from each artifact:
 
 - Architecture/stack choices and technical decisions
 - Data Model references
-- Phases and named touch-points (files/components the plan says will be created or edited)
+- Phases and named touch-points (documents/components the plan says will be created or edited)
 - Technical constraints
 
 **From tasks.md:**

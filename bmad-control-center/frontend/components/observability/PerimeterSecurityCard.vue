@@ -62,7 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const defaultRoots = [
-  { path: 'files/', is_monitored: true },
+  { path: 'documents/', is_monitored: true },
   { path: '.specify/', is_monitored: true },
   { path: 'specs/', is_monitored: true },
 ]

@@ -30,7 +30,7 @@ class TestWebSocketEvents:
                 "active_stage": "UX",
                 "overall_status": "IN_PROGRESS",
                 "active_agent_role": "Designer UX",
-                "active_artifact_in_progress": "files/designer-ux/ux_003.md",
+                "active_artifact_in_progress": "documents/designer-ux/ux_003.md",
                 "latest_handoff": {
                     "from_agent": "QA Documental",
                     "target_agent": "UX",
@@ -46,7 +46,7 @@ class TestWebSocketEvents:
             msg = json.loads(raw)
 
             assert msg["event_type"] == "WORKFLOW_UPDATED"
-            assert msg["resource_path"] == "files/tracker_bmad.md"
+            assert msg["resource_path"] == "documents/tracker_bmad.md"
             assert msg["coalesced_count"] == 3
             assert msg["payload"]["active_stage"] == "UX"
             assert msg["payload"]["agent_role"] == "Designer UX"
@@ -60,7 +60,7 @@ class TestWebSocketEvents:
             import asyncio
             asyncio.run(manager.broadcast_artifact_changed(
                 action="CREATED",
-                path="files/designer-ux/mock.md",
+                path="documents/designer-ux/mock.md",
                 size_bytes=1024,
                 is_large_file=False,
                 metadata_only=False,
@@ -72,7 +72,7 @@ class TestWebSocketEvents:
             msg = json.loads(raw)
 
             assert msg["event_type"] == "ARTIFACT_CHANGED"
-            assert msg["resource_path"] == "files/designer-ux/mock.md"
+            assert msg["resource_path"] == "documents/designer-ux/mock.md"
             assert msg["payload"]["change_type"] == "created"
             assert msg["payload"]["is_new_tag"] is True
             assert msg["payload"]["file_metadata"]["filename"] == "mock.md"
@@ -84,10 +84,10 @@ class TestWebSocketEvents:
         with client.websocket_connect("/ws/v1/events") as ws:
             notice = SystemNoticePayload(
                 notice_code="DEBOUNCE_COALESCENCE_APPLIED",
-                message="Se agruparon 5 escrituras consecutivas en files/tracker_bmad.md",
+                message="Se agruparon 5 escrituras consecutivas en documents/tracker_bmad.md",
                 absorbed_mutations_count=5,
                 window_duration_ms=200,
-                coalesced_resource="files/tracker_bmad.md",
+                coalesced_resource="documents/tracker_bmad.md",
             )
             import asyncio
             asyncio.run(manager.broadcast_system_notice(notice))

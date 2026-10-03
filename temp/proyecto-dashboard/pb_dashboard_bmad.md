@@ -35,9 +35,9 @@
 - **Módulos Incluidos:**
   - **Live Workflow Monitor & File Explorer:** Visualización en vivo del flujo de los agentes y renderizado automático de artefactos Markdown y diagramas.
   - **HITL Command Center:** Interfaz central accionable para aprobar, rechazar o inyectar feedback en el proceso de los agentes.
-  - **Observability de Eventos:** Emisión en tiempo real de los cambios del sistema de archivos (`tracker_bmad.md`, `/files/`, `/.specify/`).
+  - **Observability de Eventos:** Emisión en tiempo real de los cambios del sistema de archivos (`tracker_bmad.md`, `/documents/`, `/.specify/`).
   - **Panel de Telemetría Git:** Visualización de cambios en el control de versiones (commits y stage).
-  - **Integración con Sistema Heredado:** Lectura pasiva sobre el `tracker_bmad.md`, la carpeta `files/` y el directorio `.specify/` existentes en el proyecto.
+  - **Integración con Sistema Heredado:** Lectura pasiva sobre el `tracker_bmad.md`, la carpeta `documents/` y el directorio `.specify/` existentes en el proyecto.
 - **Exclusiones Explícitas (Fuera de Alcance):**
   - Modificar la lógica de negocio ni la arquitectura del Portafolio SSG descrito en el repositorio; la herramienta actúa como observador y controlador del proceso, no del dominio funcional externo.
   - Despliegue en la nube (el entorno debe operar de forma estrictamente local).
@@ -81,4 +81,4 @@
 
 ## 9. ORDEN DE DELEGACIÓN PARA EL TRACKER (PAUSA OBLIGATORIA HITL)
 
-@HUMANO: El Product Brief pb_dashboard_bmad.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
+@HUMANO: El Product Brief pb_dashboard_bmad.md está listo para revisión en documents/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.

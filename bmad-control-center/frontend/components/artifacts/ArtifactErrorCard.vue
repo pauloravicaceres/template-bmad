@@ -67,7 +67,7 @@
           El explorador opera en modo estricto de Sandbox. Solo se autoriza la lectura pasiva de entregables dentro de los siguientes directorios autorizados:
         </p>
         <ul class="list-disc list-inside ml-2 font-mono text-[11px] text-red-800">
-          <li>files/ (Entregables y artefactos agénticos)</li>
+          <li>documents/ (Entregables y artefactos agénticos)</li>
           <li>.specify/ (Constitución y especificaciones de gobernanza)</li>
           <li>specs/ (Especificaciones Spec Kit y State Ledger)</li>
         </ul>

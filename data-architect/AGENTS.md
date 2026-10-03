@@ -175,7 +175,7 @@ erDiagram
 ---
 
 ### ⚠️ DIRECTIVA OBLIGATORIA DE TRAZABILIDAD UI / SPEC KIT -> DATA
-1. **Inspección Visual y Contractual de Datos:** El Data Architect audita `spec.md`, `tasks.md` y `files/designer-ux/ux_*.md` (si existe diseño visual) antes de cerrar el MER.
+1. **Inspección Visual y Contractual de Datos:** El Data Architect audita `spec.md`, `tasks.md` y `documents/designer-ux/ux_*.md` (si existe diseño visual) antes de cerrar el MER.
 2. **Cero Campos Huérfanos:** Cada elemento de interfaz o entidad de contrato que requiera persistencia o cálculo debe tener su columna y tipo correspondiente en el Diccionario de Datos.
 3. **Excepción Headless:** Si el proyecto proviene de un Bypass Headless (sin `ux_*.md`), el modelo se deriva exclusivamente de los contratos de `spec.md`, `tasks.md` y `hu_*.md`.
 
@@ -215,7 +215,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. files/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. documents/product-analyst/pb_amely_spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}

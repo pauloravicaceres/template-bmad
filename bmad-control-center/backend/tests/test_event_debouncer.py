@@ -26,7 +26,7 @@ async def test_event_debouncer_coalesces_burst_into_single_event():
     # Simulate 10 rapid mutations in 30ms (< 100ms window)
     for _ in range(10):
         debouncer.submit_event(
-            "files/tracker_bmad.md",
+            "documents/tracker_bmad.md",
             "WORKFLOW_UPDATED",
             lambda c: mock_dispatch(c)
         )
@@ -60,19 +60,19 @@ async def test_event_debouncer_independent_resource_paths():
 
     # Emit 3 mutations for file A and 5 mutations for file B
     for _ in range(3):
-        debouncer.submit_event("files/doc_a.md", "ARTIFACT_CHANGED", lambda c: record_event("files/doc_a.md", c))
+        debouncer.submit_event("documents/doc_a.md", "ARTIFACT_CHANGED", lambda c: record_event("documents/doc_a.md", c))
         await asyncio.sleep(0.005)
 
     for _ in range(5):
-        debouncer.submit_event("files/doc_b.md", "ARTIFACT_CHANGED", lambda c: record_event("files/doc_b.md", c))
+        debouncer.submit_event("documents/doc_b.md", "ARTIFACT_CHANGED", lambda c: record_event("documents/doc_b.md", c))
         await asyncio.sleep(0.005)
 
     await asyncio.sleep(0.12)
 
-    assert "files/doc_a.md" in dispatched
-    assert dispatched["files/doc_a.md"] == 3
-    assert "files/doc_b.md" in dispatched
-    assert dispatched["files/doc_b.md"] == 5
+    assert "documents/doc_a.md" in dispatched
+    assert dispatched["documents/doc_a.md"] == 3
+    assert "documents/doc_b.md" in dispatched
+    assert dispatched["documents/doc_b.md"] == 5
 
 
 @pytest.mark.asyncio
@@ -87,7 +87,7 @@ async def test_event_debouncer_single_event_no_system_notice():
         system_notice_callback=lambda n: notices.append(n)
     )
 
-    debouncer.submit_event("files/single.md", "ARTIFACT_CHANGED", lambda c: dispatched.append(c))
+    debouncer.submit_event("documents/single.md", "ARTIFACT_CHANGED", lambda c: dispatched.append(c))
     await asyncio.sleep(0.08)
 
     assert len(dispatched) == 1

@@ -1,16 +1,16 @@
 ### [02-10-2026] Business Storyteller
 - **Hora:** 20:14:10
-- **Artefacto generado:** `files/business-storyteller/idea_generador_cotizaciones.md`
+- **Artefacto generado:** `documents/business-storyteller/idea_generador_cotizaciones.md`
 - **Estado:** Transformación narrativa completada con éxito. Idea estructurada en primera persona con dolores de negocio, actores y bloques modulares explícitos.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @PA: Se entrega la idea de negocio optimizada para el inicio de la Fase de Análisis y elaboración del Product Brief.
 
 ### [02-10-2026] Product Analyst
 - **Hora:** 20:15:00
-- **Artefacto generado:** `files/product-analyst/pb_generador_cotizaciones.md`
+- **Artefacto generado:** `documents/product-analyst/pb_generador_cotizaciones.md`
 - **Estado:** Product Brief elaborado respetando las 8 secciones canónicas y la política anti-alucinación. Se verificó la persistencia física en el sistema de archivos.
 - **⚠️ Puntos Abiertos:** Definición de la inclusión de impuestos (IGV / Recibos por Honorarios) e independización de plantillas de términos comerciales en la cotización PDF.
-- **Handoff:** @HUMANO: El Product Brief pb_generador_cotizaciones.md está listo para revisión en files/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
+- **Handoff:** @HUMANO: El Product Brief pb_generador_cotizaciones.md está listo para revisión en documents/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
 
 ### [02-10-2026] HUMANO
 - **Hora:** 20:15:30
@@ -20,7 +20,7 @@
 
 ### [02-10-2026] Product Manager
 - **Hora:** 20:16:30
-- **Artefacto generado:** `files/product-manager/mvp_generador_cotizaciones.md`
+- **Artefacto generado:** `documents/product-manager/mvp_generador_cotizaciones.md`
 - **Estado:** Análisis estratégico y Backlog del MVP estructurados bajo Ruta Crítica. Se registró la Historia de Usuario `001-HU_configurador_y_calculo_cotizaciones` en `specs/README.md` con estado IN-PROGRESS.
 - **⚠️ Puntos Abiertos:** Definición de impuestos (IGV / Recibos por Honorarios) y nivel de editabilidad de condiciones comerciales en el PDF.
 @WATCHER: GITOPS-BRANCH-CREATE feat/001-HU_configurador_y_calculo_cotizaciones
@@ -28,14 +28,14 @@
 
 ### [02-10-2026] Business Analyst
 - **Hora:** 20:20:00
-- **Artefacto generado:** `files/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md`
-- **Estado:** Especificación Dual-Output completada exitosamente. Se generaron la Historia de Usuario Técnica (Spec Kit Ready) en `files/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md` y la Historia de Usuario para Stakeholders en `files/business-analyst/HUs-stakeholders/001-HU_configurador_y_calculo_cotizaciones.md`, cumpliendo la política anti-alucinación, sintaxis Gherkin BDD, matriz de casos borde y auto-validación de calidad.
+- **Artefacto generado:** `documents/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md`
+- **Estado:** Especificación Dual-Output completada exitosamente. Se generaron la Historia de Usuario Técnica (Spec Kit Ready) en `documents/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md` y la Historia de Usuario para Stakeholders en `documents/business-analyst/HUs-stakeholders/001-HU_configurador_y_calculo_cotizaciones.md`, cumpliendo la política anti-alucinación, sintaxis Gherkin BDD, matriz de casos borde y auto-validación de calidad.
 - **⚠️ Puntos Abiertos:** Definición sobre la incorporación de impuestos locales (IGV 18% / Recibo por Honorarios 8%) en el motor de cálculo.
 - **Handoff:** @QA: Se entregan las HUs Técnica y Stakeholders para la Historia 001-HU_configurador_y_calculo_cotizaciones.
 
 ### [02-10-2026] QA Documental
 - **Hora:** 20:21:45
-- **Artefacto generado:** `files/qa-documental/aprobado_qa_001_configurador_y_calculo_cotizaciones.md`
+- **Artefacto generado:** `documents/qa-documental/aprobado_qa_001_configurador_y_calculo_cotizaciones.md`
 - **Estado:** Auditoría de Requisitos completada con éxito. La Historia de Usuario `001-HU_configurador_y_calculo_cotizaciones.md` cumple al 100% las 6 dimensiones de la rúbrica QA (Trazabilidad, INVEST, BDD/Gherkin, Consistencia, Separación de Capas y No-regresión Brownfield).
 - **⚠️ Puntos Abiertos:** Definición pendiente sobre la incorporación de impuestos locales (IGV / Recibos por Honorarios) a nivel de motor de cálculo.
 - **Handoff:** @UX: La Historia de Usuario 001-HU_configurador_y_calculo_cotizaciones.md ha sido aprobada por QA. Por favor, procede a diseñar los wireframes y estados visuales.
@@ -46,7 +46,7 @@
 
 ### [02-10-2026] SpecKit / System
 - **Hora:** 20:23:00
-- **Artefacto procesado:** `files/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md`
+- **Artefacto procesado:** `documents/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md`
 - **Estado:** Análisis funcional de la especificación verificado exitosamente.
 - **Handoff:** @UX: La especificación del Requerimiento `001-HU_configurador_y_calculo_cotizaciones` está validada y lista para la elaboración de componentes y wireframes visuales.
 
@@ -83,14 +83,14 @@ Si deseas crear el archivo `spec.md` bajo `specs/002-HU_motor_configuracion_calc
 
 ### [02-10-2026] Designer UX
 - **Hora:** 20:25:00
-- **Artefacto generado:** `files/designer-ux/ux_001_configurador_y_calculo_cotizaciones.md`
+- **Artefacto generado:** `documents/designer-ux/ux_001_configurador_y_calculo_cotizaciones.md`
 - **Estado:** Especificación de diseño visual y wireframes ASCII completados al 100% mapeando los 3 escenarios BDD de la Historia de Usuario 001-HU_configurador_y_calculo_cotizaciones (Happy Path, Sad Path y Caso Borde de deselección).
 - **⚠️ Puntos Abiertos:** Ninguno.
 - **Handoff:** @SA: El diseño visual de la HU 001-HU_configurador_y_calculo_cotizaciones ha sido completado exitosamente. Por favor, procede con la fase de arquitectura técnica y diseño detallado de solución (tech-design).
 
 ### [02-10-2026] Solutions Architect
 - **Hora:** 20:25:35
-- **Artefacto generado:** `files/solutions-architect/tech_guidelines.md`
+- **Artefacto generado:** `documents/solutions-architect/tech_guidelines.md`
 - **Estado:** Definición de gobernanza técnica, arquitectura de manejo de estado, patrones de resiliencia y ADRs en formato MADR completados para 001-HU_configurador_y_calculo_cotizaciones.md. Subordinado a la Constitución Técnica en .specify/memory/constitution.md (Modo Brownfield).
 - **⚠️ Puntos Abiertos:** Ninguno.
 @WATCHER: SDD-FREEZE 001-HU_configurador_y_calculo_cotizaciones.md
@@ -112,7 +112,7 @@ Si deseas crear el archivo `spec.md` bajo `specs/002-HU_motor_configuracion_calc
 
 ### [02-10-2026] Data Architect
 - **Hora:** 20:28:50
-- **Artefacto generado:** `files/data-architect/db_configurador_y_calculo_cotizaciones.md`
+- **Artefacto generado:** `documents/data-architect/db_configurador_y_calculo_cotizaciones.md`
 - **Estado:** Diseño del Modelo Entidad-Relación (MER), Diccionario de Datos y Registro de Decisiones de Arquitectura (ADRs MADR) completado exitosamente a partir de spec.md, tasks.md y ux_001_configurador_y_calculo_cotizaciones.md. Se realizó la auditoría de trazabilidad UI -> Data verificando cero campos huérfanos.
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @API: El modelo de datos (MER) y la persistencia han sido definidos a partir de spec.md y tasks.md. Por favor, diseña los contratos de integración (Endpoints/Payloads) basados en estas tablas.

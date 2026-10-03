@@ -1,6 +1,6 @@
 # Task Breakdown: 002-HU_motor_configuracion_calculo_cotizaciones
 
-**Feature Branch**: `feat/001-HU_configurador_y_calculo_cotizaciones` | **Spec**: [001-HU_configurador_y_calculo_cotizaciones.md](file:///D:/Paulo/Cursos/DMC/template-bmad/files/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md)  
+**Feature Branch**: `feat/001-HU_configurador_y_calculo_cotizaciones` | **Spec**: [001-HU_configurador_y_calculo_cotizaciones.md](file:///D:/Paulo/Cursos/DMC/template-bmad/documents/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md)  
 **Plan**: [plan.md](file:///D:/Paulo/Cursos/DMC/template-bmad/specs/002-HU_motor_configuracion_calculo_cotizaciones/plan.md) | **Data Model**: [data-model.md](file:///D:/Paulo/Cursos/DMC/template-bmad/specs/002-HU_motor_configuracion_calculo_cotizaciones/data-model.md)
 
 ---

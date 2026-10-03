@@ -1,4 +1,4 @@
-﻿# 🏛️ Ecosistema Multi-Agente BMAD v2.0 (con SDD y Herdr)
+# 🏛️ Ecosistema Multi-Agente BMAD v2.0 (con SDD y Herdr)
 
 > Framework y plugin organizacional para la definición integral, autónoma y desacoplada de software bajo metodología BMAD (Business, Management, Architecture, Development). Orquestado sobre terminales independientes en **Herdr**, automatización Git Headless y herramientas MCP.
 
@@ -39,7 +39,7 @@ La carpeta `utils/` contiene los scripts operativos que le dan al humano el cont
 | **`start_agents.py`** | Despliega simultáneamente a los 15 agentes de IA. Crea 3 pestañas temáticas en **Herdr** (Negocio, Arquitectura y Deployment), divide los paneles inyectando el contexto de las instrucciones y arranca los bucles de escucha. |
 | **`stop_agents.py`** | *Kill-switch* controlado. Busca y cierra limpiamente todas las pestañas, paneles y procesos residuales de Herdr asociados al ecosistema para liberar memoria de la terminal. |
 | **`approve_step.py`** | Motor del *Human-in-the-Loop (HITL)*. Cuando el framework se pausa obligatoriamente (ej. tras el Product Brief o la auditoría Spec Kit), este script permite al humano revisar los artefactos y autorizar matemáticamente la transición hacia el siguiente agente en el tracker. |
-| **`clean_files.py`** | Utilidad interactiva de mantenimiento. Permite purgar selectivamente los entregables (Markdowns, PDFs, Códigos) generados en la carpeta `files/` para resetear un pipeline fallido, conservando intactos el Tracker y la Constitución. |
+| **`clean_files.py`** | Utilidad interactiva de mantenimiento. Permite purgar selectivamente los entregables (Markdowns, PDFs, Códigos) generados en la carpeta `documents/` para resetear un pipeline fallido, conservando intactos el Tracker y la Constitución. |
 | **`delete_agents.py`** | Limpiador del Meta-Agente. Borra los archivos `AGENTS.md` compilados dinámicamente para forzar al orquestador a re-inyectar las skills (`[IMPORT_SKILL]`) en el siguiente arranque. |
 | **`response_sa.py`** | Herramienta de *mocking* o debugging interno utilizada para simular las respuestas del Arquitecto de Soluciones y destrabar cuellos de botella en la fase de pruebas de handoff. |
 
@@ -73,7 +73,7 @@ Sin embargo, si necesitas realizar micro-ajustes rápidos, refactorizaciones men
 * **Estrategia Dual-Output de Requisitos (Business Analyst):** Generación simultánea de Historias Técnicas (Gherkin puro para Spec Kit) y Funcionales (Narrativas amigables para Stakeholders).
 * **Fase D (Ingeniería) como Cartucho Intercambiable:** Arquitectura desacoplada con segregación entre Constructores (`DEV-BACK`, `DEV-FRONT`) y Auditores (`QA-AUTO`, `CODE-REVIEW`). Todos dotados con `execute_command` para operar físicamente la máquina del host.
 * **Lógica de Bypass Inteligente:** El `config_bmad.json` decide rutas. En `project_type: ui` pasa al diseñador `@UX:`. En `project_type: headless`, salta directamente al `@SA:` ahorrando tiempo.
-* **El Tracker como Único Bus de Datos:** Eliminación de alucinaciones inter-agente. Se comunican exclusivamente anexando texto (*read -> concat -> write*) en `files/tracker_bmad.md`.
+* **El Tracker como Único Bus de Datos:** Eliminación de alucinaciones inter-agente. Se comunican exclusivamente anexando texto (*read -> concat -> write*) en `documents/tracker_bmad.md`.
 
 ---
 
@@ -138,7 +138,7 @@ flowchart TD
         L1["🏛️ Nivel 1 (Constitución Inviolable):<br><b>.specify/memory/constitution.md</b><br><i>(Stack, Motores DB, Patrones Base)</i>"]
         L2["📐 Nivel 2 (Directiva de Solución):<br><b>tech_guidelines.md</b><br><i>(ADRs MADR subordinados al Nivel 1)</i>"]
         L3["💾 Nivel 3 (Diseño de Persistencia y Red):<br><b>db_*.md / api_*.md</b><br><i>(Modelado MER y Contratos REST/GraphQL)</i>"]
-        L4["💬 Nivel 4 (Peticiones Transitorias):<br><b>files/tracker_bmad.md</b><br><i>(Instrucciones en caliente)</i>"]
+        L4["💬 Nivel 4 (Peticiones Transitorias):<br><b>documents/tracker_bmad.md</b><br><i>(Instrucciones en caliente)</i>"]
     end
     
     L1 ==>|Prevalece sobre| L2

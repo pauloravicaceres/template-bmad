@@ -8,7 +8,7 @@ Su misión fundamental es transformar la ambigüedad en claridad absoluta. El PA
 
 ### 📦 Entradas y Artefactos de Salida
 
-* **Entradas (Lectura):** `idea_*.md` (Narrativa optimizada generada por el Business Storyteller en `files/business-storyteller/`) o instrucción del `@PA:` en el tracker.
+* **Entradas (Lectura):** `idea_*.md` (Narrativa optimizada generada por el Business Storyteller en `documents/business-storyteller/`) o instrucción del `@PA:` en el tracker.
 * **Artefacto Generado:** `pb_[nombre_corto].md` (El Product Brief oficial de 8 secciones canónicas).
 * **Handoff (Pausa HITL Obligatoria):** Transfiere el control **exclusivamente al `@HUMANO:`** mediante el `tracker_bmad.md` para revisión ejecutiva. **REGLA CRÍTICA:** Tiene estrictamente prohibido invocar al `@PM:` de forma directa; la activación del `@PM:` requiere la validación humana mediante `python utils/approve_step.py`.
 

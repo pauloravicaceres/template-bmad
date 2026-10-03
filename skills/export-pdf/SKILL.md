@@ -11,7 +11,7 @@ tags: [export, pdf, reporting, python, herramientas]
 Convertir los entregables finales aprobados (Product Briefs, Historias de Usuario, Reportes) de su formato nativo Markdown a un documento PDF profesional y presentable, utilizando el motor de conversión interno.
 
 ## Input
-- **Ruta del archivo Markdown original:** (ej. `files/product-analyst/pb_amely_spa.md`)
+- **Ruta del archivo Markdown original:** (ej. `documents/product-analyst/pb_amely_spa.md`)
 - **Ruta de destino del PDF (opcional):** Si no se provee, se guardará en la misma carpeta con la extensión `.pdf`.
 
 ## Workflow

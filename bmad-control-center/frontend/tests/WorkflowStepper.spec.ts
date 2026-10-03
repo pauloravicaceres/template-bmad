@@ -87,7 +87,7 @@ describe('WorkflowStepper Component (T009 / US1)', () => {
         started_at: '2026-09-30T23:10:00Z',
         completed_at: '2026-09-30T23:14:00Z',
         origin_block_index: 2,
-        generated_artifact_path: 'files/business-analyst/002-HU_monitoreo.md',
+        generated_artifact_path: 'documents/business-analyst/002-HU_monitoreo.md',
       },
     ]
 
@@ -106,6 +106,6 @@ describe('WorkflowStepper Component (T009 / US1)', () => {
     expect(wrapper.emitted('select-stage')).toBeTruthy()
     expect(wrapper.emitted('select-stage')?.[0]).toEqual([customStages[0]])
     expect(wrapper.emitted('select-artifact')).toBeTruthy()
-    expect(wrapper.emitted('select-artifact')?.[0]).toEqual(['files/business-analyst/002-HU_monitoreo.md'])
+    expect(wrapper.emitted('select-artifact')?.[0]).toEqual(['documents/business-analyst/002-HU_monitoreo.md'])
   })
 })

@@ -61,7 +61,7 @@ Abre una terminal y ejecuta el script del orquestador:
 ```bash
 python watcher_bmad.py
 ```
-> *El Watcher compilará automáticamente las definiciones modulares en `AGENTS.md` de cada agente y quedará escuchando el archivo `files/tracker_bmad.md`.*
+> *El Watcher compilará automáticamente las definiciones modulares en `AGENTS.md` de cada agente y quedará escuchando el archivo `documents/tracker_bmad.md`.*
 
 ---
 
@@ -87,7 +87,7 @@ Dirígete a la terminal del agente **Business Storyteller** (o envía un prompt 
 - **Si la idea es ambigua:** El Business Storyteller formulará 3 a 4 preguntas en su panel. Responde en el mismo chat para que proceda a generar `idea_*.md`.
 - **A partir de la delegación:** El Watcher detectará la orden `@PA:` y el flujo avanzará hacia el PA.
 - **Pausa Obligatoria HITL (Product Brief):** Al concluir el Product Brief, el PA detiene deliberadamente el flujo emitiendo `@HUMANO:`. La activación de `@PM:` depende de la validación humana:
-  1. Revisa el archivo generado en `files/product-analyst/`.
+  1. Revisa el archivo generado en `documents/product-analyst/`.
   2. Abre una terminal y ejecuta:
      ```bash
      python utils/approve_step.py
@@ -95,15 +95,15 @@ Dirígete a la terminal del agente **Business Storyteller** (o envía un prompt 
   3. Selecciona la opción `[2] Product Analyst` y confirma con `s`.
   4. El script inyectará la orden `@PM:` en el tracker y el Watcher despertará automáticamente.
 - **Fase Ágil de Especificación (Estrategia Dual-Output):** El PM asignará épicas al BA (`@BA:`), quien redactará simultáneamente:
-  - La **HU Técnica (Spec Kit Ready)** en `files/business-analyst/hu_[ID]_[nombre].md`.
-  - La **HU para Stakeholders** en `files/business-analyst/HUs-stakeholders/hu_[ID]_[nombre].md`.
+  - La **HU Técnica (Spec Kit Ready)** en `documents/business-analyst/hu_[ID]_[nombre].md`.
+  - La **HU para Stakeholders** en `documents/business-analyst/HUs-stakeholders/hu_[ID]_[nombre].md`.
   - El BA delega la revisión al QA Documental (`@QA:`).
 
 - **🛑 Intercepción SDD Gatekeeper (Pausa Lógica de Spec Kit):**
   Cuando `@QA:` emite su certificado de aprobación (`aprobado_qa_*.md`), el orquestador **`watcher_bmad.py` intercepta el avance automático hacia UX o Arquitectura y detiene el flujo**. La consola del Watcher mostrará un banner indicando que es el momento del ciclo interactivo de Spec Kit:
   1. Ejecutar en terminal:
      ```bash
-     /speckit.specify files/business-analyst/hu_[ID]_[nombre].md
+     /speckit.specify documents/business-analyst/hu_[ID]_[nombre].md
      /speckit.clarify
      /speckit.plan
      /speckit.tasks
@@ -136,16 +136,16 @@ Dirígete a la terminal del agente **Business Storyteller** (o envía un prompt 
 
 | Agente | Entrada Requerida | Salida Generada | Ubicación de Salida |
 |---|---|---|---|
-| **BS** | Idea o requerimiento crudo del usuario | `idea_[nombre].md` | `files/business-storyteller/` |
-| **PA** | `idea_[nombre].md` | `pb_[nombre].md` (Product Brief) | `files/product-analyst/` |
-| **PM** | `pb_[nombre].md` (Post-HITL) | `mvp_[nombre].md` (Plan MVP + Épicas) | `files/product-manager/` |
-| **BA** | `mvp_[nombre].md` + `pb_[nombre].md` | `hu_[nombre].md` (Historias BDD) | `files/business-analyst/` |
-| **QA** | `hu_[nombre].md` + `pb_[nombre].md` | `aprobado_qa_*.md` / `feedback_qa_*.md` | `files/qa-documental/` |
-| **UX** | `hu_[nombre].md` (Aprobada) | `ux_[nombre].md` (Wireframes ASCII) | `files/designer-ux/` |
-| **SA** | `pb_*.md` + `mvp_*.md` + (Q&A Humano o `constitution.md`) | `tech_guidelines.md` (Gobernanza) | `files/solutions-architect/` |
-| **DA** | `hu_*.md` + `pb_*.md` + Guidelines | `db_[nombre].md` (MER + ADRs) | `files/data-architect/` |
-| **API** | `db_*.md` + `hu_*.md` | `api_[nombre].md` (Contratos + ADRs) | `files/api-architect/` |
-| **QT** | `db_*.md` + `api_*.md` | `tech-design_[nombre].md` (TDD Maestro) | `files/qa-tech/` |
+| **BS** | Idea o requerimiento crudo del usuario | `idea_[nombre].md` | `documents/business-storyteller/` |
+| **PA** | `idea_[nombre].md` | `pb_[nombre].md` (Product Brief) | `documents/product-analyst/` |
+| **PM** | `pb_[nombre].md` (Post-HITL) | `mvp_[nombre].md` (Plan MVP + Épicas) | `documents/product-manager/` |
+| **BA** | `mvp_[nombre].md` + `pb_[nombre].md` | `hu_[nombre].md` (Historias BDD) | `documents/business-analyst/` |
+| **QA** | `hu_[nombre].md` + `pb_[nombre].md` | `aprobado_qa_*.md` / `feedback_qa_*.md` | `documents/qa-documental/` |
+| **UX** | `hu_[nombre].md` (Aprobada) | `ux_[nombre].md` (Wireframes ASCII) | `documents/designer-ux/` |
+| **SA** | `pb_*.md` + `mvp_*.md` + (Q&A Humano o `constitution.md`) | `tech_guidelines.md` (Gobernanza) | `documents/solutions-architect/` |
+| **DA** | `hu_*.md` + `pb_*.md` + Guidelines | `db_[nombre].md` (MER + ADRs) | `documents/data-architect/` |
+| **API** | `db_*.md` + `hu_*.md` | `api_[nombre].md` (Contratos + ADRs) | `documents/api-architect/` |
+| **QT** | `db_*.md` + `api_*.md` | `tech-design_[nombre].md` (TDD Maestro) | `documents/qa-tech/` |
 
 > *Nota sobre Modo Brownfield: Si existe el archivo `.specify/memory/constitution.md`, todos los agentes de negocio, producto, requerimientos y arquitectura lo consumen de forma complementaria para subordinar sus entregables a dicho entorno.*
 
@@ -171,7 +171,7 @@ El ecosistema permite agregar nuevas habilidades (*skills*) a los agentes de for
 
 | Síntoma | Causa Probable | Solución Recomendada |
 |---|---|---|
-| El Watcher entra en pausa tras el Product Brief | Pausa obligatoria HITL activa | Revisar `files/product-analyst/pb_*.md` y ejecutar `python utils/approve_step.py`. |
+| El Watcher entra en pausa tras el Product Brief | Pausa obligatoria HITL activa | Revisar `documents/product-analyst/pb_*.md` y ejecutar `python utils/approve_step.py`. |
 | El Watcher indica `Agente no encontrado` | El panel de Herdr no coincide con el nombre esperado | Verificar que `start_agents.py` haya nombrado los paneles correctamente o ejecutar `herdr agent list`. |
 | El agente reporta `Access Denied` al leer un archivo | El agente no tiene permisos sobre la ruta raíz del proyecto | Asegurarse de haber arrancado el agente con el flag `--add-dir` en la raíz (manejado automáticamente por `start_agents.py`). |
 | Bucle infinito entre BA y QA (Rechazo repetido) | El LLM del BA no logra interpretar el feedback de QA | Intervenir manualmente en la terminal del BA inyectando la corrección puntual y reactivar el Watcher. |
@@ -179,7 +179,7 @@ El ecosistema permite agregar nuevas habilidades (*skills*) a los agentes de for
 | Faltan archivos `AGENTS.md` en los directorios de los agentes | No se ejecutó el paso de compilación previa | El Watcher los compila automáticamente al iniciar, o se pueden forzar corriendo `python watcher_bmad.py`. |
 | El enjambre ignora restricciones del sistema existente | `.specify/memory/constitution.md` no existe o está vacío | Crear `.specify/memory/constitution.md` detallando el stack, datos y reglas preexistentes antes de iniciar el flujo. |
 | Se desea alternar entre Greenfield y Brownfield | Gestión del archivo interruptor físico | Para Greenfield: renombrar o borrar `constitution.md`. Para Brownfield: crear o poblar dicho archivo. |
-| Se requiere reiniciar el proyecto desde cero | Existen archivos residuales de ejecuciones previas | Ejecutar `python utils/clean_files.py` (opción `T`) y vaciar `files/tracker_bmad.md`. |
+| Se requiere reiniciar el proyecto desde cero | Existen archivos residuales de ejecuciones previas | Ejecutar `python utils/clean_files.py` (opción `T`) y vaciar `documents/tracker_bmad.md`. |
 
 ---
 

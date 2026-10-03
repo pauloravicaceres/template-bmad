@@ -2,7 +2,7 @@
 
 - **Especificación SDD Base:** `specs/002-HU_motor_configuracion_calculo_cotizaciones/data-model.md`, `plan.md` y `tasks.md`
 - **Historias de Usuario Base:** `001-HU_configurador_y_calculo_cotizaciones.md`
-- **Diseño Visual UX Auditado:** `files/designer-ux/ux_001_configurador_y_calculo_cotizaciones.md`
+- **Diseño Visual UX Auditado:** `documents/designer-ux/ux_001_configurador_y_calculo_cotizaciones.md`
 - **Fecha de Diseño:** 02-10-2026
 - **Data Architect:** Agente DA Senior BMAD
 
@@ -13,7 +13,7 @@
 ### ADR-01: Motor de Persistencia Relacional PostgreSQL 16
 - **Estado:** Aceptado (heredado)
   > *Regla: Usar "Aceptado (heredado)" si la decisión proviene de `.specify/memory/constitution.md` o `tech_guidelines.md`.*
-- **Contexto:** Subordinación a la gobernanza global del proyecto registrada en `.specify/memory/constitution.md` y `files/solutions-architect/tech_guidelines.md` para el almacenamiento transaccional del catálogo y las cotizaciones emitidas.
+- **Contexto:** Subordinación a la gobernanza global del proyecto registrada en `.specify/memory/constitution.md` y `documents/solutions-architect/tech_guidelines.md` para el almacenamiento transaccional del catálogo y las cotizaciones emitidas.
 - **Decisión:** Utilizar el motor relacional PostgreSQL 16 como solución de persistencia relacional transaccional (ACID).
 - **Consecuencias:**
   - ✅ **Ventajas / Impacto Positivo:** Integridad referencial fuerte, soporte nativo de tipos numéricos precisos (`NUMERIC`/`DECIMAL`), restricciones CHECK a nivel de base de datos para evitar importes negativos.

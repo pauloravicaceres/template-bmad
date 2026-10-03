@@ -9,10 +9,10 @@ artifact_service = ArtifactService()
 
 @router.get("/artifacts/tree", response_model=ArtifactTreeResponse, summary="Escaneo recursivo del árbol de entregables")
 async def get_artifact_tree(
-    root: str = Query("all", description="Raíz a inspeccionar ('files', 'specs', '.specify', 'all')")
+    root: str = Query("all", description="Raíz a inspeccionar ('documents', 'specs', '.specify', 'all')")
 ) -> ArtifactTreeResponse:
     """
-    Escanea recursivamente las raíces del workspace autorizadas ('files/', 'specs/', '.specify/').
+    Escanea recursivamente las raíces del workspace autorizadas ('documents/', 'specs/', '.specify/').
     Calcula el conteo de entregables directos y detecta directorios vacíos (Empty State).
     """
     return artifact_service.get_artifact_tree(root=root)
@@ -20,7 +20,7 @@ async def get_artifact_tree(
 
 @router.get("/workspace/tree", response_model=ArtifactTreeResponse, summary="Alias interoperable para árbol de entregables")
 async def get_workspace_tree(
-    root: str = Query("all", description="Raíz a inspeccionar ('files', 'specs', '.specify', 'all')")
+    root: str = Query("all", description="Raíz a inspeccionar ('documents', 'specs', '.specify', 'all')")
 ) -> ArtifactTreeResponse:
     """Ruta de interoperabilidad alineada con contracts/api-contract.md."""
     return artifact_service.get_artifact_tree(root=root)

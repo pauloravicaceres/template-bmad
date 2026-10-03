@@ -3,7 +3,7 @@ import mimetypes
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Set
-import aiofiles
+import aiodocuments
 from fastapi import HTTPException
 
 from core.config import settings
@@ -70,7 +70,7 @@ class ArtifactService:
         parent_rel = "/".join(norm_rel.split("/")[:-1]) if "/" in norm_rel else ("" if norm_rel else None)
         
         children: List[DirectoryNode] = []
-        child_files_count = 0
+        child_documents_count = 0
 
         try:
             entries = sorted(list(current_dir.iterdir()), key=_get_entry_sort_key)
@@ -92,7 +92,7 @@ class ArtifactService:
                 sub_node = self._scan_directory_node(entry, entry_rel)
                 children.append(sub_node)
             else:
-                child_files_count += 1
+                child_documents_count += 1
                 file_node = DirectoryNode(
                     node_id=entry_rel,
                     name=entry.name,
@@ -108,7 +108,7 @@ class ArtifactService:
                 )
                 children.append(file_node)
 
-        is_empty = (child_files_count == 0 and len([c for c in children if c.node_type == "DIRECTORY"]) == 0) or (child_files_count == 0)
+        is_empty = (child_documents_count == 0 and len([c for c in children if c.node_type == "DIRECTORY"]) == 0) or (child_documents_count == 0)
 
         return DirectoryNode(
             node_id=norm_rel or "workspace_root",
@@ -116,7 +116,7 @@ class ArtifactService:
             node_type="DIRECTORY",
             relative_path=norm_rel,
             parent_path=parent_rel,
-            child_file_count=child_files_count,
+            child_file_count=child_documents_count,
             is_empty=is_empty,
             last_modified=self._format_mtime(current_dir),
             children=children,
@@ -126,14 +126,14 @@ class ArtifactService:
 
     def get_artifact_tree(self, root: str = "all") -> ArtifactTreeResponse:
         """
-        Escanea recursivamente las raíces del workspace autorizadas ('files/', 'specs/', '.specify/').
+        Escanea recursivamente las raíces del workspace autorizadas ('documents/', 'specs/', '.specify/').
         Valida que el parámetro root pertenezca a la lista blanca o sea 'all'.
         """
-        valid_roots = ["files", "specs", ".specify", "all"]
+        valid_roots = ["documents", "specs", ".specify", "all"]
         if root not in valid_roots:
             raise HTTPException(
                 status_code=400,
-                detail=f"El parámetro 'root' recibido ('{root}') no es una raíz autorizada. Valores admitidos: 'files', 'specs', '.specify', 'all'."
+                detail=f"El parámetro 'root' recibido ('{root}') no es una raíz autorizada. Valores admitidos: 'documents', 'specs', '.specify', 'all'."
             )
 
         roots_to_scan = settings.ALLOWED_ROOTS if root == "all" else [root]
@@ -263,9 +263,9 @@ class ArtifactService:
                 detail=f"El archivo '{canonical_path.name}' posee un formato binario ('{detected_mime}') no renderizable en modo texto o Markdown."
             )
 
-        # 5. Read file asynchronously with aiofiles
+        # 5. Read file asynchronously with aiodocuments
         try:
-            async with aiofiles.open(canonical_path, mode="r", encoding="utf-8") as f:
+            async with aiodocuments.open(canonical_path, mode="r", encoding="utf-8") as f:
                 content = await f.read()
         except UnicodeDecodeError:
             # File is binary or not valid UTF-8

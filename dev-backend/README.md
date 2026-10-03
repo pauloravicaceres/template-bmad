@@ -20,7 +20,7 @@ El agente **`dev-backend`** es el desarrollador backend de élite del framework 
 
 | Archivo / Fuente | Ruta Típica | Propósito |
 |---|---|---|
-| **Tech Design Maestro** | `files/qa-tech/tech-design_*.md` | Especificación técnica canónica, contratos de DTOs y modelos de datos. |
+| **Tech Design Maestro** | `documents/qa-tech/tech-design_*.md` | Especificación técnica canónica, contratos de DTOs y modelos de datos. |
 | **Constitución Técnica** | `.specify/memory/constitution.md` | Invariantes inmutables de stack y patrones de ejecución. |
 
 ---
@@ -30,7 +30,7 @@ El agente **`dev-backend`** es el desarrollador backend de élite del framework 
 * Código fuente Python organizado modularmente (rutas, modelos, servicios, websockets).
 * Instancias de `APIRouter` inyectadas en `main.py`.
 * Configuración del servidor `uvicorn` local.
-* Registro de actividad en `files/tracker_bmad.md`
+* Registro de actividad en `documents/tracker_bmad.md`
 
 ---
 

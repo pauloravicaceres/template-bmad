@@ -22,8 +22,8 @@ class Settings(BaseModel):
     
     # Workspace & File-System as Database boundaries
     WORKSPACE_ROOT: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[3])
-    TRACKER_FILE: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[3] / "files" / "tracker_bmad.md")
-    ALLOWED_ROOTS: List[str] = ["files", "specs", ".specify"]
+    TRACKER_FILE: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[3] / "documents" / "tracker_bmad.md")
+    ALLOWED_ROOTS: List[str] = ["documents", "specs", ".specify"]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -35,7 +35,7 @@ def load_settings() -> Settings:
     workspace_root = current_file.parents[3]
     config_file = workspace_root / "config_bmad.json"
     
-    tracker_path = workspace_root / "files" / "tracker_bmad.md"
+    tracker_path = workspace_root / "documents" / "tracker_bmad.md"
     project_name = "BMAD Control Center"
 
     if config_file.exists():
@@ -53,7 +53,7 @@ def load_settings() -> Settings:
         PROJECT_NAME=project_name,
         WORKSPACE_ROOT=workspace_root,
         TRACKER_FILE=tracker_path,
-        ALLOWED_ROOTS=["files", "specs", ".specify"]
+        ALLOWED_ROOTS=["documents", "specs", ".specify"]
     )
 
 

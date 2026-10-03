@@ -50,7 +50,7 @@ applyTo: '**'
 ## 4. ORDEN DE REPARACIÓN EN TRACKER
 *(Instrucción continua para devolver el turno al agente causante)*
 
-`{{ @DA: | @API: | @SA: }} Se ha emitido feedback adversarial crítico en files/qa-tech/feedback_tech_*.md. Por favor, subsana las inconsistencias señaladas para proceder con la re-auditoría.`
+`{{ @DA: | @API: | @SA: }} Se ha emitido feedback adversarial crítico en documents/qa-tech/feedback_tech_*.md. Por favor, subsana las inconsistencias señaladas para proceder con la re-auditoría.`
 ```
 
 ---

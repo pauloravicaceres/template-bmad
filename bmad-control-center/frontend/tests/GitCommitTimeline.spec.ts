@@ -18,7 +18,7 @@ describe('GitCommitTimeline Component', () => {
       deletions: 0,
       files: [
         {
-          relative_path: 'files/business-analyst/004-HU_panel.md',
+          relative_path: 'documents/business-analyst/004-HU_panel.md',
           change_type: 'added',
           is_binary: false,
           is_diff_omitted: false,
@@ -86,7 +86,7 @@ describe('GitCommitTimeline Component', () => {
     expect(wrapper.text()).toContain('a7c4e91d830b8ef29e92d77cb31940918ef83921')
     expect(wrapper.text()).toContain('ba@bmad.local')
     expect(wrapper.text()).toContain('+239')
-    expect(wrapper.text()).toContain('files/business-analyst/004-HU_panel.md')
+    expect(wrapper.text()).toContain('documents/business-analyst/004-HU_panel.md')
     // Elisión de diff binario
     expect(wrapper.text()).toContain('[ ARCHIVO BINARIO - DIFF TEXTUAL OMITIDO ]')
   })

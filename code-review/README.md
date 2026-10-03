@@ -36,7 +36,7 @@ El agente **`code-review`** es el Tech Lead y Auditor de Seguridad de élite del
 
 ## 📤 Outputs Producidos
 
-* Dictamen formal y vinculante registrado en `files/tracker_bmad.md`:
+* Dictamen formal y vinculante registrado en `documents/tracker_bmad.md`:
   - **`[APROBADO]`:** Certifica la entrega y autoriza el cierre de la HU o el pase a infraestructura `@DEVOPS:`.
   - **`[RECHAZADO]`:** Detalla el archivo exacto, la línea/hallazgo infractor y la corrección exigida, devolviendo el turno al responsable (`@DEV-BACK:`, `@DEV-FRONT:` o `@QA-AUTO:`).
 

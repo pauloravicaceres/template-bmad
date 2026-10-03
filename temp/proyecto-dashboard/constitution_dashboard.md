@@ -3,7 +3,7 @@
 ## Core Principles
 
 ### I. File-System as a Database (FSaaDB)
-El sistema debe operar de manera estrictamente local y carecer de bases de datos tradicionales. Actuará como un envoltorio reactivo sobre el espacio de trabajo de los agentes (leyendo y mutando `tracker_bmad.md`, el directorio `files/` y `.specify/`).
+El sistema debe operar de manera estrictamente local y carecer de bases de datos tradicionales. Actuará como un envoltorio reactivo sobre el espacio de trabajo de los agentes (leyendo y mutando `tracker_bmad.md`, el directorio `documents/` y `.specify/`).
 
 ### II. Observabilidad y Desacoplamiento Reactivo en Tiempo Real
 El sistema se compone de una arquitectura desacoplada donde el Frontend no requiere gestionar estado pesado de los agentes; se limita a reaccionar en tiempo real a los eventos disparados por un servidor de WebSockets multiplexado que monitorea el sistema de archivos y el árbol Git local.

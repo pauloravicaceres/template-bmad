@@ -8,7 +8,7 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
   describe('ArtifactEmptyState Component (SC-05 / CB-05)', () => {
     it('Render_ConDirectorioVacioYRolAgente_DebeMostrarTarjetaInformativaYEstadoEnEspera', () => {
       // Arrange
-      const folderPath = 'files/solutions-architect'
+      const folderPath = 'documents/solutions-architect'
       const agentRole = 'Solutions Architect'
       const stageStatus = 'En progreso agéntico'
 
@@ -25,7 +25,7 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
       expect(wrapper.text()).toContain('[ 📁 ETAPA SIN ENTREGABLES ]')
       expect(wrapper.text()).toContain("El agente 'Solutions Architect'")
       expect(wrapper.text()).toContain('En progreso agéntico')
-      expect(wrapper.text()).toContain('files/solutions-architect')
+      expect(wrapper.text()).toContain('documents/solutions-architect')
       expect(wrapper.text()).toContain('0 archivos encontrados')
     })
 
@@ -44,7 +44,7 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
 
     it('Render_ConRutaDeCarpetaSinRol_DebeInferirRolDeAgenteDesdeRuta', () => {
       // Arrange
-      const folderPath = 'files/business-analyst'
+      const folderPath = 'documents/business-analyst'
 
       // Act
       const wrapper = mount(ArtifactEmptyState, {
@@ -55,7 +55,7 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
 
       // Assert
       expect(wrapper.text()).toContain("El agente 'Business Analyst'")
-      expect(wrapper.text()).toContain('files/business-analyst')
+      expect(wrapper.text()).toContain('documents/business-analyst')
     })
   })
 
@@ -67,21 +67,21 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
         message: 'El archivo solicitado ya no existe en el disco.',
         statusCode: 404,
         errorCode: 'ARTIFACT_NOT_FOUND',
-        path: 'files/product-analyst/inexistente.md',
+        path: 'documents/product-analyst/inexistente.md',
       }
 
       // Act
       const wrapper = mount(ArtifactErrorCard, {
         props: {
           error,
-          requestedPath: 'files/product-analyst/inexistente.md',
+          requestedPath: 'documents/product-analyst/inexistente.md',
           hasLastValid: true,
         },
       })
 
       // Assert
       expect(wrapper.text()).toContain('Artefacto No Encontrado (HTTP 404)')
-      expect(wrapper.text()).toContain('files/product-analyst/inexistente.md')
+      expect(wrapper.text()).toContain('documents/product-analyst/inexistente.md')
       expect(wrapper.text()).toContain('Actualizar Árbol de Artefactos')
       expect(wrapper.text()).toContain('Volver al Último Válido')
     })
@@ -108,7 +108,7 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
       expect(wrapper.text()).toContain('Acceso Denegado por Seguridad (HTTP 403 Forbidden)')
       expect(wrapper.text()).toContain('../../etc/passwd')
       expect(wrapper.text()).toContain('POLÍTICA DE SEGURIDAD DEL ESPACIO DE TRABAJO')
-      expect(wrapper.text()).toContain('files/ (Entregables y artefactos agénticos)')
+      expect(wrapper.text()).toContain('documents/ (Entregables y artefactos agénticos)')
     })
 
     it('Render_ConError413PayloadDemasiadoGrande_DebeMostrarAdvertenciaDe5MB', () => {
@@ -118,7 +118,7 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
         message: 'El archivo excede los 5MB autorizados.',
         statusCode: 413,
         errorCode: 'PAYLOAD_TOO_LARGE',
-        path: 'files/data-architect/huge_dump.sql',
+        path: 'documents/data-architect/huge_dump.sql',
         metadata: { size_bytes: 8388608 },
       }
 
@@ -126,13 +126,13 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
       const wrapper = mount(ArtifactErrorCard, {
         props: {
           error,
-          requestedPath: 'files/data-architect/huge_dump.sql',
+          requestedPath: 'documents/data-architect/huge_dump.sql',
         },
       })
 
       // Assert
       expect(wrapper.text()).toContain('Archivo No Renderizable en Modo Texto (HTTP 413)')
-      expect(wrapper.text()).toContain('files/data-architect/huge_dump.sql')
+      expect(wrapper.text()).toContain('documents/data-architect/huge_dump.sql')
       expect(wrapper.text()).toContain('excede el límite máximo de previsualización (5 MB)')
       expect(wrapper.text()).toContain('8 MB')
     })
@@ -144,20 +144,20 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
         message: 'El archivo binario no es soportado.',
         statusCode: 415,
         errorCode: 'UNSUPPORTED_MEDIA_TYPE',
-        path: 'files/designer-ux/mockup.png',
+        path: 'documents/designer-ux/mockup.png',
       }
 
       // Act
       const wrapper = mount(ArtifactErrorCard, {
         props: {
           error,
-          requestedPath: 'files/designer-ux/mockup.png',
+          requestedPath: 'documents/designer-ux/mockup.png',
         },
       })
 
       // Assert
       expect(wrapper.text()).toContain('Archivo No Renderizable en Modo Texto (HTTP 415)')
-      expect(wrapper.text()).toContain('files/designer-ux/mockup.png')
+      expect(wrapper.text()).toContain('documents/designer-ux/mockup.png')
       expect(wrapper.text()).toContain('posee un formato binario no representable en modo texto')
     })
 
@@ -168,12 +168,12 @@ describe('ArtifactStates & Error Handling Components (HU-002 QA Certification)',
         message: 'No encontrado',
         statusCode: 404,
         errorCode: 'ARTIFACT_NOT_FOUND',
-        path: 'files/qa-tech/missing.md',
+        path: 'documents/qa-tech/missing.md',
       }
       const wrapper = mount(ArtifactErrorCard, {
         props: {
           error,
-          requestedPath: 'files/qa-tech/missing.md',
+          requestedPath: 'documents/qa-tech/missing.md',
         },
       })
 

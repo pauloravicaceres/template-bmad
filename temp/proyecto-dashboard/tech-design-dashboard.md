@@ -3,7 +3,7 @@
 ## 1. Resumen Ejecutivo
 El **BMAD Control Center** es una interfaz gráfica (Dashboard Web) diseñada para gobernar el enjambre de agentes del ecosistema BMAD. Su propósito es proveer una ventana de observabilidad en tiempo real sobre las operaciones autónomas de los agentes y centralizar la toma de decisiones humanas (HITL - Human-in-the-Loop) sin depender exclusivamente de interacciones por terminal. 
 
-La plataforma operará de manera local (File-System as a Database), actuando como un envoltorio reactivo sobre los archivos generados por los agentes (`tracker_bmad.md`, carpeta `files/`, `.specify/`). Esto empoderará al Tech Lead u Operador para monitorear estados, inspeccionar el pensamiento del LLM, evaluar entregables y liberar compuertas operativas con fluidez y precisión visual.
+La plataforma operará de manera local (File-System as a Database), actuando como un envoltorio reactivo sobre los archivos generados por los agentes (`tracker_bmad.md`, carpeta `documents/`, `.specify/`). Esto empoderará al Tech Lead u Operador para monitorear estados, inspeccionar el pensamiento del LLM, evaluar entregables y liberar compuertas operativas con fluidez y precisión visual.
 
 ## 2. Topología del Sistema
 
@@ -34,7 +34,7 @@ flowchart TD
 
     subgraph FileSystem["BMAD Workspace - File System as DB"]
         Tracker[("tracker_bmad.md")]
-        FilesDir["Directorio /files/"]
+        FilesDir["Directorio /documents/"]
         SpecifyDir["Directorio /.specify/"]
         GitRepo[".git/"]
     end
@@ -85,12 +85,12 @@ El diseño de comunicaciones cubre los 4 módulos funcionales.
 ### A. Canal Bidireccional de WebSockets (`ws://localhost:8000/ws/bmad`)
 Este canal unificado (o multiplexado) distribuirá los eventos en tiempo real:
 * **Eventos de Tracker:** `{"type": "TRACKER_UPDATE", "agent": "QA", "status": "running", "line_added": "..."}`. Mantiene vivo el **Live Workflow Monitor**.
-* **Eventos de Archivos:** `{"type": "FILE_CHANGED", "path": "files/qa-tech/report.md"}`. Dispara el re-renderizado en el **File & Artifact Explorer**.
+* **Eventos de Archivos:** `{"type": "FILE_CHANGED", "path": "documents/qa-tech/report.md"}`. Dispara el re-renderizado en el **File & Artifact Explorer**.
 
 ### B. REST API Endpoints
 
 **1. File & Artifact Explorer**
-* `GET /api/fs/tree` -> Retorna el árbol de directorios JSON de `files/` y `.specify/`.
+* `GET /api/fs/tree` -> Retorna el árbol de directorios JSON de `documents/` y `.specify/`.
 * `GET /api/fs/file?path={filepath}` -> Retorna el contenido en crudo (Markdown/texto) de un archivo específico para su visualización.
 
 **2. HITL Command Center**

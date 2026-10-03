@@ -4,7 +4,7 @@ import mimetypes
 from pathlib import Path
 from typing import Optional, Callable, List
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileSystemEvent
+from watchdog.events import documentsystemEventHandler, documentsystemEvent
 
 from core.config import settings
 from core.security import is_path_in_perimeter, increment_ignored_external_events
@@ -14,12 +14,12 @@ from services.workflow_service import WorkflowService
 from services.git_service import git_service
 
 
-class MultiDirectoryWatcherHandler(FileSystemEventHandler):
+class MultiDirectoryWatcherHandler(documentsystemEventHandler):
     """
     Handles file system events across authorized directories with:
     - Canonical perimeter validation (ADR-012)
     - 200ms debouncing and coalescence (ADR-010)
-    - Metadata-Only policy on files > 5MB (ADR-012 / CB-05)
+    - Metadata-Only policy on documents > 5MB (ADR-012 / CB-05)
     """
 
     def __init__(self, loop: asyncio.AbstractEventLoop, legacy_callback: Optional[Callable] = None):
@@ -106,7 +106,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
                     "staged_count": status.staged_count,
                     "unstaged_count": status.unstaged_count,
                     "untracked_count": status.untracked_count,
-                    "total_modified_files": status.total_modified_files,
+                    "total_modified_documents": status.total_modified_documents,
                     "trigger_source": "WATCHDOG_FS_EVENT",
                     "sync_latency_ms": 42,
                 }
@@ -116,7 +116,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
 
         debouncer.submit_event(".git/HEAD", "GIT_STATUS_CHANGED", _dispatch_git)
 
-    def on_modified(self, event: FileSystemEvent):
+    def on_modified(self, event: documentsystemEvent):
         if self._is_git_head(event.src_path):
             self._trigger_git_status_change()
             return
@@ -158,7 +158,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
                 except Exception:
                     pass
 
-            debouncer.submit_event("files/tracker_bmad.md", "WORKFLOW_UPDATED", _dispatch_workflow)
+            debouncer.submit_event("documents/tracker_bmad.md", "WORKFLOW_UPDATED", _dispatch_workflow)
         elif not event.is_directory:
             # 2. Artifact modified
             size_bytes, is_large_file, metadata_only, mime_type = self._get_file_info(event.src_path)
@@ -176,7 +176,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
 
             debouncer.submit_event(rel_path, "ARTIFACT_CHANGED", _dispatch_artifact_mod)
 
-    def on_created(self, event: FileSystemEvent):
+    def on_created(self, event: documentsystemEvent):
         if not self._validate_perimeter(event.src_path):
             return
 
@@ -214,7 +214,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
             self.loop,
         )
 
-    def on_deleted(self, event: FileSystemEvent):
+    def on_deleted(self, event: documentsystemEvent):
         if not self._validate_perimeter(event.src_path):
             return
 
@@ -245,7 +245,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
             self.loop,
         )
 
-    def on_moved(self, event: FileSystemEvent):
+    def on_moved(self, event: documentsystemEvent):
         dest_path = getattr(event, "dest_path", None)
         src_valid = self._validate_perimeter(event.src_path)
         dest_valid = dest_path and self._validate_perimeter(dest_path)
@@ -280,7 +280,7 @@ class FileWatcher:
         """Schedules observers for all allowed roots and tracker file."""
         handler = MultiDirectoryWatcherHandler(loop, callback)
 
-        # Watch each allowed root (files, specs, .specify)
+        # Watch each allowed root (documents, specs, .specify)
         for root_name in self.watched_roots:
             dir_path = (self.workspace_root / root_name).resolve()
             if dir_path.exists() and dir_path.is_dir():

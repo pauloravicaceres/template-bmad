@@ -41,7 +41,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
             "active_stage": "BA",
             "active_agent_role": "Business Analyst",
             "overall_status": "IN_PROGRESS",
-            "active_artifact_in_progress": "files/business-analyst/003-HU.md",
+            "active_artifact_in_progress": "documents/business-analyst/003-HU.md",
             "latest_handoff": {
                 "target_agent": "BA",
                 "to_directive": "@BA:",
@@ -56,7 +56,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
         assert len(received_messages) == 1
         msg = received_messages[0]
         assert msg["event_type"] == "WORKFLOW_UPDATED"
-        assert msg["resource_path"] == "files/tracker_bmad.md"
+        assert msg["resource_path"] == "documents/tracker_bmad.md"
         assert msg["coalesced_count"] == 2
         assert "timestamp" in msg
         assert msg["payload"]["active_stage"] == "BA"
@@ -80,7 +80,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
         # Act
         await mgr.broadcast_artifact_changed(
             action="CREATED",
-            path="files/business-analyst/003-HU_observabilidad.md",
+            path="documents/business-analyst/003-HU_observabilidad.md",
             size_bytes=10240,
             is_large_file=False,
             metadata_only=False,
@@ -92,7 +92,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
         assert len(received_messages) == 1
         msg = received_messages[0]
         assert msg["event_type"] == "ARTIFACT_CHANGED"
-        assert msg["resource_path"] == "files/business-analyst/003-HU_observabilidad.md"
+        assert msg["resource_path"] == "documents/business-analyst/003-HU_observabilidad.md"
         assert msg["coalesced_count"] == 1
         assert msg["payload"]["change_type"] == "created"
         assert msg["payload"]["is_new_tag"] is True
@@ -115,7 +115,7 @@ class TestHU003DebouncerAndThrottlingCertification:
 
         # Debouncer con ventana de 100ms para testing rápido y determinista
         debouncer = EventDebouncer(loop=loop, window_ms=100)
-        resource = "files/tracker_bmad.md"
+        resource = "documents/tracker_bmad.md"
 
         # Act
         # Disparo de 4 escrituras consecutivas en rápida sucesión (<50ms entre cada una)
@@ -152,7 +152,7 @@ class TestHU003DebouncerAndThrottlingCertification:
             window_ms=80,
             system_notice_callback=dummy_notice_cb
         )
-        resource = "files/data-architect/schema.md"
+        resource = "documents/data-architect/schema.md"
 
         # Act
         # Disparo de 3 mutaciones consecutivas
@@ -172,7 +172,7 @@ class TestHU003DebouncerAndThrottlingCertification:
         notice = system_notices[0]
         assert notice.notice_code == "DEBOUNCE_COALESCENCE_APPLIED"
         assert notice.absorbed_mutations_count == 3
-        assert "files/data-architect/schema.md" in notice.coalesced_resource
+        assert "documents/data-architect/schema.md" in notice.coalesced_resource
 
     @pytest.mark.asyncio
     async def test_EventDebouncer_ConRutasDistintas_DebeMantenerBuffersIndependientes(self):
@@ -189,14 +189,14 @@ class TestHU003DebouncerAndThrottlingCertification:
 
         # Act
         debouncer.submit_event(
-            resource_path="files/doc_a.md",
+            resource_path="documents/doc_a.md",
             event_type="ARTIFACT_CHANGED",
-            dispatch_coro_factory=make_dispatcher("files/doc_a.md"),
+            dispatch_coro_factory=make_dispatcher("documents/doc_a.md"),
         )
         debouncer.submit_event(
-            resource_path="files/doc_b.md",
+            resource_path="documents/doc_b.md",
             event_type="ARTIFACT_CHANGED",
-            dispatch_coro_factory=make_dispatcher("files/doc_b.md"),
+            dispatch_coro_factory=make_dispatcher("documents/doc_b.md"),
         )
 
         await asyncio.sleep(0.15)
@@ -205,8 +205,8 @@ class TestHU003DebouncerAndThrottlingCertification:
         # Cada archivo debe despacharse independientemente
         assert len(dispatched_resources) == 2
         paths = [item[0] for item in dispatched_resources]
-        assert "files/doc_a.md" in paths
-        assert "files/doc_b.md" in paths
+        assert "documents/doc_a.md" in paths
+        assert "documents/doc_b.md" in paths
 
 
 class TestHU003PerimeterSandboxingCertification:
@@ -215,7 +215,7 @@ class TestHU003PerimeterSandboxingCertification:
     def test_IsPathInPerimeter_ConRutasFueraDeScopeOCarpetasOcultas_DebeRetornarFalseYDescartarSilenciosamente(self, tmp_path):
         # Arrange
         ws_root = tmp_path
-        (ws_root / "files").mkdir()
+        (ws_root / "documents").mkdir()
 
         # Act & Assert
         # Carpetas excluidas del perímetro
@@ -226,15 +226,15 @@ class TestHU003PerimeterSandboxingCertification:
         # Ruta completamente fuera del workspace
         assert is_path_in_perimeter("C:/Windows/System32/calc.exe", workspace_root=ws_root) is False
 
-    def test_IsPathInPerimeter_ConRaicesAutorizadasFilesSpecsYSpecify_DebeRetornarTrue(self, tmp_path):
+    def test_IsPathInPerimeter_ConRaicesAutorizadasdocumentsSpecsYSpecify_DebeRetornarTrue(self, tmp_path):
         # Arrange
         ws_root = tmp_path
-        (ws_root / "files").mkdir()
+        (ws_root / "documents").mkdir()
         (ws_root / "specs").mkdir()
         (ws_root / ".specify").mkdir()
 
         # Act & Assert
-        assert is_path_in_perimeter(ws_root / "files" / "tracker_bmad.md", workspace_root=ws_root) is True
+        assert is_path_in_perimeter(ws_root / "documents" / "tracker_bmad.md", workspace_root=ws_root) is True
         assert is_path_in_perimeter(ws_root / "specs" / "README.md", workspace_root=ws_root) is True
         assert is_path_in_perimeter(ws_root / ".specify" / "memory" / "constitution.md", workspace_root=ws_root) is True
 
@@ -254,7 +254,7 @@ class TestHU003PerimeterSandboxingCertification:
         assert payload["zero_leakage_verified"] is True
         assert payload["ignored_external_events_count"] >= 2
         monitored_paths = [r["allowed_path"] for r in payload["monitored_roots"]]
-        assert "files/" in monitored_paths
+        assert "documents/" in monitored_paths
         assert "specs/" in monitored_paths
         assert ".specify/" in monitored_paths
 
@@ -320,7 +320,7 @@ class TestHU003LargeFileMetadataOnlyPolicyCertification:
         # Act
         await mgr.broadcast_artifact_changed(
             action="MODIFIED",
-            path="files/data-architect/large_export.sql",
+            path="documents/data-architect/large_export.sql",
             size_bytes=size_6mb,
             is_large_file=True,
             metadata_only=True,

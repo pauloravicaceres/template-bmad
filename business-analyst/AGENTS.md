@@ -15,8 +15,8 @@ argument-hint: 'Instrucción del @PM: o @QA: leída desde el tracker_bmad.md'
 | Variable | Descripción |
 |---|---|
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
-| `CARPETA_SALIDA` | `business-analyst` — clave en `routes_bmad` donde se guardan las HUs Técnicas (`files/business-analyst/`) |
-| `CARPETA_SALIDA_STAKEHOLDERS` | Subcarpeta `files/business-analyst/HUs-stakeholders/` donde se guardan las HUs de Stakeholders |
+| `CARPETA_SALIDA` | `business-analyst` — clave en `routes_bmad` donde se guardan las HUs Técnicas (`documents/business-analyst/`) |
+| `CARPETA_SALIDA_STAKEHOLDERS` | Subcarpeta `documents/business-analyst/HUs-stakeholders/` donde se guardan las HUs de Stakeholders |
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief |
 | `CARPETA_ENTRADA_MVP` | `product-manager` — clave donde reside el Plan de Gestión |
 | `CARPETA_ENTRADA_QA` | `qa-documental` — clave donde reside el feedback de rechazo |
@@ -132,7 +132,7 @@ Todos los archivos de salida generados por el agente BA (`hu_*.md`) deben ser **
 
 ## HU STAKEHOLDERS TEMPLATE
 ---
-description: 'Usar al generar la Historia de Usuario para Stakeholders (HU Funcional/Negocio). Esqueleto determinista orientado a valor de negocio, narrativa amigable y criterios funcionales. Se guarda en files/business-analyst/HUs-stakeholders/.'
+description: 'Usar al generar la Historia de Usuario para Stakeholders (HU Funcional/Negocio). Esqueleto determinista orientado a valor de negocio, narrativa amigable y criterios funcionales. Se guarda en documents/business-analyst/HUs-stakeholders/.'
 applyTo: '**'
 ---
 
@@ -158,7 +158,7 @@ Toda HU de Stakeholders generada por el agente BA usa esta estructura. Enfatiza 
 
 ## Convención de Nombres de Archivo y Ruta
 ```
-files/business-analyst/HUs-stakeholders/XXX-HU_[nombre_corto].md
+documents/business-analyst/HUs-stakeholders/XXX-HU_[nombre_corto].md
 ```
 - `XXX`: Identificador secuencial de 3 dígitos provisto exactamente por el `@PM` en el Handoff. El nombre debe ser EXACTAMENTE el mismo que el archivo técnico para asegurar simetría, preservando el prefijo numérico ordenado (ej. `002-HU_login.md`).
 - `nombre_corto`: snake_case, máximo 4 palabras, agnóstico al dominio.
@@ -295,7 +295,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. files/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. documents/product-analyst/pb_amely_spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}
@@ -332,7 +332,7 @@ tags: [export, pdf, reporting, python, herramientas]
 Convertir los entregables finales aprobados (Product Briefs, Historias de Usuario, Reportes) de su formato nativo Markdown a un documento PDF profesional y presentable, utilizando el motor de conversión interno.
 
 ## Input
-- **Ruta del archivo Markdown original:** (ej. `files/product-analyst/pb_amely_spa.md`)
+- **Ruta del archivo Markdown original:** (ej. `documents/product-analyst/pb_amely_spa.md`)
 - **Ruta de destino del PDF (opcional):** Si no se provee, se guardará en la misma carpeta con la extensión `.pdf`.
 
 ## Workflow
@@ -380,7 +380,7 @@ Toda HU Técnica generada por el agente BA usa esta estructura aséptica y deter
 
 ## Convención de Nombres de Archivo y Ruta
 ```
-files/business-analyst/XXX-HU_[nombre_corto].md
+documents/business-analyst/XXX-HU_[nombre_corto].md
 ```
 - `XXX`: Identificador secuencial de 3 dígitos (ej. `001`, `002`) provisto exactamente por el `@PM` en el Handoff. Queda estrictamente PROHIBIDO que el BA invente un nombre genérico; debe respetar el prefijo numérico de la orden recibida.
 - `nombre_corto`: snake_case, máximo 4 palabras, agnóstico al dominio.
@@ -397,7 +397,7 @@ files/business-analyst/XXX-HU_[nombre_corto].md
 - **Tipo:** {{Feature | Enhancement | Bugfix | Refactor}}
 - **Prioridad:** {{Alta | Media | Baja}}
 - **Tags:** [{{TAG_1}}, {{TAG_2}}, {{TAG_3}}]
-- **Consumo SDD:** `/speckit.specify files/business-analyst/{{XXX}}-HU_{{nombre_corto}}.md`
+- **Consumo SDD:** `/speckit.specify documents/business-analyst/{{XXX}}-HU_{{nombre_corto}}.md`
 
 ---
 
@@ -489,7 +489,7 @@ sequenceDiagram
 ## 7. ORDEN DE DELEGACIÓN PARA EL QA
 *(Generar como una sola línea de texto continuo, sin saltos de línea internos)*
 
-@QA: La Historia de Usuario Técnica {{TITULO_HU}} está lista en el archivo {{XXX}}-HU_{{nombre_corto}}.md (y su versión de stakeholders en files/business-analyst/HUs-stakeholders/{{XXX}}-HU_{{nombre_corto}}.md). Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
+@QA: La Historia de Usuario Técnica {{TITULO_HU}} está lista en el archivo {{XXX}}-HU_{{nombre_corto}}.md (y su versión de stakeholders en documents/business-analyst/HUs-stakeholders/{{XXX}}-HU_{{nombre_corto}}.md). Por favor, procede con la auditoría documental contra el Product Brief para asegurar que la historia cumple con los requerimientos originales.
 ```
 
 ### ⚠️ Directiva para Proyectos Headless / Procesamiento de Datos
@@ -579,7 +579,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. files/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. documents/product-analyst/pb_amely_spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}
@@ -616,7 +616,7 @@ tags: [export, pdf, reporting, python, herramientas]
 Convertir los entregables finales aprobados (Product Briefs, Historias de Usuario, Reportes) de su formato nativo Markdown a un documento PDF profesional y presentable, utilizando el motor de conversión interno.
 
 ## Input
-- **Ruta del archivo Markdown original:** (ej. `files/product-analyst/pb_amely_spa.md`)
+- **Ruta del archivo Markdown original:** (ej. `documents/product-analyst/pb_amely_spa.md`)
 - **Ruta de destino del PDF (opcional):** Si no se provee, se guardará en la misma carpeta con la extensión `.pdf`.
 
 ## Workflow

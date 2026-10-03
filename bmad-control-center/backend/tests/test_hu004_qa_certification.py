@@ -140,7 +140,7 @@ class TestHU004GitStatusTelemetriaCertification:
         simulated_porcelain = (
             "# branch.oid 0123456789abcdef0123456789abcdef01234567\n"
             "# branch.head main\n"
-            "u UU N... 100644 100644 100644 100644 hash1 hash2 hash3 files/conflict_file.md\n"
+            "u UU N... 100644 100644 100644 100644 hash1 hash2 hash3 documents/conflict_file.md\n"
         )
         simulated_log = (
             "0123456789abcdef0123456789abcdef01234567\x1f0123456\x1fAgent\x1f2026-10-01T12:00:00Z\x1fConflict commit"
@@ -160,7 +160,7 @@ class TestHU004GitStatusTelemetriaCertification:
             # Assert
             assert status.is_conflicted is True
             assert len(status.working_tree.conflicts) == 1
-            assert status.working_tree.conflicts[0].path == "files/conflict_file.md"
+            assert status.working_tree.conflicts[0].path == "documents/conflict_file.md"
             assert status.working_tree.conflicts[0].category == "conflict"
 
 

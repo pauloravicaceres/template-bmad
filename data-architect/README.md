@@ -32,7 +32,7 @@ Su responsabilidad exclusiva es el estado de los datos "en reposo". Opera bajo e
   * En modo Brownfield, las decisiones heredadas se registran con estado `Aceptado (heredado)` sin requerir alternativas consideradas.
 
 * **4. Trazabilidad Estricta UI -> Persistencia (Cero Campos Huérfanos)**
-  * Cruza obligatoriamente los wireframes de `files/designer-ux/ux_*.md` contra el MER para garantizar que todo dato visible o calculado tenga su columna y tipo en la base de datos.
+  * Cruza obligatoriamente los wireframes de `documents/designer-ux/ux_*.md` contra el MER para garantizar que todo dato visible o calculado tenga su columna y tipo en la base de datos.
   * Si el proyecto opera mediante el Bypass Headless (sin diseño UX), salta limpiamente esta verificación.
 
 * **5. Prevención de Riesgos y Escalabilidad**

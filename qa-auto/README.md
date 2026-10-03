@@ -21,10 +21,10 @@ El agente **`qa-auto`** es el ingeniero de automatización de pruebas de élite 
 
 | Archivo / Fuente | Ruta Típica | Propósito |
 |---|---|---|
-| **Historia de Usuario** | `files/business-analyst/hu_*.md` | Criterios de Aceptación (Gherkin/BDD) que deben automatizarse. |
+| **Historia de Usuario** | `documents/business-analyst/hu_*.md` | Criterios de Aceptación (Gherkin/BDD) que deben automatizarse. |
 | **Código Fuente Backend** | `src/backend-modulith-template/` | Features, Handlers, Validadores y Endpoints recién programados. |
 | **Código Fuente Frontend** | `src/template-base/` | Componentes, Signals y servicios HTTP implementados. |
-| **Tech Design Maestro** | `files/qa-tech/tech-design_*.md` | Contratos esperados y reglas de negocio. |
+| **Tech Design Maestro** | `documents/qa-tech/tech-design_*.md` | Contratos esperados y reglas de negocio. |
 
 ---
 
@@ -32,7 +32,7 @@ El agente **`qa-auto`** es el ingeniero de automatización de pruebas de élite 
 
 * Suites de pruebas xUnit (`*Tests.cs`) en proyectos de prueba del backend
 * Suites de pruebas Jest (`*.spec.ts`) en el frontend
-* Reporte de cobertura y escenarios probados en `files/tracker_bmad.md`
+* Reporte de cobertura y escenarios probados en `documents/tracker_bmad.md`
 
 ---
 

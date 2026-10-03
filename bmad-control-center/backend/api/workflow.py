@@ -11,7 +11,7 @@ async def get_workflow_status(
     include_history: bool = Query(True, description="Incluir historial detallado de transiciones previas")
 ) -> WorkflowStatusResponse:
     """
-    Retorna la proyección en memoria del pipeline agéntico extraído de files/tracker_bmad.md.
+    Retorna la proyección en memoria del pipeline agéntico extraído de documents/tracker_bmad.md.
     Identifica la fase activa, el rol del agente en turno y el estado de las 8 fases canónicas.
     """
     return workflow_service.get_workflow_status(include_history=include_history)

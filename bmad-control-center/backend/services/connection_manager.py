@@ -124,7 +124,7 @@ class ConnectionManager:
         event_payload = {
             "event_id": event_id,
             "event_type": "WORKFLOW_UPDATED",
-            "resource_path": "files/tracker_bmad.md",
+            "resource_path": "documents/tracker_bmad.md",
             "timestamp": now_iso,
             "coalesced_count": coalesced_count,
             "payload": payload,

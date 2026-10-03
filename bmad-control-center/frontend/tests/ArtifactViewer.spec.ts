@@ -6,7 +6,7 @@ import mermaid from 'mermaid'
 
 describe('ArtifactViewer Component', () => {
   const mockArtifact: ArtifactContent = {
-    relative_path: 'files/business-analyst/002-HU_monitoreo.md',
+    relative_path: 'documents/business-analyst/002-HU_monitoreo.md',
     filename: '002-HU_monitoreo.md',
     raw_content: '# Especificación Técnica\n\nEste es un párrafo explicativo.\n\n```mermaid\nflowchart TD\nStart --> Stop\n```\n\nFin del documento.',
     detected_format: 'MARKDOWN',
@@ -50,7 +50,7 @@ describe('ArtifactViewer Component', () => {
 
     // Assert
     expect(wrapper.text()).toContain('VISOR DE ENTREGABLE: 002-HU_monitoreo.md')
-    expect(wrapper.text()).toContain('files/business-analyst/002-HU_monitoreo.md')
+    expect(wrapper.text()).toContain('documents/business-analyst/002-HU_monitoreo.md')
     expect(wrapper.text()).toContain('Formato: UTF-8 MARKDOWN | Tamaño: 1 KB')
     expect(wrapper.text()).toContain('En vivo vía WebSockets')
     expect(wrapper.html()).toContain('<h1>Especificación Técnica</h1>')

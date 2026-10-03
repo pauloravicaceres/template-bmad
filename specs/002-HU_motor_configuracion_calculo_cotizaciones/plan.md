@@ -1,8 +1,8 @@
 # Implementation Plan: 001-HU_configurador_y_calculo_cotizaciones
 
-**Branch**: `feat/001-HU_configurador_y_calculo_cotizaciones` | **Date**: 2026-10-02 | **Spec**: [001-HU_configurador_y_calculo_cotizaciones.md](file:///D:/Paulo/Cursos/DMC/template-bmad/files/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md)
+**Branch**: `feat/001-HU_configurador_y_calculo_cotizaciones` | **Date**: 2026-10-02 | **Spec**: [001-HU_configurador_y_calculo_cotizaciones.md](file:///D:/Paulo/Cursos/DMC/template-bmad/documents/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md)
 
-**Input**: Feature specification from `/files/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md`, `files/solutions-architect/tech_guidelines.md` y `files/designer-ux/ux_001_configurador_y_calculo_cotizaciones.md`.
+**Input**: Feature specification from `/documents/business-analyst/001-HU_configurador_y_calculo_cotizaciones.md`, `documents/solutions-architect/tech_guidelines.md` y `documents/designer-ux/ux_001_configurador_y_calculo_cotizaciones.md`.
 
 ## Summary
 

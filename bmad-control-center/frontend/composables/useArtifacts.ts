@@ -167,7 +167,7 @@ export function useArtifacts(apiBase?: string) {
     }
 
     // Si el usuario tiene el visor abierto en el archivo modificado, recargar en caliente (SC-02)
-    // Usamos endsWith / includes para tolerar paths parciales como "tracker_bmad.md" vs "files/tracker_bmad.md"
+    // Usamos endsWith / includes para tolerar paths parciales como "tracker_bmad.md" vs "documents/tracker_bmad.md"
     const currentPath = selectedPath.value
     if (
       currentPath &&

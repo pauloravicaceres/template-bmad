@@ -123,7 +123,7 @@ class WorkflowService:
         return blocks
 
     def get_workflow_status(self, include_history: bool = True) -> WorkflowStatusResponse:
-        """Projects memory state of the workflow from files/tracker_bmad.md."""
+        """Projects memory state of the workflow from documents/tracker_bmad.md."""
         tracker_file = Path(self.tracker_path)
         if not tracker_file.exists():
             # Return empty / idle pipeline

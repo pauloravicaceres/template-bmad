@@ -21,7 +21,7 @@ if sys.platform.startswith('win'):
 # ==========================================
 # Asume que el script está en la carpeta /utils/
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent.parent
-TRACKER_PATH = DIRECTORIO_RAIZ / "files" / "tracker_bmad.md"
+TRACKER_PATH = DIRECTORIO_RAIZ / "documents" / "tracker_bmad.md"
 
 # ==========================================
 # MATRIZ DE APROBACIÓN Y HANDOFF (HITL & SDD BRIDGE)
@@ -187,10 +187,10 @@ def main():
         
     # 2. APERTURA AUTOMÁTICA DEL ARCHIVO (Búsqueda multi-ruta resiliente)
     candidatos_ruta = [
-        DIRECTORIO_RAIZ / "files" / config["folder"] / archivo_detectado,
+        DIRECTORIO_RAIZ / "documents" / config["folder"] / archivo_detectado,
         DIRECTORIO_RAIZ / ".specify" / archivo_detectado,
         DIRECTORIO_RAIZ / "specs" / archivo_detectado,
-        DIRECTORIO_RAIZ / "files" / "business-analyst" / archivo_detectado,
+        DIRECTORIO_RAIZ / "documents" / "business-analyst" / archivo_detectado,
         DIRECTORIO_RAIZ / archivo_detectado
     ]
     ruta_fisica = None
@@ -203,7 +203,7 @@ def main():
         print(f"🔍 Abriendo archivo para revisión humana ({ruta_fisica.name})...")
         abrir_archivo_en_so(ruta_fisica)
     else:
-        ruta_defecto = DIRECTORIO_RAIZ / "files" / config["folder"] / archivo_detectado
+        ruta_defecto = DIRECTORIO_RAIZ / "documents" / config["folder"] / archivo_detectado
         print(f"⚠️ El archivo está referenciado en el tracker pero no existe físicamente en:\n{ruta_defecto}")
         
     # 3. Confirmación humana

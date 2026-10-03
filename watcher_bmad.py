@@ -22,7 +22,7 @@ if sys.platform.startswith('win'):
 # RUTAS Y DIRECTORIOS DINÁMICOS
 # ==========================================
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent
-TRACKER_PATH = str(DIRECTORIO_RAIZ / "files" / "tracker_bmad.md")
+TRACKER_PATH = str(DIRECTORIO_RAIZ / "documents" / "tracker_bmad.md")
 
 def write_watcher_log(mensaje):
     from datetime import datetime
@@ -298,7 +298,7 @@ def ejecutar_sdd_fase_implementacion():
                 # TAREA FANTASMA PARA BACKEND
                 tarea_fantasma_back = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
-Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'files/dev-backend/backend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
+Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'documents/dev-backend/backend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
 """
                 active_directive_path.write_text(alma_backend + tarea_fantasma_back, encoding="utf-8")
             
@@ -337,7 +337,7 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
                 # TAREA FANTASMA PARA FRONTEND
                 tarea_fantasma_front = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
-Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'files/dev-frontend/frontend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
+Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'documents/dev-frontend/frontend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
 """
                 active_directive_path.write_text(alma_frontend + tarea_fantasma_front, encoding="utf-8")
             
@@ -353,7 +353,7 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
                 block = f"""
 ### [{dt_str}] Senior Frontend Developer
 - **Hora:** {hr_str}
-- **Artefacto generado:** `files/dev-frontend/frontend-architecture.md`
+- **Artefacto generado:** `documents/dev-frontend/frontend-architecture.md`
 - **Estado:** Implementación frontend finalizada exitosamente mediante SDD SpecKit.
 - **Handoff:** @CODE-REVIEW: Procede con la auditoría de seguridad y GitOps.
 """
@@ -492,10 +492,10 @@ def extraer_instrucciones(linea):
         print("=" * 80)
         
         # Buscar la ruta de la HU en el mensaje
-        match_hu = re.search(r'(?:files[/\\]business-analyst[/\\])?((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
+        match_hu = re.search(r'(?:documents[/\\]business-analyst[/\\])?((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
         if match_hu:
             nombre_hu = match_hu.group(1)
-            ruta_hu = f"files/business-analyst/{nombre_hu}"
+            ruta_hu = f"documents/business-analyst/{nombre_hu}"
             print(f"Iniciando SDD Fase de Negocio para: {ruta_hu}\n")
             
             exito = ejecutar_sdd_fase_negocio(ruta_hu)

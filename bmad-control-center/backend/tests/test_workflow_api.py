@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 from fastapi.testclient import TestClient
 from main import app
 from services.workflow_service import WorkflowService
@@ -68,14 +68,14 @@ class TestWorkflowApi:
 
 ### [30-09-2026] Business Analyst
 - **Hora:** 23:14:00
-- **Artefacto generado:** `files/business-analyst/002-HU.md`
+- **Artefacto generado:** `documents/business-analyst/002-HU.md`
 - **Estado:** BDD completado
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @QA: Auditoría documental
 
 ### [30-09-2026] QA Documental
 - **Hora:** 23:18:00
-- **Artefacto generado:** `files/qa-documental/aprobado_002.md`
+- **Artefacto generado:** `documents/qa-documental/aprobado_002.md`
 - **Estado:** Aprobado 100%
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @UX: Diseñar wireframes
@@ -105,7 +105,7 @@ class TestWorkflowApi:
         tracker_text = """
 ### [30-09-2026] SecOps
 - **Hora:** 23:47:30
-- **Artefacto generado:** `files/qa-tech/tech-design_002.md`
+- **Artefacto generado:** `documents/qa-tech/tech-design_002.md`
 - **Estado:** Auditoría Adversarial Exitosa
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @HUMANO: Fin

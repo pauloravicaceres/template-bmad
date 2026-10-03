@@ -20,7 +20,7 @@ El frontend opera bajo el patrón **Single Page Application (SPA)** desacoplada 
   - Manejador defensivo de errores HTTP 403 (Path Traversal Guard).
   - Manejo de HTTP 404 con auto-sincronización y poda reactiva del árbol documental.
   - Manejo de HTTP 413/415 para archivos excesivos (>5 MB) o binarios no soportados mediante tarjetas de metadatos (`LargeFileMetadataCard.vue`).
-  - Tarjeta de auditoría de seguridad perimetral (`PerimeterSecurityCard.vue`) que inspecciona raíces vigiladas (`files/`, `specs/`, `.specify/`) y contabiliza eventos fuera de perímetro descartados silenciosamente.
+  - Tarjeta de auditoría de seguridad perimetral (`PerimeterSecurityCard.vue`) que inspecciona raíces vigiladas (`documents/`, `specs/`, `.specify/`) y contabiliza eventos fuera de perímetro descartados silenciosamente.
 - **Canal Reactivo y Observabilidad WebSocket (HU-003):**
   - **Latidos Bidireccionales:** Protocolo Heartbeat PING/PONG cada 30 segundos con cálculo reactivo de latencia en milisegundos (`latencyMs`).
   - **Backoff Exponencial con Jitter:** Reconexión progresiva (1s, 2s, 4s, 8s, máx 10s + jitter aleatorio) ante desconexiones de red (`WebSocketStatusBadge.vue`) con botón de reconexión manual instantánea.

@@ -107,7 +107,7 @@ describe('Git Telemetry & VCS Components (HU-004 QA Certification)', () => {
           { relative_path: 'bmad-control-center/backend/main.py', status_code: 'M', category: 'staged' as const },
         ],
         unstaged: [
-          { relative_path: 'files/tracker_bmad.md', status_code: 'M', category: 'unstaged' as const },
+          { relative_path: 'documents/tracker_bmad.md', status_code: 'M', category: 'unstaged' as const },
         ],
         untracked: [
           { relative_path: 'scratch/test.txt', status_code: '?', category: 'untracked' as const },
@@ -134,7 +134,7 @@ describe('Git Telemetry & VCS Components (HU-004 QA Certification)', () => {
   describe('GitBinaryDiffNotice Component (CB-05 / ADR-014)', () => {
     it('Render_ConArchivoBinarioMayorA1MB_DebeMostrarInsigniaDeDiffOmitidoYTamanoFormateado', () => {
       // Arrange
-      const filePath = 'files/designer-ux/mockup.png'
+      const filePath = 'documents/designer-ux/mockup.png'
       const sizeBytes = 2500000 // ~2.38 MB
 
       // Act
@@ -143,7 +143,7 @@ describe('Git Telemetry & VCS Components (HU-004 QA Certification)', () => {
       })
 
       // Assert
-      expect(wrapper.text()).toContain('files/designer-ux/mockup.png')
+      expect(wrapper.text()).toContain('documents/designer-ux/mockup.png')
       expect(wrapper.text()).toContain('[ ARCHIVO BINARIO - DIFF TEXTUAL OMITIDO ]')
       expect(wrapper.text()).toContain('2.38 MB')
       expect(wrapper.text()).toContain('Se omitió el desglose línea por línea para proteger el rendimiento')

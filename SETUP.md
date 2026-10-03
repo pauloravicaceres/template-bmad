@@ -24,7 +24,7 @@ En tu terminal (estando dentro de la carpeta `template-bmad`), ejecuta:
 ```bash
 python3.14 utils/clone_template.py "D:\ruta\a\mi-nuevo-proyecto"
 ```
-> **¿Qué hace este script?** Utiliza un enfoque de "Lista Blanca" para copiar exclusivamente las 15 carpetas de agentes, el motor orquestador (`watcher_bmad.py`), las herramientas (`utils/`, `skills/`), y la infraestructura de Spec Kit (`.specify/`). Ignorará automáticamente la carpeta `.git/`, la carpeta `files/` y cualquier archivo Markdown residual.
+> **¿Qué hace este script?** Utiliza un enfoque de "Lista Blanca" para copiar exclusivamente las 15 carpetas de agentes, el motor orquestador (`watcher_bmad.py`), las herramientas (`utils/`, `skills/`), y la infraestructura de Spec Kit (`.specify/`). Ignorará automáticamente la carpeta `.git/`, la carpeta `documents/` y cualquier archivo Markdown residual.
 
 ### Paso 2: Inicializar Git y hacer el commit base
 Una vez que el script copie los archivos, ve a tu nueva carpeta y crea un repositorio limpio. El orquestador necesita una rama `main` de donde partir para crear ramas de funcionalidad.
@@ -47,8 +47,8 @@ En la raíz de tu nuevo proyecto, ejecuta:
 python3.14 init_bmad.py "Nombre de Mi Sistema"
 ```
 **¿Qué hace este script?**
-- Crea las carpetas de salida en `/files/` para los 15 agentes.
-- Vacía el archivo `files/tracker_bmad.md` dejándolo en 0 bytes.
+- Crea las carpetas de salida en `/documents/` para los 15 agentes.
+- Vacía el archivo `documents/tracker_bmad.md` dejándolo en 0 bytes.
 - Actualiza el archivo `config_bmad.json` con las rutas absolutas correctas de tu disco duro.
 - Crea el directorio `.specify/memory/` para tu Constitución Técnica.
 
@@ -92,7 +92,7 @@ python3.14 utils/start_agents.py
 
 ¡Tu ecosistema está vivo! 
 
-Para empezar a crear software, dirígete al archivo `files/tracker_bmad.md` y escribe tu idea inicial etiquetando al analista de negocio:
+Para empezar a crear software, dirígete al archivo `documents/tracker_bmad.md` y escribe tu idea inicial etiquetando al analista de negocio:
 
 ```markdown
 @BS: Necesitamos construir un panel administrativo para recursos humanos que permita gestionar vacaciones, subir nóminas en PDF y aprobar solicitudes con flujos de varios niveles.
@@ -106,7 +106,7 @@ El orquestador detectará tu mensaje, despertará al Business Storyteller y come
 
 - `python3.14 utils/approve_step.py`: Úsalo cuando el framework te etiquete (`@HUMANO:`) pidiendo aprobación para transicionar de fase (HITL) o si ocurre una ambigüedad en el Spec-Driven Development.
 - `python3.14 utils/stop_agents.py`: Ejecútalo cuando termines tu día de trabajo para cerrar limpiamente todos los agentes sin dejar procesos colgando en la terminal.
-- `python3.14 utils/clean_files.py`: Herramienta de mantenimiento para vaciar los entregables de `/files/` interactivamente si deseas purgar pruebas y volver a empezar.
+- `python3.14 utils/clean_files.py`: Herramienta de mantenimiento para vaciar los entregables de `/documents/` interactivamente si deseas purgar pruebas y volver a empezar.
 
 
 ---

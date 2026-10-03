@@ -20,8 +20,8 @@ El agente **`dev-frontend`** es el desarrollador frontend senior del framework B
 
 | Archivo / Fuente | Ruta Típica | Propósito |
 |---|---|---|
-| **Tech Design Maestro** | `files/qa-tech/tech-design_*.md` | Contratos de endpoints, DTOs de Request/Response y códigos de estado. |
-| **Especificación UX/UI** | `files/designer-ux/ux_*.md` | Flujos visuales, jerarquía de pantallas, wireframes y controles. |
+| **Tech Design Maestro** | `documents/qa-tech/tech-design_*.md` | Contratos de endpoints, DTOs de Request/Response y códigos de estado. |
+| **Especificación UX/UI** | `documents/designer-ux/ux_*.md` | Flujos visuales, jerarquía de pantallas, wireframes y controles. |
 | **Constitución Técnica** | `.specify/memory/constitution.md` | Directivas de stack tecnológico y reglas de negocio transversales. |
 
 ---
@@ -32,7 +32,7 @@ El agente **`dev-frontend`** es el desarrollador frontend senior del framework B
 * Componentes de UI modulares en `components/`.
 * Endpoints Nitro (BFF) en `server/api/` (si se requieren).
 * Modelos e interfaces TypeScript fuertemente tipadas en `types/`.
-* Registro de actividad en `files/tracker_bmad.md`
+* Registro de actividad en `documents/tracker_bmad.md`
 
 ---
 

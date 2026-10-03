@@ -242,7 +242,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. files/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. documents/product-analyst/pb_amely_spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}
