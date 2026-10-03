@@ -295,19 +295,31 @@ def ejecutar_sdd_fase_implementacion():
             if agent_backend_path.exists():
                 alma_backend = agent_backend_path.read_text(encoding="utf-8")
                 
-                # TAREA FANTASMA PARA BACKEND
+                # TAREA FANTASMA PARA BACKEND (Ruta estricta en documents/)
                 tarea_fantasma_back = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
 Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'documents/dev-backend/backend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
 """
                 active_directive_path.write_text(alma_backend + tarea_fantasma_back, encoding="utf-8")
             
+            ts_inicio_back = time.time()
             try:
                 print("🏃 [SpecKit] Ejecutando implementación de Backend...")
                 write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Backend (/speckit.implement)...")
                 
-                subprocess.run('agy --dangerously-skip-permissions "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                
+                res_back = subprocess.run('agy --dangerously-skip-permissions "/speckit.implement"', shell=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if res_back.returncode != 0:
+                    print("❌ [SpecKit] Falló la ejecución del subproceso para Backend.")
+                    return False
+
+                # POST-CHECK DE VALIDACIÓN: Backend Architecture Doc
+                doc_back_path = DIRECTORIO_RAIZ / "documents" / "dev-backend" / "backend-architecture.md"
+                if not doc_back_path.exists() or doc_back_path.stat().st_mtime < (ts_inicio_back - 2):
+                    msg_err = "@WATCHER: 🚨 ERROR: SpecKit omitió la documentación viva de Backend en 'documents/dev-backend/backend-architecture.md'"
+                    print(f"❌ {msg_err}")
+                    write_watcher_log(msg_err)
+                    return False
+
                 from datetime import datetime
                 dt_str = datetime.now().strftime("%d-%m-%Y")
                 hr_str = datetime.now().strftime("%H:%M:%S")
@@ -316,7 +328,7 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
                 block = f"""
 ### [{dt_str}] Senior Backend Developer
 - **Hora:** {hr_str}
-- **Artefacto generado:** ackend-architecture.md
+- **Artefacto generado:** `documents/dev-backend/backend-architecture.md`
 - **Estado:** Implementación backend finalizada exitosamente mediante SDD SpecKit.
 - **Handoff:** {handoff_target} {handoff_text}
 """
@@ -334,19 +346,31 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
             if agent_frontend_path.exists():
                 alma_frontend = agent_frontend_path.read_text(encoding="utf-8")
                 
-                # TAREA FANTASMA PARA FRONTEND
+                # TAREA FANTASMA PARA FRONTEND (Ruta estricta en documents/)
                 tarea_fantasma_front = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
 Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'documents/dev-frontend/frontend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar.
 """
                 active_directive_path.write_text(alma_frontend + tarea_fantasma_front, encoding="utf-8")
             
+            ts_inicio_front = time.time()
             try:
                 print("🏃 [SpecKit] Ejecutando implementación de Frontend...")
                 write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Frontend (/speckit.implement)...")
                 
-                subprocess.run('agy --dangerously-skip-permissions "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                
+                res_front = subprocess.run('agy --dangerously-skip-permissions "/speckit.implement"', shell=True, cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if res_front.returncode != 0:
+                    print("❌ [SpecKit] Falló la ejecución del subproceso para Frontend.")
+                    return False
+
+                # POST-CHECK DE VALIDACIÓN: Frontend Architecture Doc
+                doc_front_path = DIRECTORIO_RAIZ / "documents" / "dev-frontend" / "frontend-architecture.md"
+                if not doc_front_path.exists() or doc_front_path.stat().st_mtime < (ts_inicio_front - 2):
+                    msg_err = "@WATCHER: 🚨 ERROR: SpecKit omitió la documentación viva de Frontend en 'documents/dev-frontend/frontend-architecture.md'"
+                    print(f"❌ {msg_err}")
+                    write_watcher_log(msg_err)
+                    return False
+
                 from datetime import datetime
                 dt_str = datetime.now().strftime("%d-%m-%Y")
                 hr_str = datetime.now().strftime("%H:%M:%S")
