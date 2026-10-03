@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ocultar la insignia / badge de licencia de PrimeUI en la esquina inferior derecha */
+body > div[style*="fixed"][style*="bottom"],
+body > div[style*="position: fixed"],
+div[class*="license"],
+[aria-label*="License"],
+a[href*="primeui"],
+a[href*="primefaces"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

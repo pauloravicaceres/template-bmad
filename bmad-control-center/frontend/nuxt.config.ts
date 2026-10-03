@@ -3,5 +3,5 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   modules: ['@nuxtjs/tailwindcss'],
-  css: ['primeicons/primeicons.css'],
+  css: ['primeicons/primeicons.css', '~/assets/css/main.css'],
 })

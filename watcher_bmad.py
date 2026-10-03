@@ -1,4 +1,4 @@
-﻿import time
+import time
 import os
 import sys
 import json
@@ -380,6 +380,26 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
         print(f"❌ [SDD Implementación] Error inesperado: {e}")
         return False
 
+def is_tracker_paused_for_human() -> bool:
+    """
+    Verifica si el último bloque registrado en tracker_bmad.md está esperando respuesta del @HUMANO:
+    """
+    if not os.path.exists(TRACKER_PATH):
+        return False
+    try:
+        with open(TRACKER_PATH, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read()
+        blocks = [b.strip() for b in content.split("### [") if b.strip()]
+        if not blocks:
+            return False
+        last_block = blocks[-1]
+        header_line = last_block.split("\n")[0]
+        if "HUMANO" not in header_line and "@HUMANO:" in last_block:
+            return True
+    except Exception:
+        pass
+    return False
+
 def extraer_instrucciones(linea):
     agentes = {
         "@BS:": "business-storyteller",
@@ -401,14 +421,16 @@ def extraer_instrucciones(linea):
     tareas = []
     todas_las_etiquetas = list(agentes.keys())
 
-    # Salvaguarda: Si el Handoff está dirigido al @HUMANO:, no despachar ningún agente
+    # Salvaguarda Global: Si el tracker está en estado pausado esperando al @HUMANO:
+    paused = is_tracker_paused_for_human()
+    linea_lower = linea.lower()
+
+    # Si la línea contiene @HUMANO:, no despachar agentes
     if "@HUMANO:" in linea:
         pos_humano = linea.find("@HUMANO:")
         pos_agentes = [linea.find(tag) for tag in todas_las_etiquetas if linea.find(tag) != -1]
         if not pos_agentes or pos_humano < min(pos_agentes):
             return []
-
-    linea_lower = linea.lower()
     # ==========================================
     # SDD GATEKEEPER 0: Respuesta a Clarify desde el Frontend
     # ==========================================
@@ -521,6 +543,9 @@ def extraer_instrucciones(linea):
         return []
 
     
+    if paused:
+        return []
+
     for etiqueta, agente_nombre in agentes.items():
         if etiqueta in linea:
             inicio = linea.find(etiqueta)
