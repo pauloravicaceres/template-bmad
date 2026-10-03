@@ -24,17 +24,21 @@ export const CANONICAL_STAGES: Array<{ key: StageKey; name: string; role: string
 ]
 
 export function buildDefaultStages(activeStageKey?: string): WorkflowStageStep[] {
-  let foundActive = false
-  return CANONICAL_STAGES.map((s) => {
+  const activeIndex = CANONICAL_STAGES.findIndex((s) => s.key === activeStageKey)
+
+  return CANONICAL_STAGES.map((s, idx) => {
     let status: 'COMPLETED' | 'IN_PROGRESS' | 'PENDING' = 'PENDING'
     let isActive = false
 
-    if (activeStageKey && s.key === activeStageKey) {
-      status = 'IN_PROGRESS'
-      isActive = true
-      foundActive = true
-    } else if (!foundActive && activeStageKey) {
-      status = 'COMPLETED'
+    if (activeIndex !== -1) {
+      if (idx < activeIndex) {
+        status = 'COMPLETED'
+      } else if (idx === activeIndex) {
+        status = 'IN_PROGRESS'
+        isActive = true
+      } else {
+        status = 'PENDING'
+      }
     }
 
     return {

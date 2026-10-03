@@ -128,6 +128,8 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
 
         # 1. Tracker modified
         if self._is_tracker(event.src_path):
+            size_bytes, is_large_file, metadata_only, mime_type = self._get_file_info(event.src_path)
+
             async def _dispatch_workflow(coalesced_count: int):
                 if self.legacy_callback:
                     try:
@@ -138,6 +140,19 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
                     wf_status = self.workflow_service.get_workflow_status()
                     await manager.broadcast_workflow_updated(
                         wf_status.model_dump(),
+                        coalesced_count=coalesced_count,
+                    )
+                except Exception:
+                    pass
+
+                try:
+                    await manager.broadcast_artifact_changed(
+                        action="MODIFIED",
+                        path=rel_path,
+                        size_bytes=size_bytes,
+                        is_large_file=is_large_file,
+                        metadata_only=metadata_only,
+                        mime_type=mime_type,
                         coalesced_count=coalesced_count,
                     )
                 except Exception:

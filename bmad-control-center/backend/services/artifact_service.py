@@ -20,6 +20,34 @@ BINARY_EXTENSIONS: Set[str] = {
 }
 
 
+CANONICAL_FOLDER_ORDER: List[str] = [
+    "business-storyteller",
+    "product-analyst",
+    "product-manager",
+    "business-analyst",
+    "qa-documental",
+    "designer-ux",
+    "solutions-architect",
+    "data-architect",
+    "api-architect",
+    "qa-tech",
+    "dev-backend",
+    "dev-frontend",
+    "qa-auto",
+    "code-review",
+    "devops"
+]
+
+FOLDER_ORDER_INDEX = {name: i for i, name in enumerate(CANONICAL_FOLDER_ORDER)}
+
+
+def _get_entry_sort_key(entry: Path):
+    is_dir = entry.is_dir()
+    name_lower = entry.name.lower()
+    order = FOLDER_ORDER_INDEX.get(name_lower, 999)
+    return (not is_dir, order, name_lower)
+
+
 class ArtifactService:
     """Service for securely exploring and reading workspace artifacts."""
 
@@ -45,7 +73,7 @@ class ArtifactService:
         child_files_count = 0
 
         try:
-            entries = sorted(list(current_dir.iterdir()), key=lambda x: (not x.is_dir(), x.name.lower()))
+            entries = sorted(list(current_dir.iterdir()), key=_get_entry_sort_key)
         except Exception as e:
             raise HTTPException(
                 status_code=500,

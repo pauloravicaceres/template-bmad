@@ -108,6 +108,41 @@ const onNodeSelect = (node: DirectoryNode): void => {
   emit('select-node', node)
 }
 
+const CANONICAL_FOLDER_ORDER = [
+  'business-storyteller',
+  'product-analyst',
+  'product-manager',
+  'business-analyst',
+  'qa-documental',
+  'designer-ux',
+  'solutions-architect',
+  'data-architect',
+  'api-architect',
+  'qa-tech',
+  'dev-backend',
+  'dev-frontend',
+  'qa-auto',
+  'code-review',
+  'devops',
+]
+
+const FOLDER_ORDER_MAP = new Map(CANONICAL_FOLDER_ORDER.map((name, i) => [name, i]))
+
+function sortNodes(nodes: DirectoryNode[]): DirectoryNode[] {
+  return [...nodes].sort((a, b) => {
+    const isDirA = a.node_type === 'DIRECTORY'
+    const isDirB = b.node_type === 'DIRECTORY'
+    if (isDirA && !isDirB) return -1
+    if (!isDirA && isDirB) return 1
+
+    const orderA = FOLDER_ORDER_MAP.get(a.name.toLowerCase()) ?? 999
+    const orderB = FOLDER_ORDER_MAP.get(b.name.toLowerCase()) ?? 999
+    if (orderA !== orderB) return orderA - orderB
+
+    return a.name.localeCompare(b.name)
+  })
+}
+
 // Filtro recursivo
 function filterNode(node: DirectoryNode, query: string): DirectoryNode | null {
   if (node.name === '.specify' || node.relative_path === '.specify') {
@@ -129,7 +164,7 @@ function filterNode(node: DirectoryNode, query: string): DirectoryNode | null {
   if (matches || filteredChildren.length > 0) {
     return {
       ...node,
-      children: filteredChildren,
+      children: sortNodes(filteredChildren),
     }
   }
   return null
@@ -145,9 +180,11 @@ const filteredTree = computed<DirectoryNode[]>(() => {
 
   const query = searchQuery.value.trim().toLowerCase()
   if (!query) {
-    return initialNodes
-      .map(n => filterNode(n, ''))
-      .filter((n): n is DirectoryNode => n !== null)
+    return sortNodes(
+      initialNodes
+        .map(n => filterNode(n, ''))
+        .filter((n): n is DirectoryNode => n !== null)
+    )
   }
 
   const result: DirectoryNode[] = []
@@ -157,6 +194,6 @@ const filteredTree = computed<DirectoryNode[]>(() => {
       result.push(filtered)
     }
   }
-  return result
+  return sortNodes(result)
 })
 </script>

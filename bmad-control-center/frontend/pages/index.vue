@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-h-screen bg-gray-100 flex flex-col font-sans">
     <!-- Barra Superior de Control Center (UX Header con WebSocketStatusBadge y DebounceIndicator) -->
     <header class="bg-gray-900 text-white px-6 py-3 shadow-md flex items-center justify-between border-b border-gray-800">
@@ -416,6 +416,11 @@ watch(lastMessage, (msg: WebSocketMessage | string | null) => {
     
     if (payload.handoff_target === 'HUMANO' || (typeof payload.handoff_directive === 'string' && payload.handoff_directive.includes('@HUMANO'))) {
       showGateControl.value = true
+    }
+
+    // Si el visor tiene abierto el tracker_bmad.md, recargar en tiempo real
+    if (selectedPath.value && selectedPath.value.includes('tracker_bmad.md')) {
+      selectArtifact(selectedPath.value)
     }
 
     toast?.add({

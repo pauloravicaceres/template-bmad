@@ -167,9 +167,15 @@ export function useArtifacts(apiBase?: string) {
     }
 
     // Si el usuario tiene el visor abierto en el archivo modificado, recargar en caliente (SC-02)
-    // Usamos endsWith para tolerar paths parciales como "tracker_bmad.md" vs "files/tracker_bmad.md"
+    // Usamos endsWith / includes para tolerar paths parciales como "tracker_bmad.md" vs "files/tracker_bmad.md"
     const currentPath = selectedPath.value
-    if (currentPath && (payload.relative_path === currentPath || payload.relative_path.endsWith('/' + currentPath) || currentPath.endsWith('/' + payload.relative_path))) {
+    if (
+      currentPath &&
+      (payload.relative_path === currentPath ||
+        payload.relative_path.endsWith('/' + currentPath) ||
+        currentPath.endsWith('/' + payload.relative_path) ||
+        (currentPath.includes('tracker_bmad.md') && payload.relative_path.includes('tracker_bmad.md')))
+    ) {
       await selectArtifact(currentPath, selectedNode.value || undefined)
     }
   }

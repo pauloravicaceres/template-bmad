@@ -1,4 +1,4 @@
-﻿import re
+import re
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +24,8 @@ CANONICAL_STAGES = [
 ]
 
 ROLE_TO_KEY = {
+    "Business Storyteller": "BS",
+    "Product Analyst": "PA",
     "Product Manager": "PM",
     "Business Analyst": "BA",
     "QA Documental": "QA",
@@ -40,6 +42,8 @@ ROLE_TO_KEY = {
 }
 
 TOKEN_TO_KEY = {
+    "BS": "BS",
+    "PA": "PA",
     "PM": "PM",
     "BA": "BA",
     "QA": "QA",
