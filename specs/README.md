@@ -18,8 +18,6 @@ Para mantener el determinismo del *Ledger*, los agentes mutadores y lectores uti
 
 | N° | Épica Origen | Nombre spec / HU | Qué aporta | Estado | Rama |
 |----|--------------|------------------|------------|--------|------|
-| 001 | [P1] Catálogo de Servicios | 001-HU_catalogo_servicios_tarifario | Registro y mantenimiento del catálogo reutilizable de servicios, componentes y tarifas base | ACTIVE | feat/001-HU_catalogo_servicios_tarifario |
-| 002 | [P2] Motor de Configuración y Cálculo | 002-HU_motor_configuracion_calculo_cotizaciones | Selección de servicios/módulos, ajuste de cantidades/parámetros y cálculo automático del precio total de la cotización | IN-PROGRESS | feat/002-HU_motor_configuracion_calculo_cotizaciones |
 
 ---
 

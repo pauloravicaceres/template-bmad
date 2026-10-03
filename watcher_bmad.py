@@ -189,6 +189,21 @@ def ejecutar_sdd_fase_negocio(ruta_hu: str):
         if "?" in res_clarify.stdout or "ambiguity" in res_clarify.stdout.lower() or res_clarify.returncode != 0:
             print("⚠️ [HITL] Ambigüedad detectada en /speckit.clarify. Pausando para intervención humana.")
             print(res_clarify.stdout)
+            
+            from datetime import datetime
+            dt_str = datetime.now().strftime("%d-%m-%Y")
+            hr_str = datetime.now().strftime("%H:%M:%S")
+            block = f"""
+### [{dt_str}] WATCHER
+- **Hora:** {hr_str}
+- **Mensaje:** ⚠️ [HITL] Ambigüedad detectada por Spec Kit.
+- **Handoff:** @HUMANO: El motor de análisis funcional encontró ambigüedades o vacíos en la Historia de Usuario. Por favor, revisa la matriz y responde la pregunta a continuación para que la IA pueda cerrar el análisis.
+
+{res_clarify.stdout}
+"""
+            with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+                f.write(block)
+                
             return False
 
         # 3. Handoff Dinámico (UX o SA)
@@ -393,10 +408,53 @@ def extraer_instrucciones(linea):
         if not pos_agentes or pos_humano < min(pos_agentes):
             return []
 
+    linea_lower = linea.lower()
+    # ==========================================
+    # SDD GATEKEEPER 0: Respuesta a Clarify desde el Frontend
+    # ==========================================
+    respuesta_inferida = ""
+    if "@watcher: /speckit.clarify" in linea_lower:
+        match = re.search(r'/speckit\.clarify\s+(.+)', linea, re.IGNORECASE)
+        respuesta_inferida = match.group(1).strip() if match else ""
+    elif linea.strip().startswith("- **Handoff:**") or linea.strip().startswith("- **Feedback:**"):
+        posible_resp = linea.replace("- **Handoff:**", "").replace("- **Feedback:**", "").strip()
+        if posible_resp and len(posible_resp) < 50 and "@" not in posible_resp:
+            try:
+                with open(TRACKER_PATH, "r", encoding="utf-8", errors="replace") as f:
+                    ultimas = f.readlines()[-50:]
+                for l in reversed(ultimas):
+                    if "Ambigüedad detectada por Spec Kit" in l:
+                        respuesta_inferida = posible_resp
+                        break
+                    if "Artefacto generado" in l:
+                        break
+            except Exception:
+                pass
+
+    if respuesta_inferida:
+        print("\n" + "=" * 80)
+        print("🚀 [PAUSA SDD INTERCEPTADA] RESPUESTA HUMANA RECIBIDA PARA CLARIFY")
+        print("=" * 80)
+        write_watcher_log(f"⚙️ [SDD Auto-Runner] Inyectando respuesta humana a Spec Kit: {respuesta_inferida}")
+        res = subprocess.run(f'agy --dangerously-skip-permissions -p "/speckit.clarify {respuesta_inferida}"', shell=True, cwd=DIRECTORIO_RAIZ)
+        
+        # Continuar con el handoff dinámico a UX o SA
+        handoff = determinar_handoff_fase_a(TRACKER_PATH)
+        
+        from datetime import datetime
+        dt_str = datetime.now().strftime("%d-%m-%Y")
+        hr_str = datetime.now().strftime("%H:%M:%S")
+        msg = f"{handoff} La ambigüedad ha sido resuelta por el Humano y la especificación SDD ha concluido con éxito. Procede con tu diseño."
+        
+        with open(TRACKER_PATH, "a", encoding="utf-8") as f:
+            f.write(f"\n### [{dt_str}] WATCHER\n- **Hora:** {hr_str}\n- **Mensaje:** ⚙️ [SDD Auto-Runner] Resolución aplicada exitosamente.\n- **Handoff:** {msg}\n")
+        
+        print(f"✅ [SDD Negocio] Handoff despachado: {handoff}")
+        return []
+
     # ==========================================
     # SDD GATEKEEPER 1: Intercepción de Aprobación de QA Documental (Negocio)
     # ==========================================
-    linea_lower = linea.lower()
     es_transicion_a_arquitectura = "@UX:" in linea or "@SA:" in linea
     es_aprobacion_qa = (
         "aprobado_qa_" in linea_lower

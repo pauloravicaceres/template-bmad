@@ -30,16 +30,13 @@ async def get_gate_status():
     """Returns current gate status from tracker (HU-001)."""
     content = tracker_service.read_tracker()
     
-    # Evaluar si existe un handoff al humano o estado PENDING sin una decision posterior que lo haya cerrado
-    has_human_handoff = "@HUMANO" in content or "PENDING" in content
-    
-    if has_human_handoff:
-        last_human_index = max(content.rfind("@HUMANO"), content.rfind("PENDING"))
-        last_decision_index = content.rfind("DECISION [")
-        if last_decision_index > last_human_index:
-            status = "APPROVED"
-        else:
+    blocks = content.split("###")
+    if len(blocks) > 1:
+        last_block = blocks[-1]
+        if "@HUMANO:" in last_block and "HUMANO" not in last_block.split("\n")[0]:
             status = "PENDING_DECISION"
+        else:
+            status = "APPROVED"
     else:
         status = "APPROVED"
         

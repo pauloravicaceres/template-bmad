@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import shutil
 import sys
 
@@ -20,7 +20,6 @@ AGENTS = {
     "devops:": "devops"
 }
 
-
 def seleccionar_carpetas():
     opciones = list(AGENTS.items())
     
@@ -28,18 +27,21 @@ def seleccionar_carpetas():
     for i, (prefijo, nombre) in enumerate(opciones, 1):
         print(f" [{i}] {nombre}")
     
-    print(" [T] Todas las carpetas")
+    print(" [S] Carpeta specs (y regenerar README.md)")
+    print(" [T] Todas las carpetas (incluyendo specs)")
     print(" [0] Cancelar y salir")
     
     while True:
-        seleccion = input("\nIngresa los números separados por coma (ej. 1,3,5), 'T' o '0': ").strip().upper()
+        seleccion = input("\nIngresa los números separados por coma (ej. 1,3,S), 'T' o '0': ").strip().upper()
         
         if seleccion == '0':
             print("Operación cancelada.")
             sys.exit(0)
             
         if seleccion == 'T':
-            return AGENTS
+            todas = AGENTS.copy()
+            todas['specs'] = 'specs'
+            return todas
             
         carpetas_seleccionadas = {}
         indices_ingresados = seleccion.split(',')
@@ -47,7 +49,9 @@ def seleccionar_carpetas():
         errores = False
         for idx in indices_ingresados:
             idx = idx.strip()
-            if idx.isdigit():
+            if idx == 'S':
+                carpetas_seleccionadas['specs'] = 'specs'
+            elif idx.isdigit():
                 i = int(idx)
                 if 1 <= i <= len(opciones):
                     prefijo, nombre = opciones[i-1]
@@ -66,20 +70,20 @@ def seleccionar_carpetas():
             
         return carpetas_seleccionadas
 
-
 def main():
-    # utils/clean_folders.py -> raíz del proyecto
     raiz_proyecto = Path(__file__).resolve().parent.parent
     files_dir = raiz_proyecto / "files"
-
-    print(f"Directorio objetivo: {files_dir}")
+    specs_dir = raiz_proyecto / "specs"
     
     carpetas_a_limpiar = seleccionar_carpetas()
     
     print("\nIniciando vaciado de directorios...\n")
 
     for prefijo, nombre_carpeta in carpetas_a_limpiar.items():
-        ruta_carpeta = files_dir / nombre_carpeta
+        if nombre_carpeta == "specs":
+            ruta_carpeta = specs_dir
+        else:
+            ruta_carpeta = files_dir / nombre_carpeta
 
         if not ruta_carpeta.exists():
             print(f"[OMITIDO] La carpeta no existe: {ruta_carpeta.name}")
@@ -90,19 +94,26 @@ def main():
             continue
 
         try:
-            # Iterar y borrar únicamente el contenido interno de cada carpeta
             for elemento in ruta_carpeta.iterdir():
                 if elemento.is_file() or elemento.is_symlink():
                     elemento.unlink()
                 elif elemento.is_dir():
                     shutil.rmtree(elemento)
-                    
+            
             print(f"[OK] Contenido eliminado en: {nombre_carpeta}")
+            
+            if nombre_carpeta == "specs":
+                template_path = raiz_proyecto / "utils" / "readme-specs.template.md"
+                if template_path.exists():
+                    shutil.copy2(template_path, specs_dir / "README.md")
+                    print("[OK] README.md regenerado en specs/")
+                else:
+                    print(f"[WARN] No se encontró el template {template_path}")
+                    
         except Exception as e:
             print(f"[ERROR] Fallo al limpiar {nombre_carpeta}: {e}")
 
     print("\nProceso finalizado. Los archivos en la raíz (ej. tracker_bmad.md) están intactos.")
-
 
 if __name__ == "__main__":
     main()

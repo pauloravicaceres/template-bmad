@@ -1,0 +1,38 @@
+# Python / Virtual Environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Node.js / Node Modules (si aplica)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Entorno y Secretos
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Archivos temporales y de compilación / Caché
+temp/
+*.tmp
+*.log
+
+# Archivos del sistema y de IDEs / Editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Archivos específicos de respaldo/comprimidos del proyecto
+*.zip
+*.tar.gz

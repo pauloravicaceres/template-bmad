@@ -52,7 +52,7 @@ const approve = async () => {
     await fetch(`http://localhost:8000/api/v1/gates/${gateId}/decision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'APPROVE' })
+      body: JSON.stringify({ action: 'APPROVE', feedback: feedback.value })
     })
     fetchStatus()
   } catch (e) {

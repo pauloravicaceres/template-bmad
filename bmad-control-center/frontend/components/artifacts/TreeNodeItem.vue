@@ -37,7 +37,7 @@
           v-if="node.is_empty || node.child_file_count === 0"
           class="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.2 rounded font-medium border border-amber-200"
         >
-          (0) [VACÍO]
+          (0)
         </span>
         <span
           v-else-if="node.child_file_count !== undefined"
