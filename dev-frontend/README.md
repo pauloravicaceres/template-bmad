@@ -1,18 +1,19 @@
-# 🎨 Senior Frontend Developer (`dev-frontend-vue`)
+# 🎨 Senior Frontend Developer (`dev-frontend`)
 
 > **Fase:** D (Development & Deployment) | **Rol:** Constructor Frontend Core | **Handoff Token:** `@DEV-FRONT:` / `@DEV-FRONTEND:`
 
-El agente **`dev-frontend`** es el desarrollador frontend senior del framework BMAD. Su propósito es construir interfaces de usuario de nivel de producción bajo **Vue 3 (Composition API) y Nuxt 3**, consumiendo las APIs del backend (o creando rutas BFF con Nitro) definidas en el `tech-design_*.md` y calcando estrictamente la distribución estructural (Skeleton) de los wireframes (`ux_*.md`) integrando la librería de componentes **PrimeVue** estilizada nativamente con **Tailwind CSS**.
+El agente **`dev-frontend`** es el desarrollador frontend senior del framework BMAD. Su propósito es construir interfaces de usuario de nivel de producción bajo **Angular 22 Zoneless**, consumiendo las APIs del backend definidas en el `tech-design_*.md` y calcando estrictamente la distribución estructural (Skeleton) de los wireframes (`ux_*.md`) sobre la librería de componentes **PrimeNG v22.1.1**.
 
 ---
 
 ## 🎯 Responsabilidades Principales
 
-* **Arquitectura Composition API Estricta:** Todos los componentes usan exclusivamente el bloque `<script setup lang="ts">`. Prohibido el uso de Options API (`export default { data() ... }`).
-* **Ecosistema Nuxt 3 y SSR:** Aprovechamiento del auto-import nativo de Nuxt. Uso exclusivo de `useFetch` o `useAsyncData` para fetching de datos compatible con Server-Side Rendering (SSR). Prohibido el uso de `axios` o `fetch` nativo sin manejo de hidratación.
-* **Reactividad y Estado Global:** Manejo de estado local con la Reactividad de Vue (`ref()`, `reactive()`, `computed()`). Gestión de estado global y compartido mediante `useState` de Nuxt o inicialización de stores con **Pinia**.
-* **Integración BFF (Backend for Frontend):** Creación y mantenimiento de rutas de servidor (endpoints) utilizando el motor Nitro de Nuxt 3 en `server/api/` cuando la arquitectura requiera abstracción o agregación.
-* **Maquetación PrimeVue + Tailwind CSS:** Replicación exacta del esqueleto de diseño usando componentes de PrimeVue. Se prohíbe inventar clases CSS en el bloque `<style scoped>`. Se debe usar exclusivamente la sintaxis utilitaria de **Tailwind CSS** directamente en el `<template>` (ej. `flex`, `justify-between`, `grid`, `gap-3`).
+* **Arquitectura Zoneless & Standalone:** Todos los componentes son `standalone: true`. Prohibido el uso de `NgModules` o dependencias de `zone.js`.
+* **Control Flow Moderno:** Uso exclusivo de sintaxis declarativa `@if`, `@for`, `@switch`, `@empty`. Prohibido `*ngIf`, `*ngFor` y `CommonModule` tradicional.
+* **Inyección Funcional:** Inyección de dependencias exclusivamente mediante la función `inject()` de Angular (ej. `private http = inject(HttpClient);`). Prohibida inyección por constructor.
+* **Reactividad con Signals:** Manejo de estado local y reactividad mediante `signal()`, `computed()`, `effect()` y mapeo HTTP con `toSignal()`.
+* **Formularios Fuertemente Tipados:** Reactive Forms con `FormGroup<T>` y `FormControl<T>`. Prohibido `[(ngModel)]`.
+* **Maquetación PrimeNG (Skeleton vs. Theme):** Replicación exacta del esqueleto de navegación, breadcrumbs, formularios multi-columna y tablas de datos de PrimeNG, sin inventar clases CSS utilitarias ni overrides con `::ng-deep`.
 
 ---
 
@@ -20,26 +21,24 @@ El agente **`dev-frontend`** es el desarrollador frontend senior del framework B
 
 | Archivo / Fuente | Ruta Típica | Propósito |
 |---|---|---|
-| **Tech Design Maestro** | `documents/qa-tech/tech-design_*.md` | Contratos de endpoints, DTOs de Request/Response y códigos de estado. |
-| **Especificación UX/UI** | `documents/designer-ux/ux_*.md` | Flujos visuales, jerarquía de pantallas, wireframes y controles. |
-| **Constitución Técnica** | `.specify/memory/constitution.md` | Directivas de stack tecnológico y reglas de negocio transversales. |
+| **Tech Design Maestro** | `files/qa-tech/tech-design_*.md` | Contratos de endpoints, DTOs de Request/Response y códigos de estado. |
+| **Especificación UX/UI** | `files/designer-ux/ux_*.md` | Flujos visuales, jerarquía de pantallas, wireframes y controles. |
+| **Constitución Técnica** | `.specify/memory/constitution.md` | Directivas de Skeleton vs Theme y versión de PrimeNG. |
 
 ---
 
 ## 📤 Outputs Producidos
 
-* Páginas y vistas ruteables en `pages/` (Nuxt Pages).
-* Componentes de UI modulares en `components/`.
-* Endpoints Nitro (BFF) en `server/api/` (si se requieren).
-* Modelos e interfaces TypeScript fuertemente tipadas en `types/`.
-* Registro de actividad en `documents/tracker_bmad.md`
+* Componentes Standalone en TypeScript (`.ts`), plantillas HTML (`.html`) y servicios HTTP en `./src/template-base/src/app/`
+* Modelos e interfaces TypeScript fuertemente tipadas
+* Registro de actividad en `files/tracker_bmad.md`
 
 ---
 
 ## 🛠️ Skills e Instrucciones Asociadas
 
-1. **`zero-hallucination-policy.instructions.md`:** Prohíbe placeholders, mocks hardcodeados, uso del tipo `any`, Options API, CSS hackeado (`:deep()`, `<style scoped>`) y fuerza el uso de Vue 3 Composition API, Nuxt 3 SSR y utilitarios de Tailwind CSS.
-2. **`nuxt3-composition-validator` (Skill Local):** Checklist de auto-auditoría sobre Composition API estricta, fetching SSR seguro, integración Nitro y el uso obligatorio de utilitarios de Tailwind CSS frente al CSS tradicional.
+1. **`zero-hallucination-policy.instructions.md`:** Prohíbe placeholders, mocks hardcodeados, uso del tipo `any`, suscripciones manuales con `.subscribe()` cuando puedan ser reactivas, y código obsoleto de Angular.
+2. **`zoneless-validator` (Skill Local):** Checklist de auto-auditoría sobre Control Flow moderno, inyección funcional, Signals y tipado estricto.
 3. **`tracker-logger` (Skill Global):** Estándar de bitácora determinista en `tracker_bmad.md`.
 
 ---
@@ -49,8 +48,8 @@ El agente **`dev-frontend`** es el desarrollador frontend senior del framework B
 ```markdown
 ### [26-09-2026] Dev Frontend
 - **Hora:** 15:45:00
-- **Artefacto generado:** `pages/orders/index.vue`, `components/OrderList.vue`
-- **Estado:** Vistas maquetadas en Vue 3 Composition API con Nuxt 3, PrimeVue y Tailwind CSS. Datos consumidos con `useFetch` SSR.
+- **Artefacto generado:** `src/template-base/src/app/features/orders/order-list/`
+- **Estado:** Componente OrderListComponent maquetado en Angular 22 Zoneless con Signals, PrimeNG Table y formularios reactivos tipados.
 - **⚠️ Puntos Abiertos:** Ninguno.
-- **Handoff:** @QA-AUTO: Componente OrderList listo para la suite de pruebas E2E y validación SSR.
+- **Handoff:** @QA-AUTO: Componente OrderList listo para suite de pruebas Jest y validación de reactividad en Signals.
 ```

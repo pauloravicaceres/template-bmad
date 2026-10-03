@@ -18,7 +18,6 @@ Para mantener el determinismo del *Ledger*, los agentes mutadores y lectores uti
 
 | N° | Épica Origen | Nombre spec / HU | Qué aporta | Estado | Rama |
 |----|--------------|------------------|------------|--------|------|
-| 001 | P1 - Motor de Cálculo y Configuración Interactiva de Cotizaciones | 001-HU_configurador_y_calculo_cotizaciones | Selección de servicios, ajuste de parámetros y cómputo automático de costos de propuestas comerciales | IN-PROGRESS | feat/001-HU_configurador_y_calculo_cotizaciones |
 
 ---
 
