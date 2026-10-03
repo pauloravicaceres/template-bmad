@@ -26,7 +26,8 @@ def copy_template(target_dir):
         "business-storyteller", "product-analyst", "product-manager", "business-analyst",
         "qa-documental", "designer-ux", "solutions-architect", "data-architect",
         "api-architect", "qa-tech", "dev-backend", "dev-frontend", "qa-auto",
-        "code-review", "devops", "skills", "utils", ".specify", ".github", "app"
+        "code-review", "devops", "skills", "utils", ".specify", ".github", "app",
+        "bmad-control-center"
     ]
 
     archivos_permitidos = [
@@ -38,6 +39,12 @@ def copy_template(target_dir):
     print(f"\n🚀 Clonando Motor BMAD v2.0 hacia: {target_path}")
     print("=" * 60)
 
+    # Patrones a ignorar durante la copia (paquetes generados por install, entornos virtuales, caches, builds)
+    patrones_ignore = shutil.ignore_patterns(
+        "node_modules", ".venv", "venv", "env", "__pycache__", 
+        ".next", "dist", "build", ".turbo", ".cache", ".output"
+    )
+
     # 1. Copiar Carpetas
     for carpeta in carpetas_permitidas:
         src = source_dir / carpeta
@@ -45,7 +52,7 @@ def copy_template(target_dir):
         if src.exists() and src.is_dir():
             if dst.exists():
                 shutil.rmtree(dst)
-            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("node_modules", ".venv", "__pycache__"))
+            shutil.copytree(src, dst, ignore=patrones_ignore)
             print(f"📁 Copiado: {carpeta}/")
 
     # 2. Copiar Archivos
