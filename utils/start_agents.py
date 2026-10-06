@@ -31,33 +31,40 @@ WORKSPACE_DIR = Path(__file__).resolve().parent.parent
 TABS_CONFIG = {
     "Negocio y Producto": [
         # Fila 1
-        {"name": "business-storyteller", "model": "Gemini 3.6 Flash", "effort": "low"},
-        {"name": "product-analyst",     "model": "Gemini 3.6 Flash", "effort": "low", "target": "business-storyteller", "direction": "right"},
-        {"name": "product-manager",     "model": "Gemini 3.6 Flash", "effort": "low", "target": "product-analyst", "direction": "right"},
+        {"name": "business-storyteller", "model": "claude-sonnet-5-5", "effort": "low"},
+        {"name": "product-manager",     "model": "claude-sonnet-5-5", "effort": "low", "target": "business-storyteller", "direction": "right"},
+        {"name": "business-analyst",    "model": "claude-sonnet-5-5", "effort": "medium", "target": "product-manager", "direction": "right"},
 
         # Fila 2
-        {"name": "business-analyst",    "model": "Gemini 3.6 Flash", "effort": "low", "target": "business-storyteller", "direction": "down"},
-        {"name": "qa-documental",       "model": "Gemini 3.6 Flash", "effort": "low", "target": "product-analyst", "direction": "down"},
-        {"name": "designer-ux",         "model": "Gemini 3.6 Flash", "effort": "low", "target": "product-manager", "direction": "down"},
+        {"name": "product-analyst",     "model": "claude-sonnet-5-5", "effort": "low", "target": "business-storyteller", "direction": "down"},
+        {"name": "qa-documental",       "model": "claude-sonnet-5-5", "effort": "low", "target": "product-manager", "direction": "down"},
+        {"name": "designer-ux",         "model": "claude-sonnet-5-5", "effort": "low", "target": "business-analyst", "direction": "down"},
     ],
     "Arquitectura e Ingeniería": [
-        {"name": "solutions-architect", "model": "Gemini 3.6 Flash", "effort": "low"},
-        {"name": "data-architect",      "model": "Gemini 3.6 Flash", "effort": "low", "target": "solutions-architect", "direction": "right"},
-        {"name": "api-architect",       "model": "Gemini 3.6 Flash", "effort": "low", "target": "solutions-architect", "direction": "down"},
-        {"name": "qa-tech",             "model": "Gemini 3.6 Flash", "effort": "low", "target": "data-architect", "direction": "down"},
+        {"name": "solutions-architect", "model": "claude-sonnet-5-5", "effort": "medium"},
+        {"name": "data-architect",      "model": "claude-sonnet-5-5", "effort": "medium", "target": "solutions-architect", "direction": "right"},
+        {"name": "api-architect",       "model": "claude-sonnet-5-5", "effort": "medium", "target": "solutions-architect", "direction": "down"},
+        {"name": "qa-tech",             "model": "claude-sonnet-5-5", "effort": "medium", "target": "data-architect", "direction": "down"},
     ],
     "Desarrollo y Despliegue": [
         # Fase D automatizada: @DEV-BACK y @DEV-FRONT son asimilados por SpecKit.
         # Solo mantenemos a los auditores e infraestructura.
-        {"name": "qa-auto",      "model": "Gemini 3.6 Flash", "effort": "low"},
-        {"name": "code-review",  "model": "Gemini 3.6 Flash", "effort": "low", "target": "qa-auto", "direction": "right"},
-        {"name": "devops",       "model": "Gemini 3.6 Flash", "effort": "low", "target": "code-review", "direction": "right"},
+        {"name": "qa-auto",      "model": "claude-sonnet-5-5", "effort": "low"},
+        {"name": "code-review",  "model": "claude-sonnet-5-5", "effort": "low", "target": "qa-auto", "direction": "right"},
+        {"name": "devops",       "model": "claude-sonnet-5-5", "effort": "low", "target": "code-review", "direction": "right"},
     ]
 }
 
 # ==========================================
 # 2. FUNCIONES DE APOYO Y HERDR CLI
 # ==========================================
+def agentes_omitidos():
+    """Agentes que no deben levantarse según config_bmad.json (designer-ux con ux_phase=off o proyecto headless)."""
+    if str(WORKSPACE_DIR) not in sys.path:
+        sys.path.insert(0, str(WORKSPACE_DIR))
+    import ux_routing
+    return ux_routing.agentes_omitidos(WORKSPACE_DIR)
+
 def obtener_contexto_actual():
     """Obtiene dinámicamente el ID del panel y tab donde se ejecuta este script."""
     try:
@@ -129,15 +136,9 @@ def extraer_id_pane(salida_cruda):
     return salida_cruda.strip()
 
 def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
-    """Renombra el panel, inicia el agente AGY con sandboxing y asigna modelo/esfuerzo FinOps."""
-    modelo_base = config_agente.get("model", "Gemini 3.6 Flash")
+    """Renombra el panel, inicia el agente con sandboxing y asigna modelo/esfuerzo FinOps."""
+    modelo_final = config_agente.get("model", "claude-sonnet-5-5")
     esfuerzo = config_agente.get("effort", "low")
-    esfuerzo_cap = esfuerzo.capitalize()
-
-    if f"({esfuerzo_cap})" not in modelo_base:
-        modelo_final = f"{modelo_base} ({esfuerzo_cap})"
-    else:
-        modelo_final = modelo_base
 
     # 1. Renombrar panel en Herdr
     try:
@@ -155,15 +156,26 @@ def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
     time.sleep(1)
 
     # 2. Iniciar el agente con agy, inyectando perfil y modelo directamente al arranque
+    # cmd_start = [
+    #     "herdr", "agent", "start", nombre_agente,
+    #     "--kind", "agy",
+    #     "--pane", pane_id,
+    #     "--", 
+    #     "--dangerously-skip-permissions",
+    #     "--add-dir", str(WORKSPACE_DIR),
+    #     "--model", modelo_final,
+    #     "--agent", f"{nombre_agente}/AGENTS.md" 
+    # ]
+    # 2. Iniciar el agente con claude, inyectando perfil y modelo directamente al arranque
     cmd_start = [
         "herdr", "agent", "start", nombre_agente,
-        "--kind", "agy",
+        "--kind", "claude",
         "--pane", pane_id,
         "--", 
         "--dangerously-skip-permissions",
-        "--add-dir", str(WORKSPACE_DIR),
+        "--add-dir", str(WORKSPACE_DIR / nombre_agente),
         "--model", modelo_final,
-        "--agent", f"{nombre_agente}/AGENTS.md" 
+        "--effort", esfuerzo,
     ]
     
     res_start = subprocess.run(
@@ -174,26 +186,12 @@ def configurar_agente_en_panel(pane_id, nombre_agente, config_agente):
         errors="replace"
     )
     if res_start.returncode == 0:
-        print(f"      🤖 Agente inicializado con perfil y modelo {modelo_final}.")
+        print(f"      🤖 Agente inicializado con modelo {modelo_final} (esfuerzo: {esfuerzo}).")
     else:
         err = res_start.stderr.strip() or res_start.stdout.strip()
         print(f"      ⚠️ Advertencia al arrancar agente {nombre_agente}: {err}")
 
     time.sleep(1)
-
-    # 3. Asignar modelo y esfuerzo FinOps
-    cmd_model = ["herdr", "pane", "run", pane_id, f"/model {modelo_final}"]
-    res_model = subprocess.run(
-        cmd_model,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace"
-    )
-    if res_model.returncode == 0:
-        print(f"      🧠 FinOps: Asignado {modelo_final}")
-    else:
-        print(f"      ⚠️ No se pudo asignar modelo para {nombre_agente}")
 
 # ==========================================
 # 3. ORQUESTACIÓN PRINCIPAL
@@ -212,7 +210,11 @@ def inicializar_flota():
 
     primer_tab_id = None
 
+    omitidos = agentes_omitidos()
+    if omitidos:
+        print(f"⏭️ Agentes omitidos por config_bmad.json: {', '.join(sorted(omitidos))}")
     for tab_label, agentes in TABS_CONFIG.items():
+        agentes = [a for a in agentes if a['name'] not in omitidos]
         total_agentes = len(agentes)
         print(f"\n📂 Creando Pestaña: [{tab_label}] ({total_agentes} agentes)...")
 
