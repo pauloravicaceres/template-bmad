@@ -116,6 +116,16 @@ class ConnectionManager:
             "last_artifact_path": artifact_path,
             "last_open_points": "Ninguno",
             "has_pulse": True,
+            # Estado completo proyectado por el backend (incluye etapas paralelas como DEV-BACK/DEV-FRONT)
+            "overall_status": workflow_data.get("overall_status"),
+            "active_agent_role": agent_role,
+            "active_artifact_in_progress": artifact_path,
+            "last_updated": workflow_data.get("last_updated"),
+            "total_stages": workflow_data.get("total_stages"),
+            "completed_stages": workflow_data.get("completed_stages"),
+            "stages": workflow_data.get("stages") or [],
+            "rework": workflow_data.get("rework"),
+            "alert": workflow_data.get("alert"),
             # Dual output compatibility
             "current_stage": stage,
             "status": workflow_data.get("overall_status"),

@@ -23,6 +23,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     const removeLicenseElements = () => {
       const allDivs = document.querySelectorAll('div, a, span')
       allDivs.forEach((el) => {
+        // El contenido de la app (p. ej. un entregable que cite "PrimeUI License") nunca debe borrarse:
+        // textContent incluye a los descendientes y arrastraría la raíz #__nuxt completa.
+        if (el.closest('#__nuxt')) return
         const text = el.textContent || ''
         if (text.includes('Invalid PrimeUI License') || text.includes('PrimeUI License')) {
           el.remove()

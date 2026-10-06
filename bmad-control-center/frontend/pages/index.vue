@@ -105,6 +105,8 @@
       <WorkflowStepper
           :stages="stages"
           :active-stage-key="activeStage"
+          :overall-status="overallStatus"
+          :active-agent-role="activeAgentRole"
           :selected-path="selectedPath"
           @select-stage="handleSelectStage"
           @select-artifact="handleSelectArtifactPath"

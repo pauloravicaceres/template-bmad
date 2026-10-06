@@ -3,6 +3,7 @@
     <h2 class="text-xl font-bold">Estado: {{ status }}</h2>
     <div v-if="status === 'PENDING_DECISION'" class="space-y-4">
       <p>Hay una compuerta esperando decisión.</p>
+
       <textarea 
         v-model="feedback"
         class="w-full border rounded p-2"

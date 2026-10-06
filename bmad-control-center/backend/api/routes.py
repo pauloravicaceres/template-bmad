@@ -1,4 +1,6 @@
 import json
+import re
+from typing import Optional
 from fastapi import APIRouter, HTTPException
 
 from models.schemas import DecisionPayload
@@ -33,7 +35,10 @@ async def get_gate_status():
     blocks = content.split("###")
     if len(blocks) > 1:
         last_block = blocks[-1]
-        if "@HUMANO:" in last_block and "HUMANO" not in last_block.split("\n")[0]:
+        # Un bloque que incluye la macro de cierre de rama es un cierre, no una consulta al humano
+        cierre = re.search(r"^\s*(?:[-*]\s+)*(?:\*\*Handoff:\*\*\s*)?@WATCHER:\s*GITOPS-MERGE-CLOSE\s+\S+",
+                           last_block, re.MULTILINE)
+        if "@HUMANO:" in last_block and "HUMANO" not in last_block.split("\n")[0] and not cierre:
             status = "PENDING_DECISION"
         else:
             status = "APPROVED"
@@ -43,15 +48,44 @@ async def get_gate_status():
     return {"status": status, "content": content}
 
 
+_REVISOR_TOKEN = {"Code Review": "@CODE-REVIEW:", "QA Automation": "@QA-AUTO:"}
+
+
+def _handoff_a_revisor(payload: DecisionPayload) -> Optional[str]:
+    """
+    Si el último bloque es una consulta de un revisor (Code Review / QA Automation) dirigida al humano,
+    devuelve el handoff que le entrega la respuesta. Sin él la decisión queda registrada en el tracker pero
+    ningún agente la lee y el cierre de la HU no avanza.
+    """
+    from services.workflow_service import WorkflowService
+    blocks = WorkflowService()._parse_blocks(tracker_service.read_tracker())
+    if not blocks:
+        return None
+    last = blocks[-1]
+    token = _REVISOR_TOKEN.get(last.get("author_role"))
+    if not token or "HUMANO" not in last.get("handoff_targets", []):
+        return None
+
+    accion = "APROBÓ" if payload.action.value == "APPROVE" else "RECHAZÓ"
+    # Una sola línea y sin '@' en las menciones del texto libre: sanitize_feedback deja "[@PM:_ESCAPED]", que
+    # todavía contiene la etiqueta y el Watcher (que busca por coincidencia de texto) podría despachar a ese agente.
+    respuesta = re.sub(r"@(?=[A-Za-z])", "", " ".join((payload.feedback or "").split()))[:1500]
+    detalle = f" Respuesta: {respuesta}" if respuesta else " Sin comentarios adicionales."
+    return (
+        f"{token} El humano {accion} tu consulta de cierre.{detalle} "
+        "Procede según su decisión; si autorizó cerrar la rama, emite el cierre como línea independiente."
+    )
+
+
 @router.post("/gates/{gate_id}/decision")
 async def make_decision(gate_id: str, payload: DecisionPayload):
     """Records human decision with token sanitization into tracker (HU-001)."""
     from datetime import datetime
     dt_str = datetime.now().strftime("%d-%m-%Y")
     hr_str = datetime.now().strftime("%H:%M:%S")
-    
-    handoff_text = None
-    if payload.action.value == "APPROVE":
+
+    handoff_text = _handoff_a_revisor(payload)
+    if payload.action.value == "APPROVE" and not handoff_text:
         content_tracker = tracker_service.read_tracker()
         from services.workflow_service import WorkflowService
         ws = WorkflowService()
@@ -68,7 +102,20 @@ async def make_decision(gate_id: str, payload: DecisionPayload):
             elif author in ["Business Storyteller", "BS"]:
                 handoff_text = f"@PA: La idea de usuario ha sido auditada y aprobada por negocio en el archivo {filename}. Procede con la creación del PRODUCT BRIEF."
             elif author in ["Product Manager", "PM"]:
-                handoff_text = f"@BA: El MVP y Backlog han sido aprobados en el archivo {filename}. Procede con el análisis de negocio y redacción de Historias de Usuario."
+                import re
+                handoff_str = last_block.get("handoff_directive") or ""
+                # Determinar si es cierre de inicio de épica o cierre final
+                if "100% concluido" in handoff_str or "no hay más épicas" in handoff_str.lower():
+                    handoff_text = "@HUMANO: Proyecto completado exitosamente. No hay más acciones requeridas por el enjambre."
+                else:
+                    epic = payload.epic_id.strip() if payload.epic_id and payload.epic_id.strip() else None
+                    if not epic:
+                        match = re.search(r"delegar es\s+(\d{3}-HU_[\w_]+)", handoff_str)
+                        if match:
+                            epic = match.group(1)
+                        else:
+                            epic = "001-HU_epic_generica"
+                    handoff_text = f"@WATCHER: GITOPS-BRANCH-CREATE feat/{epic}\n@BA: El MVP y Backlog han sido aprobados en el archivo {filename}. La rama feat/{epic} ha sido creada. Procede con el análisis de negocio y redacción de Historias de Usuario para la épica {epic}. Usa el identificador universal estricto para crear el archivo físico en documents/business-analyst."
             elif author in ["Business Analyst", "BA"]:
                 handoff_text = f"@QA: La Historia de Usuario ha sido revisada en el archivo {filename}. Procede con la auditoría documental."
             elif author in ["QA Documental", "QA"]:

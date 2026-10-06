@@ -109,3 +109,70 @@ describe('WorkflowStepper Component (T009 / US1)', () => {
     expect(wrapper.emitted('select-artifact')?.[0]).toEqual(['documents/business-analyst/002-HU_monitoreo.md'])
   })
 })
+
+describe('WorkflowStepper - Retrabajo SDD', () => {
+  const conRetrabajo = (): WorkflowStageStep[] =>
+    buildDefaultStages('CR').map((s) => {
+      if (s.stage_key === 'CR') {
+        return { ...s, status: 'COMPLETED', is_active: false, rework_state: 'REJECTED', rework_iteration: 1, rework_max: 2, rework_reason: 'RECHAZADO: falta ValidationBehavior' } as WorkflowStageStep
+      }
+      if (s.stage_key === 'DEV-BACK') {
+        return { ...s, status: 'IN_PROGRESS', is_active: true, rework_state: 'REWORK', rework_iteration: 1, rework_max: 2, rework_reason: 'RECHAZADO: falta ValidationBehavior' } as WorkflowStageStep
+      }
+      return s
+    })
+
+  it('DebeMarcarRechazadoAlRevisorYRetrabajoALaEtapaACorregir', () => {
+    const wrapper = mount(WorkflowStepper, { props: { stages: conRetrabajo(), activeStageKey: 'DEV-BACK' } })
+
+    expect(wrapper.text()).toContain('[✗ RECHAZADO]')
+    expect(wrapper.text()).toContain('[● EN PROGRESO · RETRABAJO 1/2]')
+    expect(wrapper.text()).toContain('Retrabajo 1/2')
+  })
+
+  it('NoDebeMostrarBannerNiMarcasSiNoHayRetrabajo', () => {
+    const wrapper = mount(WorkflowStepper, { props: { stages: buildDefaultStages('UX'), activeStageKey: 'UX' } })
+
+    expect(wrapper.text()).not.toContain('RETRABAJO')
+    expect(wrapper.text()).not.toContain('RECHAZADO')
+  })
+})
+
+
+describe('WorkflowStepper - Etapa estancada', () => {
+  it('DebeMostrarEstancadaEnLaEtapaConAlertaSinTocarLasDemas', () => {
+    const stages = buildDefaultStages('QT').map((s) =>
+      s.stage_key === 'QT'
+        ? ({ ...s, alert_state: 'STALLED', alert_reason: '[Vigilante] qa-tech no registró' } as WorkflowStageStep)
+        : s
+    )
+    const wrapper = mount(WorkflowStepper, { props: { stages, activeStageKey: 'QT' } })
+
+    expect(wrapper.text()).toContain('[⚠ ESTANCADA]')
+    expect((wrapper.text().match(/ESTANCADA/g) || []).length).toBe(1)
+  })
+
+  it('NoDebeMostrarEstancadaSinAlerta', () => {
+    const wrapper = mount(WorkflowStepper, { props: { stages: buildDefaultStages('QT'), activeStageKey: 'QT' } })
+
+    expect(wrapper.text()).not.toContain('ESTANCADA')
+  })
+})
+
+describe('WorkflowStepper - Etapa omitida', () => {
+  it('DebeMostrarOmitidaEnLaEtapaSaltadaSinTocarLasDemas', () => {
+    const stages = buildDefaultStages('SA').map((s) =>
+      s.stage_key === 'UX' ? ({ ...s, status: 'SKIPPED' } as WorkflowStageStep) : s
+    )
+    const wrapper = mount(WorkflowStepper, { props: { stages, activeStageKey: 'SA' } })
+
+    expect(wrapper.text()).toContain('[⏭ OMITIDA]')
+    expect((wrapper.text().match(/OMITIDA/g) || []).length).toBe(1)
+  })
+
+  it('NoDebeMostrarOmitidaSiNingunaEtapaFueSaltada', () => {
+    const wrapper = mount(WorkflowStepper, { props: { stages: buildDefaultStages('SA'), activeStageKey: 'SA' } })
+
+    expect(wrapper.text()).not.toContain('OMITIDA')
+  })
+})

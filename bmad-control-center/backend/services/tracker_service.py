@@ -21,7 +21,7 @@ class TrackerService:
     def append_decision(self, decision: str):
         with self.lock:
             with open(self.file_path, "a", encoding="utf-8") as f:
-                f.write(f"\n{decision}\n")
+                f.write(f"\n{decision}\n\n")
 
     def replace_tracker_content(self, new_content: str):
         with self.lock:

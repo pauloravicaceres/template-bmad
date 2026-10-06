@@ -71,7 +71,7 @@ bmad-control-center/frontend/
 │   │   ├── MarkdownViewer.vue           # Wrapper de compatibilidad para visor
 │   │   └── WorkflowVisualizer.vue       # Wrapper de compatibilidad para stepper
 │   ├── workflow/
-│   │   └── WorkflowStepper.vue          # Barra de 8 etapas con pulso luminoso reactivo
+│   │   └── WorkflowStepper.vue          # Pipeline de etapas con pulso luminoso reactivo y estados de retrabajo SDD (✗ RECHAZADO / ↻ RETRABAJO i/n)
 │   └── GateControl.vue                  # Panel Human-in-the-Loop (HITL)
 ├── composables/
 │   ├── useArtifacts.ts                  # Estado del árbol, badges temporales y hot-reload del visor

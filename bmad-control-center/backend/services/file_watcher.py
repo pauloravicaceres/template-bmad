@@ -4,7 +4,7 @@ import mimetypes
 from pathlib import Path
 from typing import Optional, Callable, List
 from watchdog.observers import Observer
-from watchdog.events import documentsystemEventHandler, documentsystemEvent
+from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
 from core.config import settings
 from core.security import is_path_in_perimeter, increment_ignored_external_events
@@ -14,7 +14,7 @@ from services.workflow_service import WorkflowService
 from services.git_service import git_service
 
 
-class MultiDirectoryWatcherHandler(documentsystemEventHandler):
+class MultiDirectoryWatcherHandler(FileSystemEventHandler):
     """
     Handles file system events across authorized directories with:
     - Canonical perimeter validation (ADR-012)
@@ -106,7 +106,7 @@ class MultiDirectoryWatcherHandler(documentsystemEventHandler):
                     "staged_count": status.staged_count,
                     "unstaged_count": status.unstaged_count,
                     "untracked_count": status.untracked_count,
-                    "total_modified_documents": status.total_modified_documents,
+                    "total_modified_files": status.total_modified_files,
                     "trigger_source": "WATCHDOG_FS_EVENT",
                     "sync_latency_ms": 42,
                 }
@@ -116,7 +116,7 @@ class MultiDirectoryWatcherHandler(documentsystemEventHandler):
 
         debouncer.submit_event(".git/HEAD", "GIT_STATUS_CHANGED", _dispatch_git)
 
-    def on_modified(self, event: documentsystemEvent):
+    def on_modified(self, event: FileSystemEvent):
         if self._is_git_head(event.src_path):
             self._trigger_git_status_change()
             return
@@ -176,7 +176,7 @@ class MultiDirectoryWatcherHandler(documentsystemEventHandler):
 
             debouncer.submit_event(rel_path, "ARTIFACT_CHANGED", _dispatch_artifact_mod)
 
-    def on_created(self, event: documentsystemEvent):
+    def on_created(self, event: FileSystemEvent):
         if not self._validate_perimeter(event.src_path):
             return
 
@@ -214,7 +214,7 @@ class MultiDirectoryWatcherHandler(documentsystemEventHandler):
             self.loop,
         )
 
-    def on_deleted(self, event: documentsystemEvent):
+    def on_deleted(self, event: FileSystemEvent):
         if not self._validate_perimeter(event.src_path):
             return
 
@@ -245,7 +245,7 @@ class MultiDirectoryWatcherHandler(documentsystemEventHandler):
             self.loop,
         )
 
-    def on_moved(self, event: documentsystemEvent):
+    def on_moved(self, event: FileSystemEvent):
         dest_path = getattr(event, "dest_path", None)
         src_valid = self._validate_perimeter(event.src_path)
         dest_valid = dest_path and self._validate_perimeter(dest_path)

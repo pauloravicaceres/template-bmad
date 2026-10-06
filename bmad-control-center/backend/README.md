@@ -19,6 +19,10 @@ El backend está concebido bajo el paradigma **File-System as a Database (FSaaDB
 8. **Invocación Asíncrona Git Porcelain v2 con SLA < 300ms (ADR-014):** Invocación segura mediante subproceso nativo sin shell (`asyncio.create_subprocess_exec("git", ..., shell=False)`), parser determinista de Porcelain v2 y elisión de diffs binarios o masivos (>1MB) garantizando tiempos de respuesta ultrarrápidos.
 9. **Resiliencia ante Contención `.git/index.lock` y Aislamiento 404 (ADR-015):** Detección defensiva de colisiones por bloqueo de Git con reintentos escalonados (50ms, 100ms, 200ms) y fallback elegante hacia snapshot en memoria con bandera `is_syncing: true` (0% errores 5xx). Repositorios no inicializados son capturados como `GIT_REPO_NOT_FOUND` (HTTP 404 estructurado RFC 7807) para despliegue de Empty State sin afectar los otros módulos.
 10. **Frame Protocol Guard y Blindaje WebSocket (WS 1008 - ADR-011 / ADR-012):** El canal `/ws/v1/events` valida la integridad de cada trama entrante. Si un cliente envía tramas corruptas no conformes a JSON o payloads no-diccionario, el servidor cierra inmediatamente el socket con código WS 1008 Policy Violation.
+11. **Proyección del Retrabajo SDD:** `WorkflowService` detecta el último dictamen `[RECHAZADO]` de `Code Review` / `QA Automation` y expone `rework` (`origin_stage`, `iteration`, `max_iterations`, `reason`, `pending_stages`) más `rework_state` (`REJECTED` | `REWORK`) por etapa. Un rechazo activo reabre el pipeline (`IN_PROGRESS`) y mantiene `W-IMP` activo mientras el Watcher corre converge/implement. El evento `WORKFLOW_UPDATED` ahora incluye `stages` y `rework` en su `payload`, de modo que el frontend refleja las etapas paralelas (`DEV-BACK`/`DEV-FRONT`) sin refrescar.
+12. **Decisiones HITL sobre consultas de revisores:** si el último bloque del tracker es una consulta de `Code Review` o `QA Automation` dirigida a `@HUMANO:`, `POST /api/v1/gates/{id}/decision` añade al bloque `HUMANO` un `Handoff` hacia `@CODE-REVIEW:` / `@QA-AUTO:` con la respuesta (una sola línea, sin `@` en las menciones del texto libre). Sin él, la decisión quedaba registrada pero ningún agente la leía y el cierre de la HU no avanzaba. Aplica tanto a Aprobar como a Rechazar.
+13. **Cierre de HU sin falsa compuerta:** un bloque de `Code Review` que lleva la macro de cierre de rama como línea propia (`@WATCHER: GITOPS-MERGE-CLOSE <rama>`) se proyecta como `COMPLETED` aunque su Handoff apunte a `@HUMANO:` como aviso, y `GET /api/v1/gates/status` devuelve `APPROVED` en vez de `PENDING_DECISION`. El Watcher aplica la misma regla a su pausa HITL. Una consulta real al humano (sin la macro) sigue mostrando "POR APROBAR". Una cita de la macro dentro de una frase no cuenta como cierre.
+14. **Avisos del Watcher no son pasos en curso:** un bloque `WATCHER` con `[Vigilante]` o `ERROR` (el agente terminó sin registrar, el límite de uso de la cuenta se agotó, una fase falló) se trata como anotación: no ilumina ninguna caja del Watcher (`W-QA`, `W-SA`, `W-IMP`). La etapa real, la del último handoff, queda `IN_PROGRESS` con `alert_state: STALLED` y `alert_reason`, y la respuesta (y el evento `WORKFLOW_UPDATED`) incluye `alert`. La alerta desaparece sola cuando el agente vuelve a registrar un bloque. Los mensajes informativos del Watcher (`⚙️`, `⚡`, `🔁`) siguen siendo pasos en curso.
 
 ### Estructura de Directorios
 ```text
@@ -90,7 +94,7 @@ bmad-control-center/backend/
 
 #### Con `uv` (Recomendado por alto rendimiento):
 ```bash
-cd bmad-control-center/backend
+cd "bmad-control-center/backend"
 uv venv .venv --python 3.14
 uv pip install -r requirements.txt
 ```
@@ -140,3 +144,7 @@ Una vez levantado, la documentación Swagger interactiva y telemetría estarán 
 ```bash
 uv run python -m py_compile bmad-control-center/backend/main.py bmad-control-center/backend/api/git.py bmad-control-center/backend/services/git_service.py
 ```
+
+### Etapa omitida (`SKIPPED`)
+
+Cuando el Watcher omite el diseño UX deja en el tracker un bloque `WATCHER` con `⏭️ [UX] Diseño UX omitido`. `WorkflowService` lo detecta y devuelve la etapa `UX` con `status: SKIPPED` (no activa); cuenta como etapa avanzada en `completed_stages`. El frontend la dibuja como `[⏭ OMITIDA]` en `WorkflowStepper.vue`. Detalle de la regla en `ARCHITECTURE.md` (sección "Enrutamiento del diseño UX").

@@ -3,7 +3,7 @@ import mimetypes
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Set
-import aiodocuments
+import aiofiles
 from fastapi import HTTPException
 
 from core.config import settings
@@ -263,9 +263,9 @@ class ArtifactService:
                 detail=f"El archivo '{canonical_path.name}' posee un formato binario ('{detected_mime}') no renderizable en modo texto o Markdown."
             )
 
-        # 5. Read file asynchronously with aiodocuments
+        # 5. Read file asynchronously with aiofiles
         try:
-            async with aiodocuments.open(canonical_path, mode="r", encoding="utf-8") as f:
+            async with aiofiles.open(canonical_path, mode="r", encoding="utf-8") as f:
                 content = await f.read()
         except UnicodeDecodeError:
             # File is binary or not valid UTF-8

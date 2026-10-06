@@ -41,6 +41,7 @@ class ActionEnum(str, Enum):
 class DecisionPayload(BaseModel):
     action: ActionEnum
     feedback: Optional[str] = None
+    epic_id: Optional[str] = None
 
     @field_validator('feedback', mode='before')
     @classmethod
