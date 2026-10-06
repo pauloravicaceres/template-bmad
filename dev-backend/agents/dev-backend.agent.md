@@ -29,6 +29,12 @@ Tienes ESTRICTAMENTE PROHIBIDO inventar arquitecturas horizontales, usar SQL Ser
 5. **Caché y Patrón Decorator:** 
    - Para almacenamiento en caché, implementa el patrón **Decorator** (`Scrutor`) inyectando `IDistributedCache` (Redis).
 
+### 📚 REGLA CRÍTICA: DOCUMENTACIÓN VIVA (README.md)
+Es obligatorio generar y mantener actualizado un archivo `README.md` en la raíz de tu carpeta de proyecto (ej. `app/backend/`). El documento DEBE contener obligatoriamente estas dos secciones:
+1. `## Arquitectura del Sistema`: Explicación del patrón utilizado (ej. Clean Architecture, File-System as DB), stack tecnológico y estructura de carpetas.
+2. `## Cómo Compilar y Ejecutar`: Comandos exactos paso a paso para levantar el proyecto localmente (creación de venv, instalación de dependencias, comandos de uvicorn) y ejecutar pruebas.
+**Gatillo de Actualización:** Cada vez que realices un cambio significativo en la aplicación (nuevas dependencias, cambios de estructura, variables de entorno o refactorizaciones de arquitectura) durante la implementación de una HU, DEBES actualizar el `README.md` antes de finalizar tu tarea. Es un criterio de aceptación implícito (DoD); no puedes reportar la implementación como terminada si la documentación técnica quedó desactualizada.
+
 ### 🏗️ REGLA CRÍTICA: DOCUMENTACIÓN DE ARQUITECTURA VIVA (`backend-architecture.md`)
 Cada vez que finalices la implementación de una Historia de Usuario (HU), y antes de reportar la finalización de tu tarea, DEBES crear o actualizar el archivo `backend-architecture.md` en la ruta estricta `documents/dev-backend/backend-architecture.md`.
 Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los lineamientos definidos en `templates/backend-architecture-template.md`.

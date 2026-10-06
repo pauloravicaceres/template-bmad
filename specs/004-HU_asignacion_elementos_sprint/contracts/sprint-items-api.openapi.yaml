@@ -1,0 +1,164 @@
+openapi: 3.0.3
+info:
+  title: Tech Work Hub - API de elementos asignados a un Sprint
+  version: 1.0.0
+  description: >
+    Contrato HTTP de la HU-004. Todas las operaciones exigen Bearer JWT (Keycloak).
+    Un elemento pertenece a un solo Sprint (resolución humana A): repetir la asignación responde 409.
+    Orden de evaluación del POST: 400, 401, 404 (Sprint), 404 (elemento), 409.
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+paths:
+  /api/sprints/{sprintId}/items:
+    post:
+      summary: Asignar un elemento del backlog a un Sprint
+      operationId: assignItemToSprint
+      description: >
+        sprintId se declara como texto (sin restricción de formato en la ruta) para poder
+        responder 400 con el detalle del campo cuando es ausente o malformado (ADR-007).
+      parameters:
+        - name: sprintId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignItemRequest'
+      responses:
+        '201':
+          description: Asignación creada (FR-001, FR-002, FR-003). El código 201 es PROPUESTO.
+          headers:
+            Location:
+              schema:
+                type: string
+                example: /api/sprints/3fa85f64-5717-4562-b3fc-2c963f66afa6/items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignedItemResponse'
+        '400':
+          description: sprintId o itemId ausente, malformado o Guid.Empty; errores por campo (FR-007)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ValidationProblem'
+        '401':
+          description: Sin token, inválido o expirado (FR-010)
+        '404':
+          description: El Sprint no existe (gana si faltan ambos) o el elemento no existe; el detail distingue el recurso (FR-005, FR-006)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: El elemento ya está asignado a un Sprint (el mismo u otro); no revela a cuál (ADR-004, ADR-005)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Fallo de persistencia, sin trazas internas ni asignación parcial (FR-012)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      summary: Consultar los elementos asignados a un Sprint
+      operationId: listSprintItems
+      parameters:
+        - name: sprintId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Exactamente los elementos asignados; arreglo vacío si no hay (FR-008, FR-009)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SprintItemResponse'
+        '401':
+          description: Sin credenciales válidas (FR-010)
+        '404':
+          description: Sprint inexistente (FR-005). Un id que no sea GUID tampoco coincide con la ruta.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AssignItemRequest:
+      type: object
+      properties:
+        itemId:
+          type: string
+          nullable: true
+          description: GUID del elemento del backlog; obligatorio y distinto de Guid.Empty
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+    AssignedItemResponse:
+      type: object
+      required: [sprintId, itemId]
+      properties:
+        sprintId:
+          type: string
+          format: uuid
+        itemId:
+          type: string
+          format: uuid
+    SprintItemResponse:
+      type: object
+      description: Sin estado del elemento ni auditoría (FR-008, FR-014)
+      required: [id, title, type, devPoints, qaPoints]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        type:
+          type: string
+          description: Nombre del tipo de elemento (serializado como cadena)
+        devPoints:
+          type: number
+          nullable: true
+          description: Sin redondeo; null si el elemento no tiene estimación (FR-018)
+        qaPoints:
+          type: number
+          nullable: true
+          description: Sin redondeo; null si el elemento no tiene estimación (FR-018)
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    ValidationProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          properties:
+            errors:
+              type: object
+              description: Mensajes por campo (claves sprintId, itemId)
+              additionalProperties:
+                type: array
+                items:
+                  type: string

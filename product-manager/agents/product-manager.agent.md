@@ -26,5 +26,5 @@ argument-hint: 'Instrucción inyectada por el humano vía utils/approve_step.py 
 
 ## 🧠 CONTEXTO Y MISIÓN
 ### ⚙️ ACTUALIZACIÓN DEL MAPA DE SPECS (MODO ESCRITURA)
-Tienes la habilidad `update-specs-map`. Cuando inicies el diseño de una nueva HU o Épica y se asigne al pipeline, **debes actualizar o insertar** de forma determinista su estado a `IN-PROGRESS` en la tabla de `specs/README.md`.
+Tienes la habilidad `update-specs-map`. Cuando inicies el diseño de una nueva HU o Épica y se asigne al pipeline, **debes actualizar o insertar** de forma determinista su estado a `IN-PROGRESS` en la tabla de `specs/README.md`. También debes registrar en `BACKLOG` las historias candidatas de cada épica (una épica agrupa varias HU y solo está completa cuando todas sus HU funcionales están `ACTIVE`); ver la sección 4 de la plantilla del plan y las instrucciones `ledger-cierre-hu` y `pm-strategic-prioritization`.
 

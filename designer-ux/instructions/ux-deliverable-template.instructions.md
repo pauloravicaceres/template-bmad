@@ -13,7 +13,7 @@ applyTo: '**'
 ```
 ux_[ID]_[nombre_corto].md
 ```
-- Se deriva directamente del nombre del archivo de la Historia de Usuario aprobada (ej. de `hu_01_motor_reservas.md` se genera obligatoriamente `ux_01_motor_reservas.md`).
+- Se deriva directamente del nombre del archivo de la Historia de Usuario aprobada (ej. de `012-HU_motor_reservas.md` se genera obligatoriamente `ux_012_motor_reservas.md`: sin `HU_` y con guion bajo tras el correlativo).
 
 ---
 
@@ -65,16 +65,14 @@ ux_[ID]_[nombre_corto].md
 ---
 
 ## 4. ORDEN DE DELEGACIÓN PARA EL TRACKER
-*(Instrucción de una sola línea plana que se anexa a tracker_bmad.md tras realizar la Auditoría de Alcance)*
+*(Instrucción de una sola línea plana que se anexa a tracker_bmad.md al terminar el diseño)*
 
 **Regla de Handoff Autónomo:** 
-Usa `read_file` para obtener el texto del tracker, añade un salto de línea (`\n`), y luego usa `write_file` para pegar únicamente la orden de delegación sin destruir el historial.
+Usa `read_file` para obtener el texto del tracker, añade un salto de línea, y luego usa `write_file` para pegar únicamente la orden de delegación sin destruir el historial.
 
-**SI EL MVP CONTINÚA (Épicas diseñadas < Épicas del backlog), imprime exactamente esto:**
-`@PM: Los wireframes para la HU [Nombre] están listos en [Archivo]. Por favor, lee el historial, identifica la siguiente Épica pendiente en el backlog y asígnala al BA.`
+**Imprime siempre exactamente esto (el traspaso es incondicional al `@SA:` y no depende de cuántas épicas o HU falten; elegir la siguiente historia es del PM):**
+`@SA: El diseño visual de la HU [NNN-HU_nombre] ha concluido exitosamente en [Archivo]. Procede con el tech-design y arquitectura.`
 
-**SI EL MVP CONCLUYE (Épicas diseñadas = Épicas del backlog), imprime exactamente esto:**
-`@SA: El diseño visual del MVP ha concluido exitosamente. Por favor, lee el Product Brief y el MVP, y define el stack tecnológico y las reglas arquitectónicas del proyecto.`
 ```
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

@@ -53,6 +53,7 @@ def init_project(nombre_proyecto):
     config_data = {
         "project_name": nombre_proyecto,
         "project_type": "ui",  # Por defecto 'ui', puede ser 'headless'
+        "ux_phase": "auto",    # 'auto': cada HU decide (campo Requiere interfaz) | 'on': siempre diseña | 'off': nunca
         "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "context": str(constitution_path.resolve()),
         "tracker": str(TRACKER_PATH.resolve()),

@@ -1,0 +1,242 @@
+openapi: 3.0.3
+info:
+  title: Tech Work Hub - API de relación personas, roles y elementos
+  version: 1.0.0
+  description: >
+    Contrato HTTP de la HU-015. Todas las operaciones exigen Bearer JWT (Keycloak).
+    Orden de evaluación del POST: 400 (validador), 401 (identidad), 404 (miembro),
+    404 (elemento), 200 (par ya existente, sin escribir), 201 (creado).
+    Si faltan a la vez miembro y elemento, gana el 404 del miembro.
+    Las respuestas no incluyen CreatedAt ni CreatedBy, estimaciones, estado ni Sprint.
+    No existen operaciones de quitar ni reemplazar responsables (fuera de alcance).
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+paths:
+  /api/backlog-items/{itemId}/assignees:
+    post:
+      summary: Asignar un miembro como responsable de un elemento del backlog
+      operationId: assignMemberToItem
+      description: >
+        Un miembro por solicitud; el elemento puede tener varios responsables. El rol mostrado es el rol
+        técnico registrado del miembro; no se elige por asignación. Asignar dos veces el mismo par es
+        idempotente: responde 200 con la relación existente, sin crear otra ni alterar su auditoría.
+        itemId se recibe como texto para reportar por campo un formato inválido (ADR-008).
+        Los códigos 201/200 son PROPUESTOS (FR-003 solo exige un código de éxito).
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identificador GUID del elemento; texto para validar por campo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignMemberToItemRequest'
+            example:
+              memberId: 3f0c1a52-8d3e-4b7a-9c61-2f5e8a1b7d40
+      responses:
+        '201':
+          description: Relación creada (FR-001, FR-003, FR-004).
+          headers:
+            Location:
+              schema:
+                type: string
+                example: /api/backlog-items/9b2e6d10-4c1a-4f3e-8a77-0d5c3e91b2f4/assignees
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemAssigneeResponse'
+        '200':
+          description: El par (elemento, miembro) ya existía; se devuelve la relación existente sin escribir ni alterar CreatedAt/CreatedBy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemAssigneeResponse'
+        '400':
+          description: >
+            itemId o memberId ausente, con formato inválido o Guid vacío; errores por campo bajo
+            itemId y memberId (FR-010). Sin relación persistida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ValidationProblem'
+        '401':
+          description: Sin token, inválido o expirado (FR-011); no se lee ni persiste ningún dato.
+        '404':
+          description: >
+            El miembro no existe o el elemento no existe (FR-009); el detail distingue cuál
+            ("El miembro indicado no existe." / "El elemento indicado no existe."). Sin relación persistida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: Fallo de persistencia, sin trazas internas ni relación parcial (FR-012).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    get:
+      summary: Consultar las personas y roles relacionados con un elemento
+      operationId: listItemAssignees
+      description: >
+        Solo lectura (FR-008). Devuelve exactamente las personas relacionadas con el elemento o una colección
+        vacía si no hay ninguna. Un elemento bien formado pero inexistente también devuelve 200 con []
+        (⚠️ PROPUESTO). Un itemId malformado no enruta (404, ruta :guid).
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Personas relacionadas (FR-006).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssigneeResponse'
+        '401':
+          description: Sin token, inválido o expirado (FR-011).
+        '500':
+          description: Fallo interno sin trazas.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/team-members/{memberId}/items:
+    get:
+      summary: Consultar los elementos relacionados con un miembro
+      operationId: listMemberItems
+      description: >
+        Solo lectura (FR-008). Devuelve exactamente los elementos relacionados con el miembro, con una
+        única llamada de lote al contrato hacia Backlog. Un id inexistente de miembro devuelve 200 con []
+        (⚠️ PROPUESTO). Un elemento relacionado que ya no exista se omite y se registra un warning.
+      parameters:
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Elementos relacionados (FR-007).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MemberItemResponse'
+        '401':
+          description: Sin token, inválido o expirado (FR-011).
+        '500':
+          description: Fallo interno sin trazas.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/backlog-items:
+    get:
+      summary: Listar elementos del backlog para el selector del UX
+      operationId: listBacklogItems
+      description: >
+        ⚠️ PROPUESTO (ADR-006). Consulta aditiva de solo lectura en el módulo Backlog; no devuelve
+        estimaciones, estado ni Sprint. Sin paginación, filtros ni orden contractual.
+      responses:
+        '200':
+          description: Elementos del backlog.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MemberItemResponse'
+        '401':
+          description: Sin token, inválido o expirado.
+        '500':
+          description: Fallo interno sin trazas.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AssignMemberToItemRequest:
+      type: object
+      properties:
+        memberId:
+          type: string
+          nullable: true
+          description: GUID del miembro; se valida por campo (presente, formato, no vacío).
+    ItemAssigneeResponse:
+      type: object
+      required: [itemId, memberId, memberName, role]
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        memberId:
+          type: string
+          format: uuid
+        memberName:
+          type: string
+        role:
+          type: string
+          description: Rol técnico registrado del miembro (p. ej. Desarrollo, QA).
+    AssigneeResponse:
+      type: object
+      required: [id, name, role]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        role:
+          type: string
+    MemberItemResponse:
+      type: object
+      required: [id, title, type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        type:
+          type: string
+          description: Tipo del elemento serializado como cadena.
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    ValidationProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string

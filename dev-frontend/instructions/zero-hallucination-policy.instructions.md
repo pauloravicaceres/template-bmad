@@ -15,12 +15,12 @@ applyTo: '**'
 - **Cero CSS Hackeado / Maquetación Prohibida en Componentes:**
   - 🚫 PROHIBIDO usar `::ng-deep` para sobrescribir estilos de PrimeNG.
   - 🚫 PROHIBIDO escribir reglas de maquetación (márgenes, paddings, flexbox, grids, gaps, posicionamiento) en los archivos `.css` o `.scss` de los componentes.
-  - ✅ OBLIGATORIO usar EXCLUSIVAMENTE las clases utilitarias de **PrimeFlex** directamente en el `.html`. Ejemplos canónicos:
-    - Layout: `flex`, `flex-column`, `flex-row`, `flex-wrap`
-    - Alineación: `justify-content-between`, `justify-content-center`, `align-items-center`
-    - Espaciado: `p-2`, `p-4`, `m-0`, `gap-3`, `px-3`, `py-2`
-    - Grid Responsivo: `col-12`, `md:col-6`, `lg:col-4`
-    - Bordes/Efectos: `border-round`, `border-round-lg`, `shadow-2`
+  - ✅ OBLIGATORIO usar EXCLUSIVAMENTE las clases utilitarias de **Tailwind CSS v4** directamente en el `.html`. Ejemplos canónicos:
+    - Layout: `flex`, `flex-col`, `flex-row`, `flex-wrap`
+    - Alineación: `justify-between`, `justify-center`, `items-center`
+    - Espaciado: `p-2`, `p-4`, `m-0`, `gap-4`, `px-3`, `py-2` (escala Tailwind: 1 = 0.25rem)
+    - Grid Responsivo: `grid grid-cols-12 gap-4`, `col-span-12`, `md:col-span-6`, `lg:col-span-4`
+    - Bordes/Efectos: `rounded-md`, `rounded-lg`, `shadow-md`
   - Para ajustes visuales propios de un componente PrimeNG usa exclusivamente `[style]`, `[class]` o `styleClass` en el propio tag del componente.
 
 ## 2. Fidelidad Absoluta al Contrato

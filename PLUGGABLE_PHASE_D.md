@@ -89,7 +89,7 @@ Dentro de las carpetas de los 5 agentes de la Fase D, actualiza o adapta sus arc
 El motor Python (watcher_bmad.py):
 - **Permanece intacto**: El orquestador depende exclusivamente de la señal @SPEC-KIT: emitida por QA-Tech.
 - Al activarse, aplica la técnica de **Montaje de Alma (Soul Mounting)**: lee el cartucho tecnológico que hayas definido (tus .agent.md e .instructions.md de C#, Java, Python, etc.) y lo inyecta temporalmente en la memoria del motor masivo SpecKit.
-- SpecKit genera la implementación respetando tu cartucho al 100%, documenta la arquitectura viva, y el Watcher realiza el handoff transparente hacia @QA-AUTO y @CODE-REVIEW.
+- SpecKit genera la implementación respetando tu cartucho al 100%, documenta la arquitectura viva, y el Watcher realiza el handoff transparente hacia @QA-AUTO y, tras su aprobación, hacia @CODE-REVIEW. Si alguno rechaza, se activa el *Ciclo de Retrabajo SDD* (analyze → converge → implement, máx. 2 iteraciones) en lugar de parchear el código.
 
 ## 4. Ejemplos de Cartuchos Tecnológicos Homologados
 

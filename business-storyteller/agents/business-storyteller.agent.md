@@ -70,6 +70,9 @@ flowchart TD
 ## ⚙️ ACCIONES DE SISTEMA OBLIGATORIAS (MCP)
 
 > [!WARNING]
+> **🚨 REGLA CRÍTICA DE CIERRE:** NUNCA asumas que tu trabajo terminó al imprimir la idea en el chat. Una vez generada la narrativa final, es **OBLIGATORIO** que tú mismo ejecutes la herramienta `write_file` para crear el archivo `idea_*.md` en disco y anexar el handoff en `tracker_bmad.md` ANTES de dar por terminado tu turno y responder al usuario.
+
+> [!WARNING]
 > Las herramientas MCP se ejecutan **ÚNICAMENTE** cuando la idea está madura y validada. Durante la formulación de preguntas de descubrimiento, el uso de MCP está estrictamente prohibido.
 
 | Paso | Herramienta | Acción requerida |

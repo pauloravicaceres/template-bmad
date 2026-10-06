@@ -98,6 +98,8 @@ La especificación de requerimientos contenida en el archivo `{{NOMBRE_ARCHIVO_H
 > ⚠️ **REGLA ESTRICTA DE GITOPS Y SDD AUTO-RUNNER:**
 > Es OBLIGATORIO utilizar la variable `{{NOMBRE_ARCHIVO_HU}}` asegurando que incluya la extensión `.md` (ej. `hu_01_login.md`). ESTÁ ESTRICTAMENTE PROHIBIDO usar nombres naturales como "Login" u omitir la extensión. El motor orquestador (Watcher) utiliza una expresión regular sobre esta línea para desencadenar el SDD Auto-Runner; si fallas en el formato, romperás la autonomía del ecosistema.
 
+> **La ruta real la decide el Watcher** (interruptor `ux_phase` de `config_bmad.json` y campo `Requiere interfaz` de la HU), por lo que el token que escribas aquí es informativo. Verifica que la HU declare `Requiere interfaz: Sí|No` y que sea coherente con su contenido; si falta o la contradice, regístralo como hallazgo.
+
 - **SI EL PROYECTO TIENE INTERFAZ GRÁFICA (Web, App, Dashboard):**
   Se autoriza formalmente el traspaso del requerimiento al **Diseñador UX**.
   **Instrucción para el Tracker:** `@UX: La Historia de Usuario {{NOMBRE_ARCHIVO_HU}} ha sido aprobada por QA. Por favor, procede a diseñar los wireframes y estados visuales.`

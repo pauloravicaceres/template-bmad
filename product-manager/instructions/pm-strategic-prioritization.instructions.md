@@ -55,12 +55,30 @@ Al analizar el Product Brief, desglosa el alcance aplicando estrictamente la jer
 
 ---
 
-## 3. Heurística de Selección en Ciclos de Iteración
-Cuando el Diseñador UX finaliza una HU y el PM es invocado en el tracker:
-1. Inspecciona el tracker para verificar cuál fue la última Épica delegada que completó el circuito (`@UX:` aprobado).
-2. Lee el archivo `mvp_[nombre_corto].md` y localiza el Backlog Inicial.
-3. Selecciona la Épica inmediata con menor número de prioridad que **aún no haya sido inyectada** en el tracker (ej. si P1 fue aprobada, toma P2; luego P3; y así sucesivamente).
-4. Si todas las Épicas del backlog han completado su ciclo, activa el **Stage-Gate de Cierre (`@HUMANO:`)**.
+## 3. Épicas, Historias y Heurística de Selección
+
+### 3.1 Una épica agrupa varias HU
+Una épica es un **bloque de valor**, no una unidad de entrega: se materializa en **varias Historias de Usuario (HU)**, y la HU es la unidad que se delega al BA y recorre todo el pipeline (una rama `feat/XXX-HU_...` por HU). Reglas:
+- Una épica está **COMPLETA** solo cuando **todas** sus HU funcionales están `ACTIVE` en el ledger (`specs/README.md`).
+- Las HU de calidad derivadas de un riesgo (p. ej. pruebas de integración contra servicios reales) comparten la épica de origen pero **no cuentan** para completarla.
+- Haber cerrado una HU de una épica NO significa que la épica esté terminada.
+
+### 3.2 Heurística de Selección en Ciclos de Iteración
+Cuando el PM es invocado tras el cierre de una HU:
+1. Deja el ledger coherente siguiendo `ledger-cierre-hu` (promueve la HU cerrada a `ACTIVE` y registra en `BACKLOG` las HU candidatas que falten).
+2. Lee `mvp_[nombre_corto].md` y el ledger. Identifica la **épica en curso** (la de la HU recién cerrada).
+3. Selecciona la **siguiente HU** en este orden:
+   a. Una HU en `BACKLOG` de la misma épica en curso, que no dependa de un punto abierto de negocio (❓) sin resolver ni de datos de otra épica aún no construida.
+   b. Si la épica en curso no tiene HU elegibles (todas `ACTIVE` o bloqueadas), la primera HU elegible de la épica inmediata con menor número de prioridad que **no esté completa** (si P1 está completa, P2; luego P3; y así sucesivamente).
+   c. Si la HU que seguiría depende de datos maestros de otra épica (p. ej. P1 necesita P2), puedes adelantar la porción mínima de la épica de la que depende.
+4. **Delegación:**
+   - En los casos **a** y **b**: pasa la HU a `IN-PROGRESS` con su rama y **delega directamente al BA** de forma autónoma (sin pausar).
+     ```markdown
+     @WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_{{nombre_en_snake_case}}
+     - **Handoff:** @BA: Iniciar el análisis de negocio y redacción de la Historia de Usuario seleccionada.
+     ```
+   - En el caso **c**, o cuando haya dos opciones razonables, **NO abras rama**: entrega un handoff a `@HUMANO:` con 2 o 3 opciones numeradas debajo (épica de cada una, dependencias y puntos abiertos que la bloquean) y tu recomendación, y espera su respuesta.
+5. Si **todas** las épicas están completas (todas sus HU funcionales `ACTIVE`), activa el **Stage-Gate de Cierre Final (`@HUMANO:`)** notificando que el MVP está 100% concluido y no hay más épicas en la ruta crítica.
 
 
 [IMPORT_SKILL: skills/tracker-logger/SKILL.md]

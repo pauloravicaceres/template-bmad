@@ -44,16 +44,22 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 
 ### [P1] Épica: {{Nombre de la Funcionalidad Core}}
 - **Descripción de Negocio:** {{Qué resuelve esta épica a nivel macro}}.
+- **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Por qué esta épica constituye el núcleo indispensable del MVP}}.
 - **Trazabilidad PRD:** {{Sección o requerimiento del Product Brief que la origina}}.
 
 ### [P2] Épica: {{Nombre de la Funcionalidad Dependiente / Catálogo}}
 - **Descripción de Negocio:** {{Qué resuelve}}.
+- **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Por qué ocupa el segundo nivel de prelación}}.
 - **Trazabilidad PRD:** {{Referencia al brief}}.
 
 ### [P3] Épica: {{Nombre de Autogestión o Siguiente Prioridad}}
 - **Descripción de Negocio:** {{Qué resuelve}}.
+- **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Motivo de prelación}}.
 - **Trazabilidad PRD:** {{Referencia al brief}}.
 
@@ -71,26 +77,31 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 
 ---
 
-## 4. ORDEN DE DELEGACIÓN PARA EL BA Y GITOPS
-*(Instrucción que se inyecta en tracker_bmad.md)*
+## 4. CREACIÓN DE IDENTIFICADORES Y MAPA DE SPECS (DESCOMPOSICIÓN EN HISTORIAS)
+
+Una épica agrupa **varias HU** y cada HU es la unidad que se delega al BA. En esta fase registras en el ledger **todas las historias candidatas de todas las épicas**, no solo la primera.
 
 ⚠️ **REGLA ESTRICTA DE NOMENCLATURA (IDENTIFICADOR SECUENCIAL):**
-Antes de generar la macro GitOps o el Handoff, el `@PM` DEBE leer obligatoriamente el archivo `specs/README.md` (Product State Ledger).
-1. Analiza la columna "N°" de la tabla de funcionalidades para encontrar el correlativo numérico más alto.
-2. Suma +1 a ese número y formatéalo con 3 dígitos (ej. si el último es `002`, el nuevo será `003`).
-3. Este prefijo debe concatenarse inmediatamente con `HU_` y el nombre en snake_case para crear el IDENTIFICADOR UNIVERSAL ESTRICTO: `XXX-HU_[nombre_en_snake_case]` (ej. `001-HU_tarjeta_identidad_digital`).
-4. Si la tabla está vacía o es la primera funcionalidad, inicia en `001-HU_[nombre_en_snake_case]`.
+Lee obligatoriamente el archivo `specs/README.md` (Product State Ledger).
+1. Analiza la columna "N°" de la tabla para encontrar el correlativo numérico más alto.
+2. Cada HU recibe el siguiente correlativo, formateado con 3 dígitos (ej. si el último es `002`, el nuevo será `003`), concatenado con `HU_` y el nombre en snake_case: `XXX-HU_[nombre_en_snake_case]` (ej. `001-HU_tarjeta_identidad_digital`).
+3. Si la tabla está vacía, inicia en `001`.
 
-Este identificador exacto es sagrado y debe usarse idénticamente para CUATRO (4) lugares:
-1. En la columna `Nombre spec / HU` en el Ledger (`specs/README.md`).
-2. En la columna `Rama` en el Ledger (ej. `feat/001-HU_tarjeta_identidad_digital`).
-3. En la macro GitOps del Watcher para la creación de la rama aislada.
-4. En el Handoff al `@BA`.
+**Registro en el Ledger (con tu herramienta `update-specs-map`):**
+1. Por cada épica, toma su campo "Historias candidatas" y registra **cada HU** como una fila nueva con estado `BACKLOG`: numeración consecutiva siguiendo el orden de prioridad de las épicas y, dentro de cada una, su orden lógico; *Épica Origen* con el formato `[Pn] Nombre de la épica`; *Qué aporta* tomado de tu plan con la marca `⚠️ [PROPUESTO]` y, si aplica, la dependencia o el punto abierto ❓ que la bloquea; *Rama* con `—`.
+2. La **primera HU a trabajar** (la primera de la épica de mayor prioridad que no esté bloqueada por un punto abierto de negocio) pasa a `IN-PROGRESS`: su identificador es el `{{IDENTIFICADOR_ESTRICTO}}` con el que cierras el Stage-Gate de la sección 5.
+3. Prohibido inventar historias fuera del alcance del Product Brief: cada HU debe desprenderse de una capacidad listada en la épica.
 
-Obligatorio inyectar en el tracker en líneas separadas:
+---
+
+## 5. ORDEN DE APROBACIÓN (STAGE-GATE HITL)
+*(Instrucción que se inyecta en tracker_bmad.md)*
+
+⚠️ **REGLA CRÍTICA DE CIERRE:**
+Al finalizar el Plan Estratégico y las Épicas, tienes estrictamente prohibido delegar el turno a otro agente. Tu única acción de cierre válida es escribir en el tracker:
+
 ```markdown
-@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_{{nombre_en_snake_case}}
-{{Texto de delegación donde explícitamente se le ordena al @BA usar el identificador universal estricto para crear el archivo físico `XXX-HU_{nombre_en_snake_case}.md`}}.
+@HUMANO: El Plan Estratégico del MVP ha sido definido. La próxima épica a delegar es {{IDENTIFICADOR_ESTRICTO}}. Las historias de cada épica quedaron registradas en BACKLOG en el ledger (specs/README.md). Por favor, valida las Épicas y su descomposición en historias, y ejecuta el script de aprobación para autorizar la transición hacia el Business Analyst (@BA).
 ```
 
 

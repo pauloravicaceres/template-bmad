@@ -60,7 +60,7 @@ flowchart TD
     L --> M["Concatenar salto de línea + Token correspondiente"]
     M --> N["write_file: tracker_bmad.md consolidado"]
     H -.->|Token| O["Handoff BA: Notificación de rechazo con ruta de feedback"]
-    I -.->|Evaluar Tipo de Proyecto| P{"¿Es Headless?"}
+    I -.->|Evaluar Tipo de Proyecto| P{"¿Es Headless? (token informativo: la ruta real la decide el Watcher)"}
     P -->|NO: Tiene UI| Q["Handoff UX: Aprobación formal para avanzar a Wireframes"]
     P -->|SÍ: Sin UI| R["Handoff SA: Bypass de UX, avanzar a Arquitectura"]
 ```

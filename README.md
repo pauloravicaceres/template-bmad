@@ -60,7 +60,7 @@ Sin embargo, si necesitas realizar micro-ajustes rápidos, refactorizaciones men
    ```
 3. Ejecuta el agente con su "Alma" (Archivo de Reglas Maestro) inyectada:
    ```bash
-   herdr agent start dev-frontend --kind agy -- --dangerously-skip-permissions --add-dir . --agent AGENTS.md
+   herdr agent start dev-frontend --kind claude -- --dangerously-skip-permissions --add-dir . --append-system-prompt-file AGENTS.md
    ```
 *(Sustituye `dev-frontend` por `dev-backend` según corresponda). Una vez en línea, el orquestador (`watcher_bmad.py`) o tú mismo podrán despacharle instrucciones directas.*
 ---
@@ -72,7 +72,8 @@ Sin embargo, si necesitas realizar micro-ajustes rápidos, refactorizaciones men
 * **Commits Atómicos Headless:** Durante la Fase D, los agentes programadores carecen de capacidades interactivas. Ejecutan código e inyectan commits en Git aislando lógicamente cada característica (`git add . && git commit -m "feat: [TASK-ID]"`).
 * **Estrategia Dual-Output de Requisitos (Business Analyst):** Generación simultánea de Historias Técnicas (Gherkin puro para Spec Kit) y Funcionales (Narrativas amigables para Stakeholders).
 * **Fase D (Ingeniería) como Cartucho Intercambiable:** Arquitectura desacoplada con segregación entre Constructores (`DEV-BACK`, `DEV-FRONT`) y Auditores (`QA-AUTO`, `CODE-REVIEW`). Todos dotados con `execute_command` para operar físicamente la máquina del host.
-* **Lógica de Bypass Inteligente:** El `config_bmad.json` decide rutas. En `project_type: ui` pasa al diseñador `@UX:`. En `project_type: headless`, salta directamente al `@SA:` ahorrando tiempo.
+* **Retrabajo SDD (Ciclo de Convergencia):** Un rechazo de `CODE-REVIEW` o `QA-AUTO` no se parchea en el código: se clasifica por capa (spec → plan → tasks → código) y se corrige con `/speckit-analyze` → `/speckit-converge` → `/speckit-implement`, con tope de 2 iteraciones y escalado a `@HUMANO:`.
+* **Lógica de Bypass Inteligente:** El `config_bmad.json` decide rutas. En `project_type: ui` pasa al diseñador `@UX:`. En `project_type: headless`, salta directamente al `@SA:` ahorrando tiempo. Además, `ux_phase` (`auto`/`on`/`off`) y el campo `Requiere interfaz: Sí|No` de cada HU permiten omitir el diseño UX global o por historia (ver `SETUP.md`).
 * **El Tracker como Único Bus de Datos:** Eliminación de alucinaciones inter-agente. Se comunican exclusivamente anexando texto (*read -> concat -> write*) en `documents/tracker_bmad.md`.
 
 ---
@@ -118,7 +119,10 @@ flowchart TD
         QAAuto -->|"Pruebas Verificadas"| CR{"15. Code Review (CR)<br><i>Quality Gate & SecOps</i>"}
     end
     
-    CR -->|"Rechazo de Calidad"| DevBack
+    CR -->|"Rechazo (Retrabajo SDD)"| Rework["🔁 analyze → converge → implement<br><i>Máx. 2 iteraciones</i>"]
+    Rework --> DevBack
+    Rework --> DevFront
+    Rework -.->|"Tope alcanzado"| Humano["👤 @HUMANO"]
     CR -->|"Aprobado"| Fin["🚀 Software en Producción (Commits Atómicos Listos)"]
     QT -.->|"Context Distillation"| Legacy[("🏛️ .specify/memory/constitution.md<br><i>Memoria Invariante para Iteraciones Brownfield</i>")]
 ```
@@ -192,7 +196,48 @@ El ecosistema BMAD v2.0 impone una trazabilidad matemática exacta (1:1) entre e
 ## 🚪 El Motor: "Doble Compuerta SDD" (Two-Stage Gatekeeper)
 El orquestador BMAD implementa un "Two-Stage Gatekeeper" para fraccionar la ejecución automática del puente **Spec Kit**. Esto evita la alucinación técnica y asegura que el modelo tecnológico propuesto por el orquestador obedezca a los arquitectos.
 
-*   **Compuerta 1 (Negocio):** Al recibir la aprobación del `@QA` (QA Documental), el Watcher intercepta la ejecución para lanzar de forma independiente `/speckit.specify` y `/speckit.clarify`. Esto detalla funcionalmente el comportamiento sin inferir el stack.
+*   **Compuerta 1 (Negocio):** Al recibir la aprobación del `@QA` (QA Documental), el Watcher intercepta la ejecución para lanzar de forma independiente `/speckit.specify` y `/speckit.clarify`. El Watcher fija de forma explícita la carpeta de la especificación (`specs/XXX-HU_nombre`, igual al identificador universal) y detiene la fase si Spec Kit no la respeta. Esto detalla funcionalmente el comportamiento sin inferir el stack.
 *   **Compuerta 2 (Arquitectura):** Tras el diseño de gobernanza del `@SA` (Solutions Architect), este agente emite la macro `@WATCHER: SDD-FREEZE`. El orquestador pausa el flujo nuevamente y ejecuta `/speckit.plan`, `/speckit.tasks` y `/speckit.analyze`. En esta fase, Spec-Kit asimila las guidelines inyectadas por el Arquitecto para generar un plan técnico realista y congelarlo (`[SPEC-FREEZE]`).
+*   **Compuerta 3 (Implementación):** Tras el Tech Design aprobado por `@QT`, el Watcher ejecuta la Fase D con `/speckit-implement` (backend y luego frontend, cada uno acotado a su alcance y con *Soul Mounting*), exige la documentación viva de arquitectura y el README del código de cada capa (`app/backend/README.md` y `app/frontend/README.md`: se crea si falta y se actualiza solo en lo que cambió; rutas configurables con `code_dirs` en `config_bmad.json`) y hace handoff a `@QA-AUTO`, que a su vez deriva a `@CODE-REVIEW`.
+*   **Compuerta 4 (Retrabajo):** Si `@CODE-REVIEW` o `@QA-AUTO` rechazan la implementación, el Watcher no despacha a un agente: ejecuta el ciclo de convergencia (`/speckit-analyze` → `/speckit-converge` → `/speckit-implement` acotado a las tareas `[fix:*]`) y devuelve el turno a `@QA-AUTO` y luego a `@CODE-REVIEW`, con tope de 2 iteraciones antes de escalar a `@HUMANO:`. Ver *Ciclo de Retrabajo SDD*.
 
 > **Nota Operativa:** Durante el desarrollo asistido, el usuario notará que el Watcher (`watcher_bmad.py`) detiene el avance automático en estos dos hitos exactos de la línea de tiempo, delegando silenciosamente la ejecución hacia el puente SDD antes de reanudar el Handoff hacia los desarrolladores.
+
+---
+
+## 🔁 Ciclo de Retrabajo SDD (Rechazos de `@CODE-REVIEW` / `@QA-AUTO`)
+
+En SDD la fuente de verdad es la especificación, no el código. Por eso un dictamen `[RECHAZADO]` **no se parchea directamente en el código**: se clasifica por la **capa de origen** y se corrige desde ahí hacia abajo. Cuando `@CODE-REVIEW` o `@QA-AUTO` rechazan y su handoff asigna `@DEV-BACK:` / `@DEV-FRONT:`, el Watcher (**Compuerta 4**) ejecuta el ciclo de convergencia en lugar de despachar a un agente:
+
+| Paso | Comando | Qué ocurre |
+|---|---|---|
+| 1 | `/speckit-analyze` | Auditoría de consistencia spec ↔ plan ↔ tasks (solo lectura). Revela si el rechazo esconde una grieta entre artefactos. |
+| 2 | (dentro de converge) | Se corrige primero la capa que falló, con el cambio mínimo: contrato → `spec.md`; diseño incompleto → `plan.md`; si es solo código, **no se tocan spec ni plan**. |
+| 3 | `/speckit-converge` | Compara el código real con spec, plan y tasks. Reabre las tareas falsamente `[X]` y añade al final de `tasks.md` una tarea por hallazgo: `T0NN [fix:CAPA:n]`. |
+| 4 | `/speckit-implement` | Ejecuta **solo** las tareas `[fix:*]`, con alcance backend o frontend según el handoff y con Soul Mounting. |
+| 5 | Re-validación | El último bloque DEV deriva a `@QA-AUTO:` y este, al aprobar, a `@CODE-REVIEW:`. El ciclo cierra cuando ambos aprueban. |
+
+```mermaid
+flowchart LR
+    R["❌ Dictamen [RECHAZADO]<br>CR o QA-AUTO"] --> A["/speckit-analyze"]
+    A --> C["/speckit-converge<br>clasifica por capa · corrige spec/plan · reabre tasks"]
+    C --> I["/speckit-implement<br>solo tareas [fix:*]"]
+    I --> Q["@QA-AUTO"] --> V["@CODE-REVIEW"]
+    V -->|"Aprobado"| F["✅ Cierre"]
+    V -->|"Rechazo (iteración < 2)"| R
+    V -.->|"Tope alcanzado"| H["👤 @HUMANO"]
+```
+
+**Etiquetado por capa.** `code-review` y `qa-auto` incluyen la instrucción `rework-layer-labeling.instructions.md`: cada hallazgo lleva `[CAPA:SPEC]`, `[CAPA:PLAN]`, `[CAPA:TASKS]` o `[CAPA:CODE]`. Si todos son `CODE`/`TASKS`, el Watcher ordena no modificar spec ni plan; si hay `SPEC`/`PLAN`, se corrigen primero. Sin etiquetas, `converge` clasifica con criterio conservador (ante la duda, la capa superior).
+
+**Principios**
+- **Trazabilidad:** cada hallazgo se convierte en una tarea con ID (`[fix:...]`), así se puede probar que se resolvió.
+- **La verdad de "terminado" es la verificación, no el `[X]`:** `converge` reconcilia las tareas falsamente cerradas.
+- **Constitución como árbitro:** si un hallazgo viola `.specify/memory/constitution.md`, se corrige el código; si la constitución es ambigua, se enmienda con `/speckit-constitution`, no se reinterpreta.
+- **Alcance mínimo:** cada iteración corrige solo lo rechazado, sin regenerar lo aprobado.
+- **Tope de iteraciones:** máximo **2** por rama (`.specify/memory/rework_state.json`, se reinicia con `GITOPS-BRANCH-CREATE` / `GITOPS-MERGE-CLOSE`). Al excederlo, el Watcher escribe un handoff a `@HUMANO:` y se detiene: la causa suele estar en la spec o el plan.
+
+**Límites conocidos.** Los cambios de spec/plan los aplica `converge` con edición mínima; el Watcher no vuelve a recorrer la cadena `@BA → @QA → @UX → @SA → @DA → @API → @QT` (regenerar `spec.md`/`tasks.md` borraría el progreso `[X]`). En su lugar deja una nota en el tracker para sincronizar manualmente los artefactos de diseño de `@BA`, `@API` y `@DA`. La clasificación por capa depende de que el revisor etiquete bien sus hallazgos. La última clasificación queda en `.specify/memory/rework_last_classification.md`.
+
+**Reflejo en `bmad-control-center`.** El *Pipeline de Agentes* muestra el rechazo en vivo: el revisor aparece en rojo (`✗ [RECHAZADO]`), las etapas a corregir en ámbar (`↻ [RETRABAJO i/2]`) y un banner resume el ciclo. El backend lo proyecta desde el tracker (`rework` + `rework_state` por etapa) y lo emite en `WORKFLOW_UPDATED`.
+

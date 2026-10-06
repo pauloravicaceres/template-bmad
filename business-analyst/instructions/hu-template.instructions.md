@@ -39,6 +39,7 @@ documents/business-analyst/XXX-HU_[nombre_corto].md
 - **Tipo:** {{Feature | Enhancement | Bugfix | Refactor}}
 - **Prioridad:** {{Alta | Media | Baja}}
 - **Tags:** [{{TAG_1}}, {{TAG_2}}, {{TAG_3}}]
+- **Requiere interfaz:** {{Sí | No}}
 - **Consumo SDD:** `/speckit.specify documents/business-analyst/{{XXX}}-HU_{{nombre_corto}}.md`
 
 ---
@@ -137,6 +138,7 @@ sequenceDiagram
 ### ⚠️ Directiva para Proyectos Headless / Procesamiento de Datos
 Si el proyecto no tiene interfaz de usuario (ej. ETL, SSIS, Webhooks, APIs puras):
 - **Prohibido usar verbos de UI:** No uses "hacer clic", "ver pantalla" o "mostrar modal".
+- **Campo `Requiere interfaz` (obligatorio):** declara `Sí` si la HU introduce o modifica pantallas, formularios o componentes visuales; `No` si es solo API, datos, pruebas, infraestructura o procesos sin pantalla. Ante la duda, `Sí`. El Watcher lo lee para decidir si la HU pasa por el Diseñador UX o va directo al Arquitecto de Soluciones.
 - **Enfoque Backend:** Los escenarios `Given / When / Then` deben enfocarse en estados de persistencia, respuestas de red, códigos HTTP, logs de error, validación de esquemas (JSON/XML) y tolerancia a fallos.
 
 ### ⚠️ Directiva para Ecosistemas Preexistentes (Modo Brownfield)

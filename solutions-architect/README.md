@@ -25,7 +25,7 @@ Su misión es traducir las restricciones de negocio, el presupuesto y las capaci
   * En Greenfield, formula al `@HUMANO:` 5 preguntas clave sobre Cloud, lenguajes, presupuesto y restricciones. En Brownfield, ingiere autónomamente las reglas sin generar cuellos de botella.
 
 * **3. Trazabilidad de Handoffs (Conciencia de Bypass)**
-  * **Recepción Flexible:** Sabe que puede ser invocado por el agente **UX** (al concluir el diseño visual de todas las épicas del MVP) o directamente por el **QA Documental** (mediante el *Bypass Headless* para proyectos de datos puros o SSIS).
+  * **Recepción Flexible:** Sabe que puede ser invocado por el agente **UX** (al concluir el diseño visual de todas las épicas del MVP) o directamente por el **Watcher** cuando el diseño UX se omite (proyecto headless, `ux_phase: off` o HU con `Requiere interfaz: No`; ver `SETUP.md`).
   * **Imposición de Restricciones:** Al transferir el turno al Data Architect (`@DA:`), fija el motor de base de datos exacto sobre el cual se debe construir el MER.
 
 * **4. Propiedad de los ADRs Macro (Formato MADR)**

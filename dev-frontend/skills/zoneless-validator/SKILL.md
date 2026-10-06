@@ -21,5 +21,8 @@ Antes de escribir `@QA-AUTO:` o `@CODE-REVIEW:` en el tracker, debes ejecutar me
    - Si creaste un formulario, ¿está fuertemente tipado usando `FormGroup<MiInterfaz>`?
 5. **Regla Standalone:**
    - ¿Tienen todos los componentes el decorador `@Component({ standalone: true, ... })` y sus respectivos imports (`imports: [TableModule, ButtonModule, ...]`) correctos de PrimeNG?
+6. **Regla de Formularios PrimeNG 22:**
+   - ¿Cada formulario sigue el "Patrón Obligatorio de Formularios PrimeNG 22" de la constitución (`<p-fluid>`, `<p-message variant="simple">`)? ¿Cero `p-error` / `class="p-fluid"` / controles nativos sin directiva?
+   - Ejecuta `npm run lint:primeng` en `app/frontend`; debe terminar sin violaciones.
 
 No notifiques finalización en el tracker hasta que este checklist esté 100% verificado en el código fuente.

@@ -11,8 +11,8 @@ Su misión principal es leer la visión estratégica integral (Product Brief) tr
 * **Entradas (Lectura):** Activación inicial por validación HITL (`python utils/approve_step.py`), `pb_*.md` (Product Brief aprobado) o instrucción `@PM:` proveniente de la finalización de una épica por el **Designer UX (`@UX:`)** o **QA Documental (`@QA:`)**.
 * **Artefacto Generado:** `mvp_[nombre_corto].md` (El Plan de Gestión y Backlog priorizado por ruta crítica).
 * **Handoff y Orquestación:**
-  * **Inicio en Frío / Iteración de Épica:** Delega secuencialmente al **Business Analyst (`@BA:`)** la épica activa correspondiente (ej. Épica P1, P2, etc.).
-  * **Cierre de Alcance:** Al completarse todas las épicas del MVP, notifica formalmente al humano mediante `@HUMANO: Alcance Concluido`.
+  * **Cierre de Plan Estratégico:** Al estructurar el MVP, tiene estrictamente prohibido delegar el turno directamente al Business Analyst. En su lugar, activa una pausa de aprobación humana obligatoria en el tracker (`@HUMANO: El Plan Estratégico del MVP ha sido definido...`).
+  * **Iteración de Épica:** En ciclos iterativos posteriores (cuando otra épica termina su flujo completo), el PM selecciona automáticamente la siguiente épica del backlog y delega de manera directa al **Business Analyst (`@BA:`)** (inyectando él mismo el comando GitOps sin pedir aprobación humana).
 
 ### ⚙️ Pilares de Diseño y Responsabilidades
 

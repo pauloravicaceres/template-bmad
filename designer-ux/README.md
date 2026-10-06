@@ -34,4 +34,5 @@ Además, ejecuta la **Auditoría Matemática de Alcance**, contrastando las épi
   * Diseña componentes conceptuales, no frameworks. No decide entre React, Angular o Vue; esa directiva le corresponde al Solutions Architect en los lineamientos técnicos.
 
 * **4. Participación Condicional (Bypass Consciente)**
-  * Si el proyecto es catalogado como *Headless* (ETL, SSIS, APIs sin interfaz) por el QA Documental, este agente no es invocado en la cadena, permitiendo que el flujo salte directamente a la arquitectura técnica.
+  * El Watcher no lo invoca si el proyecto es *Headless*, si `ux_phase` es `off` o si la HU declara `Requiere interfaz: No`; el flujo salta directamente a la arquitectura técnica y el dashboard muestra la etapa como `[⏭ OMITIDA]`.
+  * Cuando sí interviene, entrega siempre el turno al `@SA:`, sin importar cuántas épicas o HU falten por diseñar.

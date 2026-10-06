@@ -40,10 +40,10 @@ APPROVAL_CONFIG = {
         "message": "@PM: El Product Brief ha sido auditado y aprobado formalmente en el archivo {file}. Procede con el análisis estratégico y la creación del Backlog del MVP."
     },
     "3": {
-        "name": "Product Manager (PM) -> BA",
+        "name": "Product Manager (PM) -> BA [Pausa HITL de Estrategia]",
         "folder": "product-manager",
         "file_regex": r"(mvp_[\w_]+\.md)",
-        "message": "@BA: El MVP y Backlog han sido aprobados en el archivo {file}. Procede con el análisis de negocio y redacción de Historias de Usuario para la siguiente Épica en prioridad."
+        "message": "@WATCHER: GITOPS-BRANCH-CREATE feat/{branch_name}\n@BA: El MVP y Backlog han sido aprobados en el archivo {file}. La rama feat/{branch_name} ha sido creada. Procede con el análisis de negocio y redacción de Historias de Usuario para la épica {branch_name}. Usa el identificador universal estricto para crear el archivo físico en documents/business-analyst."
     },
     "4": {
         "name": "Business Analyst (BA) -> QA",
@@ -173,6 +173,20 @@ def main():
         
     config = APPROVAL_CONFIG[opcion]
     
+    if opcion == "3":
+        import re
+        branch_name = "001-HU_epic_generica"
+        if TRACKER_PATH.exists():
+            with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
+                content = f.read()
+            match = re.search(r"delegar es\s+(\d{3}-HU_[\w_]+)", content)
+            if match:
+                branch_name = match.group(1)
+                print(f"\n⚡ Identificador extraído automáticamente del Tracker: {branch_name}")
+            else:
+                print(f"\n⚠️ No se pudo extraer el identificador automáticamente. Usando fallback: {branch_name}")
+        config['message'] = config['message'].replace("{branch_name}", branch_name)
+    
     # 1. Extraer el nombre del archivo inteligentemente
     archivo_detectado = extract_latest_file(config['file_regex'])
     
@@ -214,7 +228,7 @@ def main():
         mensaje_final = config['message'].format(file=archivo_detectado)
         
         with open(TRACKER_PATH, 'a', encoding='utf-8') as f:
-            f.write(f"\n{mensaje_final}")
+            f.write(f"\n{mensaje_final}\n\n")
             
         print("\n✅ Aprobación registrada con éxito en el tracker.")
         print(f"📝 Se ha añadido al bus de eventos:\n>> {mensaje_final}\n")
