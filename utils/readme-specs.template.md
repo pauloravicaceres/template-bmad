@@ -23,4 +23,3 @@ Para mantener el determinismo del *Ledger*, los agentes mutadores y lectores uti
 
 ## 🔗 Notas de Relación entre Specs
 * (Aún no hay relaciones registradas)
-
