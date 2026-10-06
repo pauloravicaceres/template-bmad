@@ -1,3 +1,4 @@
+
 # 📜 Constitución Técnica Global de BMAD
 
 ## 🌐 REGLAS DE COMPORTAMIENTO Y LOCALIZATION (LEX SUPERIOR)
@@ -25,6 +26,7 @@ Esta nomenclatura nace obligatoriamente en el **Product State Ledger** (`specs/R
 1. El nombre de la rama GitOps (`feat/XXX-HU_[nombre]`).
 2. El nombre del archivo físico de la Historia de Usuario en el disco (`documents/business-analyst/XXX-HU_[nombre].md`).
 3. Los Hand-offs y registros en el Tracker.
+4. La carpeta de especificación de Spec Kit (`specs/XXX-HU_[nombre]/`): el Watcher la fija de forma explícita (`SPECIFY_FEATURE_DIRECTORY`) al ejecutar `/speckit-specify`, de modo que Spec Kit no genere su propio nombre ni su propio correlativo, y verifica al terminar que `.specify/feature.json` apunte a ella; si no, detiene la fase.
 
 ---
 
