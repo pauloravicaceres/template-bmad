@@ -71,6 +71,9 @@ def seleccionar_carpetas():
         return carpetas_seleccionadas
 
 def main():
+    import os
+    if os.environ.get('BMAD_WORKSPACE') or os.environ.get('WORKSPACE_ROOT') or any(arg.startswith(('--workspace', '--project')) for arg in sys.argv):
+        raise SystemExit('Legacy engine maintenance is disabled in a project context.')
     raiz_proyecto = Path(__file__).resolve().parent.parent
     documents_dir = raiz_proyecto / "documents"
     specs_dir = raiz_proyecto / "specs"

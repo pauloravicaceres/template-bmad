@@ -11,7 +11,7 @@ from core.config import settings
 class TestGitLockContention:
     """Tests for lockfile contention resilience and fallback to cached snapshot (T017 / US3 / ADR-015)."""
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_lockfile_triggers_cached_snapshot_fallback(self, tmp_path):
         # First ensure we have a valid snapshot in memory
         initial_status = await git_service.get_git_status()

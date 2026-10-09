@@ -1,10 +1,10 @@
 <template>
   <div class="flex flex-col h-full bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
     <!-- Header del Explorador -->
-    <div class="p-3 border-b border-gray-100 bg-gray-50/70 flex items-center justify-between">
+    <div class="p-3 border-b border-gray-100 bg-gray-50/70 dark:bg-slate-800/80 dark:border-slate-700 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-sm">📁</span>
-        <h2 class="text-xs font-bold uppercase tracking-wider text-gray-700">
+        <i class="pi pi-folder-open text-sm text-blue-600 dark:text-sky-400" aria-hidden="true"></i>
+        <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-gray-700 dark:text-slate-100">
           Explorador de Artefactos
         </h2>
       </div>
@@ -27,7 +27,7 @@
           v-model="searchQuery"
           type="text"
           placeholder="Buscar archivo... (Filtro)"
-          class="w-full pl-7 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+          class="w-full pl-7 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition-all text-gray-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder:text-slate-400 dark:focus:bg-slate-800 dark:focus:ring-sky-500"
         />
         <button
           v-if="searchQuery"
@@ -41,7 +41,7 @@
     </div>
 
     <!-- Lista o Arbol de Nodos -->
-    <div class="flex-1 overflow-y-auto p-2">
+    <div class="scroll-personalizado flex-1 overflow-y-auto p-2">
       <!-- Loading State -->
       <div v-if="isLoading && !rootNode" class="flex items-center justify-center p-8 text-xs text-gray-400">
         <span class="animate-spin mr-2">⚙</span> Cargando estructura...

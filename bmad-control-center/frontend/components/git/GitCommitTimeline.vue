@@ -7,7 +7,7 @@
         <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider">
           Historial de Commits (Ciclo de Vida Agéntico)
         </h3>
-        <span class="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono font-semibold">
+        <span class="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono font-semibold dark:bg-slate-700 dark:text-slate-100">
           {{ totalCount }} confirmaciones
         </span>
       </div>
@@ -29,7 +29,7 @@
     <!-- Si no hay commits -->
     <div
       v-if="commits.length === 0"
-      class="text-center py-10 text-xs text-gray-400 bg-gray-50/50 rounded-lg border border-dashed border-gray-200"
+      class="text-center py-10 text-xs text-gray-400 bg-gray-50/50 rounded-lg border border-dashed border-gray-200 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-300"
     >
       <span v-if="isLoading">⚙ Cargando historial de commits...</span>
       <span v-else>No se encontraron confirmaciones en el historial.</span>
@@ -51,8 +51,8 @@
             :class="[
               'p-2.5 rounded-lg border cursor-pointer transition-all text-xs relative pl-6',
               selectedCommit?.commit_hash === commit.commit_hash
-                ? 'bg-blue-50/80 border-blue-300 shadow-xs'
-                : 'bg-gray-50/70 hover:bg-gray-100/70 border-gray-200/80 text-gray-700'
+                ? 'bg-blue-50/80 border-blue-300 shadow-xs dark:bg-blue-950/60 dark:border-blue-700'
+                : 'bg-gray-50/70 hover:bg-gray-100/70 border-gray-200/80 text-gray-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-200'
             ]"
           >
             <!-- Línea conectora vertical -->
@@ -67,17 +67,17 @@
                 'absolute left-2 top-3 w-2.5 h-2.5 rounded-full border-2',
                 index === 0
                   ? 'bg-blue-600 border-blue-400 ring-2 ring-blue-100'
-                  : 'bg-white border-gray-400'
+                  : 'bg-white border-gray-400 dark:bg-slate-700 dark:border-slate-400'
               ]"
             ></span>
 
             <!-- Encabezado de commit -->
             <div class="flex items-center justify-between gap-1 mb-1">
               <div class="flex items-center gap-1.5 font-mono">
-                <span class="font-bold text-blue-700">🔀 {{ commit.short_hash }}</span>
+                <span class="font-bold text-blue-700 dark:text-blue-300">🔀 {{ commit.short_hash }}</span>
                 <span
                   v-if="index === 0"
-                  class="bg-blue-100 text-blue-800 text-[9px] px-1.5 py-0.2 rounded font-bold"
+                  class="bg-blue-100 text-blue-800 text-[9px] px-1.5 py-0.2 rounded font-bold dark:bg-blue-900 dark:text-blue-100"
                 >
                   HEAD
                 </span>
@@ -106,17 +106,17 @@
       </div>
 
       <!-- Columna Derecha: Detalle del Commit Seleccionado (5 cols) -->
-      <div class="lg:col-span-5 bg-gray-50/90 border border-gray-200 rounded-lg p-3 flex flex-col h-[520px]">
+      <div class="lg:col-span-5 bg-gray-50/90 border border-gray-200 rounded-lg p-3 flex flex-col h-[520px] dark:bg-slate-800 dark:border-slate-700">
         <div class="text-[10px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1.5 mb-2">
           Detalle del Commit Seleccionado
-          <span v-if="selectedCommit" class="font-mono text-blue-700">
+          <span v-if="selectedCommit" class="font-mono text-blue-700 dark:text-blue-300">
             [ {{ selectedCommit.short_hash }} ]
           </span>
         </div>
 
         <div v-if="selectedCommit" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
           <!-- Metadatos del commit -->
-          <div class="space-y-1 bg-white p-2.5 rounded-md border border-gray-200/80 text-[11px]">
+          <div class="space-y-1 bg-white p-2.5 rounded-md border border-gray-200/80 text-[11px] dark:bg-slate-900 dark:border-slate-700">
             <div>
               <span class="text-gray-400 font-mono">Hash:</span>
               <span class="font-mono text-gray-700 text-[10px] break-all ml-1 select-all">
@@ -137,20 +137,20 @@
             </div>
             <div class="pt-1 border-t border-gray-100">
               <span class="text-gray-400 block mb-0.5">Mensaje:</span>
-              <div class="font-medium text-gray-900 bg-gray-50 p-1.5 rounded font-mono text-xs">
+              <div class="font-medium text-gray-900 bg-gray-50 p-1.5 rounded font-mono text-xs dark:bg-slate-800">
                 {{ selectedCommit.message }}
               </div>
             </div>
           </div>
 
           <!-- Estadísticas de cambios -->
-          <div class="bg-white p-2 rounded-md border border-gray-200/80 flex items-center justify-between text-[11px] font-mono">
+          <div class="bg-white p-2 rounded-md border border-gray-200/80 flex items-center justify-between text-[11px] font-mono dark:bg-slate-900 dark:border-slate-700">
             <span class="text-gray-600 font-semibold">
               {{ selectedCommit.files_changed_count }} mutaciones
             </span>
             <div class="flex items-center gap-2">
-              <span class="text-emerald-700 font-bold">+{{ selectedCommit.insertions }}</span>
-              <span class="text-red-600 font-bold">-{{ selectedCommit.deletions }}</span>
+              <span class="text-emerald-700 font-bold dark:text-emerald-300">+{{ selectedCommit.insertions }}</span>
+              <span class="text-red-600 font-bold dark:text-red-300">-{{ selectedCommit.deletions }}</span>
             </div>
           </div>
 
@@ -172,14 +172,14 @@
                 <!-- Archivo normal de texto -->
                 <div
                   v-else
-                  class="flex items-center justify-between py-1 px-2 bg-white rounded border border-gray-200/70 text-[10px] font-mono"
+                  class="flex items-center justify-between py-1 px-2 bg-white rounded border border-gray-200/70 text-[10px] font-mono dark:bg-slate-900 dark:border-slate-700"
                 >
                   <span class="truncate mr-2 text-gray-800" :title="file.relative_path">
                     {{ file.relative_path }}
                   </span>
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <span v-if="file.insertions" class="text-emerald-700 font-semibold">+{{ file.insertions }}</span>
-                    <span v-if="file.deletions" class="text-red-600 font-semibold">-{{ file.deletions }}</span>
+                    <span v-if="file.insertions" class="text-emerald-700 font-semibold dark:text-emerald-300">+{{ file.insertions }}</span>
+                    <span v-if="file.deletions" class="text-red-600 font-semibold dark:text-red-300">-{{ file.deletions }}</span>
                     <span class="bg-gray-100 text-gray-600 px-1 rounded text-[9px] uppercase">
                       {{ file.change_type }}
                     </span>
@@ -187,7 +187,7 @@
                 </div>
               </template>
             </div>
-            <div v-else class="text-[11px] text-gray-400 italic p-2 bg-white rounded border border-gray-100">
+            <div v-else class="text-[11px] text-gray-400 italic p-2 bg-white rounded border border-gray-100 dark:bg-slate-900 dark:border-slate-700 dark:text-gray-300">
               Desglose detallado no disponible para este commit.
             </div>
           </div>
@@ -257,7 +257,7 @@
           type="button"
           @click="emit('load-more')"
           :disabled="isLoading"
-          class="ml-2 px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded hover:bg-blue-100 disabled:opacity-40 cursor-pointer text-xs font-semibold"
+          class="ml-2 px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded hover:bg-blue-100 disabled:opacity-40 cursor-pointer text-xs font-semibold dark:bg-blue-950/60 dark:border-blue-800 dark:text-blue-200 dark:hover:bg-blue-900"
         >
           ⚡ Cargar 50 Más
         </button>

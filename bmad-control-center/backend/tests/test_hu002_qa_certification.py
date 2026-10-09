@@ -89,7 +89,7 @@ def qa_isolated_environment(tmp_path):
 class TestHU002WorkflowCertification:
     """Certificación de Criterios de Aceptación para Workflow Status y Stepper (SC-01)."""
 
-    def test_GetWorkflowStatus_ConHistorialValido_DebeRetornarEtapaActivaY8EtapasCanonicas(self, qa_isolated_environment):
+    def test_GetWorkflowStatus_ConHistorialValido_DebeRetornarEtapaActivaY15EtapasCanonicas(self, qa_isolated_environment):
         # Arrange
         client, _ = qa_isolated_environment
 
@@ -103,14 +103,14 @@ class TestHU002WorkflowCertification:
         assert payload["active_stage"] == "QA"
         assert payload["active_agent_role"] == "QA Documental"
         assert payload["completed_stages"] == 2
-        assert payload["total_stages"] == 12
-        assert len(payload["stages"]) == 8
+        assert payload["total_stages"] == 15
+        assert len(payload["stages"]) == 15
         # Verificar trazabilidad histórica de handoffs
         assert len(payload["history"]) == 2
         assert payload["history"][0]["author_role"] == "Product Manager"
         assert payload["history"][1]["author_role"] == "Business Analyst"
 
-    def test_GetWorkflowStatus_CuandoTrackerNoExiste_DebeRetornarEstadoIdleCon8EtapasPendientes(self, tmp_path):
+    def test_GetWorkflowStatus_CuandoTrackerNoExiste_DebeRetornarEstadoIdleCon15EtapasPendientes(self, tmp_path):
         # Arrange
         non_existent_tracker = tmp_path / "documents" / "inexistente.md"
         workflow_module.workflow_service = WorkflowService(tracker_path=non_existent_tracker)

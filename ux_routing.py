@@ -66,7 +66,7 @@ def _leer_config(raiz: Path, config_path: str) -> dict:
 
 
 def decidir_ruta_ux(raiz: RutaLike, ruta_hu: Optional[RutaLike] = None,
-                    config_path: str = "config_bmad.json") -> RutaUX:
+                    config_path: str = "config_bmad.json", *, config=None) -> RutaUX:
     """
     Decide si la HU pasa por el diseño UX.
       ux_phase = "off"  -> nunca diseña (interruptor global)
@@ -75,7 +75,7 @@ def decidir_ruta_ux(raiz: RutaLike, ruta_hu: Optional[RutaLike] = None,
     Lee el config en cada llamada: se puede cambiar en caliente, sin reiniciar el orquestador.
     """
     raiz = Path(raiz)
-    config = _leer_config(raiz, config_path)
+    config = _leer_config(raiz, config_path) if config is None else config
     if str(config.get("project_type", "")).lower() == "headless":
         return RutaUX("SA", "el proyecto es headless", True)
     modo = str(config.get("ux_phase", "auto")).lower()
@@ -92,9 +92,9 @@ def decidir_ruta_ux(raiz: RutaLike, ruta_hu: Optional[RutaLike] = None,
     return RutaUX("UX", "la HU no declara 'Requiere interfaz'; por defecto se diseña", False)
 
 
-def agentes_omitidos(raiz: RutaLike, config_path: str = "config_bmad.json") -> set:
+def agentes_omitidos(raiz: RutaLike, config_path: str = "config_bmad.json", *, config=None) -> set:
     """Agentes cuyo panel/nodo no hace falta levantar según la configuración global (no mira HU concretas)."""
-    config = _leer_config(Path(raiz), config_path)
+    config = _leer_config(Path(raiz), config_path) if config is None else config
     if str(config.get("ux_phase", "auto")).lower() == "off" or str(config.get("project_type", "")).lower() == "headless":
         return {"designer-ux"}
     return set()

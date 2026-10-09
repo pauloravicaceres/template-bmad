@@ -263,6 +263,7 @@ if ($branchName -ne $originalBranchName) {
 }
 
 $featureDir = Join-Path $specsDir $branchName
+Assert-BmadOutput -RepoRoot $repoRoot -OutputPath $featureDir -Subdirectory 'specs'
 $specFile = Join-Path $featureDir 'spec.md'
 
 if (-not $DryRun) {

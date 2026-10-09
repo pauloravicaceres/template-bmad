@@ -150,7 +150,16 @@ def abrir_archivo_en_so(ruta):
     except Exception as e:
         print(f"⚠️ No se pudo abrir el archivo automáticamente. Puede revisarlo manualmente en:\n{ruta}\nError: {e}")
 
-def main():
+def main(argv=None):
+    import argparse
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from bmad_runtime.context import add_project_arguments, resolve_context
+    parser = argparse.ArgumentParser(description='Approve a gate in the selected workspace.')
+    add_project_arguments(parser)
+    args = parser.parse_args(argv)
+    context = resolve_context(Path(__file__).resolve().parent.parent, workspace=args.workspace, project=args.project)
+    global DIRECTORIO_RAIZ, TRACKER_PATH
+    DIRECTORIO_RAIZ, TRACKER_PATH = context.workspace_root, context.tracker_path
     print("\n" + "="*60)
     print(" 🛡️  SISTEMA DE APROBACIÓN MANUAL (HITL) - FRAMEWORK BMAD ")
     print("="*60)
@@ -227,24 +236,31 @@ def main():
         # 4. Formatear y despachar el mensaje de delegación
         mensaje_final = config['message'].format(file=archivo_detectado)
         
-        with open(TRACKER_PATH, 'a', encoding='utf-8') as f:
-            f.write(f"\n{mensaje_final}\n\n")
+        registrar_aprobacion(mensaje_final, archivo_detectado)
             
         print("\n✅ Aprobación registrada con éxito en el tracker.")
         print(f"📝 Se ha añadido al bus de eventos:\n>> {mensaje_final}\n")
         
         # Intercepción para auto-gatillar Spec Kit Implement
-        if opcion == "10":
-            print("\n🚀 [Auto-Runner] Lanzando '/speckit.implement' automáticamente hacia la Fase D...")
-            try:
-                subprocess.run('agy --dangerously-skip-permissions --print "/speckit.implement"', shell=True, check=True, cwd=DIRECTORIO_RAIZ)
-                print("\n✅ Implementación despachada con éxito. Los agentes desarrolladores tomarán el control.")
-            except subprocess.CalledProcessError as e:
-                print(f"\n❌ Error al intentar ejecutar /speckit.implement: {e}")
-        else:
-            print("🚀 El Watcher detectará este evento y activará al siguiente agente automáticamente.")
+        print("🚀 El Watcher detectará este evento y resolverá el proveedor configurado para la operación.")
     else:
         print("\n🛑 Aprobación cancelada. El flujo permanece en pausa HITL segura.")
+
+def registrar_aprobacion(mensaje, artefacto):
+    """A human approval starts its own block and releases the preceding HITL gate."""
+    from datetime import datetime
+    now = datetime.now()
+    lines = mensaje.splitlines()
+    macros = [line for line in lines if line.startswith('@WATCHER: GITOPS-')]
+    handoff = ' '.join(line for line in lines if line not in macros)
+    with open(TRACKER_PATH, 'a', encoding='utf-8') as handle:
+        handle.write(f"\n### [{now:%d-%m-%Y}] HUMANO\n- **Hora:** {now:%H:%M:%S}\n"
+                     f"- **Artefacto generado:** `{artefacto}`\n- **Estado:** APPROVE\n"
+                     "- **⚠️ Puntos Abiertos:** Ninguno.\n")
+        for macro in macros:
+            handle.write(macro + '\n')
+        handle.write(f'- **Handoff:** {handoff}\n')
+
 
 if __name__ == "__main__":
     main()

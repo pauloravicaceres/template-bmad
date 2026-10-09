@@ -1,33 +1,20 @@
-## 📝 Business Analyst (BA) — El Traductor del Valor de Negocio
+# Business Analyst
 
-El agente **Business Analyst** es el puente crítico entre la visión estratégica (Management) y la ejecución táctica (Arquitectura y Desarrollo). Actúa como el primer engranaje operativo del framework BMAD, transformando las ideas de alto nivel en especificaciones granulares, accionables y matemáticamente testeables.
+Fase M; token `@BA:`.
 
-### 🎯 Misión
+Produce requisitos INVEST y criterios Gherkin, con versiones técnica y narrativa para stakeholders. Conserva el identificador universal y deriva a QA Documental.
 
-Su objetivo central es desglosar las Épicas dictadas por el Product Manager en Historias de Usuario atómicas. Garantiza que el equipo técnico entienda con precisión absoluta *qué* se debe construir, *quién* es el usuario final y *cuál* es el valor de negocio esperado, sin cruzar nunca la línea de dictar *cómo* se debe programar o implementar a nivel técnico.
+## Directivas
 
-### 📦 Entradas y Artefactos de Salida
+El perfil [AGENTS.md](AGENTS.md) se compila desde [business-analyst.agent.md](agents/business-analyst.agent.md), sus instrucciones y skills:
 
-* **Entradas (Lectura):**
-  * **Escenario A (Nueva HU):** `pb_*.md` (Product Brief) y `mvp_*.md` (Plan de Gestión) bajo instrucción del `@PM:`.
-  * **Escenario B (Subsanación por Rechazo):** `feedback_qa_[ID]_[nombre_corto].md` y la versión previa de `hu_[ID]_[nombre_corto].md` bajo instrucción del `@QA:`.
-* **Artefacto Generado:** `hu_[ID]_[nombre_corto].md` (Historias de Usuario atómicas con criterios BDD y DoD).
-* **Handoff:** Transfiere el control siempre al **QA Documental (`@QA:`)** para la auditoría y certificación de requisitos.
+- [anti-hallucination-policy.instructions.md](instructions/anti-hallucination-policy.instructions.md)
+- [business-analysis-standards.instructions.md](instructions/business-analysis-standards.instructions.md)
+- [hu-stakeholders-template.instructions.md](instructions/hu-stakeholders-template.instructions.md)
+- [hu-template.instructions.md](instructions/hu-template.instructions.md)
 
-### ⚙️ Pilares de Diseño y Responsabilidades
+## Contexto del proyecto
 
-* **1. Atomicidad y Estándar INVEST**
-  * Desacopla requerimientos complejos en unidades mínimas de valor. No permite historias monolíticas.
-  * Se asegura rigurosamente de que cada Historia de Usuario sea Independiente, Negociable, Valiosa, Estimable, Pequeña (Atómica) y Testable.
+Las entradas y entregables están en [INPUTS_POR_AGENTE.md](../INPUTS_POR_AGENTE.md). Se escriben en el workspace seleccionado; el tracker usa `BMAD_TRACKER`, la configuración efectiva `BMAD_CONFIG` y los perfiles compartidos `ENGINE_ROOT`. Conserva el historial y registra un único destinatario por handoff.
 
-* **2. Especificación BDD (Gherkin) y Cobertura de Contingencias**
-  * Redacta los Criterios de Aceptación y el *Definition of Done* (DoD) utilizando el formato canónico Behavior-Driven Development: `Dado [Contexto] / Cuando [Acción] / Entonces [Resultado]`.
-  * Modela obligatoriamente los *Sad Paths* y *Edge Cases* para anticipar fallas de red, validaciones erróneas y comportamientos anómalos.
-
-* **3. Política Anti-Alucinación (Supuestos Explícitos)**
-  * Opera bajo una directiva de trazabilidad implacable. Si el Product Brief omite un detalle funcional necesario, el BA no inventa la regla en secreto; propone soluciones lógicas marcadas obligatoriamente con la etiqueta `⚠️ [PROPUESTO]` o `⚠️ SUPUESTO:`.
-
-* **4. Adaptabilidad de Interfaz (Directiva Headless)**
-  * Declara en cada HU técnica el campo `Requiere interfaz: Sí|No`: el Watcher lo lee para decidir si la HU pasa por el Designer UX (ante la duda, `Sí`).
-  * Si el proyecto es interactivo (Web/Mobile), enriquece la historia con referencias de usabilidad para UX.
-  * Si el proyecto es *Headless* (ETL, SSIS, APIs sin UI), suprime verbos visuales ("hacer clic", "mostrar modal") y enfoca sus Criterios de Aceptación en estados de persistencia, códigos HTTP, tolerancia a fallos y colas de errores (DLQ).
+La selección de proveedor y effort sigue el [contrato del runtime](../bmad_runtime/README.md). Consulta [GUIDE.md](../GUIDE.md) para compuertas, implementación y retrabajo.

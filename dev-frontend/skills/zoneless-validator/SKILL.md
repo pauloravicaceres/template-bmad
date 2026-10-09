@@ -1,28 +1,26 @@
 ---
 name: zoneless-validator
-description: Skill de auto-auditoría estricta para validar que el código Angular cumple con el paradigma Zoneless, Signals, flujos de control modernos y tipado estricto antes del handoff.
+description: Reglas de calidad para el stack del workspace activo.
 type: skill
-tags: [frontend, angular, zoneless, auditoria, dev]
+tags: [calidad, workspace]
 ---
 
-# Zoneless Code Validator — Auditoría de Calidad Frontend
+## Contexto técnico del workspace
+Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
+Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
+WORKSPACE_ROOT/documents/architecture; si existe roles/dev-frontend.md, aplícalo.
+Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
+versiones ni herramientas desde el perfil compartido. Conserva las decisiones
+aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva
+la propuesta a SA y la aprobación al humano antes de imponer una tecnología.
 
-## Workflow de Auto-Revisión OBLIGATORIO
-Antes de escribir `@QA-AUTO:` o `@CODE-REVIEW:` en el tracker, debes ejecutar mentalmente este checklist sobre los componentes y servicios que acabas de escribir. Si algún paso falla, usa `write_file` para corregirlo inmediatamente:
-
-1. **Regla de Control Flow Moderno:** 
-   - Abre mentalmente tus archivos `.html`. ¿Usaste `*ngIf` o `*ngFor` en algún lugar? Si es así, cámbialos INMEDIATAMENTE a la sintaxis `@if` y `@for`.
-2. **Regla de Inyección Funcional:**
-   - Abre mentalmente tus archivos `.ts`. ¿Declaraste el constructor `constructor(private http: HttpClient) {}`? Si es así, cámbialo INMEDIATAMENTE a `private http = inject(HttpClient);`.
-3. **Regla de Estado Reactivo (Signals):**
-   - ¿Estás usando mutaciones manuales de variables clásicas para actualizar la UI, o utilizaste `signal()` y `computed()`? ¿Resolviste la lectura HTTP con `toSignal()`?
-4. **Regla de Tipado Estricto y Formularios:**
-   - ¿Hay algún tipo `any` en los modelos o componentes?
-   - Si creaste un formulario, ¿está fuertemente tipado usando `FormGroup<MiInterfaz>`?
-5. **Regla Standalone:**
-   - ¿Tienen todos los componentes el decorador `@Component({ standalone: true, ... })` y sus respectivos imports (`imports: [TableModule, ButtonModule, ...]`) correctos de PrimeNG?
-6. **Regla de Formularios PrimeNG 22:**
-   - ¿Cada formulario sigue el "Patrón Obligatorio de Formularios PrimeNG 22" de la constitución (`<p-fluid>`, `<p-message variant="simple">`)? ¿Cero `p-error` / `class="p-fluid"` / controles nativos sin directiva?
-   - Ejecuta `npm run lint:primeng` en `app/frontend`; debe terminar sin violaciones.
-
-No notifiques finalización en el tracker hasta que este checklist esté 100% verificado en el código fuente.
+## Validación y entrega
+Implementa o verifica el tech-design aprobado y sus contratos exactos; no inventes
+campos, dependencias, respuestas simuladas en producción ni funcionalidad incompleta.
+Revisa físicamente los archivos escritos. Aplica el stack y las convenciones del
+workspace, sus validadores y pruebas, y documenta evidencia y fallos antes del handoff.
+Respeta autenticación, autorización por recurso, cancelación, límites de módulos,
+seguridad de entradas y rendimiento conforme a la arquitectura aprobada.
+Las pruebas validan comportamiento, con Arrange/Act/Assert, escenarios felices y
+adversos; nunca mocks tautológicos. No declares aprobada una entrega con fallos.
+Los commits y el cierre GitOps siguen exclusivamente el protocolo operativo.

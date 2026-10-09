@@ -59,8 +59,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
         return True
 
     def _is_tracker(self, src_path: str) -> bool:
-        norm = src_path.replace("\\", "/")
-        return norm.endswith("tracker_bmad.md")
+        return Path(src_path).resolve() == Path(settings.TRACKER_FILE).resolve()
 
     def _get_file_info(self, abs_path: str):
         size_bytes = 0
@@ -158,7 +157,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
                 except Exception:
                     pass
 
-            debouncer.submit_event("documents/tracker_bmad.md", "WORKFLOW_UPDATED", _dispatch_workflow)
+            debouncer.submit_event(self._get_relative_path(str(settings.TRACKER_FILE)), "WORKFLOW_UPDATED", _dispatch_workflow)
         elif not event.is_directory:
             # 2. Artifact modified
             size_bytes, is_large_file, metadata_only, mime_type = self._get_file_info(event.src_path)

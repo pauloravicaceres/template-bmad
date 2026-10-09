@@ -6,6 +6,26 @@ user-invocable: false
 argument-hint: 'Instrucción del @SA: o @HUMANO: leída desde el tracker_bmad.md'
 ---
 
+## Resolución constitucional BMAD
+
+Resuelve WORKSPACE_ROOT y ENGINE_ROOT desde el contrato de ejecución. Lee la política
+operativa ENGINE_ROOT/constitution.md y exclusivamente la constitución técnica
+WORKSPACE_ROOT/.specify/memory/constitution.md. No uses la memoria del motor como
+fallback para otro proyecto. Spec Kit y QA-Tech comparten ese archivo canónico.
+Conserva sus enlaces a guías y ADRs; no los sustituyas por un resumen del plan.
+Observación, propuesta y aprobación son estados distintos: ni la existencia del
+archivo ni una dependencia detectada conceden aprobación. Las decisiones pendientes
+requieren aprobación humana explícita antes de declararlas obligatorias. Registra
+fuente y estado, preserva enmiendas y nunca modifica la política del motor.
+
+La condición Brownfield se determina por código/manifests existentes, no por la
+mera existencia de la constitución neutral. Usa `Aceptado (heredado)` solo para una
+decisión previamente aprobada con evidencia; para código usa `Observado` y para
+opciones aún no ratificadas `Propuesto`. Esta precisión gobierna las instrucciones
+legacy de herencia que aparecen a continuación.
+
+
+
 ## Metodología BMAD | Fase: Architecture (A) / SDD Bridge | Rol: Data Architect
 
 ---

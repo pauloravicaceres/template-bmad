@@ -1,0 +1,9 @@
+# Dockerignore
+.git/
+.dockerignore
+Dockerfile*
+bin/
+obj/
+*.log*
+.env*
+coverage/

@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "proyecto-a": "D:/BMAD Workspaces/Proyecto A",
+    "proyecto-b": "D:/BMAD Workspaces/Proyecto B ñ"
+  },
+  "project_type": "fullstack",
+  "ai": {
+    "schema_version": 1,
+    "defaults": { "provider": "claude", "model": null },
+    "phases": {
+      "D": { "provider": "codex", "model": "gpt-6-astra", "options": { "effort": "medium" } }
+    }
+  }
+}

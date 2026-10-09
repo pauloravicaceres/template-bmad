@@ -18,7 +18,7 @@ class TestGitBinaryAndSanitization:
         assert git_service._infer_agent_role("Business Analyst", "feat: spec") == "Business Analyst"
         assert git_service._infer_agent_role("Designer UX", "wireframes") == "Designer UX"
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_commits_elide_diff_for_large_or_binary_files(self):
         # Inspect commits returned by get_commits
         response = await git_service.get_commits(limit=50)

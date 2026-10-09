@@ -23,6 +23,48 @@ router.include_router(observability_router)
 router.include_router(git_router)
 
 
+@router.get('/project')
+async def get_project():
+    return {'project_id': settings.PROJECT_ID if settings.HAS_PROJECT else None,
+            'project_name': settings.PROJECT_NAME,
+            'workspace_root': str(settings.WORKSPACE_ROOT) if settings.HAS_PROJECT else None}
+
+
+@router.get('/projects')
+async def get_projects():
+    """List the engine registry without selecting or writing to a workspace."""
+    from core.config import ENGINE_ROOT
+    from bmad_runtime.context import read_json, absolute_path, validate_id
+    from bmad_runtime.errors import ConfigurationError
+    registry = read_json(ENGINE_ROOT / 'config_bmad.json').get('projects', {})
+    if not isinstance(registry, dict):
+        raise HTTPException(500, 'Invalid projects registry')
+    rows = []
+    for identity, path in registry.items():
+        try:
+            validate_id(identity)
+            if not isinstance(path, str) or not path.strip():
+                raise ConfigurationError('Invalid workspace path')
+            rows.append({'project_id': identity, 'workspace_root': str(absolute_path(path, ENGINE_ROOT)),
+                         'selected': settings.HAS_PROJECT and identity == settings.PROJECT_ID})
+        except ConfigurationError as exc:
+            raise HTTPException(500, 'Invalid projects registry') from exc
+    return {'projects': rows}
+
+
+@router.get('/project/context')
+async def get_project_context():
+    """Read-only context of this API process; never select a project from request paths."""
+    from core.config import ENGINE_ROOT
+    from bmad_runtime.context import ProjectContext
+    from bmad_runtime.technical_context import PROJECT_CONSTITUTION, discover, document_index
+    context = ProjectContext(ENGINE_ROOT, settings.WORKSPACE_ROOT, settings.PROJECT_ID,
+                             settings.WORKSPACE_ROOT == ENGINE_ROOT)
+    return {'project_id': context.project_id, 'constitution': PROJECT_CONSTITUTION,
+            'documents': document_index(context, role='solutions-architect'),
+            'discovery': discover(context)}
+
+
 # -------------------------------------------------------------
 # HU-001 Endpoints (Preserved for full backward compatibility)
 # -------------------------------------------------------------

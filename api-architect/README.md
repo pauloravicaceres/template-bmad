@@ -1,37 +1,17 @@
-## 🌐 API Architect (API) — Arquitecto de Integración y Dueño del Contrato
+# API Architect
 
-El agente **API Architect** es la pieza conectiva vital en la Fase de Arquitectura (A) del ecosistema BMAD. Su propósito es diseñar el lenguaje universal con el que los componentes interactúan, construyendo el puente exacto entre las reglas de negocio y el modelo de persistencia subyacente.
+Fase A; token `@API:`.
 
-### 🎯 Misión
+Define contratos de integración coherentes con requisitos, datos y guidelines; los entrega a QA Tech.
 
-Su responsabilidad exclusiva es el estado de los datos "en movimiento". Asume la propiedad total de las interfaces de comunicación, asegurando que la información modelada por el Data Architect sea expuesta de manera segura, eficiente y estandarizada para cualquier cliente (Web, Mobile o servicios de terceros). Opera bajo el **Principio de Desacoplamiento**: el backend que diseña es agnóstico al frontend que lo consume.
+## Directivas
 
-### 📦 Entradas y Artefactos de Salida
+El perfil [AGENTS.md](AGENTS.md) se compila desde [api-architect.agent.md](agents/api-architect.agent.md), sus instrucciones y skills:
 
-* **Entradas (Lectura):**
-  * `db_*.md` (Modelo Entidad-Relación y diccionario de datos generado por el Data Architect en `data-architect`).
-  * `hu_*.md` (Historias de Usuario aprobadas en `business-analyst` con Criterios Gherkin).
-  * `.specify/memory/constitution.md` (opcional: protocolos de comunicación y servicios del sistema legado).
-  * Directivas del `@DA:` leídas desde el `tracker_bmad.md`.
-* **Artefacto Generado:** `api_[nombre_corto].md` (El documento maestro de contratos, rutas, endpoints, esquemas JSON y códigos HTTP).
-* **Handoff:** Transfiere el control mediante el tracker al **QA Técnico (`@QT:`)** para la auditoría cruzada de coherencia y compilación del Tech Design Document (TDD).
+- [api-template.instructions.md](instructions/api-template.instructions.md)
 
-### ⚙️ Pilares de Diseño y Responsabilidades
+## Contexto del proyecto
 
-* **1. Diseño de Interfaces y Esquemas Estrictos**
-  * Define la arquitectura de comunicación (endpoints REST, esquemas GraphQL o contratos de eventos asíncronos).
-  * Estructura los cuerpos de petición (*Request*) y respuesta (*Response*) en JSON puro y determinista, definiendo tipos de datos que el Developer Agent deberá programar.
+Las entradas y entregables están en [INPUTS_POR_AGENTE.md](../INPUTS_POR_AGENTE.md). Se escriben en el workspace seleccionado; el tracker usa `BMAD_TRACKER`, la configuración efectiva `BMAD_CONFIG` y los perfiles compartidos `ENGINE_ROOT`. Conserva el historial y registra un único destinatario por handoff.
 
-* **2. Subordinación a Protocolos Legacy (Modo Brownfield)**
-  * Si existe `.specify/memory/constitution.md`, subordina los contratos a los protocolos, servicios preexistentes y topología de red documentada, diseñando las capas de adaptación (BFF / Facade) y el mapeo formal de códigos de error hacia respuestas HTTP estándar.
-
-* **3. Traducción de Contingencias (Gherkin a HTTP)**
-  * Toma los escenarios de fallo descritos en el BDD de la Historia de Usuario y los mapea directamente al estándar de red con códigos de estado HTTP precisos: 400 (Bad Request), 401/403 (Seguridad), 404 (Not Found), y 409 (Conflict).
-
-* **4. Respeto Absoluto de Frontera (Inmutabilidad del Dominio)**
-  * Tiene una frontera de responsabilidad inquebrantable: **no puede modificar el modelo de datos**. Tiene estrictamente prohibido inventar tablas o columnas.
-  * Si detecta que el MER carece de atributos requeridos para armar el JSON funcional, debe registrar la inconsistencia para que se resuelva antes de compilar el TDD.
-
-* **5. Registro de Decisiones de Integración (ADRs en Formato MADR)**
-  * Documenta formalmente sus estrategias bajo el bloque de ADRs en formato MADR (métodos de paginación, rate limiting, esquemas de autenticación JWT), detallando alternativas viables reales y trade-offs de red/payload sin justificaciones cosméticas.
-  * En proyectos Brownfield, asigna estado `Aceptado (heredado)` a las decisiones preexistentes sin inventar alternativas ficticias.
+La selección de proveedor y effort sigue el [contrato del runtime](../bmad_runtime/README.md). Consulta [GUIDE.md](../GUIDE.md) para compuertas, implementación y retrabajo.

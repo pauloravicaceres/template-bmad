@@ -4,7 +4,7 @@ from services.event_debouncer import EventDebouncer
 from models.observability import SystemNoticePayload
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_event_debouncer_coalesces_burst_into_single_event():
     """
     T020 / US4: Test that a burst of 10 consecutive mutations within < 200ms
@@ -48,7 +48,7 @@ async def test_event_debouncer_coalesces_burst_into_single_event():
     assert received_notices[0].absorbed_mutations_count == 10
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_event_debouncer_independent_resource_paths():
     """Test that different resource paths maintain isolated debounce timers."""
     dispatched = {}
@@ -75,7 +75,7 @@ async def test_event_debouncer_independent_resource_paths():
     assert dispatched["documents/doc_b.md"] == 5
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_event_debouncer_single_event_no_system_notice():
     """Test that a single isolated mutation (count=1) does not emit a SYSTEM_NOTICE."""
     dispatched = []

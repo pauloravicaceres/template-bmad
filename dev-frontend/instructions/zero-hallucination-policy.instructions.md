@@ -1,36 +1,24 @@
 ---
-description: 'Política estricta de Cero Alucinación para el agente Frontend Developer. Prohíbe mocks, uso de tipo "any", directivas legacy y fuerza Angular 22 Zoneless con Signals.'
+description: Reglas de calidad para el stack del workspace activo.
 applyTo: '**'
 ---
 
-# Zero Hallucination Policy — Frontend (Angular 22)
+## Contexto técnico del workspace
+Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
+Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
+WORKSPACE_ROOT/documents/architecture; si existe roles/dev-frontend.md, aplícalo.
+Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
+versiones ni herramientas desde el perfil compartido. Conserva las decisiones
+aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva
+la propuesta a SA y la aprobación al humano antes de imponer una tecnología.
 
-## 1. Fronteras Estrictas de Implementación
-- **Cero Placeholders y Mocks:** Tienes PROHIBIDO dejar funciones vacías (ej. `saveData() { // TODO }`) o inicializar Signals con arrays ficticios. Debes crear e inyectar el servicio `HttpClient` para consumir los datos reales.
-- **Cero Tipo "any":** Tienes estrictamente PROHIBIDO tipar variables, observables, signals o parámetros de función con `any`. Todo debe estar fuertemente tipado mediante Interfaces o Types.
-- **Cero Código Obsoleto (Legacy Angular):** 
-  - 🚫 PROHIBIDO importar `zone.js` o usar `NgModules`.
-  - 🚫 PROHIBIDO usar `*ngIf` o `*ngFor`.
-  - 🚫 PROHIBIDO suscribirte manualmente con `.subscribe()` cuando el flujo pueda resolverse nativamente con `toSignal()` o pipelines reactivos.
-- **Cero CSS Hackeado / Maquetación Prohibida en Componentes:**
-  - 🚫 PROHIBIDO usar `::ng-deep` para sobrescribir estilos de PrimeNG.
-  - 🚫 PROHIBIDO escribir reglas de maquetación (márgenes, paddings, flexbox, grids, gaps, posicionamiento) en los archivos `.css` o `.scss` de los componentes.
-  - ✅ OBLIGATORIO usar EXCLUSIVAMENTE las clases utilitarias de **Tailwind CSS v4** directamente en el `.html`. Ejemplos canónicos:
-    - Layout: `flex`, `flex-col`, `flex-row`, `flex-wrap`
-    - Alineación: `justify-between`, `justify-center`, `items-center`
-    - Espaciado: `p-2`, `p-4`, `m-0`, `gap-4`, `px-3`, `py-2` (escala Tailwind: 1 = 0.25rem)
-    - Grid Responsivo: `grid grid-cols-12 gap-4`, `col-span-12`, `md:col-span-6`, `lg:col-span-4`
-    - Bordes/Efectos: `rounded-md`, `rounded-lg`, `shadow-md`
-  - Para ajustes visuales propios de un componente PrimeNG usa exclusivamente `[style]`, `[class]` o `styleClass` en el propio tag del componente.
-
-## 2. Fidelidad Absoluta al Contrato
-- Las interfaces de TypeScript que definas para los payloads HTTP deben mapear exactamente con los DTOs expuestos en el `tech-design_*.md`. Si el diseño dice `productId: string`, no lo declares como `number`.
-
-## 3. Protocolo Anti-Confirmación Fantasma
-1. Ejecuta `write_file` para generar los componentes (`.ts`, `.html`).
-2. Obligatorio: Ejecuta `read_file` sobre las rutas recién escritas para verificar que el código está completo y bien formado.
-3. Solo tras validar físicamente los archivos, notifica la finalización en el tracker.
-
-
-[IMPORT_SKILL: skills/zoneless-validator/SKILL.md]
-[IMPORT_SKILL: skills/tracker-logger/SKILL.md]
+## Validación y entrega
+Implementa o verifica el tech-design aprobado y sus contratos exactos; no inventes
+campos, dependencias, respuestas simuladas en producción ni funcionalidad incompleta.
+Revisa físicamente los archivos escritos. Aplica el stack y las convenciones del
+workspace, sus validadores y pruebas, y documenta evidencia y fallos antes del handoff.
+Respeta autenticación, autorización por recurso, cancelación, límites de módulos,
+seguridad de entradas y rendimiento conforme a la arquitectura aprobada.
+Las pruebas validan comportamiento, con Arrange/Act/Assert, escenarios felices y
+adversos; nunca mocks tautológicos. No declares aprobada una entrega con fallos.
+Los commits y el cierre GitOps siguen exclusivamente el protocolo operativo.

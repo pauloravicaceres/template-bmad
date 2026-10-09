@@ -35,8 +35,8 @@ export class ApiClientError extends Error {
   }
 }
 
-export const DEFAULT_API_BASE = 'http://localhost:8000/api/v1'
-export const DEFAULT_WS_URL = 'ws://localhost:8000/ws/v1/events'
+export const DEFAULT_API_BASE = (import.meta.env.VITE_BMAD_API_BASE || 'http://localhost:8000/api/v1').replace(/\/$/, '')
+export const DEFAULT_WS_URL = DEFAULT_API_BASE.replace(/^http/, 'ws').replace(/\/api\/v1$/, '/ws/v1/events')
 
 export async function fetchWorkflowStatus(
   includeHistory = true,

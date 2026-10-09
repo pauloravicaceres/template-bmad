@@ -5,7 +5,17 @@ from pathlib import Path
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent.parent
 TRACKER_PATH = DIRECTORIO_RAIZ / "documents" / "tracker_bmad.md"
 
-def registrar_respuesta():
+def registrar_respuesta(argv=None):
+    import argparse
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from bmad_runtime.context import add_project_arguments, resolve_context
+    parser = argparse.ArgumentParser(description='Record a human response in the selected project tracker.')
+    add_project_arguments(parser)
+    args = parser.parse_args(argv)
+    context = resolve_context(Path(__file__).resolve().parents[1], workspace=args.workspace, project=args.project)
+    global TRACKER_PATH
+    TRACKER_PATH = context.tracker_path
     
     print("===================================================")
     print("🤖 BMAD CLI - Entrada del Humano (@HUMANO)")

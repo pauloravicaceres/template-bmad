@@ -33,11 +33,13 @@ def _get_utc_now() -> str:
 async def lifespan(app: FastAPI):
     """Lifespan event handler for starting and stopping background file watcher."""
     loop = asyncio.get_running_loop()
-    file_watcher.start(loop)
+    if settings.HAS_PROJECT:
+        file_watcher.start(loop)
     try:
         yield
     finally:
-        file_watcher.stop()
+        if settings.HAS_PROJECT:
+            file_watcher.stop()
 
 
 app = FastAPI(
@@ -58,6 +60,17 @@ app.add_middleware(
 # Mount API and WebSocket routers
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(ws_router)
+
+
+@app.middleware('http')
+async def require_selected_project(request: Request, call_next):
+    if (not settings.HAS_PROJECT and request.url.path.startswith('/api/v1/')
+            and request.url.path.rstrip('/') not in {'/api/v1/project', '/api/v1/projects'}):
+        return JSONResponse(status_code=409, content={
+            'error_code': 'PROJECT_NOT_SELECTED',
+            'detail': 'Selecciona BMAD_WORKSPACE o BMAD_PROJECT al iniciar este backend.',
+        })
+    return await call_next(request)
 
 
 # -------------------------------------------------------------

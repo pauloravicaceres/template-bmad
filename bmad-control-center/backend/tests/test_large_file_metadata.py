@@ -51,7 +51,7 @@ class TestLargeFileMetadataPolicy:
 
         loop.close()
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_broadcast_artifact_changed_enforces_metadata_only(self):
         cm = ConnectionManager()
         dispatched_messages = []

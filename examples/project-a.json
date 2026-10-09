@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "project_id": "proyecto-a",
+  "config": {
+    "project_name": "Proyecto A",
+    "project_type": "headless",
+    "ux_phase": "off",
+    "code_dirs": { "backend": "app/backend" },
+    "ai": {
+      "agents": { "business-analyst": { "provider": "claude", "options": { "effort": "medium" } } }
+    }
+  }
+}

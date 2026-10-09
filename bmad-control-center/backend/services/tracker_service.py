@@ -12,6 +12,8 @@ class TrackerService:
         self.lock = FileLock(self.lock_path, timeout=5)
 
     def read_tracker(self) -> str:
+        if not os.path.exists(self.file_path):
+            return ""
         with self.lock:
             if not os.path.exists(self.file_path):
                 return ""

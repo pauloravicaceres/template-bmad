@@ -1,30 +1,26 @@
 ---
 name: qa-strict-testing
-description: Skill de rigor analítico para el QA Automation. Fuerza el diseño adversarial, prohíbe tautologías e impone pruebas exhaustivas de validadores y estado reactivo.
+description: Reglas de calidad para el stack del workspace activo.
 type: skill
-tags: [qa, testing, xunit, jest, auditoria]
+tags: [calidad, workspace]
 ---
 
-# Rigor de Pruebas (Zero-Tautology Policy)
+## Contexto técnico del workspace
+Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
+Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
+WORKSPACE_ROOT/documents/architecture; si existe roles/qa-auto.md, aplícalo.
+Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
+versiones ni herramientas desde el perfil compartido. Conserva las decisiones
+aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva
+la propuesta a SA y la aprobación al humano antes de imponer una tecnología.
 
-## Workflow de Auto-Auditoría para Pruebas Generadas
-Antes de reportar éxito en el tracker, revisa tu propio código de pruebas aplicando este checklist. Si fallas en algo, corrígelo con `write_file`:
-
-### 1. Diseño Adversarial y Casos Límite
-- ¿Implementaste al menos **1 Happy Path** y **2 Sad Paths** por cada Feature?
-- ¿Probaste condiciones límite (ej. fechas en el pasado, strings vacíos, IDs inexistentes)?
-- **Aislamiento de Validación (.NET):** ¿Escribiste pruebas específicas para la clase `AbstractValidator<TCommand>` (ej. usando `TestValidate()`) independientemente del Handler?
-
-### 2. Detección de Pruebas Tautológicas (Anti-Patrón)
-- Verifica tus bloques `// Assert`. 
-- **PROHIBIDO** mockear un repositorio para que devuelva `X`, inyectarlo en una clase que simplemente devuelve lo que le da el repositorio, y afirmar que `Assert.Equal(X, result)`. 
-- *Corrección:* Si el servicio es un simple passthrough, prueba el Endpoint a nivel de integración. En pruebas unitarias, enfócate en la lógica condicional, bucles y transformación de datos.
-
-### 3. Cobertura del Ecosistema Angular 22
-- En Jest, ¿estás probando la lógica reactiva? 
-- No te limites a probar el DOM (`fixture.nativeElement.querySelector`). Debes invocar los métodos del componente y verificar usando `expect(component.mySignal()).toBe(...)` para asegurar que la mutación del estado reactivo (Signals) es matemáticamente correcta tras la acción.
-
-### 4. Limpieza y Descarte
-- Si levantaste contenedores Docker con Testcontainers, ¿te aseguraste de que la clase de prueba implemente `DisposeAsync()` para destruir el contenedor al terminar la suite?
-
-No notifiques finalización hasta que el código de prueba sea robusto, destructivo y mantenible.
+## Validación y entrega
+Implementa o verifica el tech-design aprobado y sus contratos exactos; no inventes
+campos, dependencias, respuestas simuladas en producción ni funcionalidad incompleta.
+Revisa físicamente los archivos escritos. Aplica el stack y las convenciones del
+workspace, sus validadores y pruebas, y documenta evidencia y fallos antes del handoff.
+Respeta autenticación, autorización por recurso, cancelación, límites de módulos,
+seguridad de entradas y rendimiento conforme a la arquitectura aprobada.
+Las pruebas validan comportamiento, con Arrange/Act/Assert, escenarios felices y
+adversos; nunca mocks tautológicos. No declares aprobada una entrega con fallos.
+Los commits y el cierre GitOps siguen exclusivamente el protocolo operativo.

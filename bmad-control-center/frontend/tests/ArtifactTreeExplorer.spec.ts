@@ -77,7 +77,7 @@ describe('ArtifactTreeExplorer Component', () => {
     expect(wrapper.text()).toContain('documents')
     expect(wrapper.text()).toContain('business-analyst')
     expect(wrapper.text()).toContain('empty-agent')
-    expect(wrapper.text()).toContain('(0) [VACÍO]')
+    expect(wrapper.text()).toMatch(/empty-agent\s*\(0\)/)
   })
 
   it('AlEscribirEnFiltroDeBusqueda_DebeFiltrarNodosCoincidentes', async () => {

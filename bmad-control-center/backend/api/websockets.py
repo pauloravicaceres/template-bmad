@@ -1,6 +1,7 @@
 import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from services.connection_manager import manager
+from core.config import settings
 
 router = APIRouter(tags=["WebSockets Live Feed"])
 
@@ -10,6 +11,9 @@ async def handle_websocket_session(websocket: WebSocket):
     Handles bidirectional WebSocket session with heartbeat, subscriptions
     and WS 1008 Policy Violation guard for malformed frames (ADR-011 / ADR-012).
     """
+    if not settings.HAS_PROJECT:
+        await websocket.close(code=1008, reason='ProjectNotSelected')
+        return
     await manager.connect(websocket)
     try:
         while True:

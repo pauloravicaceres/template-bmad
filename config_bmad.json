@@ -1,24 +1,78 @@
 {
-    "project_name": "Dashboard BMAD",
-    "project_type": "ui",
-    "created_at": "2026-10-02 19:57:52",
-    "context": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\.specify\\memory\\constitution.md",
-    "tracker": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\tracker_bmad.md",
-    "routes_bmad": {
-        "business-storyteller": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\business-storyteller",
-        "product-analyst": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\product-analyst",
-        "product-manager": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\product-manager",
-        "business-analyst": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\business-analyst",
-        "qa-documental": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\qa-documental",
-        "designer-ux": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\designer-ux",
-        "solutions-architect": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\solutions-architect",
-        "data-architect": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\data-architect",
-        "api-architect": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\api-architect",
-        "qa-tech": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\qa-tech",
-        "dev-backend": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\dev-backend",
-        "dev-frontend": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\dev-frontend",
-        "qa-auto": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\qa-auto",
-        "code-review": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\code-review",
-        "devops": "D:\\Paulo\\Cursos\\DMC\\template-bmad\\documents\\devops"
-    }
+    "ai": {
+        "schema_version": 1,
+        "defaults": {
+            "provider": "claude",
+            "model": null
+        },
+        "providers": {
+            "claude": {
+                "executable": "claude"
+            },
+            "codex": {
+                "executable": "codex"
+            },
+            "gemini": {
+                "executable": "gemini"
+            }
+        },
+        "phases": {
+            "B": {
+                "provider": "codex",
+                "model": "gpt-6-astra",
+                "options": {
+                    "effort": "low"
+                }
+            },
+            "M": {
+                "provider": "codex",
+                "model": "gpt-6-astra",
+                "options": {
+                    "effort": "low"
+                }
+            },
+            "A": {
+                "provider": "codex",
+                "model": "gpt-6-astra",
+                "options": {
+                    "effort": "medium"
+                }
+            },
+            "D": {
+                "provider": "codex",
+                "model": "gpt-6-astra",
+                "options": {
+                    "effort": "medium"
+                }
+            }
+        },
+        "agents": {
+            "business-analyst": {
+                "provider": "claude",
+                "options": {
+                    "effort": "medium"
+                }
+            },
+            "solutions-architect": {
+                "provider": "codex",
+                "model": "gpt-6-astra",
+                "options": {
+                    "sandbox": "workspace-write",
+                    "effort": "medium"
+                }
+            }
+        },
+        "speckit": {
+            "clarify": {
+                "provider": "claude"
+            },
+            "implement": {
+                "provider": "codex"
+            }
+        },
+        "git": {
+            "auto_commit": false
+        }
+    },
+    "projects": {}
 }

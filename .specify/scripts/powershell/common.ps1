@@ -1,6 +1,27 @@
 #!/usr/bin/env pwsh
 # Common PowerShell functions analogous to common.sh
 
+function Assert-BmadOutput {
+    param([string]$RepoRoot, [string]$OutputPath, [string]$Subdirectory = '')
+    if (-not $env:WORKSPACE_ROOT -and -not (Test-Path -LiteralPath (Join-Path $RepoRoot 'project.json'))) { return }
+    $rootPath = [System.IO.Path]::GetFullPath($RepoRoot).TrimEnd('/', '\')
+    $allowed = if ($Subdirectory) { Join-Path $rootPath $Subdirectory } else { $rootPath }
+    $candidate = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $rootPath $OutputPath }
+    $candidate = [System.IO.Path]::GetFullPath($candidate)
+    if (-not $candidate.StartsWith($allowed + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "BMAD output escapes the project perimeter: $OutputPath"
+    }
+    $ancestor = $candidate
+    while ($ancestor -and $ancestor -ne $rootPath) {
+        if (Test-Path -LiteralPath $ancestor) {
+            if ((Get-Item -LiteralPath $ancestor -Force).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+                throw "BMAD output traverses a link/junction: $ancestor"
+            }
+        }
+        $ancestor = Split-Path $ancestor -Parent
+    }
+}
+
 
 # Find repository root by searching upward for .specify directory
 # This is the primary marker for spec-kit projects
@@ -80,6 +101,14 @@ function Resolve-SpecifyInitDir {
 function Get-RepoRoot {
     param([switch]$ReturnNullOnError)
 
+    if ($env:WORKSPACE_ROOT) {
+        if (-not [System.IO.Path]::IsPathRooted($env:WORKSPACE_ROOT)) { throw 'WORKSPACE_ROOT must be absolute' }
+        if ($env:SPECIFY_INIT_DIR -and [System.IO.Path]::GetFullPath($env:SPECIFY_INIT_DIR).TrimEnd('/', '\') -ne [System.IO.Path]::GetFullPath($env:WORKSPACE_ROOT).TrimEnd('/', '\')) {
+            throw 'SPECIFY_INIT_DIR differs from WORKSPACE_ROOT'
+        }
+        $env:SPECIFY_INIT_DIR = $env:WORKSPACE_ROOT
+    }
+
     # Explicit project override wins (see Resolve-SpecifyInitDir).
     if ($env:SPECIFY_INIT_DIR) {
         return (Resolve-SpecifyInitDir -ReturnNullOnError:$ReturnNullOnError)
@@ -117,6 +146,9 @@ function Save-FeatureJson {
         [Parameter(Mandatory = $true)][string]$RepoRoot,
         [Parameter(Mandatory = $true)][string]$FeatureDirectory
     )
+
+    Assert-BmadOutput -RepoRoot $RepoRoot -OutputPath $FeatureDirectory -Subdirectory 'specs'
+    Assert-BmadOutput -RepoRoot $RepoRoot -OutputPath '.specify/feature.json'
 
     # Strip repo root prefix if the value is absolute and under repo root.
     # Use case-insensitive comparison on Windows only (case-sensitive filesystems elsewhere).
@@ -212,6 +244,8 @@ function Get-FeaturePathsEnv {
         if ($ReturnNullOnError) { return $null }
         exit 1
     }
+
+    Assert-BmadOutput -RepoRoot $repoRoot -OutputPath $featureDir -Subdirectory 'specs'
 
     # When no branch context exists (no SPECIFY_FEATURE, feature resolved via
     # SPECIFY_FEATURE_DIRECTORY or feature.json), fall back to the feature

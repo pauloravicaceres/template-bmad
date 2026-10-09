@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     './components/**/*.{js,vue,ts}',
     './layouts/**/*.vue',
@@ -9,7 +10,12 @@ export default {
     './error.vue'
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }

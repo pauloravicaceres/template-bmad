@@ -24,7 +24,7 @@ def qa_client():
 class TestHU003WorkflowAndArtifactNotificationCertification:
     """Certificación de Criterios de Aceptación para notificaciones WebSocket estructuradas (SC-01 y SC-02)."""
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_BroadcastWorkflowUpdated_CuandoSeEmiteMutacionEnTracker_DebeEntregarEnvelopeTipadoAClientes(self):
         # Arrange
         mgr = ConnectionManager()
@@ -56,7 +56,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
         assert len(received_messages) == 1
         msg = received_messages[0]
         assert msg["event_type"] == "WORKFLOW_UPDATED"
-        assert msg["resource_path"] == "documents/tracker_bmad.md"
+        assert msg["resource_path"] == "handoffs/tracker_bmad.md"
         assert msg["coalesced_count"] == 2
         assert "timestamp" in msg
         assert msg["payload"]["active_stage"] == "BA"
@@ -64,7 +64,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
         assert msg["payload"]["handoff_target"] == "@BA:"
         assert msg["payload"]["has_pulse"] is True
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_BroadcastArtifactChanged_CuandoSeCreaOModificaArchivo_DebeEntregarEnvelopeTipadoConMetadatos(self):
         # Arrange
         mgr = ConnectionManager()
@@ -104,7 +104,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
 class TestHU003DebouncerAndThrottlingCertification:
     """Certificación del mecanismo de coalescencia y absorción de ráfagas I/O (SC-04 / CB-02 / ADR-010)."""
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_EventDebouncer_ConRafagaDeMutacionesEnVentanaDe200ms_DebeCoalescerEnUnSoloEvento(self):
         # Arrange
         loop = asyncio.get_running_loop()
@@ -135,7 +135,7 @@ class TestHU003DebouncerAndThrottlingCertification:
         assert len(dispatched_counts) == 1
         assert dispatched_counts[0] == 4
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_EventDebouncer_ConRafagaDeMutaciones_DebeInvocarCallbackSystemNoticeConTelemetria(self):
         # Arrange
         loop = asyncio.get_running_loop()
@@ -174,7 +174,7 @@ class TestHU003DebouncerAndThrottlingCertification:
         assert notice.absorbed_mutations_count == 3
         assert "documents/data-architect/schema.md" in notice.coalesced_resource
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_EventDebouncer_ConRutasDistintas_DebeMantenerBuffersIndependientes(self):
         # Arrange
         loop = asyncio.get_running_loop()
@@ -302,7 +302,7 @@ class TestHU003WebSocketProtocolGuardCertification:
 class TestHU003LargeFileMetadataOnlyPolicyCertification:
     """Certificación de la Política Metadata-Only para archivos mayores a 5MB (CB-05 / ADR-012)."""
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_BroadcastArtifactChanged_ConArchivoMayorA5MB_DebeEstablecerMetadataOnlyTrueYIsLargeFileTrue(self):
         # Arrange
         mgr = ConnectionManager()

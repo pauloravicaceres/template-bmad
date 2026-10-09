@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white border border-gray-200 rounded-lg shadow-xs overflow-hidden flex flex-col h-full">
     <!-- Header -->
-    <div class="p-3 border-b border-gray-100 bg-gray-50/70 flex items-center justify-between">
+    <div class="p-3 border-b border-gray-100 bg-gray-50/70 dark:bg-slate-800 dark:border-slate-700 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="text-xs">📡</span>
         <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -22,7 +22,7 @@
       <div
         v-for="(ev, idx) in recentEvents"
         :key="ev.event_id || idx"
-        class="p-2.5 rounded-lg border transition-all text-xs space-y-1 bg-gray-50/80 hover:bg-gray-100/60"
+        class="p-2.5 rounded-lg border transition-all text-xs space-y-1 bg-gray-50/80 hover:bg-gray-100/60 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-600"
         :class="getEventBorderClass(ev.event_type || ev.event)"
       >
         <!-- Top row: Type, Time, Badge -->

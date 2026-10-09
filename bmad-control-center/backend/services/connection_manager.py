@@ -134,7 +134,8 @@ class ConnectionManager:
         event_payload = {
             "event_id": event_id,
             "event_type": "WORKFLOW_UPDATED",
-            "resource_path": "documents/tracker_bmad.md",
+            "resource_path": settings.TRACKER_FILE.relative_to(settings.WORKSPACE_ROOT).as_posix(),
+            "project_id": settings.PROJECT_ID,
             "timestamp": now_iso,
             "coalesced_count": coalesced_count,
             "payload": payload,

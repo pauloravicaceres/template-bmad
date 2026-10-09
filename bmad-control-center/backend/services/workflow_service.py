@@ -94,7 +94,8 @@ class WorkflowService:
         """Etapa del bloque WATCHER en `index`, mirando el primer autor no-WATCHER anterior."""
         for i in range(index - 1, -1, -1):
             role_i = blocks[i]["author_role"]
-            if role_i != "WATCHER":
+            # HUMANO no es una etapa del pipeline: sus entradas (aprobaciones, reanudaciones) no cambian la fase del watcher
+            if role_i not in ("WATCHER", "HUMANO"):
                 return self._watcher_key(ROLE_TO_KEY.get(role_i))
         return "W-QA"
 
@@ -294,7 +295,8 @@ class WorkflowService:
             key = ROLE_TO_KEY.get(role)
             if key and key not in ["W-QA", "W-SA", "W-IMP"]:
                 completed_stage_map[key] = block
-                last_canonical_key = key
+                if key != "HUMANO":
+                    last_canonical_key = key
             elif role == "WATCHER":
                 key = self._watcher_key(last_canonical_key)
                 completed_stage_map[key] = block

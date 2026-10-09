@@ -67,4 +67,4 @@ class TestPerimeterSandboxing:
         assert data["ignored_external_events_count"] >= 2
         assert data["debounce_window_ms"] == 200
         assert data["large_file_threshold_bytes"] == 5242880
-        assert len(data["monitored_roots"]) == 3
+        assert len(data["monitored_roots"]) == 4

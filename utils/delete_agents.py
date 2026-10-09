@@ -28,6 +28,9 @@ def seleccionar_carpetas():
     return AGENTS
         
 def main():
+    import os
+    if os.environ.get('BMAD_WORKSPACE') or os.environ.get('WORKSPACE_ROOT') or any(arg.startswith(('--workspace', '--project')) for arg in sys.argv):
+        raise SystemExit('Legacy engine maintenance is disabled in a project context.')
     # utils/clean_folders.py -> raíz del proyecto
     raiz_proyecto = Path(__file__).resolve().parent.parent
 

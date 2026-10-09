@@ -46,7 +46,7 @@ class TestWebSocketEvents:
             msg = json.loads(raw)
 
             assert msg["event_type"] == "WORKFLOW_UPDATED"
-            assert msg["resource_path"] == "documents/tracker_bmad.md"
+            assert msg["resource_path"] == "handoffs/tracker_bmad.md"
             assert msg["coalesced_count"] == 3
             assert msg["payload"]["active_stage"] == "UX"
             assert msg["payload"]["agent_role"] == "Designer UX"

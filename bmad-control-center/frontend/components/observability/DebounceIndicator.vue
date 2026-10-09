@@ -9,7 +9,7 @@
   >
     <div
       v-if="show"
-      class="inline-flex items-center gap-1.5 bg-yellow-100 border border-yellow-400 text-yellow-900 px-2.5 py-0.5 rounded-full text-[11px] font-medium shadow-xs"
+      class="inline-flex items-center gap-1.5 bg-yellow-100 border border-yellow-400 text-yellow-900 dark:bg-amber-950/80 dark:border-amber-700 dark:text-amber-200 px-2.5 py-0.5 rounded-full text-[11px] font-medium shadow-xs"
     >
       <span class="text-xs">⚡</span>
       <span>

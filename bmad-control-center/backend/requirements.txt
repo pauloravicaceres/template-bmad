@@ -4,6 +4,7 @@ watchdog
 filelock
 pydantic
 pytest
+anyio
 flake8
 websockets
 httpx

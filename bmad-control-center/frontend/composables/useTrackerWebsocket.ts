@@ -1,6 +1,6 @@
 import { ref, computed, onMounted, onUnmounted, getCurrentInstance } from 'vue'
 import type { WebSocketMessage } from '../types'
-import { fetchWorkflowStatus, fetchArtifactsTree } from '../services/api_client'
+import { fetchWorkflowStatus, fetchArtifactsTree, DEFAULT_WS_URL } from '../services/api_client'
 
 export type ConnectionStatus = 'CONNECTED' | 'RECONNECTING' | 'DISCONNECTED'
 
@@ -10,8 +10,8 @@ export interface UseTrackerWebsocketOptions {
   onCatchUpSync?: () => void | Promise<void>
 }
 
-export function useTrackerWebsocket(optionsOrUrl: string | UseTrackerWebsocketOptions = 'ws://localhost:8000/ws') {
-  const url = typeof optionsOrUrl === 'string' ? optionsOrUrl : optionsOrUrl.url || 'ws://localhost:8000/ws'
+export function useTrackerWebsocket(optionsOrUrl: string | UseTrackerWebsocketOptions = DEFAULT_WS_URL) {
+  const url = typeof optionsOrUrl === 'string' ? optionsOrUrl : optionsOrUrl.url || DEFAULT_WS_URL
   const apiBase = typeof optionsOrUrl === 'object' ? optionsOrUrl.apiBase : undefined
   const onCatchUpSync = typeof optionsOrUrl === 'object' ? optionsOrUrl.onCatchUpSync : undefined
 

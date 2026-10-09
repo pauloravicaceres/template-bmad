@@ -1,0 +1,16 @@
+{
+  "project_type": "fullstack",
+  "ai": {
+    "schema_version": 1,
+    "defaults": {"provider": "claude", "model": null},
+    "providers": {
+      "claude": {"executable": "claude"},
+      "codex": {"executable": "codex"},
+      "gemini": {"executable": "gemini"}
+    },
+    "phases": {"M": {"provider": "claude"}, "D": {"provider": "codex"}},
+    "agents": {"business-analyst": {"provider": "gemini"}},
+    "speckit": {"implement": {"provider": "codex"}},
+    "git": {"auto_commit": false}
+  }
+}

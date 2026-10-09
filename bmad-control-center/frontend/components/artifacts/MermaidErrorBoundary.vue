@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useSafeMermaid, type MermaidRenderResult } from '../../composables/useSafeMermaid'
 
 interface Props {
@@ -74,6 +74,7 @@ const isLoading = ref<boolean>(true)
 const result = ref<MermaidRenderResult | null>(null)
 
 let idCounter = 0
+let themeObserver: MutationObserver | null = null
 const generateUniqueId = (): string => {
   idCounter++
   return props.diagramId || `mermaid-diagram-${Date.now()}-${idCounter}`
@@ -98,7 +99,14 @@ const compile = async (): Promise<void> => {
 
 onMounted(() => {
   compile()
+  themeObserver = new MutationObserver(() => compile())
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  })
 })
+
+onBeforeUnmount(() => themeObserver?.disconnect())
 
 watch(
   () => props.code,

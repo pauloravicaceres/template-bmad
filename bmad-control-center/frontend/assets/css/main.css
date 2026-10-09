@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
 /* Ocultar la insignia / badge de licencia de PrimeUI en la esquina inferior derecha */
 body > div[style*="fixed"][style*="bottom"],
 body > div[style*="position: fixed"],
@@ -13,4 +17,121 @@ a[href*="primefaces"] {
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+/* Colores base para las utilidades Tailwind existentes en el tema oscuro. */
+.dark body {
+  background-color: #111827;
+  color: #e5e7eb;
+}
+
+.dark .bg-gray-100 { background-color: #111827; }
+.dark .bg-gray-50 { background-color: #1f2937; }
+.dark .bg-white { background-color: #1f2937; }
+.dark .text-gray-900 { color: #f9fafb; }
+.dark .text-gray-800 { color: #f3f4f6; }
+.dark .text-gray-700 { color: #e5e7eb; }
+.dark .text-gray-600 { color: #d1d5db; }
+.dark .text-gray-500 { color: #e5e7eb; }
+.dark .text-gray-400,
+.dark .text-slate-400 { color: #d1d5db; }
+.dark .text-slate-600,
+.dark .text-slate-700 { color: #e2e8f0; }
+.dark .bg-slate-100,
+.dark .bg-slate-200 { background-color: #374151; }
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300 { border-color: #374151; }
+.dark .hover\:bg-gray-50:hover { background-color: #374151; }
+
+/* Contraste de Markdown y tablas en el visor de entregables. */
+.dark .markdown-body {
+  color: #e5e7eb;
+}
+
+.dark .markdown-body h1,
+.dark .markdown-body h2,
+.dark .markdown-body h3,
+.dark .markdown-body h4,
+.dark .markdown-body strong {
+  color: #f8fafc;
+}
+
+.dark .markdown-body table,
+.dark .markdown-body th,
+.dark .markdown-body td {
+  border-color: #475569;
+}
+
+.dark .markdown-body th {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+.dark .markdown-body td {
+  background-color: #1f2937;
+  color: #e2e8f0;
+}
+
+.dark .markdown-body code {
+  background-color: #374151;
+  color: #fca5a5;
+}
+
+.dark .markdown-body pre code {
+  background: transparent;
+  color: inherit;
+}
+
+.dark .markdown-body a {
+  color: #93c5fd;
+}
+
+/* Fondo de la lista del explorador en tema oscuro. */
+html.dark .scroll-personalizado {
+  background-color: #1f2937 !important;
+}
+
+/* Scrollbars oscuros en toda la app; Firefox usa scrollbar-color. */
+html.dark,
+html.dark body,
+html.dark * {
+  scrollbar-color: #64748b #1f2937 !important;
+  scrollbar-width: thin;
+}
+
+html.dark,
+html.dark body {
+  color-scheme: dark;
+}
+
+/* Chrome, Edge y Safari usan estos pseudo-elementos. */
+html.dark::-webkit-scrollbar,
+html.dark body::-webkit-scrollbar,
+html.dark *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background: #1f2937 !important;
+}
+
+html.dark::-webkit-scrollbar-track,
+html.dark body::-webkit-scrollbar-track,
+html.dark *::-webkit-scrollbar-track,
+html.dark *::-webkit-scrollbar-track-piece,
+html.dark *::-webkit-scrollbar-corner {
+  background: #1f2937 !important;
+}
+
+html.dark::-webkit-scrollbar-thumb,
+html.dark body::-webkit-scrollbar-thumb,
+html.dark *::-webkit-scrollbar-thumb {
+  background: #475569 !important;
+  border: 2px solid #1f2937;
+  border-radius: 8px;
+}
+
+html.dark::-webkit-scrollbar-thumb:hover,
+html.dark body::-webkit-scrollbar-thumb:hover,
+html.dark *::-webkit-scrollbar-thumb:hover {
+  background: #64748b !important;
 }

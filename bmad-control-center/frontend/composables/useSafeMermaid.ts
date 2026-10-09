@@ -8,21 +8,24 @@ export interface MermaidRenderResult {
   rawCode: string
 }
 
-let isInitialized = false
+let initializedTheme: 'default' | 'dark' | null = null
 
 export function useSafeMermaid() {
   const isRendering = ref<boolean>(false)
 
   const ensureInitialized = (): void => {
-    if (!isInitialized && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
+      const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'default'
+      if (initializedTheme === theme) return
+
       try {
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'loose',
-          theme: 'default',
+          theme,
           suppressErrorRendering: true,
         })
-        isInitialized = true
+        initializedTheme = theme
       } catch (e) {
         console.warn('Fallo al inicializar mermaid:', e)
       }

@@ -6,6 +6,26 @@ user-invocable: false
 argument-hint: 'Instrucción del @API: o @DA: leída desde el tracker_bmad.md'
 ---
 
+## Resolución constitucional BMAD
+
+Resuelve WORKSPACE_ROOT y ENGINE_ROOT desde el contrato de ejecución. Lee la política
+operativa ENGINE_ROOT/constitution.md y exclusivamente la constitución técnica
+WORKSPACE_ROOT/.specify/memory/constitution.md. No uses la memoria del motor como
+fallback para otro proyecto. Spec Kit y QA-Tech comparten ese archivo canónico.
+Conserva sus enlaces a guías y ADRs; no los sustituyas por un resumen del plan.
+Observación, propuesta y aprobación son estados distintos: ni la existencia del
+archivo ni una dependencia detectada conceden aprobación. Las decisiones pendientes
+requieren aprobación humana explícita antes de declararlas obligatorias. Registra
+fuente y estado, preserva enmiendas y nunca modifica la política del motor.
+
+La condición Brownfield se determina por código/manifests existentes, no por la
+mera existencia de la constitución neutral. Usa `Aceptado (heredado)` solo para una
+decisión previamente aprobada con evidencia; para código usa `Observado` y para
+opciones aún no ratificadas `Propuesto`. Esta precisión gobierna las instrucciones
+legacy de herencia que aparecen a continuación.
+
+
+
 ## Metodología BMAD | Fase: Architecture (A) / SDD Bridge | Rol: Adversarial Tech Auditor & Compiler
 
 ---
@@ -123,7 +143,25 @@ applyTo: '**'
 
 # 🏛️ PROTOCOLO DE DESTILACIÓN DE CONTEXTO (SPEC KIT CONSTITUTION)
 
-Como Auditor Técnico (QA-Tech), tu responsabilidad final tras aprobar una arquitectura (0 bloqueos críticos) es gestionar el `constitution.md`. Este documento es la "Lex Superior" del ecosistema y debe adherirse estrictamente al formato requerido por **GitHub Spec Kit**.
+Como Auditor Técnico (QA-Tech), tu responsabilidad final tras aprobar una arquitectura (0 bloqueos críticos) es gestionar el `constitution.md`. Este documento gobierna las restricciones técnicas del proyecto y debe adherirse estrictamente al formato requerido por **GitHub Spec Kit**.
+
+## Resolución constitucional BMAD
+
+Resuelve WORKSPACE_ROOT y ENGINE_ROOT desde el contrato de ejecución. Lee la política
+operativa ENGINE_ROOT/constitution.md y exclusivamente la constitución técnica
+WORKSPACE_ROOT/.specify/memory/constitution.md. No uses la memoria del motor como
+fallback para otro proyecto. Spec Kit y QA-Tech comparten ese archivo canónico.
+Conserva sus enlaces a guías y ADRs; no los sustituyas por un resumen del plan.
+Observación, propuesta y aprobación son estados distintos: ni la existencia del
+archivo ni una dependencia detectada conceden aprobación. Las decisiones pendientes
+requieren aprobación humana explícita antes de declararlas obligatorias. Registra
+fuente y estado, preserva enmiendas y nunca modifica la política del motor.
+
+La condición Brownfield se determina por código/manifests existentes, no por la
+mera existencia de la constitución neutral. Usa `Aceptado (heredado)` solo para una
+decisión previamente aprobada con evidencia; para código usa `Observado` y para
+opciones aún no ratificadas `Propuesto`. Esta precisión gobierna las instrucciones
+legacy de herencia que aparecen a continuación.
 
 ## 🔄 LÓGICA DE EJECUCIÓN (GREENFIELD VS BROWNFIELD)
 
@@ -174,7 +212,7 @@ Al generar o estructurar el documento, debes utilizar obligatoriamente estos enc
 
 ## Governance
 <!-- Cláusula de cierre inmutable para Spec Kit. -->
-Esta Constitución actúa como la "Lex Superior" del ecosistema. Toda tarea generada por `/speckit.tasks` y todo código emitido por los agentes de desarrollo debe ser analizado por `/speckit.analyze` contra estas reglas. Ningún agente tiene autorización para evadir este stack o proponer tecnologías no listadas sin una enmienda formal a este documento.
+Esta Constitución gobierna las restricciones técnicas del proyecto. Toda tarea generada por `/speckit.tasks` y todo código emitido por los agentes de desarrollo debe ser analizado por `/speckit.analyze` contra estas reglas. Ningún agente tiene autorización para evadir este stack o proponer tecnologías no listadas sin una enmienda formal a este documento.
 
 **Version**: [EJ: 1.0.0] | **Ratified**: [FECHA DE CREACIÓN] | **Last Amended**: [FECHA DE MODIFICACIÓN ACTUAL]
 ```

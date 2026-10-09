@@ -1,22 +1,26 @@
 ---
 name: devops-validator
-description: Skill de auto-auditoría para el agente DevOps. Valida la seguridad, los multi-stage builds y la resiliencia del compose antes del handoff.
+description: Reglas de calidad para el stack del workspace activo.
 type: skill
-tags: [devops, docker, ci-cd, auditoria]
+tags: [calidad, workspace]
 ---
 
-# Infra & Cloud Native Validator — Auditoría de Despliegue
+## Contexto técnico del workspace
+Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
+Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
+WORKSPACE_ROOT/documents/architecture; si existe roles/devops.md, aplícalo.
+Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
+versiones ni herramientas desde el perfil compartido. Conserva las decisiones
+aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva
+la propuesta a SA y la aprobación al humano antes de imponer una tecnología.
 
-## Workflow de Auto-Revisión OBLIGATORIO
-Antes de reportar éxito y pasar el turno en el tracker, debes ejecutar mentalmente este checklist sobre los archivos que acabas de aprovisionar (Compose, Dockerfile, Pipelines). Si algún paso falla, usa `write_file` para corregirlo:
-
-1. **Regla de Multi-Stage & Rootless:** 
-   - Lee tu `Dockerfile`. ¿La imagen base final es el SDK completo o un runtime ligero (`aspnet:8.0-alpine`)? ¿Declaraste `USER [nombre]` antes del comando `ENTRYPOINT`?
-2. **Regla de Secretos (Leak Prevention):**
-   - Escanea el `docker-compose.yml`. ¿Hay alguna contraseña en texto plano en la sección `environment:`? Si es así, cámbiala a `${VARIABLE}` y documenta que debe ir en el `.env`.
-3. **Regla de Sincronización de Arranque:**
-   - ¿La API (Backend) depende de PostgreSQL o Keycloak? Verifica que el `depends_on` de la API tenga explícitamente `condition: service_healthy` apuntando a la base de datos, y que la base de datos tenga un bloque `healthcheck` definido.
-4. **Regla de Paridad de Entorno:**
-   - ¿Aseguraste que las URLs internas (ej. la cadena de conexión de BD o el host de RabbitMQ) apunten a los *nombres de los contenedores* de la red interna de Docker (ej. `Host=eshopdb;` o `amqp://messagebus`) y NO a `localhost`?
-
-No notifiques finalización en el tracker hasta que la infraestructura sea robusta, segura y siga principios de Alta Disponibilidad.
+## Validación y entrega
+Implementa o verifica el tech-design aprobado y sus contratos exactos; no inventes
+campos, dependencias, respuestas simuladas en producción ni funcionalidad incompleta.
+Revisa físicamente los archivos escritos. Aplica el stack y las convenciones del
+workspace, sus validadores y pruebas, y documenta evidencia y fallos antes del handoff.
+Respeta autenticación, autorización por recurso, cancelación, límites de módulos,
+seguridad de entradas y rendimiento conforme a la arquitectura aprobada.
+Las pruebas validan comportamiento, con Arrange/Act/Assert, escenarios felices y
+adversos; nunca mocks tautológicos. No declares aprobada una entrega con fallos.
+Los commits y el cierre GitOps siguen exclusivamente el protocolo operativo.

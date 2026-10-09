@@ -1,33 +1,17 @@
-## 🏗️ Solutions Architect (SA) — Arquitecto de Soluciones y Gobernanza
+# Solutions Architect
 
-El agente **Solutions Architect** (o Enterprise Architect) es el estratega fundacional de la Fase de Arquitectura (A). Mientras otros agentes diseñan los engranajes específicos (tablas, endpoints), el SA define el "tablero de juego", los límites de infraestructura y el ecosistema tecnológico donde vivirá el software.
+Fase A; token `@SA:`.
 
-### 🎯 Misión
+Define guidelines y decisiones compatibles con la constitución. Recoge definiciones estratégicas cuando corresponda y emite SDD-FREEZE.
 
-Su misión es traducir las restricciones de negocio, el presupuesto y las capacidades operativas del equipo (leídas desde el Product Brief y el Backlog) en un marco arquitectónico viable. No diseña el MER ni los contratos JSON; establece el stack tecnológico, los estándares de seguridad, la estrategia de despliegue en la nube y la gobernanza global del proyecto.
+## Directivas
 
-### 📦 Entradas y Artefactos de Salida
+El perfil [AGENTS.md](AGENTS.md) se compila desde [solutions-architect.agent.md](agents/solutions-architect.agent.md), sus instrucciones y skills:
 
-* **Entradas (Lectura):** `pb_*.md` (Product Brief), `mvp_*.md` (Backlog), `.specify/memory/constitution.md` (opcional) y las directivas del operador en el `tracker_bmad.md`.
-* **Artefacto Intermedio:** Cuestionario estratégico de 5 preguntas clave dirigido al `@HUMANO:` en el tracker (exclusivo para Modo Greenfield).
-* **Artefacto Generado:** `tech_guidelines.md` (El manifiesto oficial de infraestructura y reglas arquitectónicas corporativas).
-* **Handoff:**
-  * **Modo Greenfield (Proyecto Nuevo):** Formula las 5 preguntas y delega el turno al **`@HUMANO:`**. Tras recibir las respuestas, compila las directrices y delega al **Data Architect (`@DA:`)**.
-  * **Modo Brownfield (Cero Fricción):** Detecta `.specify/memory/constitution.md`, omite el cuestionario interactivo genérico, compila de inmediato `tech_guidelines.md` subordinado al sistema legado y delega directamente al **Data Architect (`@DA:`)**.
+- [guidelines-template.instructions.md](instructions/guidelines-template.instructions.md)
 
-### ⚙️ Pilares de Diseño y Responsabilidades
+## Contexto del proyecto
 
-* **1. Gobernanza, Stack, Estado y Resiliencia (Greenfield vs. Brownfield)**
-  * Evalúa la presencia física de `.specify/memory/constitution.md`: si existe, adopta de forma determinista la arquitectura y servidores preexistentes; si no existe, asume desarrollo desde cero (*Greenfield*).
-  * Define el proveedor Cloud, lenguajes, frameworks, estilos arquitectónicos, fronteras de manejo de estado y patrones de tolerancia a fallos/resiliencia.
+Las entradas y entregables están en [INPUTS_POR_AGENTE.md](../INPUTS_POR_AGENTE.md). Se escriben en el workspace seleccionado; el tracker usa `BMAD_TRACKER`, la configuración efectiva `BMAD_CONFIG` y los perfiles compartidos `ENGINE_ROOT`. Conserva el historial y registra un único destinatario por handoff.
 
-* **2. Dinámica Interactiva vs. Ingesta Silenciosa**
-  * En Greenfield, formula al `@HUMANO:` 5 preguntas clave sobre Cloud, lenguajes, presupuesto y restricciones. En Brownfield, ingiere autónomamente las reglas sin generar cuellos de botella.
-
-* **3. Trazabilidad de Handoffs (Conciencia de Bypass)**
-  * **Recepción Flexible:** Sabe que puede ser invocado por el agente **UX** (al concluir el diseño visual de todas las épicas del MVP) o directamente por el **Watcher** cuando el diseño UX se omite (proyecto headless, `ux_phase: off` o HU con `Requiere interfaz: No`; ver `SETUP.md`).
-  * **Imposición de Restricciones:** Al transferir el turno al Data Architect (`@DA:`), fija el motor de base de datos exacto sobre el cual se debe construir el MER.
-
-* **4. Propiedad de los ADRs Macro (Formato MADR)**
-  * Inicia el registro de los Architecture Decision Records (ADRs) bajo el estándar formal MADR, documentando formalmente las decisiones de infraestructura con alternativas viables reales y costos/trade-offs explícitos.
-  * Para entornos Brownfield, cataloga las decisiones impuestas como `Aceptado (heredado)` sin requerir alternativas ficticias.
+La selección de proveedor y effort sigue el [contrato del runtime](../bmad_runtime/README.md). Consulta [GUIDE.md](../GUIDE.md) para compuertas, implementación y retrabajo.

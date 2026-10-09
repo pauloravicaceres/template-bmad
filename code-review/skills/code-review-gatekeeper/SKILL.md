@@ -1,45 +1,26 @@
 ---
 name: code-review-gatekeeper
-description: Skill de auditoría adversarial para el agente Code Review. Fuerza la lectura física del código, prohíbe el rubber-stamping y aplica una política de tolerancia cero frente a violaciones de arquitectura, rendimiento y seguridad.
+description: Reglas de calidad para el stack del workspace activo.
 type: skill
-tags: [auditoria, code-review, secops, quality-gate]
+tags: [calidad, workspace]
 ---
 
-# Code Review Gatekeeper — Compuerta de Calidad Inquebrantable
+## Contexto técnico del workspace
+Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
+Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
+WORKSPACE_ROOT/documents/architecture; si existe roles/code-review.md, aplícalo.
+Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
+versiones ni herramientas desde el perfil compartido. Conserva las decisiones
+aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva
+la propuesta a SA y la aprobación al humano antes de imponer una tecnología.
 
-## 1. Prohibición de Aprobación Ciega (Anti-Rubber Stamping)
-- **Regla de Lectura Obligatoria:** Tienes ESTRICTAMENTE PROHIBIDO emitir un dictamen de aprobación basándote en el resumen que el desarrollador escribió en el tracker.
-- **Acción Requerida:** Debes ejecutar obligatoriamente la herramienta `read_file` sobre CADA archivo `.cs`, `.ts`, `.html` o `.spec.ts` mencionado en el flujo actual antes de evaluarlo.
-
-## 2. Escaneo de Tolerancia Cero (Zero-Tolerance Heuristics)
-Si durante la lectura del código detectas CUALQUIERA de los siguientes elementos, debes emitir un `[RECHAZADO]` inmediato sin necesidad de evaluar el resto de la lógica:
-- **Firmas de Alucinación:** Palabras clave como `// TODO`, `// FIXME`, `throw new NotImplementedException()`, o datos hardcodeados (`new List<User> { new User() }`).
-- **Librerías Contrabandeadas:** Declaraciones `using AutoMapper;`, `using Microsoft.AspNetCore.Mvc;` (Controllers clásicos), o imports de `zone.js` en Angular.
-- **Fugas de Rendimiento:** Métodos `.NET` que usan `await` en llamadas I/O sin inyectar el `CancellationToken`. Consultas o `.SaveChanges()` dentro de un bucle `foreach` (N+1).
-- **Acoplamiento de BD:** Consultas LINQ que contengan `.Include()` apuntando a tablas de un schema que no pertenece al módulo actual.
-
-## 3. Verificación de Cobertura (QA Gate)
-- Revisa las pruebas generadas por el `@QA-AUTO`.
-- Si las pruebas son tautológicas (ej. probar un Mock sin ejecutar lógica real, o hacer `Assert.True(true)`), devuelve el ticket al agente de QA con un `[RECHAZADO]`.
-
-## 4. Formato de Veredicto Obligatorio
-Tu respuesta en el `tracker_bmad.md` debe usar exclusivamente uno de estos dos formatos exactos:
-
-**Opción A: Rechazo (Devolución de turno)**
-```text
-[RECHAZADO] - @[Agente_Responsable]:
-Se detectaron violaciones críticas:
-- Archivo: [Ruta]
-- Hallazgo: [Descripción exacta del código infractor (ej. Falta CancellationToken, Regla VSA rota)]
-- Corrección exigida: [Lo que debe cambiar]
-```
-
-**Opción B: Aprobación Definitiva**
-```text
-[APROBADO]
-- Lectura física completada: [N] archivos auditados.
-- Lex Superior y VSA: Verificados al 100%.
-- SecOps y Rendimiento: CancellationToken propagado, cero N+1, cero IDOR.
-- Pruebas QA: Cobertura lógica validada.
-La HU cumple con todos los criterios de aceptación y estándares arquitectónicos.
-```
+## Validación y entrega
+Implementa o verifica el tech-design aprobado y sus contratos exactos; no inventes
+campos, dependencias, respuestas simuladas en producción ni funcionalidad incompleta.
+Revisa físicamente los archivos escritos. Aplica el stack y las convenciones del
+workspace, sus validadores y pruebas, y documenta evidencia y fallos antes del handoff.
+Respeta autenticación, autorización por recurso, cancelación, límites de módulos,
+seguridad de entradas y rendimiento conforme a la arquitectura aprobada.
+Las pruebas validan comportamiento, con Arrange/Act/Assert, escenarios felices y
+adversos; nunca mocks tautológicos. No declares aprobada una entrega con fallos.
+Los commits y el cierre GitOps siguen exclusivamente el protocolo operativo.

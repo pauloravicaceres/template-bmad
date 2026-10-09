@@ -33,6 +33,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { DEFAULT_API_BASE } from '../services/api_client'
 
 const status = ref('UNKNOWN')
 const gateId = '123'
@@ -40,7 +41,7 @@ const feedback = ref('')
 
 const fetchStatus = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/v1/gates/status')
+    const res = await fetch(`${DEFAULT_API_BASE}/gates/status`)
     const data = await res.json()
     status.value = data.status
   } catch (e) {
@@ -50,7 +51,7 @@ const fetchStatus = async () => {
 
 const approve = async () => {
   try {
-    await fetch(`http://localhost:8000/api/v1/gates/${gateId}/decision`, {
+    await fetch(`${DEFAULT_API_BASE}/gates/${gateId}/decision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'APPROVE', feedback: feedback.value })
@@ -63,7 +64,7 @@ const approve = async () => {
 
 const reject = async () => {
   try {
-    await fetch(`http://localhost:8000/api/v1/gates/${gateId}/decision`, {
+    await fetch(`${DEFAULT_API_BASE}/gates/${gateId}/decision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'REJECT', feedback: feedback.value })

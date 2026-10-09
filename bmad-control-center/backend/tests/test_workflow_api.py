@@ -26,9 +26,9 @@ class TestWorkflowApi:
         assert response.status_code == 200
         data = response.json()
         assert data["overall_status"] == "IDLE"
-        assert data["total_stages"] == 12
+        assert data["total_stages"] == 15
         assert data["completed_stages"] == 0
-        assert len(data["stages"]) == 8
+        assert len(data["stages"]) == 15
         assert all(s["status"] == "PENDING" for s in data["stages"])
 
     def test_get_workflow_state_alias_returns_same_data_and_contract_fields(self, isolated_workflow_client):
@@ -108,7 +108,7 @@ class TestWorkflowApi:
 - **Artefacto generado:** `documents/qa-tech/tech-design_002.md`
 - **Estado:** Auditoría Adversarial Exitosa
 - **⚠️ Puntos Abiertos:** Ninguno
-- **Handoff:** @HUMANO: Fin
+- **Handoff:** @WATCHER: GITOPS-MERGE-CLOSE feat/001-HU_prueba
 """
         temp_tracker.write_text(tracker_text.strip(), encoding="utf-8")
 

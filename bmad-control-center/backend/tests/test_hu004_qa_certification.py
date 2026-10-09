@@ -60,7 +60,7 @@ class TestHU004GitStatusTelemetriaCertification:
         assert data["untracked_count"] == len(working_tree["untracked"])
         assert data["total_modified_files"] >= 0
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_GetGitStatus_BajoContencionPorIndexLock_DebeRetornarSnapshotCacheadoConIsSyncingTrueSinFallar(self, qa_client):
         # Arrange: Sembrar snapshot inicial válido en memoria
         seed_response = qa_client.get("/api/v1/git/status")
@@ -92,7 +92,7 @@ class TestHU004GitStatusTelemetriaCertification:
         recovery_data = recovery_response.json()
         assert recovery_data["is_syncing"] is False
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_GetGitStatus_EnDirectorioSinRepositorioGit_DebeRetornar404ConCodigoGitRepoNotFound(self, tmp_path):
         # Arrange: Crear servicio apuntando a directorio vacío (sin .git/)
         empty_service = GitService(workspace_root=tmp_path)
@@ -105,7 +105,7 @@ class TestHU004GitStatusTelemetriaCertification:
         assert exc_info.value.error_code == "GIT_REPO_NOT_FOUND"
         assert "git init" in exc_info.value.detail.lower()
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_GetGitStatus_CuandoHeadEstaEnEstadoDetached_DebeDetectarEstadoDetachedYBranchNone(self):
         # Arrange: Simular salida de git status con branch.head (detached)
         simulated_porcelain = (
@@ -134,7 +134,7 @@ class TestHU004GitStatusTelemetriaCertification:
             assert status.head_commit_hash == "0123456789abcdef0123456789abcdef01234567"
             assert status.head_commit_short == "0123456"
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_GetGitStatus_ConArchivosEnConflicto_DebeDetectarIsConflictedTrueYClasificarEnWorkingTree(self):
         # Arrange: Simular salida porcelain v2 con entrada tipo 'u' (unmerged conflict)
         simulated_porcelain = (
@@ -236,7 +236,7 @@ class TestHU004GitCommitsHistorialCertification:
         # Assert
         assert res.status_code == 422
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_GetGitCommits_EnDirectorioSinGit_DebeLanzarGitRepoNotFound404(self, tmp_path):
         # Arrange
         empty_service = GitService(workspace_root=tmp_path)
@@ -276,7 +276,7 @@ class TestHU004GitBranchesCertification:
         assert len(current_branches[0]["target_commit_hash"]) == 40
         assert len(current_branches[0]["short_hash"]) == 7
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_GetGitBranches_EnDirectorioSinGit_DebeLanzarGitRepoNotFound404(self, tmp_path):
         # Arrange
         empty_service = GitService(workspace_root=tmp_path)
@@ -315,7 +315,7 @@ class TestHU004GitSanitizationAndBinaryDiffCertification:
         assert git_service._infer_agent_role("Watcher", "auto commit") == "Watcher BMAD"
         assert git_service._infer_agent_role("Desconocido", "random message") is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.anyio
     async def test_InspectCommits_ConArchivosBinariosOMasivos_DebeOmitirDiffCrudoYMarcarDiffOmitted(self):
         # Arrange
         commits_resp = await git_service.get_commits(limit=50)

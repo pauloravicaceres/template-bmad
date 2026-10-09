@@ -8,7 +8,7 @@
           Perímetro de Seguridad (Sandbox FSaaDB)
         </h3>
       </div>
-      <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+      <span class="text-[10px] bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-700 font-bold px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
         <span>🔒</span> 0 Fugas (Criterio SC-004)
       </span>
     </div>
@@ -22,10 +22,10 @@
         <div
           v-for="root in monitoredRoots"
           :key="root.path"
-          class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs font-mono"
+          class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs font-mono dark:bg-slate-800 dark:border-slate-700"
         >
           <span class="text-gray-800 font-bold">[✓] {{ root.path }}</span>
-          <span class="text-[10px] text-emerald-600 bg-emerald-100/70 px-1.5 py-0.5 rounded font-sans">
+          <span class="text-[10px] text-emerald-600 bg-emerald-100/70 dark:bg-emerald-950/70 dark:text-emerald-200 px-1.5 py-0.5 rounded font-sans">
             🟢 Activo
           </span>
         </div>
@@ -33,10 +33,10 @@
     </div>
 
     <!-- Telemetría de Eventos Descartados Silenciosamente -->
-    <div class="bg-gray-50/70 border border-gray-200 rounded-lg p-3 text-xs space-y-2">
+    <div class="bg-gray-50/70 border border-gray-200 rounded-lg p-3 text-xs space-y-2 dark:bg-slate-800 dark:border-slate-700">
       <div class="flex items-center justify-between">
         <span class="text-gray-600 font-medium">Eventos descartados silenciosamente (fuera de perímetro):</span>
-        <span class="font-mono font-bold text-gray-900 bg-gray-200 px-2 py-0.5 rounded text-xs">
+        <span class="font-mono font-bold text-gray-900 bg-gray-200 px-2 py-0.5 rounded text-xs dark:bg-slate-700">
           {{ ignoredCount }} eventos
         </span>
       </div>
