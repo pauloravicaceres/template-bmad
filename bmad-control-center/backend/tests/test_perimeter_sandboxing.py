@@ -22,8 +22,8 @@ class TestPerimeterSandboxing:
         reset_ignored_external_events_count()
 
     def test_is_path_in_perimeter_allowed_roots(self):
-        """Files in documents/, .specify/, specs/ must be inside perimeter."""
-        assert is_path_in_perimeter("documents/tracker_bmad.md") is True
+        """Files in docs/, .specify/, specs/ must be inside perimeter."""
+        assert is_path_in_perimeter("docs/tracker_bmad.md") is True
         assert is_path_in_perimeter(".specify/memory/constitution.md") is True
         assert is_path_in_perimeter("specs/003/plan.md") is True
 

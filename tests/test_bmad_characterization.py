@@ -48,11 +48,11 @@ class CharacterizationTests(unittest.TestCase):
     def test_documentation_scope(self):
         text = watcher.instruccion_doc_viva('doc.md', 'backend', 'app/backend/README.md')
         self.assertIn('SOLO BACKEND', text)
-        self.assertIn('NO escribas en documents/tracker_bmad.md', text)
+        self.assertIn('NO escribas en docs/tracker_bmad.md', text)
         self.assertIn('app/backend/README.md', text)
 
     def test_exact_feature_folder(self):
-        self.assertEqual(watcher.carpeta_spec_para_hu('documents/business-analyst/016-HU_ficha.md'), 'specs/016-HU_ficha')
+        self.assertEqual(watcher.carpeta_spec_para_hu('docs/business-analyst/016-HU_ficha.md'), 'specs/016-HU_ficha')
 
 
 if __name__ == '__main__':

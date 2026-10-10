@@ -17,7 +17,7 @@ def materialize_config(context, raw):
     data = copy.deepcopy(raw)
     data.update(project_id=context.project_id, tracker=str(context.tracker_path),
                 context=str(context.output('.specify/memory/constitution.md')),
-                routes_bmad={role: str(context.output('documents/' + role)) for role in AGENT_PHASES})
+                routes_bmad={role: str(context.output('docs/' + role)) for role in AGENT_PHASES})
     path = context.output('state/config_bmad.json')
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = context.output(f'state/config-{uuid.uuid4().hex}.tmp')
@@ -66,7 +66,7 @@ def effective_config(context, path=None):
         target = context.output(value)
         parts = target.relative_to(context.workspace_root).parts
         first = parts[0] if parts else ''
-        if first in {'documents', 'specs', 'handoffs', 'state', 'logs', 'temp'} or first.startswith('.'):
+        if first in {'docs', 'specs', 'handoffs', 'state', 'logs', 'temp'} or first.startswith('.'):
             raise ConfigurationError('code_dirs cannot overlap operational or documentation directories.')
     return result
 

@@ -64,7 +64,7 @@ class TestLargeFileMetadataPolicy:
 
         await cm.broadcast_artifact_changed(
             action="CREATED",
-            path="documents/exports/huge_dump.tar.gz",
+            path="docs/exports/huge_dump.tar.gz",
             size_bytes=20_000_000,
             is_large_file=True,
             metadata_only=True,

@@ -42,7 +42,7 @@ legacy de herencia que aparecen a continuación.
 | `CARPETA_ENTRADA_API` | `api-architect` — clave donde residen los contratos REST/GraphQL (`api_*.md`) |
 | `CARPETA_ENTRADA_UX` | `designer-ux` — clave donde reside el diseño visual de interfaces (`ux_*.md`) |
 | `CARPETA_CONTEXTO` | Clave `context` en `config_bmad.json` (`.specify/memory/constitution.md`) — Constitución Técnica del proyecto |
-| `CARPETA_SALIDA_DIAGRAMAS` | `documents/qa-tech/diagrams/` |
+| `CARPETA_SALIDA_DIAGRAMAS` | `docs/qa-tech/diagrams/` |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 ---

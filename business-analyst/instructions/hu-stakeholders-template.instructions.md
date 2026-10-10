@@ -1,5 +1,5 @@
 ---
-description: 'Usar al generar la Historia de Usuario para Stakeholders (HU Funcional/Negocio). Esqueleto determinista orientado a valor de negocio, narrativa amigable y criterios funcionales. Se guarda en documents/business-analyst/HUs-stakeholders/.'
+description: 'Usar al generar la Historia de Usuario para Stakeholders (HU Funcional/Negocio). Esqueleto determinista orientado a valor de negocio, narrativa amigable y criterios funcionales. Se guarda en docs/business-analyst/HUs-stakeholders/.'
 applyTo: '**'
 ---
 
@@ -25,7 +25,7 @@ Toda HU de Stakeholders generada por el agente BA usa esta estructura. Enfatiza 
 
 ## Convención de Nombres de Archivo y Ruta
 ```
-documents/business-analyst/HUs-stakeholders/XXX-HU_[nombre_corto].md
+docs/business-analyst/HUs-stakeholders/XXX-HU_[nombre_corto].md
 ```
 - `XXX`: Identificador secuencial de 3 dígitos provisto exactamente por el `@PM` en el Handoff. El nombre debe ser EXACTAMENTE el mismo que el archivo técnico para asegurar simetría, preservando el prefijo numérico ordenado (ej. `002-HU_login.md`).
 - `nombre_corto`: snake_case, máximo 4 palabras, agnóstico al dominio.

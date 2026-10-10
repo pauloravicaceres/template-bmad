@@ -29,7 +29,7 @@ def isolated_dashboard(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, 'PROJECT_ID', 'dashboard-test')
     monkeypatch.setattr(settings, 'WORKSPACE_ROOT', root)
     monkeypatch.setattr(settings, 'TRACKER_FILE', tracker)
-    monkeypatch.setattr(settings, 'ALLOWED_ROOTS', ['documents', 'specs', '.specify', 'handoffs'])
+    monkeypatch.setattr(settings, 'ALLOWED_ROOTS', ['docs', 'specs', '.specify', 'handoffs'])
     monkeypatch.setattr(routes, 'tracker_service', TrackerService(str(tracker)))
     monkeypatch.setattr(workflow, 'workflow_service', WorkflowService(tracker_path=tracker))
     monkeypatch.setattr(main.file_watcher, 'start', Mock())

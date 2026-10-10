@@ -22,8 +22,8 @@ operativa del motor conserva autoridad sobre aislamiento, seguridad y workflow.
 Estado: pendiente. Si existe código, observar sus manifests y arquitectura antes
 de proponer cambios. No heredar tecnologías de otros proyectos. SA puede proponer
 opciones; requieren aprobación humana explícita y revisión QT antes de ser obligatorias.
-Registrar inventario y diferencias en documents/architecture/tech-stack.md y las
-decisiones con estado y evidencia de aprobación en documents/architecture/adr/.
+Registrar inventario y diferencias en docs/architecture/tech-stack.md y las
+decisiones con estado y evidencia de aprobación en docs/architecture/adr/.
 
 ## Governance
 Este archivo es la única constitución técnica, también para Spec Kit. Preservar
@@ -158,7 +158,7 @@ def discover(context):
             except (ValueError, TypeError, AttributeError, ET.ParseError, ConfigurationError) as exc:
                 issues.append(f'{relative}: metadatos no disponibles ({type(exc).__name__}).')
     # No approval inferred even when documentation contains a matching dependency.
-    documented = safe_text(context, 'documents/architecture/tech-stack.md')
+    documented = safe_text(context, 'docs/architecture/tech-stack.md')
     differences = sorted({o['technology'] + ' ' + o['version'] for o in observations
                           if o['technology'] not in documented or o['version'] not in documented})
     return {'mode': 'brownfield' if evidence else 'greenfield', 'observations': observations,
@@ -171,23 +171,23 @@ def document_index(context, role=None, operation=None):
     paths = [PROJECT_CONSTITUTION]
     # Existing local equivalents are supported; never consult engine project memory.
     if technical:
-        paths += ['documents/architecture/tech-stack.md', 'documents/architecture/architecture.md',
-                  'documents/solutions-architect/tech_guidelines.md']
-        folder = context.output('documents/architecture')
+        paths += ['docs/architecture/tech-stack.md', 'docs/architecture/architecture.md',
+                  'docs/solutions-architect/tech_guidelines.md']
+        folder = context.output('docs/architecture')
         if folder.is_dir():
             guides = ['agent-mandates.md', 'security-observability.md']
             if role not in {'dev-backend', 'data-architect', 'api-architect', 'devops'}:
                 guides += ['frontend.md']
             if role not in {'dev-frontend', 'designer-ux'}:
                 guides += ['persistence.md', 'integration.md']
-            paths += ['documents/architecture/' + name for name in guides]
+            paths += ['docs/architecture/' + name for name in guides]
             role_names = [role] if role else ['dev-backend', 'dev-frontend', 'qa-auto', 'code-review']
             if role in {'solutions-architect', 'qa-tech'}:
                 role_names = ['dev-backend', 'dev-frontend', 'qa-auto', 'code-review', 'devops']
             for name in role_names:
                 if name:
-                    paths.append(f'documents/architecture/roles/{name}.md')
-            for path in sorted(context.output('documents/architecture/adr').glob('*.md')):
+                    paths.append(f'docs/architecture/roles/{name}.md')
+            for path in sorted(context.output('docs/architecture/adr').glob('*.md')):
                 if not re.search(r'secret|credential|password|token|private', path.name, re.I):
                     paths.append(path.relative_to(context.workspace_root).as_posix())
     return [p for p in dict.fromkeys(paths) if context.output(p).is_file()][:80]

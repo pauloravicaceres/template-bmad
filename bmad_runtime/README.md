@@ -1,8 +1,6 @@
 # Contrato operativo del runtime BMAD
 
-El recorrido de principio a fin está en [SETUP.md](../SETUP.md); este contrato detalla las interfaces y restricciones del runtime.
-
-Esta es la fuente canónica de comandos, configuración, proveedores y effort del motor implementado. [Arquitectura](../ARCHITECTURE.md) explica los módulos y [GUIDE](../GUIDE.md) el flujo de negocio.
+Contrato por módulo del paquete `bmad_runtime`: funciones, consumidores, efectos y CLI. La instalación, configuración, proveedores y effort están en [SETUP.md](../SETUP.md); la operación en [GUIDE.md](../GUIDE.md); los diagramas de componentes, estados y secuencias en [ARCHITECTURE.md](../ARCHITECTURE.md).
 
 ## Inventario de programas y módulos Python
 
@@ -40,6 +38,7 @@ La mayoría de los módulos del paquete son bibliotecas internas: se importan de
 | [watcher_service.py](watcher_service.py) | Cursor y cola persistida del tracker | workflow |
 | [workflow.py](workflow.py) | Reglas BMAD/SDD y bucle del watcher | watcher_bmad |
 | [gitops.py](gitops.py) | Ejecución Git y freeze de especificaciones | workflow |
+| [technical_context.py](technical_context.py) | Constitución local, índice técnico, descubrimiento y ensamblado de contexto | services, workspace y dashboard |
 | [workspace.py](workspace.py) | Bootstrap y migración aditiva | init_bmad y manage_workspace |
 | [maintenance.py](maintenance.py) | Cierre de sesiones con comprobación de propiedad | stop_agents |
 | [errors.py](errors.py) | Excepciones comunes del runtime | Módulos del paquete y sus entradas públicas |
@@ -215,99 +214,11 @@ Lo importan los módulos del runtime; las entradas públicas capturan errores BM
 | Freeze | workflow → GitService.freeze → CommandRunner | Staging acotado y commit si hay cambios |
 | Detener | stop_agents → maintenance → Runtime → HerdrGateway/StateStore | Cierre solo de tabs propios idle/done |
 
-Las pruebas en [tests](../tests) cubren estos límites: `test_multiworkspace.py` verifica selección, aislamiento, bootstrap, migración y parada; `test_runtime_infrastructure.py` configuración y procesos; `test_runtime_services.py` flota/despacho/estado; `test_codex_effort.py` traducción; `test_bmad_regressions.py` y pruebas de caracterización verifican gates y compatibilidad; `test_maintenance_contracts.py` comprueba configuración explícita durante init/migrate, opciones nativas y límites de rutas. `validate_offline.py` importa los 20 módulos y comprueba ayudas, ejemplos, enlaces y dry-runs sin agentes reales. Los comandos de validación están en el [README principal](../README.md#validación-local).
-
-## Motor y workspace
-
-`ENGINE_ROOT` contiene runtime, utils, perfiles por rol, skills, plantillas y dashboard. `WORKSPACE_ROOT` contiene:
-
-| Ruta del workspace | Propiedad y uso |
-|---|---|
-| project.json | Identidad schema_version=1, project_id y overrides config |
-| AGENTS.md | Contrato de rutas que prevalece sobre rutas legacy de perfiles |
-| documents/ | Entregables por rol |
-| app/ | Código del proyecto |
-| handoffs/tracker_bmad.md | Bus de handoffs del proyecto |
-| specs/, .specify/memory/ | Especificaciones, constitución y memoria |
-| .specify/scripts/, .specify/templates/ | Snapshot aditivo del soporte SpecKit |
-| state/ | SQLite, locks y config_bmad.json efectivo generado |
-| logs/, temp/ | Auditoría de migración y destinos para logs/temporales |
-
-Init crea esas carpetas; no copia perfiles/skills, no vacía tracker, no sobrescribe archivos existentes ni inicializa Git. Repetirlo no actualiza silenciosamente los snapshots. Que logs/temp estén vacíos tras init es normal; no todas las operaciones generan un archivo de log ahí.
-
-## Inicializar y revisar sin ejecutar agentes
-
-PowerShell desde la raíz del motor; adapta la ruta del workspace y usa el Python instalado.
-
-```powershell
-$Engine = (Get-Location).Path
-$Python = Join-Path $Engine 'bmad-control-center\backend\.venv\Scripts\python.exe'
-$Workspace = Join-Path (Split-Path $Engine -Parent) 'Proyecto A'
-& $Python (Join-Path $Engine 'init_bmad.py') --workspace $Workspace --project proyecto-a
-& $Python (Join-Path $Engine 'utils\start_agents.py') --workspace $Workspace --project proyecto-a --dry-run
-& $Python (Join-Path $Engine 'watcher_bmad.py') --workspace $Workspace --project proyecto-a --dry-run
-```
-
-Para B, repite con otra ruta y otro ID. Las sesiones incluyen ID, hash de ruta y rol. Init escribe únicamente scaffolding del proyecto; los dos dry-runs no lanzan CLIs ni crean SQLite. El estado impreso `verified_cli_contract` significa que el adaptador construyó un comando, no que se ejecutó o autenticó. Gemini produce `pending`.
-
-## Selección y configuración
-
-Selección CLI explícita (`--workspace` y/o `--project`) sustituye la pareja de variables `BMAD_WORKSPACE`/`BMAD_PROJECT`. Sin selección CLI se usa esa pareja del entorno. `--project` sin ruta consulta `projects` en el config global. Con el registro `projects` presente, incluso vacío, es obligatorio seleccionar un workspace. Las configuraciones antiguas sin registro conservan compatibilidad legacy con advertencia; el template no utiliza ese modo.
-
-Rutas relativas de CLI se anclan al motor; las de `projects`, al archivo de configuración. El ID debe coincidir con project.json. No se selecciona otro proyecto ante un error.
-
-Init, manage_workspace, launcher y watcher aceptan `--config` para cambiar el config global. Su ruta también se ancla al motor. Una ruta explícita inexistente falla antes del bootstrap. Pasa el mismo `--config` a cada comando: la elección **no queda guardada como ruta de origen** en project.json. Dashboard y scripts auxiliares no ofrecen ese argumento y usan config_bmad.json del motor.
-
-El config global es `config_bmad.json`. El objeto `config` de project.json admite únicamente project_name, project_type, ux_phase, code_dirs (backend/frontend en carpetas locales de código, excluyendo directorios operativos) y ai.defaults/phases/agents/speckit. El proyecto puede elegir opciones nativas admitidas, incluyendo permission_mode/sandbox; no puede cambiar ejecutables, límites, Git ni rutas de tracker.
-
-Primero se combinan global y proyecto. Después se resuelve **defaults → fase → agente u operación SpecKit**. Un cambio de proveedor descarta modelo y opciones heredados; `options` reemplaza el objeto completo. No existe fallback a otro proveedor.
-
-Ejemplo de selección global (también puede ponerse ai sin schema_version dentro de config de project.json):
-
-```json
-{
-  "ai": {
-    "defaults": {"provider": "claude", "model": null, "options": {"effort": "medium"}},
-    "phases": {"D": {"provider": "codex", "model": "gpt-6-astra", "options": {"effort": "high"}}},
-    "agents": {"business-analyst": {"options": {"effort": "high"}}},
-    "speckit": {"implement": {"options": {"effort": "xhigh"}}}
-  }
-}
-```
-
-`state/config_bmad.json` es una vista efectiva para consumidores legacy: se genera al inicializar y se refresca al abrir Runtime con persistencia. Edita el origen y project.json, no esa vista. Runtime cachea la configuración: reinicia los procesos afectados para aplicar cambios.
-
-## Proveedores y effort
-
-| Proveedor | Implementado | Traducción de effort | Restricciones del adaptador |
-|---|---|---|---|
-| Claude | Interactivo, headless, perfiles y skills | --effort NIVEL | low, medium, high, xhigh, max; permission_mode manual/plan/acceptEdits; max_budget_usd solo aplicado en headless |
-| Codex | Interactivo, headless, perfiles y skills | -c model_reasoning_effort=NIVEL | low, medium, high, xhigh, max; max exige modelo explícito gpt-6-astra en allowlist; sandbox read-only/workspace-write |
-| Gemini | Registro solamente | Ninguna | Options rechazadas; ejecución pendiente |
-
-Omitir effort conserva el default del CLI. Se rechazan tipos inválidos, mayúsculas y `ultra`; no se convierte un valor inválido a otro. El modelo nulo delega al CLI. Las listas son contratos del código actual, no una promesa de soporte por todas las versiones/modelos. El preflight real consulta help, pero no demuestra acceso al modelo ni éxito remoto.
-
-Las skills instaladas en .agents/.claude deben coincidir con .github/skills, incluyendo recursos. No elimines esas copias por tener contenido idéntico. No hay sincronización automática al arrancar. La compilación de perfiles es una operación explícita de mantenimiento del motor mediante `watcher_bmad.py --compile-profiles`, sin selección de proyecto, y escribe los perfiles: revisar antes de usar.
-
-## Operación real controlada
-
-Prepara Git propio cuando el flujo lo requiera y verifica CLIs y permisos. Inicia launcher y watcher en terminales separadas:
-
-```powershell
-# Terminal del launcher
-& $Python (Join-Path $Engine 'utils\start_agents.py') --workspace $Workspace --project proyecto-a
-# Otra terminal para el watcher
-& $Python (Join-Path $Engine 'watcher_bmad.py') --workspace $Workspace --project proyecto-a
-# Operaciones humanas sobre el workspace elegido
-& $Python (Join-Path $Engine 'utils\approve_step.py') --workspace $Workspace
-& $Python (Join-Path $Engine 'utils\response_sa.py') --workspace $Workspace
-```
-
-Para detener: Ctrl+C en el watcher y esperar su salida; después `utils/stop_agents.py --workspace $Workspace --confirm` cierra únicamente tabs propios cuya propiedad/estado puede verificar. No fuerza el cierre de agentes ocupados. `stop_agents.py` no tiene dry-run ni --config; sin --confirm rechaza la operación. No borres locks para desbloquear una sesión.
-
-`python -m bmad_runtime.state --workspace RUTA` inspecciona el estado (puede crear/abrir SQLite si no existe). `--acknowledge ID --confirm` marca un evento inspeccionado como manejado; no lo reintenta. No equivale a completar la tarea de negocio.
+Las pruebas en [tests](../tests) cubren estos límites: `test_multiworkspace.py` verifica selección, aislamiento, bootstrap, migración y parada; `test_runtime_infrastructure.py` configuración y procesos; `test_runtime_services.py` flota/despacho/estado; `test_codex_effort.py` traducción; `test_bmad_regressions.py` y pruebas de caracterización verifican gates y compatibilidad; `test_maintenance_contracts.py` comprueba configuración explícita durante init/migrate, opciones nativas y límites de rutas. `validate_offline.py` importa todos los módulos del paquete y comprueba ayudas, ejemplos, enlaces y dry-runs sin agentes reales. Los comandos de validación están en [SETUP.md](../SETUP.md#validación-local).
 
 ## Migración opcional
+
+`utils/manage_workspace.py migrate` copia un proyecto legacy (datos dentro del motor) a un workspace nuevo:
 
 ```powershell
 & $Python (Join-Path $Engine 'utils\manage_workspace.py') migrate --workspace 'D:\BMAD Workspaces\Migrado' --project migrado --dry-run
@@ -315,18 +226,7 @@ Para detener: Ctrl+C en el watcher y esperar su salida; después `utils/stop_age
 & $Python (Join-Path $Engine 'utils\manage_workspace.py') migrate --workspace 'D:\BMAD Workspaces\Migrado' --project migrado --confirm
 ```
 
-Copia documentos/app/specs/memoria y handoffs legacy, conserva origen y registra logs/migration.json. No copia Git, dependencias, sesiones ni SQLite activo. Falla ante conflictos; una copia interrumpida puede dejar archivos parciales y requiere inspección. No reescribe referencias absolutas de documentos.
-
-## Límites y diagnóstico
-
-- Un watcher y un backend por workspace/proceso; no hay cambio de proyecto global en caliente. La configuración de frontend apunta a una API concreta.
-- El contrato de rutas no es una barrera del sistema operativo para acciones arbitrarias de una herramienta externa.
-- Gemini pending, skill diferente, configuración inválida y CLI ausente producen errores explícitos. No se intenta otro proveedor.
-- Windows requiere ejecutables nativos; configurar un shim .cmd/.ps1 no está soportado por CommandRunner.
-- Duplicación/estado uncertain requiere inspección; idle/done de Herdr no prueba finalización del artefacto.
-- auto_commit=false desactiva autosave de seguridad. El freeze posterior a analyze y macros Git del flujo aún pueden escribir commits/ramas.
-- Rotación de contexto y /clear automático no están habilitados.
-- [Pruebas locales](../README.md#validación-local) cubren contratos sin agentes reales ni reportes.
+Copia documentos/app/specs/memoria y handoffs legacy, conserva el origen y registra `logs/migration.json`. No copia Git, dependencias, sesiones ni SQLite activo. Falla ante conflictos; una copia interrumpida puede dejar archivos parciales y requiere inspección. No reescribe referencias absolutas de documentos.
 
 ## Contexto constitucional y técnico
 
@@ -344,10 +244,10 @@ No se importan reglas técnicas desde el motor como fallback de otro workspace.
 
 `python utils/manage_workspace.py context --workspace RUTA --project ID --role solutions-architect`
 inspecciona contexto y diferencias sin procesos externos. `--record` guarda solo observaciones
-en `documents/architecture/stack-observations.json`; las aprobaciones siguen siendo explícitas.
+en `docs/architecture/stack-observations.json`; las aprobaciones siguen siendo explícitas.
 `GET /api/v1/project/context` ofrece el índice y descubrimiento del workspace del proceso dashboard.
 
-La constitución técnica canónica continúa en `.specify/memory/constitution.md`; Spec Kit, QT,
+La constitución técnica canónica es `<WORKSPACE_ROOT>/.specify/memory/constitution.md`; bootstrap la crea neutral con `initialize_constitution()`. Spec Kit, QT,
 configuración efectiva y dashboard usan esa única ruta. El watcher ya no añade cláusulas globales
 ni sobrescribe memoria aprobada. Las skills instaladas se cotejan íntegramente contra sus fuentes;
 el contrato de precedencia se añade desde el servicio, conservando esa verificación.

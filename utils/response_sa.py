@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent.parent
-TRACKER_PATH = DIRECTORIO_RAIZ / "documents" / "tracker_bmad.md"
+TRACKER_PATH = DIRECTORIO_RAIZ / "docs" / "tracker_bmad.md"
 
 def registrar_respuesta(argv=None):
     import argparse

@@ -15,31 +15,31 @@ describe('ArtifactTreeExplorer Component', () => {
     last_modified: '2026-09-30T23:36:50Z',
     children: [
       {
-        node_id: 'documents',
-        name: 'documents',
+        node_id: 'docs',
+        name: 'docs',
         node_type: 'DIRECTORY',
-        relative_path: 'documents',
+        relative_path: 'docs',
         parent_path: '',
         child_file_count: 1,
         is_empty: false,
         last_modified: '2026-09-30T23:36:50Z',
         children: [
           {
-            node_id: 'documents/business-analyst',
+            node_id: 'docs/business-analyst',
             name: 'business-analyst',
             node_type: 'DIRECTORY',
-            relative_path: 'documents/business-analyst',
-            parent_path: 'documents',
+            relative_path: 'docs/business-analyst',
+            parent_path: 'docs',
             child_file_count: 1,
             is_empty: false,
             last_modified: '2026-09-30T23:14:00Z',
             children: [
               {
-                node_id: 'documents/business-analyst/002-HU_monitoreo.md',
+                node_id: 'docs/business-analyst/002-HU_monitoreo.md',
                 name: '002-HU_monitoreo.md',
                 node_type: 'FILE',
-                relative_path: 'documents/business-analyst/002-HU_monitoreo.md',
-                parent_path: 'documents/business-analyst',
+                relative_path: 'docs/business-analyst/002-HU_monitoreo.md',
+                parent_path: 'docs/business-analyst',
                 child_file_count: 0,
                 is_empty: false,
                 last_modified: '2026-09-30T23:14:00Z',
@@ -48,11 +48,11 @@ describe('ArtifactTreeExplorer Component', () => {
             ],
           },
           {
-            node_id: 'documents/empty-agent',
+            node_id: 'docs/empty-agent',
             name: 'empty-agent',
             node_type: 'DIRECTORY',
-            relative_path: 'documents/empty-agent',
-            parent_path: 'documents',
+            relative_path: 'docs/empty-agent',
+            parent_path: 'docs',
             child_file_count: 0,
             is_empty: true,
             last_modified: '2026-09-30T23:20:00Z',
@@ -74,7 +74,7 @@ describe('ArtifactTreeExplorer Component', () => {
 
     // Assert
     expect(wrapper.text()).toContain('Explorador de Artefactos')
-    expect(wrapper.text()).toContain('documents')
+    expect(wrapper.text()).toContain('docs')
     expect(wrapper.text()).toContain('business-analyst')
     expect(wrapper.text()).toContain('empty-agent')
     expect(wrapper.text()).toMatch(/empty-agent\s*\(0\)/)
@@ -115,7 +115,7 @@ describe('ArtifactTreeExplorer Component', () => {
 
   it('AlRecibirPathEnNewPaths_DebeRenderizarBadgeNuevo', async () => {
     // Act
-    const newPaths = new Set(['documents/business-analyst/002-HU_monitoreo.md'])
+    const newPaths = new Set(['docs/business-analyst/002-HU_monitoreo.md'])
     const wrapper = mount(ArtifactTreeExplorer, {
       props: {
         rootNode: mockTree,

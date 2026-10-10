@@ -42,7 +42,7 @@ legacy de herencia que aparecen a continuación.
 | `CARPETA_ENTRADA_API` | `api-architect` — clave donde residen los contratos REST/GraphQL (`api_*.md`) |
 | `CARPETA_ENTRADA_UX` | `designer-ux` — clave donde reside el diseño visual de interfaces (`ux_*.md`) |
 | `CARPETA_CONTEXTO` | Clave `context` en `config_bmad.json` (`.specify/memory/constitution.md`) — Constitución Técnica del proyecto |
-| `CARPETA_SALIDA_DIAGRAMAS` | `documents/qa-tech/diagrams/` |
+| `CARPETA_SALIDA_DIAGRAMAS` | `docs/qa-tech/diagrams/` |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
 ---
@@ -271,7 +271,7 @@ applyTo: '**'
 ## 4. ORDEN DE REPARACIÓN EN TRACKER
 *(Instrucción continua para devolver el turno al agente causante)*
 
-`{{ @DA: | @API: | @SA: }} Se ha emitido feedback adversarial crítico en documents/qa-tech/feedback_tech_*.md. Por favor, subsana las inconsistencias señaladas para proceder con la re-auditoría.`
+`{{ @DA: | @API: | @SA: }} Se ha emitido feedback adversarial crítico en docs/qa-tech/feedback_tech_*.md. Por favor, subsana las inconsistencias señaladas para proceder con la re-auditoría.`
 ```
 
 ---
@@ -442,7 +442,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. documents/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}

@@ -61,7 +61,7 @@ async def get_project_context():
     context = ProjectContext(ENGINE_ROOT, settings.WORKSPACE_ROOT, settings.PROJECT_ID,
                              settings.WORKSPACE_ROOT == ENGINE_ROOT)
     return {'project_id': context.project_id, 'constitution': PROJECT_CONSTITUTION,
-            'documents': document_index(context, role='solutions-architect'),
+            'docs': document_index(context, role='solutions-architect'),
             'discovery': discover(context)}
 
 
@@ -157,7 +157,7 @@ async def make_decision(gate_id: str, payload: DecisionPayload):
                             epic = match.group(1)
                         else:
                             epic = "001-HU_epic_generica"
-                    handoff_text = f"@WATCHER: GITOPS-BRANCH-CREATE feat/{epic}\n@BA: El MVP y Backlog han sido aprobados en el archivo {filename}. La rama feat/{epic} ha sido creada. Procede con el análisis de negocio y redacción de Historias de Usuario para la épica {epic}. Usa el identificador universal estricto para crear el archivo físico en documents/business-analyst."
+                    handoff_text = f"@WATCHER: GITOPS-BRANCH-CREATE feat/{epic}\n@BA: El MVP y Backlog han sido aprobados en el archivo {filename}. La rama feat/{epic} ha sido creada. Procede con el análisis de negocio y redacción de Historias de Usuario para la épica {epic}. Usa el identificador universal estricto para crear el archivo físico en docs/business-analyst."
             elif author in ["Business Analyst", "BA"]:
                 handoff_text = f"@QA: La Historia de Usuario ha sido revisada en el archivo {filename}. Procede con la auditoría documental."
             elif author in ["QA Documental", "QA"]:

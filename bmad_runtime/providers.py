@@ -90,8 +90,8 @@ class ClaudeProvider:
             raise ConfigurationError('Unsupported Claude option.')
         _choice(selection.options.get('effort', 'low'), {'low', 'medium', 'high', 'xhigh', 'max'},
                 'Invalid Claude effort.')
-        _choice(selection.options.get('permission_mode', 'manual'), {'manual', 'plan', 'acceptEdits'},
-                'Claude permission_mode must be manual, plan or acceptEdits; bypass is not supported.')
+        _choice(selection.options.get('permission_mode', 'manual'), {'manual', 'plan', 'acceptEdits', 'bypass'},
+                'Claude permission_mode must be manual, plan, acceptEdits or bypass.')
         budget = selection.options.get('max_budget_usd', 1)
         if type(budget) not in {int, float} or not 0 < budget <= 1000:
             raise ConfigurationError('Invalid max_budget_usd.')
@@ -104,9 +104,11 @@ class ClaudeProvider:
         if any(flag not in text for flag in required):
             raise UnsupportedCapability('Installed Claude CLI lacks required flags.')
 
-    def _options(self, selection):
+    def _options(self, selection, default_mode='manual'):
         self.validate(selection)
-        args = ['--permission-mode', selection.options.get('permission_mode', 'manual')]
+        mode = selection.options.get('permission_mode', default_mode)
+        # bypass maps to the native flag instead of a permission mode.
+        args = ['--dangerously-skip-permissions'] if mode == 'bypass' else ['--permission-mode', mode]
         if selection.model:
             args += ['--model', selection.model]
         if 'effort' in selection.options:
@@ -117,7 +119,9 @@ class ClaudeProvider:
         profile = _profile(profile)
         # Documented native file form avoids Windows argument-length limits and
         # injects the complete role without overwriting a global CLAUDE.md.
-        args = [self.executable, *self._options(selection), '--add-dir', str(root), '--append-system-prompt-file', str(profile)]
+        # Herdr-launched agents run unattended unless the selection sets a stricter permission_mode.
+        args = [self.executable, *self._options(selection, 'bypass'), '--add-dir', str(root),
+                '--append-system-prompt-file', str(profile)]
         return Command(tuple(args), profile.parent)
 
     def headless(self, selection, root, prompt, directive, env):
@@ -161,10 +165,12 @@ class CodexProvider:
         self.executable = executable
 
     def validate(self, selection):
-        if set(selection.options) - {'sandbox', 'effort'}:
-            raise ConfigurationError('Unsupported Codex option; only sandbox and effort are supported.')
+        if set(selection.options) - {'sandbox', 'effort', 'approval'}:
+            raise ConfigurationError('Unsupported Codex option; only sandbox, approval and effort are supported.')
         _choice(selection.options.get('sandbox', 'workspace-write'), {'read-only', 'workspace-write'},
                 'Only read-only and workspace-write sandboxes are supported.')
+        _choice(selection.options.get('approval', 'never'), {'on-request', 'never'},
+                'Codex approval must be on-request or never.')
         if 'effort' in selection.options:
             effort = selection.options['effort']
             if not isinstance(effort, str) or effort not in self._efforts:
@@ -192,7 +198,9 @@ class CodexProvider:
     def interactive(self, selection, root, profile):
         profile = _profile(profile)
         prompt = f'Lee y sigue íntegramente {profile.as_posix()}, incluso si excede el límite de autodescubrimiento. Proyecto: {root.as_posix()}. Espera un handoff del tracker.'
-        args = [self.executable, *self._options(selection), '--ask-for-approval', 'on-request',
+        # Herdr-launched agents never wait for approval unless the selection sets approval=on-request.
+        args = [self.executable, *self._options(selection),
+                '--ask-for-approval', selection.options.get('approval', 'never'),
                 '--cd', str(profile.parent), '--add-dir', str(root), prompt]
         return Command(tuple(args), profile.parent, sensitive=frozenset({len(args) - 1}))
 

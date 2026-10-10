@@ -94,7 +94,7 @@ const emit = defineEmits<{
 }>()
 
 const searchQuery = ref<string>('')
-const expandedNodes = ref<Set<string>>(new Set(['documents', 'specs']))
+const expandedNodes = ref<Set<string>>(new Set(['docs', 'specs']))
 
 const toggleExpand = (nodeId: string): void => {
   if (expandedNodes.value.has(nodeId)) {

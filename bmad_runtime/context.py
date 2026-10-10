@@ -57,7 +57,7 @@ class ProjectContext:
         return path
 
     @property
-    def documents_dir(self): return self.output('documents')
+    def docs_dir(self): return self.output('docs')
     @property
     def app_dir(self): return self.output('app')
     @property
@@ -65,7 +65,7 @@ class ProjectContext:
     @property
     def specify_dir(self): return self.output('.specify')
     @property
-    def handoffs_dir(self): return self.output('documents' if self.legacy else 'handoffs')
+    def handoffs_dir(self): return self.output('docs' if self.legacy else 'handoffs')
     @property
     def tracker_path(self): return self.handoffs_dir / 'tracker_bmad.md'
     @property
@@ -86,7 +86,7 @@ class ProjectContext:
             'ENGINE_ROOT': self.engine_root, 'WORKSPACE_ROOT': self.workspace_root,
             'PROJECT_ID': self.project_id, 'BMAD_WORKSPACE': self.workspace_root,
             'BMAD_PROJECT': self.project_id, 'BMAD_TRACKER': self.tracker_path,
-            'BMAD_DOCUMENTS': self.documents_dir, 'BMAD_APP': self.app_dir,
+            'BMAD_DOCUMENTS': self.docs_dir, 'BMAD_APP': self.app_dir,
             'BMAD_HANDOFFS': self.handoffs_dir, 'BMAD_STATE': self.state_dir,
             'BMAD_LOGS': self.logs_dir, 'BMAD_TEMP': self.temp_dir,
             'BMAD_CONFIG': self.output('config_bmad.json' if self.legacy else 'state/config_bmad.json'),
@@ -99,15 +99,15 @@ class ProjectContext:
                 + '\n'.join(f'{key}={value}' for key, value in self.environment().items())
                 + '\nTrabaja con cwd=WORKSPACE_ROOT. Lee perfiles, skills y plantillas compartidas '
                 'mediante rutas absolutas ENGINE_ROOT. Todas las escrituras pertenecen a WORKSPACE_ROOT. '
-                'Reinterpreta ../documents, documents/, app/, specs/, .specify/, temp/ respecto a WORKSPACE_ROOT; '
+                'Reinterpreta ../docs, docs/, app/, specs/, .specify/, temp/ respecto a WORKSPACE_ROOT; '
                 'cualquier tracker_bmad.md usa BMAD_TRACKER; handoffs legacy de utils/ usan BMAD_HANDOFFS. '
                 'RUTA_CONFIGURACION y cualquier lectura legacy de config_bmad.json usan BMAD_CONFIG (configuración efectiva). '
-                'Prohibido escribir en ENGINE_ROOT/utils, ENGINE_ROOT/documents, ENGINE_ROOT/app o perfiles compartidos. '
+                'Prohibido escribir en ENGINE_ROOT/utils, ENGINE_ROOT/docs, ENGINE_ROOT/app o perfiles compartidos. '
                 'No copies agentes ni skills. No ejecutes init_bmad sin selección de proyecto, clean_files o delete_agents. '
                 'Scripts SpecKit: usa .specify/scripts del workspace y SPECIFY_INIT_DIR=WORKSPACE_ROOT; '
                 'La política global está en ENGINE_ROOT/constitution.md; CARPETA_CONTEXTO y la clave context '
                 'son siempre WORKSPACE_ROOT/.specify/memory/constitution.md. Nunca leas la memoria técnica '
-                'de ENGINE_ROOT para otro workspace. Las guías técnicas están en WORKSPACE_ROOT/documents/architecture. '
+                'de ENGINE_ROOT para otro workspace. Las guías técnicas están en WORKSPACE_ROOT/docs/architecture. '
                 'si un proceso hijo no heredó esas variables, pásalas explícitamente. '
                 'No inicialices Git ni uses un repositorio padre. No modifiques otros proyectos.\n')
 
@@ -119,12 +119,12 @@ class ProjectContext:
         if not self.legacy and self.workspace_root.is_relative_to(self.engine_root):
             from .config import AGENT_PHASES
             first = os.path.normcase(self.workspace_root.relative_to(self.engine_root).parts[0])
-            if first in {*AGENT_PHASES, 'documents', 'utils', 'app', 'specs', 'skills', 'bmad_runtime', 'bmad-control-center', '.specify', '.agents', '.claude', '.git', '.github'}:
+            if first in {*AGENT_PHASES, 'docs', 'utils', 'app', 'specs', 'skills', 'bmad_runtime', 'bmad-control-center', '.specify', '.agents', '.claude', '.git', '.github'}:
                 raise ConfigurationError('Workspace overlaps a shared engine directory.')
         if require_exists and not self.workspace_root.is_dir():
             raise ConfigurationError('Workspace does not exist; initialize it explicitly.')
         # Resolve each controlled output, including files, to reject existing links/junctions.
-        for relative in ('documents', 'app', 'specs', '.specify', 'handoffs', 'state', 'logs', 'temp',
+        for relative in ('docs', 'app', 'specs', '.specify', 'handoffs', 'state', 'logs', 'temp',
                          'project.json', 'handoffs/tracker_bmad.md', 'state/state.sqlite3'):
             self.output(relative)
         parent = self.workspace_root

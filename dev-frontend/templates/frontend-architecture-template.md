@@ -5,7 +5,7 @@ description: 'Plantilla maestra para la generación y mantenimiento de la docume
 # 🏗️ PLANTILLA MAESTRA: ARQUITECTURA FRONTEND VIVA (`frontend-architecture.md`)
 
 ## 🎯 OBJETIVO Y REGLA CRÍTICA DE RENDERIZADO SELECTIVO
-Este documento dicta la estructura obligatoria del archivo `frontend-architecture.md` que debes mantener en el directorio `documents/dev-frontend/frontend-architecture.md`. 
+Este documento dicta la estructura obligatoria del archivo `frontend-architecture.md` que debes mantener en el directorio `docs/dev-frontend/frontend-architecture.md`. 
 
 **🚨 REGLA CRÍTICA DE RENDERIZADO SELECTIVO:** 
 NO debes regenerar todos los diagramas o secciones desde cero en cada iteración. Al implementar una nueva Historia de Usuario (HU), debes mantener la estructura de este documento intacta y **SOLO modificar, expandir o detallar con código Mermaid aquellas secciones (rutas, estado, componentes, flujos, etc.) que hayan sido creadas o alteradas por la HU actual**. Lo que no se tocó, se mantiene exactamente igual.

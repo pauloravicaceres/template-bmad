@@ -279,7 +279,7 @@ class FileWatcher:
         """Schedules observers for all allowed roots and tracker file."""
         handler = MultiDirectoryWatcherHandler(loop, callback)
 
-        # Watch each allowed root (documents, specs, .specify)
+        # Watch each allowed root (docs, specs, .specify)
         for root_name in self.watched_roots:
             dir_path = (self.workspace_root / root_name).resolve()
             if dir_path.exists() and dir_path.is_dir():

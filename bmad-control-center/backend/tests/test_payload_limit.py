@@ -9,28 +9,28 @@ import api.artifacts as artifacts_module
 @pytest.fixture
 def payload_limit_client(tmp_path):
     """Fixture providing isolated workspace with oversized and binary documents."""
-    documents_dir = tmp_path / "documents"
-    documents_dir.mkdir()
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir()
 
     # 1. Create an oversized text file (5.5 MB)
-    large_file = documents_dir / "large_execution.log"
+    large_file = docs_dir / "large_execution.log"
     # Write 5.5 MB using sparse/quick write
     with open(large_file, "wb") as f:
         f.seek(5500000)
         f.write(b"\0")
 
     # 2. Create binary documents
-    bin_file = documents_dir / "raw_recording.bin"
+    bin_file = docs_dir / "raw_recording.bin"
     bin_file.write_bytes(b"\x00\x01\x02\x03\xFF\xFE")
 
-    png_file = documents_dir / "screenshot.png"
+    png_file = docs_dir / "screenshot.png"
     png_file.write_bytes(b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR")
 
-    pdf_file = documents_dir / "document.pdf"
+    pdf_file = docs_dir / "document.pdf"
     pdf_file.write_bytes(b"%PDF-1.4\n")
 
     # 3. Create regular valid Markdown file
-    valid_file = documents_dir / "normal.md"
+    valid_file = docs_dir / "normal.md"
     valid_file.write_text("# Normal Markdown Document", encoding="utf-8")
 
     service = ArtifactService(workspace_root=tmp_path)
@@ -45,7 +45,7 @@ class TestPayloadLimitAndMediaType:
     def test_get_artifacts_content_with_oversized_file_returns_413_payload_too_large(self, payload_limit_client):
         client, _ = payload_limit_client
 
-        response = client.get("/api/v1/artifacts/content?path=documents/large_execution.log")
+        response = client.get("/api/v1/artifacts/content?path=docs/large_execution.log")
 
         assert response.status_code == 413
         data = response.json()
@@ -55,7 +55,7 @@ class TestPayloadLimitAndMediaType:
     def test_get_artifacts_content_with_bin_extension_returns_415_unsupported_media_type(self, payload_limit_client):
         client, _ = payload_limit_client
 
-        response = client.get("/api/v1/artifacts/content?path=documents/raw_recording.bin")
+        response = client.get("/api/v1/artifacts/content?path=docs/raw_recording.bin")
 
         assert response.status_code == 415
         data = response.json()
@@ -65,7 +65,7 @@ class TestPayloadLimitAndMediaType:
     def test_get_artifacts_content_with_png_extension_returns_415(self, payload_limit_client):
         client, _ = payload_limit_client
 
-        response = client.get("/api/v1/artifacts/content?path=documents/screenshot.png")
+        response = client.get("/api/v1/artifacts/content?path=docs/screenshot.png")
 
         assert response.status_code == 415
         data = response.json()
@@ -74,7 +74,7 @@ class TestPayloadLimitAndMediaType:
     def test_get_artifacts_content_with_pdf_extension_returns_415(self, payload_limit_client):
         client, _ = payload_limit_client
 
-        response = client.get("/api/v1/artifacts/content?path=documents/document.pdf")
+        response = client.get("/api/v1/artifacts/content?path=docs/document.pdf")
 
         assert response.status_code == 415
         data = response.json()
@@ -83,7 +83,7 @@ class TestPayloadLimitAndMediaType:
     def test_get_artifacts_content_with_normal_size_succeeds(self, payload_limit_client):
         client, _ = payload_limit_client
 
-        response = client.get("/api/v1/artifacts/content?path=documents/normal.md")
+        response = client.get("/api/v1/artifacts/content?path=docs/normal.md")
 
         assert response.status_code == 200
         data = response.json()

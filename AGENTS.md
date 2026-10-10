@@ -10,9 +10,9 @@ Si existe `.codegraph/` en la raíz, utiliza `codegraph_explore` o `codegraph ex
 - Configuración: `bmad_runtime/config.py`; selección y comandos nativos: `registry.py` y `providers.py`.
 - Orquestación: `runtime.py`, `fleet.py`, `services.py` y `herdr.py`.
 - Handoffs, locks y cola: `state.py`, `watcher_service.py` y `workflow.py`.
-- Contrato de operación: [bmad_runtime/README.md](bmad_runtime/README.md).
+- Contrato por módulo: [bmad_runtime/README.md](bmad_runtime/README.md); arquitectura y diagramas: [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Conserva multiworkspace, selección por fase/agente/operación y traducción de effort. Resuelve escrituras mediante ProjectContext; nunca uses el cwd del motor como salida implícita de un proyecto seleccionado. No modifiques trackers, handoffs activos, workspaces externos, secretos ni entregables de `app/` o `documents/` durante el mantenimiento del motor.
+Conserva multiworkspace, selección por fase/agente/operación y traducción de effort. Resuelve escrituras mediante ProjectContext; nunca uses el cwd del motor como salida implícita de un proyecto seleccionado. No modifiques trackers, handoffs activos, workspaces externos, secretos ni entregables de `app/` o `docs/` durante el mantenimiento del motor.
 
 Inspecciona `git status` antes de editar y respeta cambios previos. Comprueba consumidores por imports, carga dinámica, CLI, perfiles, skills y tareas antes de eliminar módulos. Las copias instaladas de skills son dependencias que se cotejan contra `.github/skills`, no duplicados prescindibles.
 

@@ -21,8 +21,8 @@ from bmad_runtime.registry import ProviderFactory
 from bmad_runtime.runtime import Runtime
 from bmad_runtime.workspace import bootstrap
 
-DOCS = ['README.md', 'GUIDE.md', 'SETUP.md', 'ARCHITECTURE.md', 'framework_bmad.md',
-        'AGENTS.md', 'INPUTS_POR_AGENTE.md', 'bmad_runtime/README.md',
+DOCS = ['README.md', 'GUIDE.md', 'SETUP.md', 'ARCHITECTURE.md',
+        'AGENTS.md', 'bmad_runtime/README.md',
         'bmad-control-center/backend/README.md', 'bmad-control-center/frontend/README.md']
 DOCS += [f'{role}/README.md' for role in AGENT_PHASES]
 DOCS += ['constitution.md']
@@ -61,7 +61,7 @@ def main():
                                          initialize=True, environ={}))
                 for name, identity in [('Proyecto A', 'audit-a'), ('Proyecto B ñ', 'audit-b')]]
     for context in contexts:
-        for relative in ('documents/marker.txt', 'app/marker.txt', 'handoffs/marker.txt',
+        for relative in ('docs/marker.txt', 'app/marker.txt', 'handoffs/marker.txt',
                          'state/marker.txt', 'logs/marker.txt', 'temp/marker.txt', 'specs/marker.txt'):
             context.output(relative).write_text(context.project_id, encoding='utf-8')
     a, b = contexts

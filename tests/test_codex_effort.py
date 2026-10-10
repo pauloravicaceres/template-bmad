@@ -55,7 +55,8 @@ class CodexEffortTests(unittest.TestCase):
                 self.assertEqual(interactive.cwd, self.profile.parent)
                 self.assertEqual(interactive.argv[interactive.argv.index('--cd') + 1], str(self.profile.parent))
                 self.assertEqual(interactive.argv[interactive.argv.index('--add-dir') + 1], str(self.root))
-                self.assertEqual(interactive.argv[interactive.argv.index('--ask-for-approval') + 1], 'on-request')
+                self.assertEqual(interactive.argv[interactive.argv.index('--ask-for-approval') + 1], 'never')
+                self.assertNotIn('--ask-for-approval', headless.argv)
                 self.assertIn(self.profile.as_posix(), interactive.argv[-1])
                 self.assertEqual(interactive.sanitized()[-1], '<redacted>')
                 self.assertEqual(headless.argv[:2], ('codex', 'exec'))
@@ -95,6 +96,34 @@ class CodexEffortTests(unittest.TestCase):
         selection = Selection('codex', options={'sandbox': 'read-only', 'effort': 'low'})
         command = self.provider.headless(selection, self.root, 'prompt', None, {})
         self.assertEqual(command.argv[command.argv.index('--sandbox') + 1], 'read-only')
+
+    def test_codex_interactive_never_asks_by_default_and_can_opt_out(self):
+        for options in ({}, {'effort': 'low'}, {'approval': 'never', 'sandbox': 'workspace-write'}):
+            with self.subTest(options=options):
+                interactive = self.provider.interactive(Selection('codex', options=options), self.root, self.profile)
+                self.assertEqual(interactive.argv[interactive.argv.index('--ask-for-approval') + 1], 'never')
+                self.assertEqual(interactive.argv[interactive.argv.index('--sandbox') + 1], 'workspace-write')
+        strict = self.provider.interactive(Selection('codex', options={'approval': 'on-request'}), self.root, self.profile)
+        self.assertEqual(strict.argv[strict.argv.index('--ask-for-approval') + 1], 'on-request')
+        for approval in ('always', 'untrusted', '', None, True, []):
+            with self.subTest(approval=approval), self.assertRaises(ConfigurationError):
+                self.provider.validate(Selection('codex', options={'approval': approval}))
+
+    def test_claude_interactive_bypasses_by_default_headless_stays_manual(self):
+        provider = ClaudeProvider()
+        for options in ({}, {'effort': 'low'}, {'permission_mode': 'bypass'}):
+            with self.subTest(options=options):
+                interactive = provider.interactive(Selection('claude', options=options), self.root, self.profile)
+                self.assertIn('--dangerously-skip-permissions', interactive.argv)
+                self.assertNotIn('--permission-mode', interactive.argv)
+        strict = provider.interactive(Selection('claude', options={'permission_mode': 'plan'}), self.root, self.profile)
+        self.assertEqual(strict.argv[strict.argv.index('--permission-mode') + 1], 'plan')
+        self.assertNotIn('--dangerously-skip-permissions', strict.argv)
+        headless = provider.headless(Selection('claude'), self.root, 'prompt', None, {})
+        self.assertEqual(headless.argv[headless.argv.index('--permission-mode') + 1], 'manual')
+        self.assertNotIn('--dangerously-skip-permissions', headless.argv)
+        with self.assertRaises(ConfigurationError):
+            provider.validate(Selection('claude', options={'permission_mode': 'dangerously-skip-permissions'}))
 
     def test_herdr_forwards_the_exact_native_argument_vector(self):
         native = self.provider.interactive(self.selection('medium'), self.root, self.profile)

@@ -88,7 +88,7 @@ def validate_sandbox_path(
 
     if not is_contained:
         raise PathTraversalError(
-            f"Acceso denegado por seguridad. La ruta solicitada '{requested_path}' resuelve fuera de los límites autorizados del sandbox ('documents/', 'specs/', '.specify/')."
+            f"Acceso denegado por seguridad. La ruta solicitada '{requested_path}' resuelve fuera de los límites autorizados del sandbox ('docs/', 'specs/', '.specify/')."
         )
 
     return resolved_target
@@ -122,7 +122,7 @@ def is_path_in_perimeter(
 ) -> bool:
     """
     Validates if a target path canonically resolves strictly within the perimeter of allowed roots (ADR-007 / ADR-012).
-    Returns True if contained inside one of allowed_roots (documents/, .specify/, specs/).
+    Returns True if contained inside one of allowed_roots (docs/, .specify/, specs/).
     Returns False if it resolves outside or belongs to excluded directories (.git/, .idea/, etc.).
     """
     if not target_path:

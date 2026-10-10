@@ -36,7 +36,7 @@ def test_incompatible_workspaces_and_all_roles(engine):
     a, b = new_project(engine, 'a'), new_project(engine, 'b')
     stack(a, '@angular/core', '.NET')
     stack(b, 'react', 'Python')
-    write(a, 'documents/architecture/frontend.md', 'Angular-only rules')
+    write(a, 'docs/architecture/frontend.md', 'Angular-only rules')
     for role in AGENT_PHASES:
         pa, pb = assemble(a, role=role), assemble(b, role=role)
         assert 'Operación global' in pa and 'Operación global' in pb
@@ -44,8 +44,8 @@ def test_incompatible_workspaces_and_all_roles(engine):
         assert 'Python' in pb and '@angular/core' not in pb
         assert str(a.workspace_root) not in pb
         assert len(pa) < MAX_PROMPT
-    assert 'documents/architecture/frontend.md' not in document_index(a, role='product-manager')
-    assert 'documents/architecture/frontend.md' in document_index(a, role='dev-frontend')
+    assert 'docs/architecture/frontend.md' not in document_index(a, role='product-manager')
+    assert 'docs/architecture/frontend.md' in document_index(a, role='dev-frontend')
 
 
 def test_brownfield_without_docs_observations_not_approval(engine):
@@ -118,9 +118,9 @@ def test_no_engine_memory_fallback_or_duplicate_documents(engine):
     ctx = new_project(engine)
     ctx.output('.specify/memory/constitution.md').unlink()
     assert 'Foreign' not in assemble(ctx, role='solutions-architect')
-    write(ctx, 'documents/architecture/architecture.md', 'a' * 60_000)
+    write(ctx, 'docs/architecture/architecture.md', 'a' * 60_000)
     prompt = assemble(ctx, role='solutions-architect')
-    assert prompt.count('DOCUMENTO LOCAL: ' + ctx.output('documents/architecture/architecture.md').as_posix()) == 1
+    assert prompt.count('DOCUMENTO LOCAL: ' + ctx.output('docs/architecture/architecture.md').as_posix()) == 1
     assert 'a' * 100 not in prompt
     assert len(prompt) < MAX_PROMPT
 
@@ -197,12 +197,12 @@ def test_context_record_never_overwrites_approved_inventory(engine, monkeypatch,
     from bmad_runtime import workspace
     ctx = new_project(engine)
     monkeypatch.setattr(workspace, 'ENGINE_ROOT', engine)
-    write(ctx, 'documents/architecture/tech-stack.md', 'Aprobado: decisión humana')
+    write(ctx, 'docs/architecture/tech-stack.md', 'Aprobado: decisión humana')
     write(ctx, 'requirements.txt', 'fastapi==0.115\n')
     assert workspace.main(['context', '--workspace', str(ctx.workspace_root), '--record']) == 0
     capsys.readouterr()
-    assert ctx.output('documents/architecture/tech-stack.md').read_text(encoding='utf-8') == 'Aprobado: decisión humana'
-    recorded = json.loads(ctx.output('documents/architecture/stack-observations.json').read_text(encoding='utf-8'))
+    assert ctx.output('docs/architecture/tech-stack.md').read_text(encoding='utf-8') == 'Aprobado: decisión humana'
+    recorded = json.loads(ctx.output('docs/architecture/stack-observations.json').read_text(encoding='utf-8'))
     assert recorded['differences'] and recorded['mode'] == 'brownfield'
 
 

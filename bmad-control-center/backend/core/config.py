@@ -31,8 +31,8 @@ class Settings(BaseModel):
     
     # Workspace & File-System as Database boundaries
     WORKSPACE_ROOT: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[3])
-    TRACKER_FILE: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[3] / "documents" / "tracker_bmad.md")
-    ALLOWED_ROOTS: List[str] = ["documents", "specs", ".specify"]
+    TRACKER_FILE: Path = Field(default_factory=lambda: Path(__file__).resolve().parents[3] / "docs" / "tracker_bmad.md")
+    ALLOWED_ROOTS: List[str] = ["docs", "specs", ".specify"]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -48,7 +48,7 @@ def load_settings() -> Settings:
         PROJECT_NAME=data.get('project_name', context.project_id),
         WORKSPACE_ROOT=context.workspace_root,
         TRACKER_FILE=context.tracker_path,
-        ALLOWED_ROOTS=["documents", "specs", ".specify"] + ([] if context.legacy else ['handoffs'])
+        ALLOWED_ROOTS=["docs", "specs", ".specify"] + ([] if context.legacy else ['handoffs'])
     )
 
 

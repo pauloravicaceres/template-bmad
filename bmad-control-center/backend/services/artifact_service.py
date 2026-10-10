@@ -126,14 +126,14 @@ class ArtifactService:
 
     def get_artifact_tree(self, root: str = "all") -> ArtifactTreeResponse:
         """
-        Escanea recursivamente las raíces del workspace autorizadas ('documents/', 'specs/', '.specify/').
+        Escanea recursivamente las raíces del workspace autorizadas ('docs/', 'specs/', '.specify/').
         Valida que el parámetro root pertenezca a la lista blanca o sea 'all'.
         """
-        valid_roots = ["documents", "specs", ".specify", "all"]
+        valid_roots = ["docs", "specs", ".specify", "all"]
         if root not in valid_roots:
             raise HTTPException(
                 status_code=400,
-                detail=f"El parámetro 'root' recibido ('{root}') no es una raíz autorizada. Valores admitidos: 'documents', 'specs', '.specify', 'all'."
+                detail=f"El parámetro 'root' recibido ('{root}') no es una raíz autorizada. Valores admitidos: 'docs', 'specs', '.specify', 'all'."
             )
 
         roots_to_scan = settings.ALLOWED_ROOTS if root == "all" else [root]

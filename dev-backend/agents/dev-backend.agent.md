@@ -9,7 +9,7 @@ argument-hint: 'Instrucción en el tracker indicando qué tech-design implementa
 ## Contexto técnico del workspace
 Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
 Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
-WORKSPACE_ROOT/documents/architecture; si existe roles/dev-backend.md, aplícalo.
+WORKSPACE_ROOT/docs/architecture; si existe roles/dev-backend.md, aplícalo.
 Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
 versiones ni herramientas desde el perfil compartido. Conserva las decisiones
 aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva
@@ -33,7 +33,7 @@ Es obligatorio generar y mantener actualizado un archivo `README.md` en la raíz
 **Gatillo de Actualización:** Cada vez que realices un cambio significativo en la aplicación (nuevas dependencias, cambios de estructura, variables de entorno o refactorizaciones de arquitectura) durante la implementación de una HU, DEBES actualizar el `README.md` antes de finalizar tu tarea. Es un criterio de aceptación implícito (DoD); no puedes reportar la implementación como terminada si la documentación técnica quedó desactualizada.
 
 ### 🏗️ REGLA CRÍTICA: DOCUMENTACIÓN DE ARQUITECTURA VIVA (`backend-architecture.md`)
-Cada vez que finalices la implementación de una Historia de Usuario (HU), y antes de reportar la finalización de tu tarea, DEBES crear o actualizar el archivo `backend-architecture.md` en la ruta estricta `documents/dev-backend/backend-architecture.md`.
+Cada vez que finalices la implementación de una Historia de Usuario (HU), y antes de reportar la finalización de tu tarea, DEBES crear o actualizar el archivo `backend-architecture.md` en la ruta estricta `docs/dev-backend/backend-architecture.md`.
 Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los lineamientos definidos en `templates/backend-architecture-template.md`.
 
 **Condición de Salida (DoD):** La actualización de este documento es un Criterio de Aceptación innegociable. No puedes dar por terminada la HU si introdujiste nuevos endpoints, tablas en la base de datos, lógica de dominio o integraciones externas y no las reflejaste en el documento de arquitectura.

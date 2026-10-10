@@ -21,7 +21,7 @@ def test_profile_compilation_does_not_require_an_application(tmp_path, monkeypat
     monkeypatch.setattr(workflow, 'compilar_agentes_modulares', compiler)
     assert workflow.main(['--compile-profiles']) == 0
     compiler.assert_called_once_with()
-    assert not (tmp_path / 'documents').exists()
+    assert not (tmp_path / 'docs').exists()
     monkeypatch.setenv('BMAD_PROJECT', 'unselected')
     with pytest.raises(SystemExit):
         workflow.main(['--compile-profiles'])
@@ -80,7 +80,7 @@ def test_shared_engine_directory_rejected_with_different_casing(tmp_path):
     engine = tmp_path / 'motor'
     engine.mkdir()
     with pytest.raises(ConfigurationError, match='overlaps'):
-        resolve_context(engine, workspace=engine / 'Documents/new', project='audit', initialize=True, environ={})
+        resolve_context(engine, workspace=engine / 'Docs/new', project='audit', initialize=True, environ={})
 
 
 @pytest.mark.parametrize('provider,key', [
@@ -104,15 +104,15 @@ def test_direct_claude_commands_validate_options(tmp_path, mode):
             provider.headless(selection, tmp_path, 'prompt', profile, {})
 
 
-@pytest.mark.parametrize('output', ['absolute', 'documents/../app/file.md', '../other/file.md'])
+@pytest.mark.parametrize('output', ['absolute', 'docs/../app/file.md', '../other/file.md'])
 def test_workflow_without_runtime_obeys_workspace_output_contract(tmp_path, monkeypatch, output):
     from bmad_runtime import workflow
 
     monkeypatch.setattr(workflow, '_runtime', None)
     monkeypatch.setattr(workflow, 'DIRECTORIO_RAIZ', tmp_path)
     monkeypatch.setattr(workflow, 'ENGINE_ROOT', tmp_path)
-    assert workflow.project_output('documents/file.md') == tmp_path / 'documents/file.md'
+    assert workflow.project_output('docs/file.md') == tmp_path / 'docs/file.md'
     if output == 'absolute':
-        output = str(tmp_path / 'documents/file.md')
+        output = str(tmp_path / 'docs/file.md')
     with pytest.raises(ConfigurationError):
         workflow.project_output(output)

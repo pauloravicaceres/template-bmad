@@ -9,7 +9,7 @@ argument-hint: 'Instrucción en el tracker para aprovisionar o modificar infraes
 ## Contexto técnico del workspace
 Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
 Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
-WORKSPACE_ROOT/documents/architecture; si existe roles/devops.md, aplícalo.
+WORKSPACE_ROOT/docs/architecture; si existe roles/devops.md, aplícalo.
 Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
 versiones ni herramientas desde el perfil compartido. Conserva las decisiones
 aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva

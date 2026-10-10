@@ -9,22 +9,22 @@ import api.artifacts as artifacts_module
 @pytest.fixture
 def isolated_workspace(tmp_path):
     """Fixture creating an isolated workspace structure with documents, specs and .specify."""
-    documents_dir = tmp_path / "documents"
+    docs_dir = tmp_path / "docs"
     specs_dir = tmp_path / "specs"
     specify_dir = tmp_path / ".specify"
 
-    documents_dir.mkdir()
+    docs_dir.mkdir()
     specs_dir.mkdir()
     specify_dir.mkdir()
 
     # Create dummy documents
-    ba_dir = documents_dir / "business-analyst"
+    ba_dir = docs_dir / "business-analyst"
     ba_dir.mkdir()
     hu_file = ba_dir / "002-HU.md"
     hu_file.write_text("# Feature BDD\n\n```mermaid\ngraph TD\nA-->B\n```", encoding="utf-8")
 
     # Empty directory (US2 / T023)
-    empty_sa_dir = documents_dir / "solutions-architect"
+    empty_sa_dir = docs_dir / "solutions-architect"
     empty_sa_dir.mkdir()
 
     # Spec file
@@ -71,11 +71,11 @@ class TestArtifactsApi:
     def test_get_artifacts_tree_detects_empty_directories_without_failing(self, isolated_workspace):
         client, _, _ = isolated_workspace
 
-        response = client.get("/api/v1/artifacts/tree?root=documents")
+        response = client.get("/api/v1/artifacts/tree?root=docs")
 
         assert response.status_code == 200
         data = response.json()
-        documents_node = next(c for c in data["root_node"]["children"] if c["name"] == "documents")
+        documents_node = next(c for c in data["root_node"]["children"] if c["name"] == "docs")
         
         # Check solutions-architect directory is marked is_empty=True and child_file_count=0
         sa_node = next(c for c in documents_node["children"] if c["name"] == "solutions-architect")
@@ -90,11 +90,11 @@ class TestArtifactsApi:
     def test_get_artifacts_content_with_valid_markdown_file_returns_200_and_payload(self, isolated_workspace):
         client, _, _ = isolated_workspace
 
-        response = client.get("/api/v1/artifacts/content?path=documents/business-analyst/002-HU.md")
+        response = client.get("/api/v1/artifacts/content?path=docs/business-analyst/002-HU.md")
 
         assert response.status_code == 200
         data = response.json()
-        assert data["relative_path"] == "documents/business-analyst/002-HU.md"
+        assert data["relative_path"] == "docs/business-analyst/002-HU.md"
         assert data["filename"] == "002-HU.md"
         assert data["detected_format"] == "MARKDOWN"
         assert data["encoding"] == "utf-8"
@@ -117,7 +117,7 @@ class TestArtifactsApi:
     def test_get_artifacts_content_with_non_existent_file_returns_404_not_found(self, isolated_workspace):
         client, _, _ = isolated_workspace
 
-        response = client.get("/api/v1/artifacts/content?path=documents/inexistente.md")
+        response = client.get("/api/v1/artifacts/content?path=docs/inexistente.md")
 
         assert response.status_code == 404
         error_data = response.json()

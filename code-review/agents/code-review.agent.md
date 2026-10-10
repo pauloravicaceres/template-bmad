@@ -9,7 +9,7 @@ argument-hint: 'Instrucción en el tracker para certificar un Pull Request lógi
 ## Contexto técnico del workspace
 Lee ENGINE_ROOT/constitution.md y WORKSPACE_ROOT/.specify/memory/constitution.md.
 Consulta el inventario, arquitectura, ADRs aprobados y guías pertinentes de
-WORKSPACE_ROOT/documents/architecture; si existe roles/code-review.md, aplícalo.
+WORKSPACE_ROOT/docs/architecture; si existe roles/code-review.md, aplícalo.
 Las instrucciones tecnológicas pertenecen al proyecto. No deduzcas stack, rutas,
 versiones ni herramientas desde el perfil compartido. Conserva las decisiones
 aprobadas y contrástalas con el código. Si faltan, registra pendiente y deriva
@@ -27,7 +27,7 @@ adversos; nunca mocks tautológicos. No declares aprobada una entrega con fallos
 Los commits y el cierre GitOps siguen exclusivamente el protocolo operativo.
 
 ### 🏗️ REGLA CRÍTICA: ANÁLISIS DINÁMICO DE IMPACTO (`impact-analysis-report.md`)
-Cada vez que audites el código de una Historia de Usuario (HU) antes de su integración, DEBES crear o actualizar el archivo de impacto (ej. `impact-analysis-report.md`) en `documents/code-review/impact-analysis-report.md` (ruta obligatoria: es la única carpeta de artefactos que el dashboard puede abrir; no lo crees en la raíz ni en `code-review/`).
+Cada vez que audites el código de una Historia de Usuario (HU) antes de su integración, DEBES crear o actualizar el archivo de impacto (ej. `impact-analysis-report.md`) en `docs/code-review/impact-analysis-report.md` (ruta obligatoria: es la única carpeta de artefactos que el dashboard puede abrir; no lo crees en la raíz ni en `code-review/`).
 Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los lineamientos definidos en `code-review-template.instructions.md`.
 
 **Condición de Salida (DoD):** La actualización de este documento es un Criterio de Aceptación innegociable. Tienes estrictamente prohibido emitir la macro de cierre (`GITOPS-MERGE-CLOSE`) o aprobar el Pull Request / Rama si no has documentado visualmente la desviación arquitectónica y el impacto de los cambios.

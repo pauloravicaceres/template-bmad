@@ -32,11 +32,11 @@ def bootstrap(context, *, config_path=None):
         # Recheck identity under the lock, including racing initializations.
         resolve_context(context.engine_root, workspace=context.workspace_root, project=context.project_id,
                         config_path=config_path)
-        for folder in ('documents', 'app', 'handoffs', 'state', 'logs', 'temp', 'specs', '.specify/memory'):
+        for folder in ('docs', 'app', 'handoffs', 'state', 'logs', 'temp', 'specs', '.specify/memory'):
             context.output(folder).mkdir(parents=True, exist_ok=True)
         for role in AGENT_PHASES:
-            context.output(f'documents/{role}').mkdir(parents=True, exist_ok=True)
-        context.output('documents/business-analyst/HUs-stakeholders').mkdir(parents=True, exist_ok=True)
+            context.output(f'docs/{role}').mkdir(parents=True, exist_ok=True)
+        context.output('docs/business-analyst/HUs-stakeholders').mkdir(parents=True, exist_ok=True)
         write_new(context.output('handoffs/tracker_bmad.md'), '')
         # Only tool scaffolding, never project memory, installed skills or agents.
         for folder in ('scripts', 'templates'):
@@ -65,7 +65,7 @@ def migration_plan(context):
         raise ConfigurationError('Migration requires a separate workspace.')
     rows = []
     # Utility source code stays shared. Only known project payloads are migrated.
-    mappings = [('documents', 'documents'), ('app', 'app'), ('specs', 'specs'),
+    mappings = [('docs', 'docs'), ('app', 'app'), ('specs', 'specs'),
                 ('.specify/memory', '.specify/memory'), ('.specify/feature.json', '.specify/feature.json'),
                 ('utils', 'handoffs')]
     for old, new in mappings:
@@ -134,7 +134,7 @@ def main(argv=None):
             from .technical_context import assemble, discover
             result = {'context': assemble(context, role=args.role), 'discovery': discover(context)}
             if args.record:
-                path = context.output('documents/architecture/stack-observations.json')
+                path = context.output('docs/architecture/stack-observations.json')
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(json.dumps(result['discovery'], ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         elif args.action == 'migrate':

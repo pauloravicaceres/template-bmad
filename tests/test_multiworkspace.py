@@ -37,7 +37,7 @@ def engine(tmp_path):
     for name in AGENT_PHASES:
         folder = root / name
         folder.mkdir()
-        (folder / 'AGENTS.md').write_text('Shared role: write legacy ../documents here.', encoding='utf-8')
+        (folder / 'AGENTS.md').write_text('Shared role: write legacy ../docs here.', encoding='utf-8')
     for folder in ('.github', '.agents', '.claude'):
         for operation in ('specify', 'clarify', 'plan', 'tasks', 'analyze', 'converge', 'implement'):
             skill = root / folder / 'skills' / f'speckit-{operation}'
@@ -116,13 +116,13 @@ def test_invalid_identity(engine, identity):
 
 
 def test_engine_overlap_rejected(engine):
-    for path in (engine, engine.parent, engine / 'documents/new', engine / 'business-analyst/new'):
+    for path in (engine, engine.parent, engine / 'docs/new', engine / 'business-analyst/new'):
         with pytest.raises(ConfigurationError):
             resolve_context(engine, workspace=path, project='alpha', initialize=True, environ={})
 
 
 @pytest.mark.parametrize('config', [{'tracker': '../other'}, {'ai': {'providers': {}}},
-                                   {'code_dirs': {'backend': '../escape'}}, {'code_dirs': {'frontend': 'documents/code'}}])
+                                   {'code_dirs': {'backend': '../escape'}}, {'code_dirs': {'frontend': 'docs/code'}}])
 def test_disallowed_overrides(engine, config):
     ctx = new_project(engine)
     ctx.output('project.json').write_text(json.dumps({'schema_version': 1, 'project_id': 'alpha', 'config': config}))
@@ -187,7 +187,7 @@ def test_parallel_ab_artifacts_watchers_locks_and_dedupe(engine):
                 service = WatcherService(rt)
                 if ctx.project_id == 'alpha':
                     ctx.tracker_path.write_text('- **Handoff:** @BA: alpha only\n', encoding='utf-8')
-                    ctx.output('documents/result.md').write_text('alpha', encoding='utf-8')
+                    ctx.output('docs/result.md').write_text('alpha', encoding='utf-8')
                     ctx.output('app/main.py').write_text('alpha', encoding='utf-8')
                 lines = service.read_lines()
                 for n, line in enumerate(lines):
@@ -201,7 +201,7 @@ def test_parallel_ab_artifacts_watchers_locks_and_dedupe(engine):
             rt.close()
     with ThreadPoolExecutor(2) as pool:
         assert list(pool.map(simulate, (a, b))) == [1, 0]
-    assert not b.output('documents/result.md').exists()
+    assert not b.output('docs/result.md').exists()
     assert not b.output('app/main.py').exists()
     assert a.state_dir != b.state_dir
     assert a.session_name('business-analyst') != b.session_name('business-analyst')
@@ -262,8 +262,8 @@ def test_same_project_speckit_conflict_starts_no_process(engine):
 
 
 def test_migration_dry_run_and_exclusive_copy(engine):
-    (engine / 'documents').mkdir()
-    (engine / 'documents/tracker_bmad.md').write_text('history', encoding='utf-8')
+    (engine / 'docs').mkdir()
+    (engine / 'docs/tracker_bmad.md').write_text('history', encoding='utf-8')
     (engine / 'utils').mkdir()
     (engine / 'utils/handoff_qa.md').write_text('handoff', encoding='utf-8')
     (engine / 'utils/tool.py').write_text('shared', encoding='utf-8')
@@ -284,7 +284,7 @@ def test_migration_dry_run_and_exclusive_copy(engine):
 def test_legacy_warning_preserves_paths(engine):
     with pytest.warns(FutureWarning, match='legacy'):
         ctx = resolve_context(engine, environ={})
-    assert ctx.tracker_path == engine / 'documents/tracker_bmad.md'
+    assert ctx.tracker_path == engine / 'docs/tracker_bmad.md'
     assert ctx.state_dir == engine / '.bmad-runtime'
     assert ctx.session_name('business-analyst') == 'business-analyst'
 
@@ -297,7 +297,7 @@ def test_effective_config_for_shared_roles_uses_workspace_outputs(engine):
         view = json.loads(Path(ctx.environment()['BMAD_CONFIG']).read_text(encoding='utf-8'))
         assert view['tracker'] == str(ctx.tracker_path)
         assert view['context'] == str(ctx.output('.specify/memory/constitution.md'))
-        assert view['routes_bmad']['business-analyst'] == str(ctx.output('documents/business-analyst'))
+        assert view['routes_bmad']['business-analyst'] == str(ctx.output('docs/business-analyst'))
         assert ctx.output('project.json').read_bytes() == identity
     finally:
         rt.close()
@@ -359,6 +359,6 @@ def test_workflow_uses_selected_tracker_and_config(engine, monkeypatch):
         assert workflow.SKILLS_DIR == ctx.engine_root / 'skills'
         assert workflow.project_settings()['project_name'] == 'alpha'
         assert str(ctx.tracker_path) in workflow.texto_recordatorio('business-analyst')
-        assert not (engine / 'documents/tracker_bmad.md').exists()
+        assert not (engine / 'docs/tracker_bmad.md').exists()
     finally:
         rt.close()

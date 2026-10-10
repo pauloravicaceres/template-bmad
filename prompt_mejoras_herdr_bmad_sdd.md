@@ -5,7 +5,7 @@ Actúa como **arquitecto de software senior y especialista en orquestación mult
 
 ## Contexto confirmado del proyecto
 - `start_agents.py` crea paneles/pestañas de Herdr y levanta agentes Claude con configuración de modelo y esfuerzo. Confirma su ruta real en el repositorio.
-- `watcher_bmad.py` vigila `documents/tracker_bmad.md`, despacha handoffs y ejecuta habilidades de Spec Kit con Claude Code en modo headless. Confirma rutas, interfaces y comportamiento real antes de intervenir.
+- `watcher_bmad.py` vigila `docs/tracker_bmad.md`, despacha handoffs y ejecuta habilidades de Spec Kit con Claude Code en modo headless. Confirma rutas, interfaces y comportamiento real antes de intervenir.
 - Existe una función `limpiar_sesiones_agentes()` que envía `/clear` a agentes libres al cierre de una historia de usuario (HU). **No supongas** que `/clear` funciona sin verificarlo mediante una prueba controlada.
 - `ejecutar_speckit()` utiliza `claude -p`; se desean límites y telemetría, pero **debes verificar las opciones que admite la versión instalada** antes de incorporarlas.
 - El proyecto puede incluir `ux_routing.py`, `config_bmad.json`, `.specify/feature.json`, `AGENTS.md` y reglas de handoff propias. No inventes sus contratos: léelos.

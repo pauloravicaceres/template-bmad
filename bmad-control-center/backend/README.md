@@ -35,7 +35,7 @@ Los endpoints REST usan `/api/v1`: `/project`, `/projects`, `/project/context`, 
 
 El canal canónico es `/ws/v1/events`; los alias `/api/v1/ws/monitor`, `/ws/hitl` y `/ws` comparten el mismo manejador. Envía frames JSON; PING recibe PONG y los frames inválidos cierran con WS 1008.
 
-Las raíces documentales son `documents`, `specs`, `.specify` y, en multiworkspace, `handoffs`. El observador compara la ruta completa del tracker. Las compuertas escriben decisiones en ese tracker; sockets, cachés y observadores pertenecen al proceso seleccionado. Los eventos de archivos mayores de 5 MiB llevan metadatos; la ventana de debounce es 200 ms.
+Las raíces documentales son `docs`, `specs`, `.specify` y, en multiworkspace, `handoffs`. El observador compara la ruta completa del tracker. Las compuertas escriben decisiones en ese tracker; sockets, cachés y observadores pertenecen al proceso seleccionado. Los eventos de archivos mayores de 5 MiB llevan metadatos; la ventana de debounce es 200 ms.
 
 ## Pruebas
 
@@ -45,7 +45,7 @@ Desde la raíz del motor:
 & $Python -B tests/run_isolated.py bmad-control-center/backend/tests -q
 ```
 
-Instala las dependencias de [requirements.txt](requirements.txt), incluido AnyIO. Las pruebas Git deben usar repositorios temporales: no crees `index.lock` en el repositorio del usuario. Los contratos del motor y su matriz offline están documentados en [README](../../README.md#validación-local).
+Instala las dependencias de [requirements.txt](requirements.txt), incluido AnyIO. Las pruebas Git deben usar repositorios temporales: no crees `index.lock` en el repositorio del usuario. Los contratos del motor y su matriz offline están documentados en [SETUP](../../SETUP.md#validación-local).
 
 Sin selección, `/project` devuelve identidad y ruta nulas y `/projects` lista el registro global.
 Las demás rutas de proyecto responden 409 y los WebSockets se cierran sin observar el motor.
