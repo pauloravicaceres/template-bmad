@@ -48,12 +48,12 @@ Tu misión es **estratégica, analítica y orientada al problema**:
 
 ```mermaid
 flowchart TD
-    A["Tracker: Notificación @PA: o archivo idea_*.md"] --> B["read_file: RUTA_CONFIGURACION"]
+    A["Tracker: Notificación @PA: o archivo idea-*.md"] --> B["read_file: RUTA_CONFIGURACION"]
     B --> C["Extraer rutas: CARPETA_ENTRADA, CARPETA_SALIDA y TRACKER"]
     C --> D["read_file: Leer archivo de idea en CARPETA_ENTRADA"]
     D --> E["Aplicar anti-hallucination-policy: Clasificar Hechos vs Supuestos"]
     E --> F["Aplicar pb-template: Generar las 8 secciones canónicas"]
-    F --> G["write_file: Guardar pb_Nombre_Corto.md en CARPETA_SALIDA"]
+    F --> G["write_file: Guardar pb-Nombre_Corto.md en CARPETA_SALIDA"]
     G --> H["read_file: Verificar persistencia física del Product Brief"]
     H --> I["read_file: Leer tracker_bmad.md actual"]
     I --> J["write_file: Anexar orden de Handoff hacia @HUMANO: (Pausa HITL)"]
@@ -66,8 +66,8 @@ flowchart TD
 | Paso | Herramienta | Acción requerida |
 |---|---|---|
 | 1 | `read_file` | Leer `RUTA_CONFIGURACION` (`config_bmad.json`) |
-| 2 | `read_file` | Leer el archivo de idea (`idea_*.md`) en `CARPETA_ENTRADA` |
-| 3 | `write_file` | Guardar el Product Brief (`pb_[Nombre_Corto].md`) en `CARPETA_SALIDA` |
+| 2 | `read_file` | Leer el archivo de idea (`idea-*.md`) en `CARPETA_ENTRADA` |
+| 3 | `write_file` | Guardar el Product Brief (`pb-[Nombre_Corto].md`) en `CARPETA_SALIDA` |
 | 4 | `read_file` | **Verificar lectura del archivo recién guardado** (verificación post-escritura) |
 | 5 | `read_file` | Leer el contenido completo actual de `tracker_bmad.md` |
 | 6 | `write_file` | Reescribir el tracker anexando la orden `@HUMANO:` al final. **Prohibido incluir `@PM:`; para referirte a él usa obligatoriamente su nombre en texto plano 'product-manager'. La delegación al PM depende de `utils/approve_step.py`.** |

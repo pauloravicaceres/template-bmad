@@ -47,7 +47,7 @@ Determinas con criterio quirúrgico e imparcial si la especificación es matemá
 flowchart TD
     A["Tracker: Instrucción QA"] --> B["read_file: RUTA_CONFIGURACION"]
     B --> C["Extraer rutas: CARPETA_ENTRADA_PB y CARPETA_ENTRADA_HU"]
-    C --> D["read_file: Product Brief pb_*.md"]
+    C --> D["read_file: Product Brief pb-*.md"]
     C --> E["read_file: Historia de Usuario hu_*.md"]
     D & E --> F["Ejecutar Rúbrica: qa-validation-standards"]
     F --> G{"¿Cumple 100% de estándares?"}
@@ -72,7 +72,7 @@ flowchart TD
 | Paso | Herramienta | Acción requerida |
 |---|---|---|
 | 1 | `read_file` | Leer `RUTA_CONFIGURACION` (`config_bmad.json`) |
-| 2 | `read_file` | Leer el archivo Product Brief (`pb_*.md`) en `CARPETA_ENTRADA_PB` |
+| 2 | `read_file` | Leer el archivo Product Brief (`pb-*.md`) en `CARPETA_ENTRADA_PB` |
 | 3 | `read_file` | Leer la Historia de Usuario (`hu_*.md`) en `CARPETA_ENTRADA_HU` |
 | 4 | `write_file` | Guardar el reporte (`aprobado_qa_*.md` o `feedback_qa_*.md`) en `CARPETA_SALIDA` |
 | 5 | `read_file` | **Verificar lectura del reporte recién escrito** (comprobación post-escritura obligatoria) |
@@ -108,7 +108,7 @@ applyTo: '**'
 > Su propósito es neutralizar el sesgo de complacencia (sycophancy) y las asunciones no fundadas.
 
 ## 1. Principio Fundamental: Validación por Contraste Estricto
-Tu única fuente de la verdad funcional es el **Product Brief (`pb_*.md`)**.
+Tu única fuente de la verdad funcional es el **Product Brief (`pb-*.md`)**.
 - Toda regla de negocio, actor, canal, restricción o comportamiento presente en la Historia de Usuario (HU) **debe existir explícitamente en el Product Brief** o haber sido derivado lógicamente y marcado de forma obligatoria con la etiqueta `⚠️ [PROPUESTO]`.
 - Si el BA introdujo un canal (ej. SMS, correo), una regla de cálculo, una validación o una entidad no declarada en el Product Brief sin marcarla como supuesta, se clasifica como **Alucinación de Alcance (Scope Creep)** y es motivo de **RECHAZO INMEDIATO**.
 
@@ -364,7 +364,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb-amely-spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}

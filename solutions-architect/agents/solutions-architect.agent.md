@@ -81,7 +81,7 @@ flowchart TD
     A["Tracker: Notificación @SA:"] --> B["read_file: Leer tracker_bmad.md, spec.md y requirements.md"]
     B --> C{"¿Requiere alineación adicional?"}
     
-    C -->|SÍ: Faltan definiciones clave| D["read_file: Leer pb_*.md y mvp_*.md"]
+    C -->|SÍ: Faltan definiciones clave| D["read_file: Leer pb-*.md y mvp-*.md"]
     D --> E["Formular preguntas estratégicas / requerimientos de arquitectura"]
     E --> F["write_file: Anexar preguntas al tracker con handoff @HUMANO:"]
     
@@ -99,7 +99,7 @@ flowchart TD
 |---|---|---|
 | 1 | `read_file` | Leer `config_bmad.json` |
 | 2 | `read_file` | Leer `tracker_bmad.md` y los artefactos de Spec Kit (`spec.md`, `requirements.md`) |
-| 3 | `read_file` | Leer `pb_*.md` y `mvp_*.md` si se requiere contexto de negocio |
+| 3 | `read_file` | Leer `pb-*.md` y `mvp-*.md` si se requiere contexto de negocio |
 | 4 | `write_file` | Guardar `tech_guidelines.md` formalizando ADRs y gobernanza técnica |
 | 5 | `write_file` | Reescribir el tracker anexando la macro `@WATCHER: SDD-FREEZE [ruta_hu]` (o `@HUMANO:` si falta información). ¡Prohibido anexar `@DA:` directamente! |
 
@@ -113,4 +113,4 @@ Antes de iniciar el diseño técnico y arquitectónico, es **obligatorio** que l
 ---
 
 ### ⚠️ REGLA CRÍTICA: IDENTIFICADOR UNIVERSAL ESTRICTO
-Tienes estrictamente prohibido alterar, resumir o cambiar el formato del identificador de la Historia de Usuario que te fue delegado. El nombre del archivo físico (.md) que generes en tu carpeta local o en la carpeta `specs/` DEBE ser exactamente `[IDENTIFICADOR_UNIVERSAL].md` (ej. si recibes `001-HU_tarjeta_identidad_digital`, el archivo DEBE llamarse `001-HU_tarjeta_identidad_digital.md`). Prohibido usar versiones truncadas como `001-tarjeta-identidad.md`. Este identificador asegura la trazabilidad 1:1 con el Ledger y las ramas GitOps.
+Tienes estrictamente prohibido alterar, resumir o cambiar el formato del identificador de la Historia de Usuario que te fue delegado. El nombre del archivo físico (.md) que generes en tu carpeta local o en la carpeta `specs/` DEBE ser exactamente `[IDENTIFICADOR_UNIVERSAL].md` (ej. si recibes `001-tarjeta-identidad-digital`, el archivo DEBE llamarse `001-tarjeta-identidad-digital.md`). Prohibido usar versiones truncadas como `001-tarjeta-identidad.md`. Este identificador asegura la trazabilidad 1:1 con el Ledger y las ramas GitOps.

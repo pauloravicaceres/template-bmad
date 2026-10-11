@@ -1,20 +1,20 @@
 ---
-description: 'Usar para estructurar la salida física del archivo mvp_[nombre_corto].md en la carpeta product-manager. Define las secciones canónicas obligatorias validadas por el Watcher de BMAD.'
+description: 'Usar para estructurar la salida física del archivo mvp-[nombre_corto].md en la carpeta product-manager. Define las secciones canónicas obligatorias validadas por el Watcher de BMAD.'
 applyTo: '**'
 ---
 
 # Plantilla Determinista del Plan MVP
 
-> Estructura estricta para el artefacto generado por el Product Manager (`mvp_[nombre_corto].md`).
+> Estructura estricta para el artefacto generado por el Product Manager (`mvp-[nombre_corto].md`).
 > Las secciones señaladas son obligatorias y evaluadas por el contrato de handoff del Watcher.
 
 ---
 
 ## Convención de Nombres de Archivo
 ```
-mvp_[nombre_corto].md
+mvp-[nombre_corto].md
 ```
-- `nombre_corto`: snake_case, máximo 4 palabras, derivado del nombre del archivo Product Brief (ej. de `pb_reserva_citas.md` se genera `mvp_reserva_citas.md`).
+- `nombre_corto`: kebab-case (minúsculas, sin tildes, palabras separadas por guiones), máximo 4 palabras, derivado del nombre del archivo Product Brief (ej. de `pb-reserva-citas.md` se genera `mvp-reserva-citas.md`).
 
 ---
 
@@ -45,21 +45,21 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 ### [P1] Épica: {{Nombre de la Funcionalidad Core}}
 - **Descripción de Negocio:** {{Qué resuelve esta épica a nivel macro}}.
 - **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
-- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Por qué esta épica constituye el núcleo indispensable del MVP}}.
 - **Trazabilidad PRD:** {{Sección o requerimiento del Product Brief que la origina}}.
 
 ### [P2] Épica: {{Nombre de la Funcionalidad Dependiente / Catálogo}}
 - **Descripción de Negocio:** {{Qué resuelve}}.
 - **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
-- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Por qué ocupa el segundo nivel de prelación}}.
 - **Trazabilidad PRD:** {{Referencia al brief}}.
 
 ### [P3] Épica: {{Nombre de Autogestión o Siguiente Prioridad}}
 - **Descripción de Negocio:** {{Qué resuelve}}.
 - **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
-- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Motivo de prelación}}.
 - **Trazabilidad PRD:** {{Referencia al brief}}.
 
@@ -84,7 +84,7 @@ Una épica agrupa **varias HU** y cada HU es la unidad que se delega al BA. En e
 ⚠️ **REGLA ESTRICTA DE NOMENCLATURA (IDENTIFICADOR SECUENCIAL):**
 Lee obligatoriamente el archivo `specs/README.md` (Product State Ledger).
 1. Analiza la columna "N°" de la tabla para encontrar el correlativo numérico más alto.
-2. Cada HU recibe el siguiente correlativo, formateado con 3 dígitos (ej. si el último es `002`, el nuevo será `003`), concatenado con `HU_` y el nombre en snake_case: `XXX-HU_[nombre_en_snake_case]` (ej. `001-HU_tarjeta_identidad_digital`).
+2. Cada HU recibe el siguiente correlativo, formateado con 3 dígitos (ej. si el último es `002`, el nuevo será `003`), concatenado con un guion y el nombre en kebab-case (minúsculas, sin tildes, palabras separadas por guiones): `XXX-[nombre-en-kebab-case]` (ej. `001-tarjeta-identidad-digital`).
 3. Si la tabla está vacía, inicia en `001`.
 
 **Registro en el Ledger (con tu herramienta `update-specs-map`):**

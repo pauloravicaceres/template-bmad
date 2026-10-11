@@ -48,12 +48,12 @@ Tu misión es **estratégica, analítica y orientada al problema**:
 
 ```mermaid
 flowchart TD
-    A["Tracker: Notificación @PA: o archivo idea_*.md"] --> B["read_file: RUTA_CONFIGURACION"]
+    A["Tracker: Notificación @PA: o archivo idea-*.md"] --> B["read_file: RUTA_CONFIGURACION"]
     B --> C["Extraer rutas: CARPETA_ENTRADA, CARPETA_SALIDA y TRACKER"]
     C --> D["read_file: Leer archivo de idea en CARPETA_ENTRADA"]
     D --> E["Aplicar anti-hallucination-policy: Clasificar Hechos vs Supuestos"]
     E --> F["Aplicar pb-template: Generar las 8 secciones canónicas"]
-    F --> G["write_file: Guardar pb_Nombre_Corto.md en CARPETA_SALIDA"]
+    F --> G["write_file: Guardar pb-Nombre_Corto.md en CARPETA_SALIDA"]
     G --> H["read_file: Verificar persistencia física del Product Brief"]
     H --> I["read_file: Leer tracker_bmad.md actual"]
     I --> J["write_file: Anexar orden de Handoff hacia @HUMANO: (Pausa HITL)"]
@@ -66,8 +66,8 @@ flowchart TD
 | Paso | Herramienta | Acción requerida |
 |---|---|---|
 | 1 | `read_file` | Leer `RUTA_CONFIGURACION` (`config_bmad.json`) |
-| 2 | `read_file` | Leer el archivo de idea (`idea_*.md`) en `CARPETA_ENTRADA` |
-| 3 | `write_file` | Guardar el Product Brief (`pb_[Nombre_Corto].md`) en `CARPETA_SALIDA` |
+| 2 | `read_file` | Leer el archivo de idea (`idea-*.md`) en `CARPETA_ENTRADA` |
+| 3 | `write_file` | Guardar el Product Brief (`pb-[Nombre_Corto].md`) en `CARPETA_SALIDA` |
 | 4 | `read_file` | **Verificar lectura del archivo recién guardado** (verificación post-escritura) |
 | 5 | `read_file` | Leer el contenido completo actual de `tracker_bmad.md` |
 | 6 | `write_file` | Reescribir el tracker anexando la orden `@HUMANO:` al final. **Prohibido incluir `@PM:`; para referirte a él usa obligatoriamente su nombre en texto plano 'product-manager'. La delegación al PM depende de `utils/approve_step.py`.** |
@@ -122,29 +122,29 @@ En la sección `## 1. PROBLEMA` del Product Brief:
 - **Inferencias Lógicas:** Conclusiones derivadas por el agente que deben estar inequívocamente precedidas por `⚠️ SUPUESTO:`.
 
 ## 4. Verificación Post-Escritura (Anti-Confirmación Fantasma)
-Nunca informes al usuario ni al tracker que el archivo `pb_[Nombre_Corto].md` fue guardado basándote únicamente en la intención:
+Nunca informes al usuario ni al tracker que el archivo `pb-[Nombre_Corto].md` fue guardado basándote únicamente en la intención:
 1. Tras ejecutar `write_file` sobre la ruta del Product Brief, ejecuta obligatoriamente un `read_file` sobre dicha ruta.
 2. Solo cuando la herramienta confirme que el contenido existe físicamente en el disco, procedes con la lectura y actualización de `tracker_bmad.md`.
 
 
 ## PB TEMPLATE
 ---
-description: 'Usar para estructurar la salida física del archivo pb_[Nombre_Corto].md en la carpeta product-analyst. Define las secciones canónicas obligatorias validadas por el Quality Gate del Watcher en BMAD.'
+description: 'Usar para estructurar la salida física del archivo pb-[Nombre_Corto].md en la carpeta product-analyst. Define las secciones canónicas obligatorias validadas por el Quality Gate del Watcher en BMAD.'
 applyTo: '**'
 ---
 
 # Plantilla Determinista del Product Brief
 
-> Estructura canónica obligatoria para el artefacto generado por el Product Analyst (`pb_[Nombre_Corto].md`).
+> Estructura canónica obligatoria para el artefacto generado por el Product Analyst (`pb-[Nombre_Corto].md`).
 > Las 8 secciones de contenido más la orden de delegación son de presencia obligatoria para superar el Quality Gate hacia el Product Manager.
 
 ---
 
 ## Convención de Nombres de Archivo
 ```
-pb_[Nombre_Corto].md
+pb-[Nombre_Corto].md
 ```
-- `Nombre_Corto`: snake_case, máximo 4 palabras, representativo del producto (ej. de `idea_reserva_citas.md` se genera `pb_reserva_citas.md`).
+- `Nombre_Corto`: kebab-case (minúsculas, sin tildes, palabras separadas por guiones), máximo 4 palabras, representativo del producto (ej. de `idea-reserva-citas.md` se genera `pb-reserva-citas.md`).
 
 ---
 
@@ -228,7 +228,7 @@ pb_[Nombre_Corto].md
 ## 9. ORDEN DE DELEGACIÓN PARA EL TRACKER (PAUSA OBLIGATORIA HITL)
 *(Al finalizar el Product Brief, el flujo entra en pausa obligatoria Human-in-the-Loop para revisión humana. La activación del Product Manager depende de utils/approve_step.py. REGLA ESTRICTA: Usa siempre el nombre en texto plano "product-manager", NUNCA la etiqueta "@PM:" para evitar disparos accidentales en el orquestador).*
 
-@HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en docs/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
+@HUMANO: El Product Brief pb-{{Nombre_Corto}}.md está listo para revisión en docs/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
 ```
 
 ---
@@ -269,7 +269,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb-amely-spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}
@@ -307,7 +307,7 @@ tags: [qa, auditoria, product-brief, product-analyst, discovery]
 Garantizar que el borrador del Product Brief cumpla estrictamente con la estructura canónica de 8 secciones y las políticas de certidumbre antes de realizar el handoff o delegación al operador humano[cite: 2, 3].
 
 ## Input
-- El borrador del Product Brief recién generado (`pb_[Nombre_Corto].md`) en la carpeta `CARPETA_SALIDA`[cite: 3].
+- El borrador del Product Brief recién generado (`pb-[Nombre_Corto].md`) en la carpeta `CARPETA_SALIDA`[cite: 3].
 - El archivo de la idea de usuario original leído desde la `CARPETA_ENTRADA`[cite: 3].
 
 ## Workflow
@@ -315,7 +315,7 @@ Garantizar que el borrador del Product Brief cumpla estrictamente con la estruct
 Ejecuta el siguiente flujo de validación paso a paso de forma interna. Si algún paso falla, detén el proceso y corrige el archivo inmediatamente.
 
 1. **Validar Estructura y Nomenclatura:**
-   - Verifica que el nombre del archivo respete la convención `pb_[Nombre_Corto].md` (formato snake_case, con un máximo de 4 palabras representativas del producto)[cite: 2].
+   - Verifica que el nombre del archivo respete la convención `pb-[Nombre_Corto].md` (formato kebab-case, con un máximo de 4 palabras representativas del producto)[cite: 2].
    - Confirma la existencia exacta y secuencial de las 8 secciones OBLIGATORIAS: `1. PROBLEMA`, `2. USUARIOS`, `3. OBJETIVO`, `4. ALCANCE INICIAL`, `5. RESTRICCIONES`, `6. CRITERIOS DE ÉXITO`, `7. SUPUESTOS` y `8. PREGUNTAS ABIERTAS`[cite: 2].
 
 2. **Validar Política Anti-Alucinación (Certidumbre):**
@@ -332,7 +332,7 @@ Ejecuta el siguiente flujo de validación paso a paso de forma interna. Si algú
    - **Regla Crítica:** Verifica de forma estricta que no exista ninguna inclusión o mención de etiquetas de otros agentes (como `@PM:`, `@BA:`, etc.) en la orden de Handoff[cite: 3].
 
 ## Notas
-- **Modo Auto-Corrección:** Si detectas fallos durante el Workflow, no pidas permiso. Sobreescribe el archivo `pb_*.md` mediante la herramienta `write_file` con las correcciones antes de avanzar[cite: 3].
+- **Modo Auto-Corrección:** Si detectas fallos durante el Workflow, no pidas permiso. Sobreescribe el archivo `pb-*.md` mediante la herramienta `write_file` con las correcciones antes de avanzar[cite: 3].
 - Tienes prohibido escribir la orden de handoff en el `tracker_bmad.md` hasta que este Workflow se complete con 100% de éxito en todos sus puntos.
 
 
@@ -351,7 +351,7 @@ tags: [export, pdf, reporting, python, herramientas]
 Convertir los entregables finales aprobados (Product Briefs, Historias de Usuario, Reportes) de su formato nativo Markdown a un documento PDF profesional y presentable, utilizando el motor de conversión interno.
 
 ## Input
-- **Ruta del archivo Markdown original:** (ej. `docs/product-analyst/pb_amely_spa.md`)
+- **Ruta del archivo Markdown original:** (ej. `docs/product-analyst/pb-amely-spa.md`)
 - **Ruta de destino del PDF (opcional):** Si no se provee, se guardará en la misma carpeta con la extensión `.pdf`.
 
 ## Workflow

@@ -31,6 +31,6 @@ En la sección `## 1. PROBLEMA` del Product Brief:
 - **Inferencias Lógicas:** Conclusiones derivadas por el agente que deben estar inequívocamente precedidas por `⚠️ SUPUESTO:`.
 
 ## 4. Verificación Post-Escritura (Anti-Confirmación Fantasma)
-Nunca informes al usuario ni al tracker que el archivo `pb_[Nombre_Corto].md` fue guardado basándote únicamente en la intención:
+Nunca informes al usuario ni al tracker que el archivo `pb-[Nombre_Corto].md` fue guardado basándote únicamente en la intención:
 1. Tras ejecutar `write_file` sobre la ruta del Product Brief, ejecuta obligatoriamente un `read_file` sobre dicha ruta.
 2. Solo cuando la herramienta confirme que el contenido existe físicamente en el disco, procedes con la lectura y actualización de `tracker_bmad.md`.

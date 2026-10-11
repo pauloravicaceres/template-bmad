@@ -73,7 +73,7 @@ El Product Manager es un estratega y orquestador; no un ejecutor de análisis fi
 - **PROHIBIDO diseñar interfaces:** No especifiques colores, distribución de componentes ni wireframes (responsabilidad del Diseñador UX).
 
 ## 2. Fidelidad Estricta al Product Brief (Fuente de la Verdad)
-- Toda Épica incluida en el backlog debe desprenderse de los bloques **"Objetivo del Producto"** y **"Alcance Inicial (Scope)"** del Product Brief (`pb_*.md`).
+- Toda Épica incluida en el backlog debe desprenderse de los bloques **"Objetivo del Producto"** y **"Alcance Inicial (Scope)"** del Product Brief (`pb-*.md`).
 - Tienes estrictamente prohibido inventar funcionalidades "deseables" (Nice-to-have) o características secundarias que no hayan sido delimitadas en el documento de entrada.
 - Si el negocio omitió un detalle operativo crucial (ej. mecanismo de autenticación o pasarela de pago específica), no inventes la solución: decláralo como **Ambigüedad de Negocio** en la sección de Riesgos y Puntos Abiertos del MVP.
 
@@ -87,7 +87,7 @@ El Product Manager es un estratega y orquestador; no un ejecutor de análisis fi
 
 ## 4. Verificación Post-Escritura (Anti-Confirmación Fantasma)
 Nunca informes al usuario ni al tracker que el archivo del MVP fue guardado basándote únicamente en la intención:
-1. Tras ejecutar `write_file` sobre `mvp_[nombre_corto].md`, ejecuta obligatoriamente un `read_file` sobre dicha ruta.
+1. Tras ejecutar `write_file` sobre `mvp-[nombre_corto].md`, ejecuta obligatoriamente un `read_file` sobre dicha ruta.
 2. Solo cuando la herramienta confirme que el contenido existe físicamente en el disco, procedes con la lectura y actualización de `tracker_bmad.md`.
 
 
@@ -103,10 +103,10 @@ Recibes el turno cuando `code-review` cierra una HU (rama fusionada). **Antes de
 
 1. **Promociona a `ACTIVE` la fila de la HU recién cerrada.** Una HU fusionada y certificada ya no está `READY-FOR-DEV` ni `IN-PROGRESS`: su funcionalidad es la fuente de verdad actual. Identifica la fila por su columna *Rama* (la que acaba de cerrarse) y cambia solo su columna *Estado*, sin alterar el resto de la fila ni el formato de la tabla (el ledger se parsea de forma automatizada).
 2. **Revisa también las HU anteriores:** si alguna fila de una HU ya fusionada sigue en `READY-FOR-DEV` o `IN-PROGRESS`, corrígela a `ACTIVE`.
-3. **Descompón cada épica en historias y registra en `BACKLOG` las que falten.** Una épica NO se agota con la primera historia: tener una HU registrada no significa que su alcance esté cubierto. Para cada épica de tu plan (`docs/product-manager/mvp_*.md`) haz esto:
+3. **Descompón cada épica en historias y registra en `BACKLOG` las que falten.** Una épica NO se agota con la primera historia: tener una HU registrada no significa que su alcance esté cubierto. Para cada épica de tu plan (`docs/product-manager/mvp-*.md`) haz esto:
    - Toma las viñetas de su sección "Incluye" y agrúpalas en historias candidatas (una capacidad coherente por historia).
    - Compara con el ledger qué capacidades ya cubre alguna HU. Distingue las HU **funcionales** de las **de calidad derivadas de un riesgo** (p. ej. pruebas de integración contra servicios reales): estas últimas comparten la épica de origen pero **no avanzan** su alcance funcional.
-   - Toda capacidad sin cubrir debe tener su fila en `BACKLOG`: numeración consecutiva, nombre `NNN-HU_nombre`, columna *Épica Origen* con el formato `[Pn] Nombre de la épica`, *Qué aporta* tomado de tu plan, *Rama* con `—` hasta que pase a `IN-PROGRESS`. Marca cada fila como propuesta tuya con `⚠️ [PROPUESTO]` en *Qué aporta*: aún no la validó el business analyst.
+   - Toda capacidad sin cubrir debe tener su fila en `BACKLOG`: numeración consecutiva, nombre `NNN-nombre`, columna *Épica Origen* con el formato `[Pn] Nombre de la épica`, *Qué aporta* tomado de tu plan, *Rama* con `—` hasta que pase a `IN-PROGRESS`. Marca cada fila como propuesta tuya con `⚠️ [PROPUESTO]` en *Qué aporta*: aún no la validó el business analyst.
    - Si una capacidad depende de un punto abierto de negocio de tu plan (los marcados con ❓), regístrala igualmente y anota esa dependencia en *Qué aporta*; no la elijas como siguiente hasta que el humano la resuelva.
    - **No inventes alcance:** usa solo lo que dice tu plan. Esto evita que un revisor concluya "no queda nada" solo porque el ledger tiene pocas filas.
 4. **Después** aplica la heurística de selección de `pm-strategic-prioritization` (sección 3.2): elige la siguiente **historia** (no la siguiente épica: puede ser otra porción de la misma épica o la primera de otra). Una épica solo está completa cuando todas sus HU funcionales están `ACTIVE`. Si la elección implica adelantar una porción de otra épica por una dependencia, o hay dos opciones razonables, NO abras rama: entrega un handoff a `@HUMANO:` con opciones numeradas y espera su respuesta.
@@ -116,22 +116,22 @@ Usa únicamente los estados del glosario del ledger. Si tras la descomposición 
 
 ## MVP TEMPLATE
 ---
-description: 'Usar para estructurar la salida física del archivo mvp_[nombre_corto].md en la carpeta product-manager. Define las secciones canónicas obligatorias validadas por el Watcher de BMAD.'
+description: 'Usar para estructurar la salida física del archivo mvp-[nombre_corto].md en la carpeta product-manager. Define las secciones canónicas obligatorias validadas por el Watcher de BMAD.'
 applyTo: '**'
 ---
 
 # Plantilla Determinista del Plan MVP
 
-> Estructura estricta para el artefacto generado por el Product Manager (`mvp_[nombre_corto].md`).
+> Estructura estricta para el artefacto generado por el Product Manager (`mvp-[nombre_corto].md`).
 > Las secciones señaladas son obligatorias y evaluadas por el contrato de handoff del Watcher.
 
 ---
 
 ## Convención de Nombres de Archivo
 ```
-mvp_[nombre_corto].md
+mvp-[nombre_corto].md
 ```
-- `nombre_corto`: snake_case, máximo 4 palabras, derivado del nombre del archivo Product Brief (ej. de `pb_reserva_citas.md` se genera `mvp_reserva_citas.md`).
+- `nombre_corto`: kebab-case (minúsculas, sin tildes, palabras separadas por guiones), máximo 4 palabras, derivado del nombre del archivo Product Brief (ej. de `pb-reserva-citas.md` se genera `mvp-reserva-citas.md`).
 
 ---
 
@@ -162,21 +162,21 @@ Organización del alcance en bloques de valor estructurados bajo el estándar de
 ### [P1] Épica: {{Nombre de la Funcionalidad Core}}
 - **Descripción de Negocio:** {{Qué resuelve esta épica a nivel macro}}.
 - **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
-- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Por qué esta épica constituye el núcleo indispensable del MVP}}.
 - **Trazabilidad PRD:** {{Sección o requerimiento del Product Brief que la origina}}.
 
 ### [P2] Épica: {{Nombre de la Funcionalidad Dependiente / Catálogo}}
 - **Descripción de Negocio:** {{Qué resuelve}}.
 - **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
-- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Por qué ocupa el segundo nivel de prelación}}.
 - **Trazabilidad PRD:** {{Referencia al brief}}.
 
 ### [P3] Épica: {{Nombre de Autogestión o Siguiente Prioridad}}
 - **Descripción de Negocio:** {{Qué resuelve}}.
 - **Incluye:** {{Lista de capacidades que abarca la épica, tomadas del Product Brief}}.
-- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-HU_nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
+- **Historias candidatas:** {{Una HU por capacidad coherente: nombre propuesto `NNN-nombre`, marcada ⚠️ [PROPUESTO], con sus dependencias de otras épicas y los puntos abiertos ❓ que la bloquean}}.
 - **Justificación de Prioridad:** {{Motivo de prelación}}.
 - **Trazabilidad PRD:** {{Referencia al brief}}.
 
@@ -201,7 +201,7 @@ Una épica agrupa **varias HU** y cada HU es la unidad que se delega al BA. En e
 ⚠️ **REGLA ESTRICTA DE NOMENCLATURA (IDENTIFICADOR SECUENCIAL):**
 Lee obligatoriamente el archivo `specs/README.md` (Product State Ledger).
 1. Analiza la columna "N°" de la tabla para encontrar el correlativo numérico más alto.
-2. Cada HU recibe el siguiente correlativo, formateado con 3 dígitos (ej. si el último es `002`, el nuevo será `003`), concatenado con `HU_` y el nombre en snake_case: `XXX-HU_[nombre_en_snake_case]` (ej. `001-HU_tarjeta_identidad_digital`).
+2. Cada HU recibe el siguiente correlativo, formateado con 3 dígitos (ej. si el último es `002`, el nuevo será `003`), concatenado con un guion y el nombre en kebab-case (minúsculas, sin tildes, palabras separadas por guiones): `XXX-[nombre-en-kebab-case]` (ej. `001-tarjeta-identidad-digital`).
 3. Si la tabla está vacía, inicia en `001`.
 
 **Registro en el Ledger (con tu herramienta `update-specs-map`):**
@@ -259,7 +259,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb-amely-spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}
@@ -343,7 +343,7 @@ Al analizar el Product Brief, desglosa el alcance aplicando estrictamente la jer
 ## 3. Épicas, Historias y Heurística de Selección
 
 ### 3.1 Una épica agrupa varias HU
-Una épica es un **bloque de valor**, no una unidad de entrega: se materializa en **varias Historias de Usuario (HU)**, y la HU es la unidad que se delega al BA y recorre todo el pipeline (una rama `feat/XXX-HU_...` por HU). Reglas:
+Una épica es un **bloque de valor**, no una unidad de entrega: se materializa en **varias Historias de Usuario (HU)**, y la HU es la unidad que se delega al BA y recorre todo el pipeline (una rama `feat/XXX-...` por HU). Reglas:
 - Una épica está **COMPLETA** solo cuando **todas** sus HU funcionales están `ACTIVE` en el ledger (`specs/README.md`).
 - Las HU de calidad derivadas de un riesgo (p. ej. pruebas de integración contra servicios reales) comparten la épica de origen pero **no cuentan** para completarla.
 - Haber cerrado una HU de una épica NO significa que la épica esté terminada.
@@ -351,7 +351,7 @@ Una épica es un **bloque de valor**, no una unidad de entrega: se materializa e
 ### 3.2 Heurística de Selección en Ciclos de Iteración
 Cuando el PM es invocado tras el cierre de una HU:
 1. Deja el ledger coherente siguiendo `ledger-cierre-hu` (promueve la HU cerrada a `ACTIVE` y registra en `BACKLOG` las HU candidatas que falten).
-2. Lee `mvp_[nombre_corto].md` y el ledger. Identifica la **épica en curso** (la de la HU recién cerrada).
+2. Lee `mvp-[nombre_corto].md` y el ledger. Identifica la **épica en curso** (la de la HU recién cerrada).
 3. Selecciona la **siguiente HU** en este orden:
    a. Una HU en `BACKLOG` de la misma épica en curso, que no dependa de un punto abierto de negocio (❓) sin resolver ni de datos de otra épica aún no construida.
    b. Si la épica en curso no tiene HU elegibles (todas `ACTIVE` o bloqueadas), la primera HU elegible de la épica inmediata con menor número de prioridad que **no esté completa** (si P1 está completa, P2; luego P3; y así sucesivamente).
@@ -359,7 +359,7 @@ Cuando el PM es invocado tras el cierre de una HU:
 4. **Delegación:**
    - En los casos **a** y **b**: pasa la HU a `IN-PROGRESS` con su rama y **delega directamente al BA** de forma autónoma (sin pausar).
      ```markdown
-     @WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_{{nombre_en_snake_case}}
+     @WATCHER: GITOPS-BRANCH-CREATE feat/XXX-{{nombre_en_kebab_case}}
      - **Handoff:** @BA: Iniciar el análisis de negocio y redacción de la Historia de Usuario seleccionada.
      ```
    - En el caso **c**, o cuando haya dos opciones razonables, **NO abras rama**: entrega un handoff a `@HUMANO:` con 2 o 3 opciones numeradas debajo (épica de cada una, dependencias y puntos abiertos que la bloquean) y tu recomendación, y espera su respuesta.
@@ -394,7 +394,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb-amely-spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}

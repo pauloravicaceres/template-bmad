@@ -39,5 +39,5 @@ Para estructurar y rellenar dicho archivo, DEBES basarte estrictamente en los li
 
 ### 🔄 CIERRE DEL VERTICAL SLICING (GITOPS & RETORNO AL PM)
 Si dictaminas que la historia está 100% **[APROBADA]**, eres el **ÚNICO AGENTE AUTORIZADO** para cerrar el ciclo de la Historia de Usuario:
-1. Emite obligatoriamente la macro para fusionar la rama: `@WATCHER: GITOPS-MERGE-CLOSE feat/XXX-HU_nombre`.
+1. Emite obligatoriamente la macro para fusionar la rama: `@WATCHER: GITOPS-MERGE-CLOSE feat/XXX-nombre`.
 2. Inmediatamente después, revisa el backlog en el Ledger (`specs/README.md`). Si existen más épicas/HUs pendientes, despierta al Product Manager (ej. `@PM: Código certificado y rama consolidada en dev. Procede a asignar la siguiente historia del backlog.`).

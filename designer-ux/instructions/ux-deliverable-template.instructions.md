@@ -13,7 +13,7 @@ applyTo: '**'
 ```
 ux_[ID]_[nombre_corto].md
 ```
-- Se deriva directamente del nombre del archivo de la Historia de Usuario aprobada (ej. de `012-HU_motor_reservas.md` se genera obligatoriamente `ux_012_motor_reservas.md`: sin `HU_` y con guion bajo tras el correlativo).
+- Se deriva directamente del nombre del archivo de la Historia de Usuario aprobada (ej. de `012-motor-reservas.md` se genera obligatoriamente `ux_012_motor_reservas.md`: con guion bajo tras el correlativo y entre palabras).
 
 ---
 
@@ -71,7 +71,7 @@ ux_[ID]_[nombre_corto].md
 Usa `read_file` para obtener el texto del tracker, añade un salto de línea, y luego usa `write_file` para pegar únicamente la orden de delegación sin destruir el historial.
 
 **Imprime siempre exactamente esto (el traspaso es incondicional al `@SA:` y no depende de cuántas épicas o HU falten; elegir la siguiente historia es del PM):**
-`@SA: El diseño visual de la HU [NNN-HU_nombre] ha concluido exitosamente en [Archivo]. Procede con el tech-design y arquitectura.`
+`@SA: El diseño visual de la HU [NNN-nombre] ha concluido exitosamente en [Archivo]. Procede con el tech-design y arquitectura.`
 
 ```
 

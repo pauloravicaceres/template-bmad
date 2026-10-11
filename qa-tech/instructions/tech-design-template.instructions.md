@@ -112,7 +112,7 @@ applyTo: '**'
 
 Obligatorio inyectar la macro de cierre de rama antes de gatillar Spec Kit, en líneas separadas:
 ```markdown
-@WATCHER: GITOPS-MERGE-CLOSE feat/HU_{{nombre_corto}}
+@WATCHER: GITOPS-MERGE-CLOSE feat/{{XXX}}-{{nombre_corto}}
 @SPEC-KIT: La arquitectura técnica consolidada ha sido verificada y aprobada en tech-design_{{nombre_corto}}.md. Gatillar /speckit.implement para despacho de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS).
 ```
 

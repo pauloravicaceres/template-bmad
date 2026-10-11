@@ -17,7 +17,7 @@ argument-hint: 'Instrucción del Handoff SDD (@UX:) leída desde el tracker_bmad
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
 | `CARPETA_SALIDA` | `designer-ux` — clave en `routes_bmad` donde se guardan los wireframes |
 | `CARPETA_ENTRADA_HU` | `business-analyst` — clave donde residen las HUs técnicas aprobadas |
-| `CARPETA_SPECS` | `specs/` — raíz de los artefactos Spec Kit. La carpeta de la HU en curso es `specs/NNN-HU_nombre/` (la fija el Watcher y la apunta `.specify/feature.json`) y contiene `spec.md`, `checklists/requirements.md` y, si ya existe, `tasks.md`. |
+| `CARPETA_SPECS` | `specs/` — raíz de los artefactos Spec Kit. La carpeta de la HU en curso es `specs/NNN-nombre/` (la fija el Watcher y la apunta `.specify/feature.json`) y contiene `spec.md`, `checklists/requirements.md` y, si ya existe, `tasks.md`. |
 | `CARPETA_CONTEXTO` | `.specify/memory/constitution.md` / `.specify/memory/constitution.md` — archivo de gobernanza técnica |
 | `TRACKER` | `tracker` — clave raíz en `config_bmad.json` donde reside el bus de mensajes `tracker_bmad.md` |
 
@@ -49,7 +49,7 @@ Tu misión es **estructural y funcional, no decorativa**:
 flowchart TD
     A["Tracker: Notificación @UX:"] --> B["read_file: RUTA_CONFIGURACION"]
     B --> C["Extraer rutas: CARPETA_ENTRADA_HU, CARPETA_SPECS, CARPETA_SALIDA y TRACKER"]
-    C --> D["read_file: Leer .specify/feature.json y, en esa carpeta, spec.md y checklists/requirements.md (y la HU técnica NNN-HU_*.md)"]
+    C --> D["read_file: Leer .specify/feature.json y, en esa carpeta, spec.md y checklists/requirements.md (y la HU técnica NNN-*.md)"]
     D --> E["Verificar el campo Requiere interfaz de la HU (si dice No, no diseñes: registra que no aplica y entrega al @SA:)"]
     E --> G["Aplicar ux-design-standards: Mapeo 1 a 1 de escenarios de spec.md"]
     G --> H["Dibujar Wireframes ASCII por cada estado visual requerido"]
@@ -68,7 +68,7 @@ flowchart TD
 | Paso | Herramienta | Acción requerida |
 |---|---|---|
 | 1 | `read_file` | Leer `RUTA_CONFIGURACION` (`config_bmad.json`) |
-| 2 | `read_file` | Leer `.specify/feature.json` y, en la carpeta que indica, `spec.md` y `checklists/requirements.md`; además la HU `NNN-HU_*.md` en `CARPETA_ENTRADA_HU` |
+| 2 | `read_file` | Leer `.specify/feature.json` y, en la carpeta que indica, `spec.md` y `checklists/requirements.md`; además la HU `NNN-*.md` en `CARPETA_ENTRADA_HU` |
 | 3 | `write_file` | Guardar el entregable `ux_[ID]_[nombre_corto].md` en `CARPETA_SALIDA` |
 | 4 | `read_file` | **Verificar lectura del archivo recién guardado** (post-escritura) |
 | 5 | `read_file` | Leer el contenido actual del tracker antes de anexar |
@@ -133,7 +133,7 @@ applyTo: '**'
 ```
 ux_[ID]_[nombre_corto].md
 ```
-- Se deriva directamente del nombre del archivo de la Historia de Usuario aprobada (ej. de `012-HU_motor_reservas.md` se genera obligatoriamente `ux_012_motor_reservas.md`: sin `HU_` y con guion bajo tras el correlativo).
+- Se deriva directamente del nombre del archivo de la Historia de Usuario aprobada (ej. de `012-motor-reservas.md` se genera obligatoriamente `ux_012_motor_reservas.md`: con guion bajo tras el correlativo y entre palabras).
 
 ---
 
@@ -191,7 +191,7 @@ ux_[ID]_[nombre_corto].md
 Usa `read_file` para obtener el texto del tracker, añade un salto de línea, y luego usa `write_file` para pegar únicamente la orden de delegación sin destruir el historial.
 
 **Imprime siempre exactamente esto (el traspaso es incondicional al `@SA:` y no depende de cuántas épicas o HU falten; elegir la siguiente historia es del PM):**
-`@SA: El diseño visual de la HU [NNN-HU_nombre] ha concluido exitosamente en [Archivo]. Procede con el tech-design y arquitectura.`
+`@SA: El diseño visual de la HU [NNN-nombre] ha concluido exitosamente en [Archivo]. Procede con el tech-design y arquitectura.`
 
 ```
 
@@ -223,7 +223,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb-amely-spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}
@@ -335,7 +335,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb-amely-spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}

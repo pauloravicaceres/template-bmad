@@ -25,6 +25,6 @@ Cuando infieras elementos lógicos para darle coherencia a la narrativa del nego
 | **Propuesta de módulo sugerida** | Si sugieres una agrupación lógica que no estaba explícita en la idea. | `⚠️ [PROPUESTO]` |
 
 ## 3. Verificación Post-Escritura (Anti-Confirmación Fantasma)
-Nunca informes al usuario ni al tracker que el archivo `idea_[Nombre_Corto].md` fue guardado basándote únicamente en la intención:
+Nunca informes al usuario ni al tracker que el archivo `idea-[Nombre_Corto].md` fue guardado basándote únicamente en la intención:
 1. Tras ejecutar `write_file` sobre la ruta de la idea optimizada, ejecuta obligatoriamente un `read_file` sobre dicha ruta.
 2. Solo cuando la herramienta confirme que el contenido existe físicamente en el disco, procedes con la lectura y actualización de `tracker_bmad.md`.

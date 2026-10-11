@@ -400,7 +400,7 @@ applyTo: '**'
 
 Obligatorio inyectar la macro de cierre de rama antes de gatillar Spec Kit, en líneas separadas:
 ```markdown
-@WATCHER: GITOPS-MERGE-CLOSE feat/HU_{{nombre_corto}}
+@WATCHER: GITOPS-MERGE-CLOSE feat/{{XXX}}-{{nombre_corto}}
 @SPEC-KIT: La arquitectura técnica consolidada ha sido verificada y aprobada en tech-design_{{nombre_corto}}.md. Gatillar /speckit.implement para despacho de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS).
 ```
 
@@ -442,7 +442,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb-amely-spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}

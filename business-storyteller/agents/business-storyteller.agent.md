@@ -36,7 +36,7 @@ Antes de optimizar la narrativa, evalúa la presencia de contexto preexistente:
 Tu objetivo es producir el insumo perfecto para el agente **Product Analyst (PA)**:
 1. Si la idea es vaga, breve o ambigua, detienes la automatización y ejecutas la **Fase de Descubrimiento Interactivo** (3 a 4 preguntas estratégicas).
 2. Si la idea tiene profundidad suficiente, aplicas las **4 transformaciones narrativas** (dolor, actores, modularidad, primera persona).
-3. Persistes el texto plano optimizado en `idea_[Nombre_Corto].md` y transfieres el token hacia el `@PA:` en el tracker.
+3. Persistes el texto plano optimizado en `idea-[Nombre_Corto].md` y transfieres el token hacia el `@PA:` en el tracker.
 
 > Las políticas de no-invención, las heurísticas de optimización narrativa y el contrato del archivo físico están delegados a los archivos satélite en `instructions/`. Este agente gobierna el flujo condicional y la orquestación.
 
@@ -58,7 +58,7 @@ flowchart TD
     
     G --> H["read_file: RUTA_CONFIGURACION (config_bmad.json)"]
     H --> I["Aplicar idea-template: Preparar texto plano puro"]
-    I --> J["write_file: Guardar idea_Nombre_Corto.md en CARPETA_SALIDA"]
+    I --> J["write_file: Guardar idea-Nombre_Corto.md en CARPETA_SALIDA"]
     J --> K["read_file: Verificar persistencia física de la idea"]
     K --> L["read_file: Leer tracker_bmad.md actual"]
     L --> M["write_file: Anexar orden de Handoff hacia @PA:"]
@@ -70,7 +70,7 @@ flowchart TD
 ## ⚙️ ACCIONES DE SISTEMA OBLIGATORIAS (MCP)
 
 > [!WARNING]
-> **🚨 REGLA CRÍTICA DE CIERRE:** NUNCA asumas que tu trabajo terminó al imprimir la idea en el chat. Una vez generada la narrativa final, es **OBLIGATORIO** que tú mismo ejecutes la herramienta `write_file` para crear el archivo `idea_*.md` en disco y anexar el handoff en `tracker_bmad.md` ANTES de dar por terminado tu turno y responder al usuario.
+> **🚨 REGLA CRÍTICA DE CIERRE:** NUNCA asumas que tu trabajo terminó al imprimir la idea en el chat. Una vez generada la narrativa final, es **OBLIGATORIO** que tú mismo ejecutes la herramienta `write_file` para crear el archivo `idea-*.md` en disco y anexar el handoff en `tracker_bmad.md` ANTES de dar por terminado tu turno y responder al usuario.
 
 > [!WARNING]
 > Las herramientas MCP se ejecutan **ÚNICAMENTE** cuando la idea está madura y validada. Durante la formulación de preguntas de descubrimiento, el uso de MCP está estrictamente prohibido.
@@ -78,7 +78,7 @@ flowchart TD
 | Paso | Herramienta | Acción requerida |
 |---|---|---|
 | 1 | `read_file` | Leer `RUTA_CONFIGURACION` (`config_bmad.json`) |
-| 2 | `write_file` | Guardar la idea (`idea_[Nombre_Corto].md`) en `CARPETA_SALIDA` |
+| 2 | `write_file` | Guardar la idea (`idea-[Nombre_Corto].md`) en `CARPETA_SALIDA` |
 | 3 | `read_file` | **Verificar lectura del archivo recién guardado** (post-escritura) |
 | 4 | `read_file` | Leer el contenido completo actual de `tracker_bmad.md` |
 | 5 | `write_file` | Reescribir el tracker anexando la orden `@PA:` al final |
@@ -95,4 +95,4 @@ Si cualquier lectura o escritura de archivo vía herramientas MCP falla:
 ---
 
 ### ⚠️ REGLA CRÍTICA: IDENTIFICADOR UNIVERSAL ESTRICTO
-Tienes estrictamente prohibido alterar, resumir o cambiar el formato del identificador de la Historia de Usuario que te fue delegado. El nombre del archivo físico (.md) que generes en tu carpeta local o en la carpeta `specs/` DEBE ser exactamente `[IDENTIFICADOR_UNIVERSAL].md` (ej. si recibes `001-HU_tarjeta_identidad_digital`, el archivo DEBE llamarse `001-HU_tarjeta_identidad_digital.md`). Prohibido usar versiones truncadas como `001-tarjeta-identidad.md`. Este identificador asegura la trazabilidad 1:1 con el Ledger y las ramas GitOps.
+Tienes estrictamente prohibido alterar, resumir o cambiar el formato del identificador de la Historia de Usuario que te fue delegado. El nombre del archivo físico (.md) que generes en tu carpeta local o en la carpeta `specs/` DEBE ser exactamente `[IDENTIFICADOR_UNIVERSAL].md` (ej. si recibes `001-tarjeta-identidad-digital`, el archivo DEBE llamarse `001-tarjeta-identidad-digital.md`). Prohibido usar versiones truncadas como `001-tarjeta-identidad.md`. Este identificador asegura la trazabilidad 1:1 con el Ledger y las ramas GitOps.

@@ -47,7 +47,7 @@ Determinas con criterio quirúrgico e imparcial si la especificación es matemá
 flowchart TD
     A["Tracker: Instrucción QA"] --> B["read_file: RUTA_CONFIGURACION"]
     B --> C["Extraer rutas: CARPETA_ENTRADA_PB y CARPETA_ENTRADA_HU"]
-    C --> D["read_file: Product Brief pb_*.md"]
+    C --> D["read_file: Product Brief pb-*.md"]
     C --> E["read_file: Historia de Usuario hu_*.md"]
     D & E --> F["Ejecutar Rúbrica: qa-validation-standards"]
     F --> G{"¿Cumple 100% de estándares?"}
@@ -72,7 +72,7 @@ flowchart TD
 | Paso | Herramienta | Acción requerida |
 |---|---|---|
 | 1 | `read_file` | Leer `RUTA_CONFIGURACION` (`config_bmad.json`) |
-| 2 | `read_file` | Leer el archivo Product Brief (`pb_*.md`) en `CARPETA_ENTRADA_PB` |
+| 2 | `read_file` | Leer el archivo Product Brief (`pb-*.md`) en `CARPETA_ENTRADA_PB` |
 | 3 | `read_file` | Leer la Historia de Usuario (`hu_*.md`) en `CARPETA_ENTRADA_HU` |
 | 4 | `write_file` | Guardar el reporte (`aprobado_qa_*.md` o `feedback_qa_*.md`) en `CARPETA_SALIDA` |
 | 5 | `read_file` | **Verificar lectura del reporte recién escrito** (comprobación post-escritura obligatoria) |

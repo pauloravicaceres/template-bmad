@@ -40,7 +40,7 @@ hallazgos bloqueantes requieren corrección antes de avanzar.
 
 ## GitOps e identificadores
 Los agentes no ejecutan operaciones Git transaccionales directamente: solicitan
-al watcher `@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_nombre_en_snake_case` y
+al watcher `@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-nombre-en-kebab-case` y
 `@WATCHER: GITOPS-MERGE-CLOSE` con el identificador de rama. La feature branch
 nace con PM, contiene negocio, arquitectura e implementación y solo se cierra
 tras la aprobación técnica, implementación y certificación final de Code Review,
@@ -49,7 +49,11 @@ repositorio del workspace. No inicializar Git implícitamente, forzar checkout,
 merge o reset, ni incluir cambios ajenos en commits.
 
 El correlativo de tres dígitos nace en `specs/README.md` del proyecto y se conserva
-sin truncar en rama, HU, handoffs, tracker y carpeta `specs/XXX-HU_nombre/`.
+sin truncar en rama, HU, handoffs, tracker y carpeta `specs/XXX-nombre/`.
+La HU se nombra `docs/business-analyst/XXX-nombre-en-kebab-case.md`: minúsculas
+ASCII, palabras separadas por guiones, sin espacios, guiones bajos, tildes ni
+marcador `HU_`. Un nombre inválido detiene solo el paso de esa HU y se informa;
+nunca se renombra, corrige ni sustituye por un identificador genérico.
 El ledger conserva las columnas `N° | Épica Origen | Nombre spec / HU | Qué aporta
 | Estado | Rama`. El watcher fija `SPECIFY_FEATURE_DIRECTORY` y verifica
 `.specify/feature.json`; una divergencia detiene la fase. Los commits preventivos

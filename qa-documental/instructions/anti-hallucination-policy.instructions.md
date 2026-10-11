@@ -9,7 +9,7 @@ applyTo: '**'
 > Su propósito es neutralizar el sesgo de complacencia (sycophancy) y las asunciones no fundadas.
 
 ## 1. Principio Fundamental: Validación por Contraste Estricto
-Tu única fuente de la verdad funcional es el **Product Brief (`pb_*.md`)**.
+Tu única fuente de la verdad funcional es el **Product Brief (`pb-*.md`)**.
 - Toda regla de negocio, actor, canal, restricción o comportamiento presente en la Historia de Usuario (HU) **debe existir explícitamente en el Product Brief** o haber sido derivado lógicamente y marcado de forma obligatoria con la etiqueta `⚠️ [PROPUESTO]`.
 - Si el BA introdujo un canal (ej. SMS, correo), una regla de cálculo, una validación o una entidad no declarada en el Product Brief sin marcarla como supuesta, se clasifica como **Alucinación de Alcance (Scope Creep)** y es motivo de **RECHAZO INMEDIATO**.
 

@@ -19,7 +19,7 @@ Garantizar que la Historia de Usuario generada cumpla estrictamente con la plant
 Ejecuta el siguiente flujo de validación paso a paso de forma interna. Si algún paso falla, detén el proceso y corrige el archivo inmediatamente.
 
 1. **Validar Estructura y Nomenclatura:**
-   - Verifica que el nombre del archivo use `snake_case`, tenga máximo 4 palabras descriptivas y NO incluya el nombre del proyecto.
+   - Verifica que el nombre del archivo siga `XXX-nombre-en-kebab-case` (correlativo de 3 dígitos y minúsculas separadas por guiones), tenga máximo 4 palabras descriptivas y NO incluya el nombre del proyecto.
    - Confirma la existencia exacta de las 5 secciones obligatorias (`1. HISTORIA DE USUARIO`, `2. CRITERIOS DE ACEPTACIÓN`, `3. DIAGRAMAS`, `4. DEFINITION OF DONE`, `5. ORDEN DE DELEGACIÓN`).
 
 2. **Validar Criterios de Aceptación (BDD):**

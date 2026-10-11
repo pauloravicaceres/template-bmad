@@ -1,4 +1,6 @@
 
+> ⚠️ **Documento histórico, sin vigencia.** Sus convenciones `XXX-HU_nombre_en_snake_case` y `feat/XXX-HU_...` están derogadas y el framework las rechaza. La convención vigente de historias de usuario es `XXX-nombre-en-kebab-case` (ver [constitution.md](constitution.md) y `bmad_runtime/hu_naming.py`).
+
 # 📜 Constitución Técnica Global de BMAD
 
 ## 🌐 REGLAS DE COMPORTAMIENTO Y LOCALIZATION (LEX SUPERIOR)

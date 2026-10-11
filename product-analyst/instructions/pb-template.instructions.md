@@ -1,20 +1,20 @@
 ---
-description: 'Usar para estructurar la salida física del archivo pb_[Nombre_Corto].md en la carpeta product-analyst. Define las secciones canónicas obligatorias validadas por el Quality Gate del Watcher en BMAD.'
+description: 'Usar para estructurar la salida física del archivo pb-[Nombre_Corto].md en la carpeta product-analyst. Define las secciones canónicas obligatorias validadas por el Quality Gate del Watcher en BMAD.'
 applyTo: '**'
 ---
 
 # Plantilla Determinista del Product Brief
 
-> Estructura canónica obligatoria para el artefacto generado por el Product Analyst (`pb_[Nombre_Corto].md`).
+> Estructura canónica obligatoria para el artefacto generado por el Product Analyst (`pb-[Nombre_Corto].md`).
 > Las 8 secciones de contenido más la orden de delegación son de presencia obligatoria para superar el Quality Gate hacia el Product Manager.
 
 ---
 
 ## Convención de Nombres de Archivo
 ```
-pb_[Nombre_Corto].md
+pb-[Nombre_Corto].md
 ```
-- `Nombre_Corto`: snake_case, máximo 4 palabras, representativo del producto (ej. de `idea_reserva_citas.md` se genera `pb_reserva_citas.md`).
+- `Nombre_Corto`: kebab-case (minúsculas, sin tildes, palabras separadas por guiones), máximo 4 palabras, representativo del producto (ej. de `idea-reserva-citas.md` se genera `pb-reserva-citas.md`).
 
 ---
 
@@ -98,7 +98,7 @@ pb_[Nombre_Corto].md
 ## 9. ORDEN DE DELEGACIÓN PARA EL TRACKER (PAUSA OBLIGATORIA HITL)
 *(Al finalizar el Product Brief, el flujo entra en pausa obligatoria Human-in-the-Loop para revisión humana. La activación del Product Manager depende de utils/approve_step.py. REGLA ESTRICTA: Usa siempre el nombre en texto plano "product-manager", NUNCA la etiqueta "@PM:" para evitar disparos accidentales en el orquestador).*
 
-@HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en docs/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
+@HUMANO: El Product Brief pb-{{Nombre_Corto}}.md está listo para revisión en docs/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
 ```
 
 ---

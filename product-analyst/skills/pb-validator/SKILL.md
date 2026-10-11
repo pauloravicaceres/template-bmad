@@ -11,7 +11,7 @@ tags: [qa, auditoria, product-brief, product-analyst, discovery]
 Garantizar que el borrador del Product Brief cumpla estrictamente con la estructura canónica de 8 secciones y las políticas de certidumbre antes de realizar el handoff o delegación al operador humano[cite: 2, 3].
 
 ## Input
-- El borrador del Product Brief recién generado (`pb_[Nombre_Corto].md`) en la carpeta `CARPETA_SALIDA`[cite: 3].
+- El borrador del Product Brief recién generado (`pb-[Nombre_Corto].md`) en la carpeta `CARPETA_SALIDA`[cite: 3].
 - El archivo de la idea de usuario original leído desde la `CARPETA_ENTRADA`[cite: 3].
 
 ## Workflow
@@ -19,7 +19,7 @@ Garantizar que el borrador del Product Brief cumpla estrictamente con la estruct
 Ejecuta el siguiente flujo de validación paso a paso de forma interna. Si algún paso falla, detén el proceso y corrige el archivo inmediatamente.
 
 1. **Validar Estructura y Nomenclatura:**
-   - Verifica que el nombre del archivo respete la convención `pb_[Nombre_Corto].md` (formato snake_case, con un máximo de 4 palabras representativas del producto)[cite: 2].
+   - Verifica que el nombre del archivo respete la convención `pb-[Nombre_Corto].md` (formato kebab-case, con un máximo de 4 palabras representativas del producto)[cite: 2].
    - Confirma la existencia exacta y secuencial de las 8 secciones OBLIGATORIAS: `1. PROBLEMA`, `2. USUARIOS`, `3. OBJETIVO`, `4. ALCANCE INICIAL`, `5. RESTRICCIONES`, `6. CRITERIOS DE ÉXITO`, `7. SUPUESTOS` y `8. PREGUNTAS ABIERTAS`[cite: 2].
 
 2. **Validar Política Anti-Alucinación (Certidumbre):**
@@ -36,5 +36,5 @@ Ejecuta el siguiente flujo de validación paso a paso de forma interna. Si algú
    - **Regla Crítica:** Verifica de forma estricta que no exista ninguna inclusión o mención de etiquetas de otros agentes (como `@PM:`, `@BA:`, etc.) en la orden de Handoff[cite: 3].
 
 ## Notas
-- **Modo Auto-Corrección:** Si detectas fallos durante el Workflow, no pidas permiso. Sobreescribe el archivo `pb_*.md` mediante la herramienta `write_file` con las correcciones antes de avanzar[cite: 3].
+- **Modo Auto-Corrección:** Si detectas fallos durante el Workflow, no pidas permiso. Sobreescribe el archivo `pb-*.md` mediante la herramienta `write_file` con las correcciones antes de avanzar[cite: 3].
 - Tienes prohibido escribir la orden de handoff en el `tracker_bmad.md` hasta que este Workflow se complete con 100% de éxito en todos sus puntos.
