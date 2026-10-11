@@ -27,17 +27,31 @@ def seleccionar_carpetas():
      
     return AGENTS
         
-def main():
+def main(argv=None, root=None):
+    import argparse
     import os
-    if os.environ.get('BMAD_WORKSPACE') or os.environ.get('WORKSPACE_ROOT') or any(arg.startswith(('--workspace', '--project')) for arg in sys.argv):
+    argv = sys.argv[1:] if argv is None else argv
+    if os.environ.get('BMAD_WORKSPACE') or os.environ.get('WORKSPACE_ROOT') or any(arg.startswith(('--workspace', '--project')) for arg in argv):
         raise SystemExit('Legacy engine maintenance is disabled in a project context.')
-    # utils/clean_folders.py -> raíz del proyecto
-    raiz_proyecto = Path(__file__).resolve().parent.parent
+    parser = argparse.ArgumentParser(description='Elimina los AGENTS.md generados del motor (regenerables con '
+                                                 'watcher_bmad.py --compile-profiles).')
+    parser.add_argument('--confirm', action='store_true',
+                        help='Autoriza explícitamente la eliminación; sin él solo se listan los archivos.')
+    args = parser.parse_args(argv)
+    # utils/delete_agents.py -> raíz del motor
+    raiz_proyecto = Path(root) if root else Path(__file__).resolve().parent.parent
 
     print(f"Directorio objetivo: {raiz_proyecto}")
-    
+
     agentes_a_eliminar = seleccionar_carpetas()
-    
+
+    if not args.confirm:
+        # Seguro por defecto: los AGENTS.md pueden tener cambios sin confirmar en Git.
+        existentes = [n for n in agentes_a_eliminar if (raiz_proyecto / n / "AGENTS.md").is_file()]
+        print(f"\nNo se eliminó nada. {len(existentes)} AGENTS.md se eliminarían; revisa git status y "
+              "vuelve a ejecutar con --confirm para autorizarlo.")
+        return 0
+
     print("\nIniciando eliminación de archivos AGENTS.md...\n")
 
     # Corrección: Iteramos directamente sobre los elementos de la lista
@@ -67,6 +81,7 @@ def main():
             print(f"[ERROR] Fallo al limpiar {nombre_carpeta}: {e}")
 
     print("\nProceso finalizado. Las carpetas internas (agents/, instructions/) están intactas.")
+    return 0
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
