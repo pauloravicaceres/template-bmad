@@ -10,10 +10,14 @@ from pathlib import Path
 
 import ux_routing
 from bmad_runtime.runtime import Runtime
-from bmad_runtime.errors import BMADRuntimeError, ReconciliationRequired
+from bmad_runtime.errors import AgentBlocked, BMADRuntimeError, ReconciliationRequired
 from bmad_runtime.gitops import GitService
-from bmad_runtime.watcher_service import WatcherService
-from bmad_runtime.state import StateStore, project_lock
+from bmad_runtime.hu_naming import find_hu_file, hu_name_error, invalid_hu_reference, is_feature_branch, is_hu_filename
+from bmad_runtime.guard import describe as describir_alerta, describe_recommendation as describir_recomendacion
+from bmad_runtime.services import block_fields
+from bmad_runtime.watcher_service import (HOLD_STATES, SESSION_LOCK, WatcherService, audit_blocks, maintenance_blocks,
+                                          mark_handoff, protocol_violations, watcher_heartbeat)
+from bmad_runtime.state import ProjectLock, StateStore, project_lock
 from bmad_runtime.context import ProjectContext, add_project_arguments, read_json, resolve_context
 
 _runtime = None
@@ -458,16 +462,68 @@ def agente_registro_bloque(agente, desde_indice):
         return True  # agente sin rol conocido: no se vigila
     return any(a.lower().startswith(r.lower()) for a in autores_en_tracker()[desde_indice:] for r in roles)
 
-def registrar_seguimiento(agente, pane_id, ahora=None):
+def registrar_seguimiento(agente, pane_id, ahora=None, event_id=None):
     """Llamar justo después de despachar una tarea al agente."""
     if agente not in ROLES_TRACKER_POR_AGENTE:
         return
+    ahora = ahora if ahora is not None else time.time()
     seguimiento_agentes[agente] = {
         "pane_id": pane_id, "bloques_al_despachar": len(autores_en_tracker()),
-        "despachado": ahora if ahora is not None else time.time(),
+        # 'despachado' se renueva con cada recordatorio; 'inicio' mide la operación completa (guard).
+        "despachado": ahora, "inicio": ahora,
         "vio_trabajando": False, "idle_desde": None, "recordatorios": 0,
+        "event_id": event_id,
     }
     runtime().state.put('followup', seguimiento_agentes)
+
+def marcar_handoff(est, etapa, **detalles):
+    """Metadato de trazabilidad del handoff seguido; no altera el estado canónico."""
+    if est.get("event_id"):
+        mark_handoff(runtime().state, est["event_id"], etapa, **detalles)
+
+def agente_de_autor(autor):
+    """Agente interactivo dueño de un autor de bloque; None para WATCHER, humanos y sesiones headless."""
+    autor = (autor or "").lower()
+    return next((agente for agente, roles in ROLES_TRACKER_POR_AGENTE.items()
+                 if any(autor.startswith(rol.lower()) for rol in roles)), None)
+
+def indice_bloque_registrado(agente, desde_indice):
+    """Índice del primer bloque del agente desde desde_indice (mismo criterio que agente_registro_bloque)."""
+    roles = ROLES_TRACKER_POR_AGENTE.get(agente, ())
+    for indice, autor in enumerate(autores_en_tracker()[desde_indice:], start=desde_indice):
+        if any(autor.lower().startswith(rol.lower()) for rol in roles):
+            return indice
+    return None
+
+def bloque_registrado(agente, desde_indice):
+    """Primer bloque del agente a partir del índice de autores (mismo criterio que agente_registro_bloque)."""
+    roles = ROLES_TRACKER_POR_AGENTE.get(agente, ())
+    try:
+        contenido = Path(TRACKER_PATH).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    cabeceras = list(re.finditer(r"^###\s+\[[^\]]+\]\s+(.+)$", contenido, flags=re.MULTILINE))
+    for i, m in enumerate(cabeceras[desde_indice:], start=desde_indice):
+        if any(m.group(1).strip().lower().startswith(r.lower()) for r in roles):
+            fin = cabeceras[i + 1].start() if i + 1 < len(cabeceras) else len(contenido)
+            return contenido[m.start():fin]
+    return ""
+
+def registrar_resumen_sesion(agente, est):
+    """Memoria verificable del handoff confirmado, previa a cualquier rotación de contexto. Nunca detiene el watcher.
+
+    El guard contrasta los artefactos declarados con su contenido: un bloque confirmado no prueba avance por sí solo.
+    """
+    if not est.get("event_id"):
+        return
+    bloque = bloque_registrado(agente, est["bloques_al_despachar"])
+    try:
+        resumen = runtime().sessions.record_summary(agente, est["event_id"], bloque)
+    except (OSError, ValueError, BMADRuntimeError) as exc:
+        print(f"⚠️ [Sesiones] No se registró el resumen de '{agente}': {exc}")
+        resumen = None
+    runtime().guard.on_confirmed(agente, est["event_id"], resumen, block_fields(bloque),
+                                 est.get("inicio", est.get("despachado")))
 
 def texto_recordatorio(agente):
     return (
@@ -493,6 +549,9 @@ def vigilar_agentes_inactivos(ahora=None, forzar=False):
     for agente in list(seguimiento_agentes):
         est = seguimiento_agentes[agente]
         if agente_registro_bloque(agente, est["bloques_al_despachar"]):
+            # El índice del bloque confirmado lo autoriza ante la auditoría de protocolo (audit_blocks).
+            marcar_handoff(est, "confirmado", confirmed_block=indice_bloque_registrado(agente, est["bloques_al_despachar"]))
+            registrar_resumen_sesion(agente, est)
             del seguimiento_agentes[agente]
             continue
 
@@ -502,6 +561,13 @@ def vigilar_agentes_inactivos(ahora=None, forzar=False):
         est["pane_id"] = pane_id
 
         if estado not in ("idle", "done"):
+            if estado == "working" and not est["vio_trabajando"]:
+                runtime().guard.event("work_started", agente, event_id=est.get("event_id"))
+            if estado == "blocked" and not est.get("vio_bloqueado"):
+                # Permiso o diálogo pendiente: solo se registra; nunca se responde automáticamente.
+                runtime().guard.event("permission_blocked", agente, event_id=est.get("event_id"),
+                                      reason="herdr_blocked")
+            est["vio_bloqueado"] = estado == "blocked"
             est["vio_trabajando"] = est["vio_trabajando"] or estado == "working"
             est["idle_desde"] = None
             continue
@@ -529,6 +595,7 @@ def vigilar_agentes_inactivos(ahora=None, forzar=False):
                               f"({pane_id}) para continuar. No se envían recordatorios.")
                 write_watcher_log(f"⚠️ [Vigilante] {motivo}")
                 print(f"⏸️ [Vigilante] {motivo}")
+                runtime().guard.error(agente, "provider_limit:" + limit_state, event_id=est.get("event_id"))
             continue
         est["aviso_limite"] = None
 
@@ -539,6 +606,8 @@ def vigilar_agentes_inactivos(ahora=None, forzar=False):
                 "bloque en el tracker. El flujo está detenido: pídele el registro manualmente o escribe el handoff tú."
             )
             print(f"🛑 [Vigilante] '{agente}' no registró tras {est['recordatorios']} recordatorios. Escalado.")
+            marcar_handoff(est, "requiere_intervencion")
+            runtime().guard.event("no_progress", agente, event_id=est.get("event_id"), reason="escalated_without_block")
             del seguimiento_agentes[agente]
             continue
 
@@ -547,21 +616,18 @@ def vigilar_agentes_inactivos(ahora=None, forzar=False):
                                           StateStore.fingerprint('reminder', agente, est['despachado'], est['recordatorios']))
             est["recordatorios"] += 1
             print(f"🔔 [Vigilante] '{agente}' terminó sin registrar en el tracker. Recordatorio {est['recordatorios']}/{MAX_RECORDATORIOS}.")
+            runtime().guard.event("no_progress", agente, event_id=est.get("event_id"), reason="turn_without_block",
+                                  reminder=est["recordatorios"])
         except (subprocess.CalledProcessError, OSError, BMADRuntimeError) as e:
             print(f"⚠️ [Vigilante] No se pudo recordar a '{agente}': {e}")
+            runtime().guard.error(agente, "reminder_failed:" + type(e).__name__, event_id=est.get("event_id"))
             continue
         est.update(despachado=ahora, vio_trabajando=False, idle_desde=None)
 
 def limpiar_sesiones_agentes():
-    """Clear only owned idle sessions whose adapter verifies the capability."""
-    for name in ROLES_TRACKER_POR_AGENTE:
-        if not runtime().state.get('agent:' + name):
-            continue
-        try:
-            runtime().sessions.clear(name)
-            seguimiento_agentes.pop(name, None)
-        except BMADRuntimeError as exc:
-            print(f"[Sesiones] {exc}")
+    """Al cerrar una HU solo se sugiere el mantenimiento: limpiar o rotar exige confirmación del operador."""
+    print("ℹ️ [Sesiones] HU cerrada. Para liberar contexto revisa "
+          "'python -m bmad_runtime.maintenance --plan-clear' y confirma --clear/--rotate manualmente.")
     # Sin escribir en el tracker: tras la fusión el árbol queda en la rama base y no debe ensuciarse.
 
 def obtener_info_agente(nombre_agente):
@@ -613,12 +679,12 @@ def registrar_traspaso_fase_a(ruta_hu=None, resuelta_por_humano=False):
 def carpeta_spec_para_hu(ruta_hu):
     """
     Carpeta de Spec Kit para una HU: specs/<identificador universal>, derivada del nombre del archivo del BA
-    (docs/business-analyst/012-HU_nombre.md -> specs/012-HU_nombre). Así la carpeta lleva el mismo número y
-    nombre que el ledger y la rama, en lugar del "NNN-nombre-corto" que Spec Kit inventaría por su cuenta.
-    Devuelve None si el nombre no lleva el correlativo (formato heredado sin número).
+    (docs/business-analyst/012-motor-reservas.md -> specs/012-motor-reservas). Así la carpeta lleva el mismo número
+    y nombre que el ledger y la rama, en lugar del "NNN-nombre-corto" que Spec Kit inventaría por su cuenta.
+    Devuelve None si el nombre no cumple el contrato de bmad_runtime/hu_naming.py (NNN-nombre-en-kebab-case.md).
     """
-    stem = Path(str(ruta_hu).replace("\\", "/")).stem
-    return f"specs/{stem}" if re.match(r"^\d{3}-HU_[\w-]+$", stem, re.IGNORECASE) else None
+    nombre = Path(str(ruta_hu).replace("\\", "/")).name
+    return f"specs/{nombre[:-3]}" if is_hu_filename(nombre) else None
 
 def verificar_carpeta_spec(carpeta_esperada):
     """Comprueba que Spec Kit usó la carpeta fijada: .specify/feature.json la apunta y contiene spec.md."""
@@ -647,23 +713,24 @@ def ejecutar_sdd_fase_negocio(ruta_hu: str):
         # 1. Specify
         write_watcher_log("⚙️ [SDD Auto-Runner] Ejecutando análisis funcional (/speckit.specify)...")
         carpeta = carpeta_spec_para_hu(ruta_hu)
-        if carpeta:
-            argumentos = (f"{ruta_hu} SPECIFY_FEATURE_DIRECTORY={carpeta} (usa EXACTAMENTE esa carpeta: no generes otro "
-                          "nombre ni otro número; esta indicación no forma parte de la descripción de la funcionalidad)")
-            entorno = {"SPECIFY_FEATURE_DIRECTORY": carpeta}
-        else:
-            print(f"⚠️ [SDD Negocio] '{ruta_hu}' no lleva el correlativo NNN-HU_: Spec Kit elegirá la carpeta por su cuenta.")
-            argumentos, entorno = ruta_hu, None
-        if ejecutar_speckit("specify", argumentos, entorno=entorno).returncode != 0:
+        if not carpeta:
+            # Sin identificador válido no hay carpeta fijable: no se deja que Spec Kit invente otra.
+            msg = (f"🚨 ERROR [SDD Negocio]: nombre de historia inválido: {hu_name_error(Path(str(ruta_hu)).name)}. "
+                   "No se ejecuta specify; renombra el archivo manualmente y vuelve a aprobar.")
+            print(f"❌ {msg}")
+            write_watcher_log(msg)
             return False
-        if carpeta:
-            ok, detalle = verificar_carpeta_spec(carpeta)
-            if not ok:
-                msg = (f"🚨 ERROR [SDD Negocio]: Spec Kit no respetó la carpeta fijada '{carpeta}' ({detalle}). "
-                       "Se detiene la fase: revisa specs/ y .specify/feature.json y reintenta.")
-                print(f"❌ {msg}")
-                write_watcher_log(msg)
-                return False
+        argumentos = (f"{ruta_hu} SPECIFY_FEATURE_DIRECTORY={carpeta} (usa EXACTAMENTE esa carpeta: no generes otro "
+                      "nombre ni otro número; esta indicación no forma parte de la descripción de la funcionalidad)")
+        if ejecutar_speckit("specify", argumentos, entorno={"SPECIFY_FEATURE_DIRECTORY": carpeta}).returncode != 0:
+            return False
+        ok, detalle = verificar_carpeta_spec(carpeta)
+        if not ok:
+            msg = (f"🚨 ERROR [SDD Negocio]: Spec Kit no respetó la carpeta fijada '{carpeta}' ({detalle}). "
+                   "Se detiene la fase: revisa specs/ y .specify/feature.json y reintenta.")
+            print(f"❌ {msg}")
+            write_watcher_log(msg)
+            return False
 
         # 2. Clarify (HITL por Excepción)
         write_watcher_log("⚙️ [SDD Auto-Runner] Verificando ambigüedades (/speckit.clarify)...")
@@ -1085,9 +1152,8 @@ def extraer_instrucciones(linea):
         print("=" * 80)
         
         # Buscar la ruta de la HU en el mensaje
-        match_hu = re.search(r'(?:docs[/\\]business-analyst[/\\])?((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
-        if match_hu:
-            nombre_hu = match_hu.group(1)
+        nombre_hu = find_hu_file(linea)
+        if nombre_hu:
             ruta_hu = f"docs/business-analyst/{nombre_hu}"
             print(f"Iniciando SDD Fase de Negocio para: {ruta_hu}\n")
             
@@ -1096,8 +1162,16 @@ def extraer_instrucciones(linea):
                 print("🛑 [HITL] Fallo o ambigüedad en SDD Negocio. Pausando el orquestador.")
                 raise ReconciliationRequired("Fase SDD negocio pendiente; revisar fallo o preguntas HITL antes de continuar.")
         else:
-            print("⚠️ No se pudo extraer la ruta de la HU del mensaje de aprobación.")
-            print("Ejecute Spec Kit manualmente y use utils/approve_step.py para reanudar.")
+            motivo = invalid_hu_reference(linea)
+            if motivo:
+                # Solo se detiene el paso de esta HU: ni specify ni handoff, y el tracker explica el rechazo.
+                msg = (f"🚨 ERROR [SDD Negocio]: nombre de historia inválido: {motivo}. "
+                       "No se ejecuta specify; renombra el archivo manualmente y vuelve a aprobar.")
+                print(f"❌ {msg}")
+                write_watcher_log(msg)
+            else:
+                print("⚠️ No se pudo extraer la ruta de la HU del mensaje de aprobación.")
+                print("Ejecute Spec Kit manualmente y use utils/approve_step.py para reanudar.")
             
         print("=" * 80 + "\n")
         return []
@@ -1110,8 +1184,7 @@ def extraer_instrucciones(linea):
         print("🛑 [PAUSA SDD INTERCEPTADA - ARQUITECTURA] GUIDELINES SA REGISTRADOS")
         print("=" * 80)
         
-        match_hu = re.search(r'((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
-        ruta_hu = match_hu.group(1) if match_hu else ""
+        ruta_hu = find_hu_file(linea) or ""
         
         print(f"Iniciando SDD Fase de Arquitectura...\n")
         exito = ejecutar_sdd_fase_arquitectura(ruta_hu)
@@ -1220,6 +1293,10 @@ def auto_commit_security():
 
 def gitops_branch_create(branch_name):
     print(f"\n🌿 [GITOPS] Interceptada macro de creación de rama: {branch_name}")
+    if not is_feature_branch(branch_name):
+        # Nunca se crea una rama genérica ni se corrige el nombre: el identificador lo fija la HU.
+        raise ReconciliationRequired(f"GitOps rechaza la rama '{branch_name}': debe ser feat/NNN-nombre-en-kebab-case "
+                                     "(mismo identificador que la HU). No se crea ninguna rama.")
     auto_commit_security()
     run_git(['git', 'check-ref-format', '--branch', branch_name], check=True)
     resetear_retrabajo(branch_name)
@@ -1240,7 +1317,14 @@ def gitops_branch_create(branch_name):
     except Exception as e:
         raise ReconciliationRequired("GitOps no pudo crear la rama; no se despacha el siguiente agente.") from e
 
-def gitops_merge_close(branch_name):
+def comando_reconciliar_evento(evento):
+    """Orden exacta (desde la raíz del motor) que marca como atendido un evento in_flight; nunca lo repite."""
+    contexto = _runtime.context if _runtime else None
+    alcance = '' if contexto is None or contexto.legacy else \
+        f' --workspace "{contexto.workspace_root}" --project {contexto.project_id}'
+    return f"python -m bmad_runtime.state{alcance} --acknowledge {evento or 'event:<id>'} --confirm"
+
+def gitops_merge_close(branch_name, evento=None):
     print(f"\n🚀 [GITOPS] Interceptada macro de fusión (merge-close): {branch_name}")
     run_git(['git', 'check-ref-format', '--branch', branch_name], check=True)
     if input(f"Confirma fusionar y cerrar {branch_name} escribiendo el nombre de rama: ").strip() != branch_name:
@@ -1260,9 +1344,19 @@ def gitops_merge_close(branch_name):
         run_git(["git", "merge", "--abort"], cwd=DIRECTORIO_RAIZ, stderr=subprocess.DEVNULL)
         run_git(["git", "checkout", branch_name], cwd=DIRECTORIO_RAIZ, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
+        # La macro queda in_flight (fail-closed): reiniciar no la resuelve ni la repite; exige reconciliación manual.
+        reconciliar = comando_reconciliar_evento(evento)
         with open(TRACKER_PATH, "a", encoding="utf-8") as f:
-            f.write(f"\n@HUMANO: ⚠️ ALERTA GITOPS: Conflicto de fusión detectado al intentar cerrar la rama {branch_name}.\nEl Watcher ha abortado el merge por seguridad y se ha detenido.\nPASOS DE RECUPERACIÓN PARA EL HUMANO:\n1. Abre tu terminal y ejecuta manualmente el merge o rebase hacia dev o main.\n2. Resuelve los conflictos en tu editor y haz el commit final.\n3. Vuelve a encender el Watcher (python watcher_bmad.py).\nNota: NO necesitas borrar ni agregar ninguna línea en este tracker. El sistema asumirá el cierre exitoso y continuará su operación normal.\n")
-        print(f"⏸️ [HITL] Se requiere intervención humana. Pausando el orquestador.")
+            f.write(f"\n@HUMANO: ⚠️ ALERTA GITOPS: Conflicto de fusión detectado al intentar cerrar la rama {branch_name}.\n"
+                    "El Watcher ha abortado el merge por seguridad y se ha detenido. La macro de cierre queda registrada "
+                    "como en curso (in_flight): reiniciar el Watcher NO la resuelve y volverá a detenerse hasta reconciliarla.\n"
+                    "PASOS DE RECUPERACIÓN PARA EL HUMANO:\n"
+                    "1. Abre tu terminal y ejecuta manualmente el merge o rebase hacia dev o main.\n"
+                    "2. Resuelve los conflictos en tu editor y haz el commit final.\n"
+                    f"3. Con el Watcher detenido, desde la raíz del motor marca la macro como atendida (no repite el merge): {reconciliar}\n"
+                    "4. Vuelve a encender el Watcher con la misma selección (--workspace/--project y --config).\n"
+                    "Nota: NO borres ni edites líneas de este tracker.\n")
+        print(f"⏸️ [HITL] Se requiere intervención humana. Tras resolver el merge, reconcilia con: {reconciliar}")
         sys.exit(1)
 
 def macro_gitops(linea, accion):
@@ -1333,7 +1427,7 @@ def iniciar_watcher():
     service = WatcherService(runtime())
     
     if os.path.exists(TRACKER_PATH):
-        lineas = service.read_lines()
+        lineas = service.startup_lines()
             
         if lineas:
             ultima_linea = lineas[-1]
@@ -1353,7 +1447,7 @@ def iniciar_watcher():
             num_lineas_leidas = 0
             
     if os.path.exists(TRACKER_PATH):
-        initial_lines = service.read_lines()
+        initial_lines = service.startup_lines()
         num_lineas_leidas = service.restore_cursor(initial_lines, num_lineas_leidas)
         cola_tareas = service.pending_tasks(initial_lines)
         service.save_cursor(initial_lines, num_lineas_leidas)
@@ -1363,11 +1457,26 @@ def iniciar_watcher():
     if saved_followup:
         seguimiento_agentes.update(saved_followup)
 
+    # Coordinación con el mantenimiento de sesiones (maintenance.py): cada ciclo toma el lock de sesiones y
+    # anuncia el protocolo en un latido; mientras un mantenimiento lo retiene, el watcher no lee ni despacha.
+    inicio_watcher = time.time()
+    lock_sesiones = ProjectLock(runtime().context, SESSION_LOCK)
+    aviso_mantenimiento = 0
+    watcher_heartbeat(runtime().state, inicio_watcher)
+
     while True:
+        if not lock_sesiones.acquire():
+            if time.time() - aviso_mantenimiento >= 60:
+                aviso_mantenimiento = time.time()
+                print("🔧 [Watcher] Mantenimiento de sesiones en curso; ciclo en pausa sin despachar.")
+            time.sleep(2)
+            continue
         try:
-            if os.path.exists(TRACKER_PATH):
-                lineas = service.read_lines()
-                
+            watcher_heartbeat(runtime().state, inicio_watcher)
+            en_mantenimiento = maintenance_blocks(runtime().state)
+            # Solo líneas completas y coherentes con el historial ya procesado; None = archivo en escritura.
+            lineas = service.poll(num_lineas_leidas)
+            if lineas is not None:
                 if len(lineas) > num_lineas_leidas:
                     nuevas_lineas = lineas[num_lineas_leidas:]
                     for idx, linea in enumerate(nuevas_lineas):
@@ -1381,7 +1490,7 @@ def iniciar_watcher():
                         if rama_crear:
                             gitops_branch_create(rama_crear)
                         elif rama_cerrar:
-                            gitops_merge_close(rama_cerrar)
+                            gitops_merge_close(rama_cerrar, event_key)
 
                         actualizar_contexto_bloque(linea)
                         nuevas_tareas = extraer_instrucciones(linea)
@@ -1392,14 +1501,25 @@ def iniciar_watcher():
                         service.complete_line(event_key)
                     num_lineas_leidas = len(lineas)
                     service.save_cursor(lineas, num_lineas_leidas)
-                elif len(lineas) < num_lineas_leidas:
-                    raise ReconciliationRequired('El tracker fue truncado; detener y reconciliar.')
+
+            # H11: el tracker no es una cola; un bloque de agente sin despacho del watcher detiene nuevos despachos.
+            for violacion in audit_blocks(runtime().state, autores_en_tracker(), agente_de_autor, seguimiento_agentes):
+                aviso = (f"🛑 [Protocolo] '{violacion['agent_id']}' registró un bloque sin despacho del watcher "
+                         f"(bloque {violacion['block_index']}). Despachos detenidos: revisa ese trabajo y reconcilia con "
+                         f"python -m bmad_runtime.state --acknowledge protocol_violation:{violacion['block_index']} --confirm "
+                         "(con el watcher detenido).")
+                write_watcher_log(aviso)
+                print(aviso)
+            violaciones = protocol_violations(runtime().state)
 
             tareas_no_procesadas = []
             candado_disparo = False
-            
+
             for tarea in cola_tareas:
-                if is_tracker_paused_for_human():
+                if is_tracker_paused_for_human() or violaciones:
+                    if violaciones and time.time() - avisos_espera.get('__protocolo__', 0) >= 60:
+                        avisos_espera['__protocolo__'] = time.time()
+                        print(f"🛑 [Watcher] {len(violaciones)} ejecución(es) fuera de protocolo sin reconciliar; tareas retenidas.")
                     tareas_no_procesadas.append(tarea)
                     continue
                 if candado_disparo:
@@ -1408,10 +1528,54 @@ def iniciar_watcher():
 
                 agente = tarea['agente']
                 mensaje = tarea['mensaje']
-                
+
+                if agente in en_mantenimiento:
+                    # Mantenimiento incompleto o incierto: nada se envía hasta reconciliarlo (--reconcile).
+                    ahora_espera = time.time()
+                    if ahora_espera - avisos_espera.get(agente, 0) >= 60:
+                        avisos_espera[agente] = ahora_espera
+                        print(f"🔧 [Watcher] '{agente}' tiene el mantenimiento {en_mantenimiento[agente][:12]} sin reconciliar; "
+                              "tarea retenida.")
+                    tareas_no_procesadas.append(tarea)
+                    continue
+
+                estado_registro = (runtime().state.get('agent:' + agente) or {}).get('state')
+                if estado_registro in HOLD_STATES:
+                    # Arranque sin verificar, diálogo de confianza o mantenimiento: solo un humano lo libera.
+                    ahora_espera = time.time()
+                    if ahora_espera - avisos_espera.get(agente, 0) >= 60:
+                        avisos_espera[agente] = ahora_espera
+                        print(f"⏸️ [Watcher] '{agente}' está '{estado_registro}'; tarea retenida hasta "
+                              f"'python -m bmad_runtime.maintenance --reconcile {agente} --confirm'.")
+                    tareas_no_procesadas.append(tarea)
+                    continue
+
+                retencion = runtime().guard.hold(agente)
+                if retencion:
+                    # Solo en modo enforce: la tarea sigue en cola, sin reintentos ni cambios en el agente.
+                    ahora_espera = time.time()
+                    if ahora_espera - avisos_espera.get('guard:' + agente, 0) >= 60:
+                        avisos_espera['guard:' + agente] = ahora_espera
+                        print(f"⏸️ [Guard] '{agente}' retenido: {describir_alerta(retencion)}")
+                    tareas_no_procesadas.append(tarea)
+                    continue
+
+                seguimiento = seguimiento_agentes.get(agente)
+                if seguimiento and seguimiento.get("event_id") != tarea['event_id']:
+                    # Idle en Herdr no confirma la tarea anterior: solo su bloque (o la escalada del vigilante)
+                    # cierra el seguimiento. Despachar ahora lo sobrescribiría y ese handoff nunca se confirmaría.
+                    ahora_espera = time.time()
+                    if ahora_espera - avisos_espera.get('seguimiento:' + agente, 0) >= 60:
+                        avisos_espera['seguimiento:' + agente] = ahora_espera
+                        print(f"⏳ [Watcher] '{agente}' aún no registró el bloque de su tarea anterior; "
+                              "la siguiente queda en cola sin despachar.")
+                    tareas_no_procesadas.append(tarea)
+                    continue
+
                 pane_id, estado = obtener_info_agente(agente)
-                
+
                 if not pane_id:
+                    service.mark(tarea, 'fallido', failure='agent_absent')
                     raise ReconciliationRequired(f"Agente {agente} ausente o sin propiedad registrada; lanzar o reconciliar antes de continuar.")
                     
                 if estado not in ["idle", "done"]:
@@ -1423,19 +1587,39 @@ def iniciar_watcher():
                     continue 
 
                 print(f"\n🚀 [Watcher] Inyectando tarea a '{agente}'...")
+                service.mark(tarea, 'reservado')
                 try:
                     runtime().dispatcher.dispatch(agente, pane_id, mensaje, tarea['event_id'])
-                    service.dispatched(tarea)
-                    print(f"✅ [Watcher] Tarea despachada a {agente}.")
-                    registrar_seguimiento(agente, pane_id)
-                    candado_disparo = True
-                except BMADRuntimeError:
+                except AgentBlocked as exc:
+                    # H10: nada se envió (un Enter respondería el diálogo); la tarea queda en cola.
+                    service.mark(tarea, 'fallido', failure='agent_blocked')
+                    runtime().guard.event('permission_blocked', agente, event_id=tarea['event_id'],
+                                          reason='dialog_before_dispatch')
+                    print(f"⏸️ [Watcher] {exc}")
+                    tareas_no_procesadas.append(tarea)
+                    continue
+                except BaseException as exc:
+                    service.failed(tarea, type(exc).__name__)
+                    # Entrega incierta o fallida: queda registrada como evidencia; nunca se reintenta sola.
+                    runtime().guard.on_dispatch_failure(agente, tarea['event_id'], type(exc).__name__)
                     raise
+                service.dispatched(tarea)
+                print(f"✅ [Watcher] Tarea despachada a {agente}.")
+                runtime().guard.on_dispatch(agente, mensaje, tarea['event_id'])
+                registrar_seguimiento(agente, pane_id, event_id=tarea['event_id'])
+                candado_disparo = True
 
             cola_tareas = tareas_no_procesadas
-            if not is_tracker_paused_for_human():
+            if not is_tracker_paused_for_human() and not violaciones:
                 vigilar_agentes_inactivos()
             runtime().state.put('followup', seguimiento_agentes)
+            # Presupuesto y bucles: se recalculan desde SQLite; solo se anuncian las alertas que suben de nivel.
+            # Quedan en SQLite y logs/guard.log, nunca en el tracker (no es un bus de alertas).
+            for alerta in runtime().guard.tick():
+                print(("🛑 " if alerta['level'] in ('PAUSE', 'REQUIRES_INTERVENTION') else "⚠️ ") + describir_alerta(alerta))
+            # Mantenimiento recomendado: solo se anuncia (una vez por sesión, causa y evidencia); lo ejecuta un humano.
+            for recomendacion in runtime().guard.announce_recommendations(runtime().sessions):
+                print("💡 " + describir_recomendacion(recomendacion))
                                 
         except KeyboardInterrupt:
             print("\n🛑 Watcher detenido por el usuario.")
@@ -1444,7 +1628,9 @@ def iniciar_watcher():
             raise
         except Exception as e:
             raise ReconciliationRequired('Watcher detenido ante fallo inesperado; revisar estado antes de reanudar.') from e
-            
+        finally:
+            lock_sesiones.release()
+
         time.sleep(2)
 
 def main(argv=None):

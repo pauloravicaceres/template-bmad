@@ -1,6 +1,7 @@
 """Composition root; external providers register here through dependency injection."""
 from .commands import CommandRunner
 from .config import RuntimeConfig, AGENT_PHASES, OPERATIONS, materialize_config
+from .guard import Guard
 from .herdr import HerdrGateway
 from .providers import default_registry
 from .registry import ProviderFactory
@@ -24,11 +25,14 @@ class Runtime:
             self.factory.resolve(agent=agent)
         for operation in OPERATIONS:
             self.factory.resolve(operation=operation)
+        # Rejects usage limits for metrics the selected providers do not report, before anything is written.
+        self.guard = Guard(self.config, self.factory, None)
         self.gateway = gateway or HerdrGateway(self.runner, self.config.root)
         if persist:
             materialize_config(self.context, self.config.raw)
         self.state = StateStore(self.context) if persist else None
-        self.spec = SpecKitExecutor(self.config, self.factory, self.runner, self.state)
+        self.guard.state = self.state
+        self.spec = SpecKitExecutor(self.config, self.factory, self.runner, self.state, guard=self.guard)
         self.dispatcher = AgentDispatcher(self.config, self.factory, self.gateway, self.state)
         self.sessions = SessionManager(self.dispatcher)
 

@@ -48,6 +48,22 @@ class RegressionTests(unittest.TestCase):
         text = self.tracker.read_text(encoding='utf-8')
         self.assertLess(text.index('@WATCHER:'), text.index('@BA:'))
 
+    def test_approval_detects_only_kebab_case_artifacts(self):
+        from utils import approve_step
+        self.tracker.write_text(
+            'idea_vieja.md pb_viejo.md mvp_viejo.md 001-HU_vieja.md\n'
+            'docs/business-storyteller/idea-reserva-citas.md docs/product-analyst/pb-reserva-citas.md\n'
+            'docs/product-manager/mvp-reserva-citas.md docs/business-analyst/003-gestion-sprint-dos-semanas.md\n',
+            encoding='utf-8')
+        esperados = {'1': 'idea-reserva-citas.md', '2': 'pb-reserva-citas.md',
+                     '3': 'mvp-reserva-citas.md', '4': '003-gestion-sprint-dos-semanas.md'}
+        with patch.object(approve_step, 'TRACKER_PATH', self.tracker):
+            for opcion, archivo in esperados.items():
+                self.assertEqual(approve_step.extract_latest_file(approve_step.APPROVAL_CONFIG[opcion]['file_regex']), archivo)
+            self.tracker.write_text('pb_viejo.md 001-HU_vieja.md\n', encoding='utf-8')
+            self.assertIsNone(approve_step.extract_latest_file(approve_step.APPROVAL_CONFIG['2']['file_regex']))
+            self.assertIsNone(approve_step.extract_latest_file(approve_step.APPROVAL_CONFIG['4']['file_regex']))
+
     def test_clarify_failure_does_not_handoff(self):
         with patch.object(workflow, 'is_tracker_paused_for_human', return_value=True), patch.object(workflow, 'write_watcher_log'), patch.object(workflow, 'ejecutar_speckit', return_value=Result(1)), patch.object(workflow, 'registrar_traspaso_fase_a') as handoff:
             with self.assertRaises(ReconciliationRequired):

@@ -177,7 +177,7 @@ Recepción necesita registrar y consultar reservas. Empezamos con una agenda int
 sin pagos ni acceso de clientes. Estructura esta idea según tu perfil y el contrato del workspace.
 ```
 
-Business Storyteller guarda la narrativa en `docs/business-storyteller/idea_<nombre>.md` y
+Business Storyteller guarda la narrativa en `docs/business-storyteller/idea-<nombre>.md` y
 anexa el handoff `@PA:`. Sigue el tracker en otra terminal:
 
 ```powershell
@@ -204,8 +204,14 @@ El diagrama completo está en [ARCHITECTURE.md](ARCHITECTURE.md#6-flujo-bmad--sd
 7. Un rechazo activa `analyze → converge → implement` (máximo dos iteraciones; luego escala al
    humano). La aprobación cierra la rama con `GITOPS-MERGE-CLOSE` y permite la siguiente HU.
 
-Una HU se completa antes de abrir la siguiente. El identificador `XXX-HU_nombre_en_snake_case`
-se conserva sin truncar en HU, carpeta de spec, rama y handoffs.
+Una HU se completa antes de abrir la siguiente. El identificador `XXX-nombre-en-kebab-case`
+se conserva sin truncar en HU, carpeta de spec, rama y handoffs (p. ej.
+`docs/business-analyst/001-registrar-cliente.md`, `specs/001-registrar-cliente/`,
+`feat/001-registrar-cliente`). `bmad_runtime/hu_naming.py` es el único validador: un nombre
+con guiones bajos, espacios, mayúsculas, tildes, numeración distinta de tres dígitos o sin
+descripción se rechaza con su motivo. El watcher no ejecuta specify ni crea la rama,
+`approve_step.py` no registra la aprobación y el dashboard responde 422. Nada se renombra:
+corrige el archivo a mano y vuelve a aprobar.
 
 ## 7. Entradas y entregables por rol
 
@@ -216,9 +222,9 @@ workspace prevalece sobre rutas legacy de los perfiles.
 
 | Rol / token | Fase | Entradas principales | Salidas y siguiente paso |
 |---|---|---|---|
-| Business Storyteller / `@BS:` | B | Idea del humano | `docs/business-storyteller/idea_*.md`; PA |
-| Product Analyst / `@PA:` | B | Idea estructurada | `docs/product-analyst/pb_*.md`; aprobación humana |
-| Product Manager / `@PM:` | M | PB aprobado, ledger y backlog | `docs/product-manager/mvp_*.md`; priorización, rama y BA |
+| Business Storyteller / `@BS:` | B | Idea del humano | `docs/business-storyteller/idea-*.md`; PA |
+| Product Analyst / `@PA:` | B | Idea estructurada | `docs/product-analyst/pb-*.md`; aprobación humana |
+| Product Manager / `@PM:` | M | PB aprobado, ledger y backlog | `docs/product-manager/mvp-*.md`; priorización, rama y BA |
 | Business Analyst / `@BA:` | M | PB, MVP, HU y feedback de QA | HU técnica en `docs/business-analyst/` y narrativa en `HUs-stakeholders/`; QA |
 | QA Documental / `@QA:` | M | HU y PB | Aprobación o feedback en `docs/qa-documental/`; specify/clarify o BA |
 | Designer UX / `@UX:` | A | HU, spec y PB | `docs/designer-ux/ux_*.md`; SA |
@@ -244,9 +250,9 @@ un aviso al humano, los demás agentes se nombran sin token para no disparar des
 Las macros GitOps van como líneas independientes antes del handoff:
 
 ```text
-@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-HU_nombre
+@WATCHER: GITOPS-BRANCH-CREATE feat/XXX-nombre
 @WATCHER: SDD-FREEZE
-@WATCHER: GITOPS-MERGE-CLOSE feat/XXX-HU_nombre
+@WATCHER: GITOPS-MERGE-CLOSE feat/XXX-nombre
 ```
 
 Un `@HUMANO:` real pausa el despacho. Atiende la compuerta con:
@@ -314,8 +320,9 @@ paralelo. No compartas tracker ni `state/` entre proyectos. Ver
 & $Python (Join-Path $Engine 'utils/stop_agents.py') --workspace $Workspace --project $Project --confirm
 ```
 
-Sin `--confirm` no cierra nada; no ofrece `--dry-run` ni `--config`. Solo cierra tabs cuya
-propiedad y estado idle/done verifica. No borres locks ni SQLite.
+Sin `--confirm` no cierra nada; no ofrece `--dry-run`. Si el watcher arrancó con `--config`,
+pásale la misma: resuelve `--project` con ese archivo y rechaza un `project.json` que no coincida.
+Solo cierra tabs cuya propiedad y estado idle/done verifica. No borres locks ni SQLite.
 
 Si las sesiones siguen válidas, reinicia solo el watcher: recupera cursor, cola y rama abierta.
 Si cerraste la flota, repite dry-runs, flota y watcher. Para inspeccionar registros no
@@ -335,7 +342,7 @@ El primero puede crear o abrir SQLite. El segundo marca como manejado un `event:
 |---|---|
 | Entregables por rol | `docs/<rol>/` |
 | Stack, arquitectura y ADRs | `docs/architecture/` |
-| Especificaciones por HU | `specs/XXX-HU_nombre/` (`spec.md`, `plan.md`, `tasks.md`) |
+| Especificaciones por HU | `specs/XXX-nombre/` (`spec.md`, `plan.md`, `tasks.md`) |
 | Ledger de HUs | `specs/README.md` |
 | Código | `code_dirs.backend` y `code_dirs.frontend` (por defecto `app/backend`, `app/frontend`) |
 | Arquitectura de capas | `docs/dev-backend/backend-architecture.md`, `docs/dev-frontend/frontend-architecture.md` |

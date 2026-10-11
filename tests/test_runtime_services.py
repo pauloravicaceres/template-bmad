@@ -62,7 +62,7 @@ class ServiceTests(unittest.TestCase):
         self.temp.cleanup()
 
     def test_external_provider_launches_without_orchestrator_edits(self):
-        self.assertEqual(FleetOrchestrator(self.rt).launch(), 13)
+        self.assertEqual(FleetOrchestrator(self.rt).launch(verify=False), 13)
         self.assertEqual(self.gateway.start.call_count, 13)
         self.assertEqual(self.rt.state.get('agent:business-analyst')['provider'], 'fake')
 
@@ -76,7 +76,7 @@ class ServiceTests(unittest.TestCase):
     def test_partial_launch_never_succeeds_or_closes_tabs(self):
         self.gateway.start.side_effect = RuntimeError('partial')
         with self.assertRaises(RuntimeError):
-            FleetOrchestrator(self.rt).launch()
+            FleetOrchestrator(self.rt).launch(verify=False)
         self.assertEqual(self.rt.state.get('agent:business-storyteller')['state'], 'uncertain')
         self.gateway.focus.assert_not_called()
         self.gateway.close.assert_not_called()
@@ -84,7 +84,7 @@ class ServiceTests(unittest.TestCase):
     def test_existing_session_prevents_duplicate_launch(self):
         self.gateway.list_agents.return_value = [{'name': 'business-analyst'}]
         with self.assertRaises(ReconciliationRequired):
-            FleetOrchestrator(self.rt).launch()
+            FleetOrchestrator(self.rt).launch(verify=False)
         self.gateway.create_tab.assert_not_called()
 
     def test_persistent_dedupe_and_ambiguous_restart(self):
@@ -111,10 +111,15 @@ class ServiceTests(unittest.TestCase):
             dispatcher.dispatch('business-analyst', 'other-project', 'write', 'two')
 
     def test_safe_context_cleanup(self):
+        # Clearing or rotating is operator-confirmed maintenance only: the watcher has no automatic path.
+        from unittest.mock import patch
+        from bmad_runtime import workflow
         self.rt.state.put('agent:business-analyst', {'provider': 'fake', 'model': None, 'pane_id': 'p', 'state': 'ready'})
-        with self.assertRaises(UnsupportedCapability):
-            self.rt.sessions.clear('business-analyst')
+        self.assertFalse(hasattr(self.rt.sessions, 'clear'))
+        with patch.object(workflow, '_runtime', self.rt), patch('builtins.print'):
+            workflow.limpiar_sesiones_agentes()
         self.gateway.prompt.assert_not_called()
+        self.gateway.submit.assert_not_called()
 
     def test_queue_restart_preserves_reference_without_prompt(self):
         service = WatcherService(self.rt)

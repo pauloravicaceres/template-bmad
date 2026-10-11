@@ -109,13 +109,17 @@ class CodexEffortTests(unittest.TestCase):
             with self.subTest(approval=approval), self.assertRaises(ConfigurationError):
                 self.provider.validate(Selection('codex', options={'approval': approval}))
 
-    def test_claude_interactive_bypasses_by_default_headless_stays_manual(self):
+    def test_claude_interactive_accepts_edits_by_default_headless_stays_manual(self):
         provider = ClaudeProvider()
-        for options in ({}, {'effort': 'low'}, {'permission_mode': 'bypass'}):
+        for options in ({}, {'effort': 'low'}):
             with self.subTest(options=options):
                 interactive = provider.interactive(Selection('claude', options=options), self.root, self.profile)
-                self.assertIn('--dangerously-skip-permissions', interactive.argv)
-                self.assertNotIn('--permission-mode', interactive.argv)
+                self.assertEqual(interactive.argv[interactive.argv.index('--permission-mode') + 1], 'acceptEdits')
+                self.assertNotIn('--dangerously-skip-permissions', interactive.argv)
+        # Bypass remains an explicit, opt-in choice.
+        explicit = provider.interactive(Selection('claude', options={'permission_mode': 'bypass'}), self.root, self.profile)
+        self.assertIn('--dangerously-skip-permissions', explicit.argv)
+        self.assertNotIn('--permission-mode', explicit.argv)
         strict = provider.interactive(Selection('claude', options={'permission_mode': 'plan'}), self.root, self.profile)
         self.assertEqual(strict.argv[strict.argv.index('--permission-mode') + 1], 'plan')
         self.assertNotIn('--dangerously-skip-permissions', strict.argv)

@@ -29,6 +29,8 @@ class Result:
     stdout: str = field(default='', repr=False)
     stderr: str = field(default='', repr=False)
     error: str | None = None
+    # Wall-clock time of the spawned process; None when nothing was spawned.
+    duration_ms: int | None = field(default=None, compare=False)
 
     def require_success(self):
         if self.returncode:
@@ -65,6 +67,7 @@ class CommandRunner:
             self._slots.release()
 
     def _execute(self, command, executable, duration):
+        started = time.monotonic()
         try:
             environment = dict(os.environ)
             if 'WORKSPACE_ROOT' in command.env:
@@ -107,17 +110,27 @@ class CommandRunner:
                    threading.Thread(target=drain, args=(process.stderr, 1), daemon=True)]
         if command.stdin is not None:
             threads.append(threading.Thread(target=feed, daemon=True))
-        for thread in threads:
-            thread.start()
-        deadline = time.monotonic() + duration
         error = None
-        while process.poll() is None:
-            if overflow.is_set() or time.monotonic() >= deadline:
-                error = 'output_limit' if overflow.is_set() else 'timeout'
-                self._terminate(process)
-                break
-            time.sleep(0.02)
-        process.wait()
+        try:
+            for thread in threads:
+                thread.start()
+            deadline = time.monotonic() + duration
+            while process.poll() is None:
+                if overflow.is_set() or time.monotonic() >= deadline:
+                    error = 'output_limit' if overflow.is_set() else 'timeout'
+                    self._terminate(process)
+                    break
+                time.sleep(0.02)
+            process.wait()
+        except BaseException:
+            # Cancellation (Ctrl+C) or an unexpected error must not leave the
+            # spawned tree writing to the project after the caller gave up.
+            self._terminate(process)
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                pass
+            raise
         for thread in threads:
             thread.join(timeout=1)
         if any(thread.is_alive() for thread in threads):
@@ -125,7 +138,8 @@ class CommandRunner:
         error = error or ('output_limit' if overflow.is_set() else None)
         return Result(124 if error else process.returncode,
                       buffers[0].decode('utf-8', errors='replace'),
-                      buffers[1].decode('utf-8', errors='replace'), error)
+                      buffers[1].decode('utf-8', errors='replace'), error,
+                      int((time.monotonic() - started) * 1000))
 
     @staticmethod
     def _terminate(process):

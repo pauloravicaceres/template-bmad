@@ -22,6 +22,9 @@ if sys.platform.startswith('win'):
 # Asume que el script está en la carpeta /utils/
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent.parent
 TRACKER_PATH = DIRECTORIO_RAIZ / "docs" / "tracker_bmad.md"
+if str(DIRECTORIO_RAIZ) not in sys.path:
+    sys.path.insert(0, str(DIRECTORIO_RAIZ))
+from bmad_runtime.hu_naming import HU_FILE_IN_TEXT, hu_id_from_delegation, hu_name_error, last_hu_candidate
 
 # ==========================================
 # MATRIZ DE APROBACIÓN Y HANDOFF (HITL & SDD BRIDGE)
@@ -30,25 +33,25 @@ APPROVAL_CONFIG = {
     "1": {
         "name": "Business Storyteller (BS) -> PA",
         "folder": "business-storyteller",
-        "file_regex": r"(idea_[\w_]+\.md)",
+        "file_regex": r"(?<![\w-])(idea-[a-z0-9]+(?:-[a-z0-9]+)*\.md)",
         "message": "@PA: La idea de usuario ha sido auditada y aprobada por negocio en el archivo {file}. Procede con la creación del PRODUCT BRIEF."
     },
     "2": {
         "name": "Product Analyst (PA) -> PM [Pausa HITL Canónica]",
         "folder": "product-analyst",
-        "file_regex": r"(pb_[\w_]+\.md)",
+        "file_regex": r"(?<![\w-])(pb-[a-z0-9]+(?:-[a-z0-9]+)*\.md)",
         "message": "@PM: El Product Brief ha sido auditado y aprobado formalmente en el archivo {file}. Procede con el análisis estratégico y la creación del Backlog del MVP."
     },
     "3": {
         "name": "Product Manager (PM) -> BA [Pausa HITL de Estrategia]",
         "folder": "product-manager",
-        "file_regex": r"(mvp_[\w_]+\.md)",
+        "file_regex": r"(?<![\w-])(mvp-[a-z0-9]+(?:-[a-z0-9]+)*\.md)",
         "message": "@WATCHER: GITOPS-BRANCH-CREATE feat/{branch_name}\n@BA: El MVP y Backlog han sido aprobados en el archivo {file}. La rama feat/{branch_name} ha sido creada. Procede con el análisis de negocio y redacción de Historias de Usuario para la épica {branch_name}. Usa el identificador universal estricto para crear el archivo físico en docs/business-analyst."
     },
     "4": {
         "name": "Business Analyst (BA) -> QA",
         "folder": "business-analyst",
-        "file_regex": r"(hu_[\w_]+\.md)",
+        "file_regex": HU_FILE_IN_TEXT,
         "message": "@QA: La Historia de Usuario ha sido revisada en el archivo {file}. Por favor, procede con la auditoría documental contra el Product Brief."
     },
     "5": {
@@ -183,27 +186,37 @@ def main(argv=None):
     config = APPROVAL_CONFIG[opcion]
     
     if opcion == "3":
-        import re
-        branch_name = "001-HU_epic_generica"
-        if TRACKER_PATH.exists():
-            with open(TRACKER_PATH, 'r', encoding='utf-8', errors='replace') as f:
-                content = f.read()
-            match = re.search(r"delegar es\s+(\d{3}-HU_[\w_]+)", content)
-            if match:
-                branch_name = match.group(1)
-                print(f"\n⚡ Identificador extraído automáticamente del Tracker: {branch_name}")
-            else:
-                print(f"\n⚠️ No se pudo extraer el identificador automáticamente. Usando fallback: {branch_name}")
+        content = TRACKER_PATH.read_text(encoding='utf-8', errors='replace') if TRACKER_PATH.exists() else ""
+        branch_name = hu_id_from_delegation(content)
+        if branch_name:
+            print(f"\n⚡ Identificador extraído automáticamente del Tracker: {branch_name}")
+        else:
+            # Sin identificador válido no se crea ninguna rama: nada de ramas genéricas ni nombres inventados.
+            print("\n⚠️ El tracker no contiene 'delegar es NNN-nombre-en-kebab-case' con un identificador válido.")
+            branch_name = input("✍️ Ingrese el identificador de la HU delegada (NNN-nombre-en-kebab-case): ").strip()
+            error = hu_name_error(f"{branch_name}.md") if branch_name else "identificador vacío"
+            if error:
+                print(f"❌ Identificador rechazado: {error}. No se registra la aprobación.")
+                sys.exit(1)
         config['message'] = config['message'].replace("{branch_name}", branch_name)
-    
+
     # 1. Extraer el nombre del archivo inteligentemente
     archivo_detectado = extract_latest_file(config['file_regex'])
-    
+    if opcion == "4" and TRACKER_PATH.exists():
+        # La HU más reciente manda: si su nombre incumple el contrato no se aprueba otra anterior en su lugar.
+        ultima = last_hu_candidate(TRACKER_PATH.read_text(encoding='utf-8', errors='replace'))
+        if ultima and hu_name_error(ultima):
+            print(f"❌ Historia de usuario rechazada: {hu_name_error(ultima)}. Renómbrala manualmente y vuelve a aprobar.")
+            sys.exit(1)
+
     if not archivo_detectado:
         print(f"\n⚠️ No se encontró ningún archivo asociado al {config['name']} en el tracker.")
-        archivo_detectado = input("✍️ Ingrese el nombre del archivo manualmente (ej. tasks.md, spec.md o pb_proyecto.md): ").strip()
+        archivo_detectado = input("✍️ Ingrese el nombre del archivo manualmente (ej. tasks.md, spec.md o pb-proyecto.md): ").strip()
         if not archivo_detectado:
             print("Operación cancelada.")
+            sys.exit(1)
+        if opcion == "4" and hu_name_error(archivo_detectado):
+            print(f"❌ Historia de usuario rechazada: {hu_name_error(archivo_detectado)}.")
             sys.exit(1)
     else:
         print(f"\n📄 Archivo detectado en el tracker: {archivo_detectado}")

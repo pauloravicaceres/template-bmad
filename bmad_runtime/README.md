@@ -14,6 +14,8 @@ La mayoría de los módulos del paquete son bibliotecas internas: se importan de
 | [watcher_bmad.py](../watcher_bmad.py) | `workflow.main()` | Revisar operaciones SpecKit, escuchar tracker o compilar perfiles explícitamente |
 | [utils/stop_agents.py](../utils/stop_agents.py) | `maintenance.stop_main()` | Cerrar tabs propios verificados e inactivos |
 | `python -m bmad_runtime.state` | `state.main()` | Inspeccionar y reconocer eventos del estado persistido |
+| `python -m bmad_runtime.maintenance --plan-clear` | `maintenance.main()` → `SessionManager.plan()` | Informe de solo lectura sobre qué sesiones podrían limpiarse o rotarse; no modifica sesiones |
+| `python -m bmad_runtime.maintenance --clear/--rotate/--reconcile ROL --confirm` | `maintenance.main()` → `SessionMaintenance` | CLEAR (solo Claude Code), ROTATE o reconciliación confirmados por el operador de un agente propio |
 | [utils/approve_step.py](../utils/approve_step.py) y [utils/response_sa.py](../utils/response_sa.py) | `context.resolve_context()` | Resolver el proyecto al registrar aprobaciones o respuestas humanas |
 | [backend/core/config.py](../bmad-control-center/backend/core/config.py) | `context.resolve_context()` y `config.effective_config()` | Fijar proyecto y configuración del dashboard al importar su aplicación |
 
@@ -35,12 +37,14 @@ La mayoría de los módulos del paquete son bibliotecas internas: se importan de
 | [herdr.py](herdr.py) | Traducción al CLI de Herdr | Flota, despacho, watcher y parada |
 | [services.py](services.py) | SpecKit, despacho y gestión de contexto | Runtime, flota y workflow |
 | [state.py](state.py) | SQLite, deduplicación y locks | Runtime, servicios, watcher, bootstrap y parada |
-| [watcher_service.py](watcher_service.py) | Cursor y cola persistida del tracker | workflow |
+| [watcher_service.py](watcher_service.py) | Cursor y cola persistida del tracker; protocolo de coordinación con el mantenimiento | workflow, services y maintenance |
 | [workflow.py](workflow.py) | Reglas BMAD/SDD y bucle del watcher | watcher_bmad |
+| [hu_naming.py](hu_naming.py) | Contrato único del identificador de HU (`NNN-nombre-en-kebab-case`) | workflow, approve_step y dashboard |
 | [gitops.py](gitops.py) | Ejecución Git y freeze de especificaciones | workflow |
 | [technical_context.py](technical_context.py) | Constitución local, índice técnico, descubrimiento y ensamblado de contexto | services, workspace y dashboard |
 | [workspace.py](workspace.py) | Bootstrap y migración aditiva | init_bmad y manage_workspace |
-| [maintenance.py](maintenance.py) | Cierre de sesiones con comprobación de propiedad | stop_agents |
+| [maintenance.py](maintenance.py) | Cierre de tabs propios y CLEAR/ROTATE supervisados con coordinación del watcher | stop_agents y operador |
+| [guard.py](guard.py) | Presupuesto de contexto, loop guard y registro de progreso; recomienda, no actúa | Runtime, workflow, SpecKitExecutor y operador |
 | [errors.py](errors.py) | Excepciones comunes del runtime | Módulos del paquete y sus entradas públicas |
 
 ### `__init__.py`: identidad del paquete
@@ -125,8 +129,8 @@ Reúne cuatro responsabilidades utilizadas por Runtime:
 
 - **`interactive_command()`:** invocada por flota; adapta el comando del proveedor al cwd del workspace, perfil absoluto compartido, entorno y contrato de rutas. Prepara el comando sin ejecutarlo.
 - **`SpecKitExecutor`:** `workflow.ejecutar_speckit()` llama a `execute()`; `cli.spec_plan()` usa `prepare()`. Valida skills, directiva y feature dentro del perímetro; construye el prompt headless. Ejecutar toma lock `speckit`, verifica ayuda, registra `run:` en SQLite, lanza el CLI y clasifica su resultado; interrupciones quedan uncertain. No reintenta automáticamente ni anexa handoffs: workflow decide cómo registrar/continuar.
-- **`AgentDispatcher`:** workflow lo usa para consultar agentes y despachar tareas/recordatorios. Comprueba registro ready, identidad/pane, proveedor/modelo y estado idle/done; deduplica por `dispatch:` y antepone el contrato de rutas al prompt. La aceptación del prompt se registra done; no equivale a terminar el trabajo del agente.
-- **`SessionManager`:** `workflow.limpiar_sesiones_agentes()` intenta `clear()`. Exige propiedad, inactividad y capacidad de rotación. Los adaptadores actuales la rechazan: no envía `/clear` ni rota contexto automáticamente.
+- **`AgentDispatcher`:** workflow lo usa para consultar agentes y despachar tareas/recordatorios. Comprueba registro ready, identidad/pane, proveedor/modelo y estado idle/done; deduplica por `dispatch:` y antepone el contrato de rutas al prompt. El archivo de tarea referencia la política global incluida en el contrato del agente en lugar de copiarla; contrato de rutas, constitución local, observaciones y regla del tracker siguen en cada tarea. La aceptación del prompt se registra done; no equivale a terminar el trabajo del agente.
+- **`SessionManager`:** `record_summary()` guarda `session:<agente>` al confirmar un handoff; `plan()` evalúa elegibilidad en solo lectura (incluye mantenimientos pendientes, generación y sesión ya renovada). No limpia ni rota: `workflow.limpiar_sesiones_agentes()` solo sugiere el plan al cerrar una HU. `probe_text()`/`probe_verdict()` construyen y evalúan la verificación de mantenimiento; `clear_supported()` limita CLEAR a Claude Code.
 
 No ofrece una CLI propia. Sus efectos reales dependen del método: preparar solo lee, ejecutar/despachar usa procesos y estado.
 
@@ -135,7 +139,7 @@ No ofrece una CLI propia. Sus efectos reales dependen del método: preparar solo
 `StateStore` guarda objetos JSON en la tabla `records(id, data)` de `state/state.sqlite3` del workspace, o `.bmad-runtime/state.sqlite3` en legacy. `get()`/`put()` leen/escriben; `claim()` registra una operación in_flight una sola vez; `finish()` actualiza el estado; `fingerprint()` calcula identificadores deterministas.
 
 - **Quién lo invoca:** Runtime abre el almacén; flota, servicios, WatcherService y workflow registran propiedad, operaciones, cursor, cola y seguimiento. `workspace` y maintenance usan `project_lock()` incluso sin abrir SQLite.
-- **Cómo funciona:** una operación ya done no vuelve a reclamarse; otra incompleta requiere reconciliación. `project_lock()` usa bloqueo del sistema operativo (`msvcrt` en Windows, `fcntl` en POSIX). El archivo `.lock` puede permanecer tras liberar el bloqueo; su existencia no prueba una operación activa. Estado y tracker son fuentes distintas: SQLite guarda metadatos, no los prompts completos.
+- **Cómo funciona:** una operación ya done no vuelve a reclamarse; otra incompleta requiere reconciliación. `project_lock()` y `ProjectLock` (adquisición no bloqueante reutilizable por ciclo) usan bloqueo del sistema operativo (`msvcrt` en Windows, `fcntl` en POSIX); `put_many()` escribe varios registros en una transacción. El archivo `.lock` puede permanecer tras liberar el bloqueo; su existencia no prueba una operación activa. Estado y tracker son fuentes distintas: SQLite guarda metadatos, no los prompts completos.
 - **CLI y efectos:** `python -m bmad_runtime.state` toma locks watcher/fleet/speckit, abre/crea SQLite y muestra registros no done. `--acknowledge ID --confirm` admite IDs event/dispatch/queued existentes y los marca done; no reintenta ni acredita entrega. No debe ejecutarse mientras esos locks estén ocupados.
 
 ### `watcher_service.py`: cursor y cola del tracker
@@ -161,18 +165,27 @@ Es la implementación del flujo de negocio. `watcher_bmad.py` invoca `main()`, q
 | `ejecutar_sdd_fase_implementacion()` | Implementación por capas y comprobación de arquitecturas/README antes de revisión | Gatillo de arquitectura o SpecKit, y retrabajo |
 | `ejecutar_sdd_retrabajo()` | analyze/converge/implement tras rechazo, con máximo dos iteraciones | Handoff de revisores hacia desarrollo |
 | `ejecutar_speckit()` | Delegar operación a `runtime().spec` y registrar errores | Funciones SDD |
-| `registrar_seguimiento()`, `vigilar_agentes_inactivos()` | Detectar falta de registro, leer cuota y enviar recordatorios o escalar | Despacho y bucle cuando no hay pausa humana |
+| `registrar_seguimiento()`, `vigilar_agentes_inactivos()` | Detectar falta de registro, leer cuota y enviar recordatorios o escalar; mientras el seguimiento de un agente está activo, el bucle retiene sus siguientes tareas | Despacho y bucle cuando no hay pausa humana |
+| `comando_reconciliar_evento()` | Orden exacta `bmad_runtime.state --acknowledge event:... --confirm` del proyecto, usada en la alerta de conflicto de `gitops_merge_close()` | Recuperación de macros GitOps |
 | `macro_gitops()`, `gitops_branch_create()`, `gitops_merge_close()` | Reconocer macros independientes y gestionar rama/cierre | Procesamiento de nuevas líneas |
 | `hydration_gitops()` | Buscar apertura de rama aún no cerrada en el tracker | Arranque del watcher |
 | `compilar_agentes_modulares()` | Reconstruir perfiles compartidos desde fuentes, instrucciones y skills | Solo `main()` con `--compile-profiles` |
 
 **Efectos de operación:** anexa registros al tracker, persiste estado, despacha prompts y ejecuta SpecKit/Git. Retrabajo conserva datos en `.specify/memory/rework_state.json` y `rework_last_classification.md`; implementación puede crear directivas temporales dentro del workspace. Las escrituras de código/documentos las realiza el CLI headless y el workflow comprueba sus entregas. Los fallos requieren inspección del trabajo parcial, no un borrado de historial.
 
-**Efectos de GitOps:** creación/reanudación de ramas y freeze; cierre solicita al operador escribir el nombre de rama, luego merge y borrado de la rama fusionada. Árbol sucio con auto_commit deshabilitado detiene el cambio; con autosave habilitado puede hacer add/commit. Cerrar una rama intenta limpiar contexto, pero la capacidad está deshabilitada actualmente.
+**Efectos de GitOps:** creación/reanudación de ramas `feat/NNN-nombre-en-kebab-case` (otro nombre se rechaza sin crear rama) y freeze; cierre solicita al operador escribir el nombre de rama, luego merge y borrado de la rama fusionada. Árbol sucio con auto_commit deshabilitado detiene el cambio; con autosave habilitado puede hacer add/commit. Cerrar una rama intenta limpiar contexto, pero la capacidad está deshabilitada actualmente.
 
 **Funciones conservadas que no son un paso automático de arranque:** `guardar_historial()` y `validar_constitucion_gitops()` están definidas, pero no tienen llamadas internas actuales. La primera es una API legacy para autosave optativo; la segunda verifica la existencia de la constitución local sin añadir política global. Su existencia no significa que iniciar el watcher las ejecute.
 
 **Mantenimiento explícito:** `--compile-profiles` escribe los `AGENTS.md` compartidos del motor y debe ejecutarse sin selección de proyecto; no es preparación habitual de cada workspace. `workflow.py` expone funciones y `main()`, pero no tiene bloque `__main__`: utiliza `watcher_bmad.py` como entrada pública.
+
+### `hu_naming.py`: identificador universal de historias de usuario
+
+Fuente única del nombre de HU: `NNN-nombre-en-kebab-case.md` (tres dígitos, guion, descripción en minúsculas ASCII con palabras separadas por un único guion). El identificador sin `.md` nombra la carpeta `specs/NNN-nombre/` y la rama `feat/NNN-nombre`. No hay compatibilidad con snake_case ni con `NNN-HU_nombre`.
+
+- **Quién lo invoca:** `workflow.carpeta_spec_para_hu()`, la intercepción de aprobación QA y SDD-FREEZE de `extraer_instrucciones()`, `gitops_branch_create()`, `utils/approve_step.py` (opciones 3 y 4) y `POST /gates/{id}/decision` del dashboard.
+- **Cómo funciona:** `is_hu_id()`, `is_hu_filename()` e `is_feature_branch()` validan; `find_hu_file()` y `hu_id_from_delegation()` reconocen nombres válidos en el tracker; `hu_name_error()` explica por qué un nombre se rechaza (numeración, separador, descripción vacía, espacios, guiones bajos, tildes, mayúsculas o caracteres especiales); `invalid_hu_reference()` y `last_hu_candidate()` localizan nombres con aspecto de HU para informar el rechazo en lugar de ignorarlo.
+- **Efectos:** ninguno; funciones puras. Los consumidores detienen solo el paso de esa HU (sin specify, sin rama, sin aprobación) y nunca renombran archivos ni inventan identificadores. No tiene CLI propia.
 
 ### `gitops.py`: ejecución Git y freeze
 
@@ -191,11 +204,33 @@ Es la implementación del flujo de negocio. `watcher_bmad.py` invoca `main()`, q
 
 ### `maintenance.py`: cierre controlado de sesiones
 
-Es código operativo necesario para `utils/stop_agents.py`, independiente de una eventual carpeta raíz `maintenance/`. `stop_main()` procesa selección y `--confirm`; sin confirmación termina sin cerrar tabs.
+Es código operativo necesario para `utils/stop_agents.py`, independiente de una eventual carpeta raíz `maintenance/`. `stop_main()` procesa selección, `--config` y `--confirm`; sin confirmación termina sin cerrar tabs. La misma `--config` resuelve el proyecto (registro `projects` y `project.json`) y construye el Runtime.
 
 - **Quién lo invoca:** `utils/stop_agents.py` llama a `stop_main()`; este construye Runtime y llama a `close_owned_tabs()`. Las pruebas comprueban propiedad y separación de proyectos.
-- **Cómo funciona:** toma locks watcher/fleet, consulta agentes/panes/tabs de Herdr y contrasta cada miembro con registros de propiedad del proyecto. Solo permite idle/done. Valida todos los destinos antes de cerrar; tabs ocupados, vacíos o con miembros no verificables requieren reconciliación/manual.
+- **Cómo funciona:** toma locks maintenance/watcher/fleet y rechaza el cierre si hay un mantenimiento sin reconciliar; consulta agentes/panes/tabs de Herdr y contrasta cada miembro con registros de propiedad del proyecto. Solo permite idle/done. Valida todos los destinos antes de cerrar; tabs ocupados, vacíos o con miembros no verificables requieren reconciliación/manual.
 - **Efectos:** con confirmación abre estado/refresca configuración, cierra tabs verificados y marca sus agentes closed. No detiene el watcher por sí solo, mata agentes ocupados, borra artefactos ni ofrece dry-run/config. Un fallo al cerrar puede requerir inspección de los tabs restantes.
+
+`main()` (`python -m bmad_runtime.maintenance`) atiende el ciclo de vida de sesiones; `plan_main` es su alias anterior.
+
+- **`--plan-clear` y operaciones sin `--confirm`:** solo lectura con `StateStore.open_readonly()`; sin locks, escrituras ni mensajes.
+- **`Coordination`:** locks de SO `maintenance`, `watcher` (solo si no corre ninguno; si corre, exige su latido `sessions-lock/1` reciente), `fleet` y `sessions` (espera acotada a que termine el ciclo del watcher). Se liberan al salir o al morir el proceso.
+- **`SessionMaintenance.run()`:** reevalúa elegibilidad e identidad bajo exclusión y ejecuta ROTATE (`REQUESTED → QUIESCED → STOPPING → STARTING → VERIFYING → COMPLETED`) o CLEAR (`… → CLEARING → VERIFYING → COMPLETED`), con `FAILED` (nada enviado) y `REQUIRES_INTERVENTION` (incierto). Persiste `maintenance:<op_id>` en cada transición; la generación sube solo tras la verificación, en la misma transacción que `COMPLETED`. No reintenta ni cambia de CLEAR a ROTATE.
+- **`reconcile()`:** marca como interrumpida una operación no final (o crea un VERIFY para un agente retenido en `starting`/`awaiting_trust`/`unverified`), verifica el agente vivo y registra `resolution`; nunca relanza, reenvía comandos ni responde diálogos. Detalle operativo en [SETUP.md](../SETUP.md#ciclo-de-vida-de-sesiones).
+- **`verify()` (`--verify`, arranque de la flota):** operación VERIFY sin cambio de contexto ni de generación. `identity()` reúne comprobaciones deterministas (Herdr, cwd, proceso y argv con el contrato, proveedor/modelo, generación del mismo `run_id`) antes de la respuesta del agente; `_check_blocker()` detiene ante un diálogo en pantalla (estado `awaiting_trust`).
+- **`prepare_pane()` / `start_agent()`:** antes de arrancar Codex en un panel (flota o ROTATE), sondea qué `pwsh` resuelve su shell y aplica `PANE_PATH_REPAIR` solo a esa shell; rechaza si sigue en `WindowsApps`. `start_agent()` diagnostica como `AgentBlocked` un arranque fallido detrás de un diálogo.
+
+### `guard.py`: presupuesto de contexto y loop guard
+
+Observa el bucle del watcher; no es un segundo orquestador. `Runtime` crea `Guard` antes de escribir nada y rechaza límites de tokens o coste para proveedores que no reportan esa métrica (`measured_usage` vacío en Claude, Codex y Gemini).
+
+- **Registro de progreso:** eventos `progress:<ns>:<id>` en SQLite (`dispatched`, `work_started`, `artifacts_changed`, `handoff_confirmed`, `task_completed`, `no_progress`, `recoverable_error`, `repeated_error`, `permission_blocked`, `delivery_uncertain`, `clarification_requested`, `headless_run`). Cada métrica lleva su calidad: `measured` (reloj del runtime, intentos), `estimated` (tamaño del archivo de tarea / 4, nunca consumo) o `unavailable` (tokens y coste). Solo un artefacto declarado y modificado durante la tarea (mtime y contenido distinto del último confirmado) cuenta como avance; una entrega `accepted` o un bloque confirmado no lo son.
+- **Evaluación:** `evaluate()` recalcula las reglas solo desde SQLite (un reinicio llega al mismo veredicto): instrucción repetida, ciclo de handoffs, error repetido, turnos sin avance y aclaración repetida (señales combinadas que se reinician con avance verificado), bloqueo por permisos, entrega incierta, intentos, duración de la operación activa, operaciones consecutivas, tareas por sesión (generación) y consumo medido. Niveles `NORMAL`, `WARNING`, `PAUSE`, `REQUIRES_INTERVENTION`.
+- **Actuación:** `tick()` persiste el veredicto en `guard_alert:<regla>:<agente>` y anuncia solo subidas de nivel (consola y `logs/guard.log`, nunca el tracker). En `enforce`, `hold()` retiene nuevos despachos a los agentes implicados ante `PAUSE`/`REQUIRES_INTERVENTION`; en `observe` (predeterminado) solo alerta. Nunca interrumpe una operación activa, reintenta, limpia ni rota.
+- **CLI:** `python -m bmad_runtime.guard --workspace W` es un informe de solo lectura; `--acknowledge REGLA:AGENTE --confirm` registra `guard_ack:`: los eventos anteriores a la revisión del operador dejan de contar. Un CLEAR/ROTATE solo reinicia el presupuesto de la sesión (nueva generación); los bucles requieren reconocimiento.
+- **Diagnóstico (solo lectura):** `status()` (`--status [--agent ROL]`) agrega por agente sesión, trabajo desde el último mantenimiento (despachos de la sesión `run_id`+generación vigente), duración medida, métricas con calidad, alertas, retenciones y la elegibilidad de `SessionManager.plan()`. Con un watcher activo, el efecto de cada alerta usa el modo que ese watcher guardó en ella. `calibrate()` (`--calibrate`) reproduce las reglas de bucle evento a evento con `evaluate(history=..., budgets=False)` (los reconocimientos posteriores a cada instante no cuentan) y resume episodios, repeticiones legítimas y recuperación tras CLEAR/ROTATE; propone umbrales solo con `MIN_DISPATCHES`/`MIN_EPISODES`. `describe()` y `hold()` expresan el modo vigente, también en la primera retención tras un reinicio.
+- **Recomendaciones (4D.2):** `recommendations()` evalúa por agente las tareas de la sesión vigente (`session_work()`) frente a `max_operations_per_session` y la elegibilidad de `SessionManager.plan()`; devuelve `below_threshold`, `blocked` (con `checks` por condición) o `recommended` con evidencia y comandos de `maintenance_command()` (conservan el `--config` explícito del proceso, `RuntimeConfig.source`, como ruta absoluta; `maintenance` y `guard` aceptan `--config`). `Guard.announce_recommendations()` (watcher) persiste `guard_recommendation:<rol>` y anuncia solo una vez por clave `run_id:generación:causa` y cuota; nunca ejecuta. `state --release-followup ROL --confirm` libera el seguimiento de una tarea ya reconocida (`--acknowledge queued:...`), sin confirmarla.
+- **Uso headless:** con `guard.headless_usage`, `SpecKitExecutor` pide al proveedor su resultado estructurado documentado (`structured_headless()`) y `read_headless_usage()` devuelve el texto y las métricas (`HEADLESS_METRICS`); `on_headless()` las registra con su calidad.
+- **Hooks no bloqueantes:** un fallo al registrar se informa y no detiene el watcher.
 
 ### `errors.py`: contrato común de errores
 
@@ -213,8 +248,9 @@ Lo importan los módulos del runtime; las entradas públicas capturan errores BM
 | Supervisar | watcher_bmad → workflow → WatcherService/StateStore → AgentDispatcher o SpecKitExecutor | Cursor/cola, handoffs, prompts y artefactos según fase |
 | Freeze | workflow → GitService.freeze → CommandRunner | Staging acotado y commit si hay cambios |
 | Detener | stop_agents → maintenance → Runtime → HerdrGateway/StateStore | Cierre solo de tabs propios idle/done |
+| Limpiar o rotar | maintenance --clear/--rotate → Coordination (locks maintenance/watcher/fleet/sessions) → SessionMaintenance → HerdrGateway/StateStore | Operación `maintenance:<op_id>` persistida; generación incrementada solo tras verificar |
 
-Las pruebas en [tests](../tests) cubren estos límites: `test_multiworkspace.py` verifica selección, aislamiento, bootstrap, migración y parada; `test_runtime_infrastructure.py` configuración y procesos; `test_runtime_services.py` flota/despacho/estado; `test_codex_effort.py` traducción; `test_bmad_regressions.py` y pruebas de caracterización verifican gates y compatibilidad; `test_maintenance_contracts.py` comprueba configuración explícita durante init/migrate, opciones nativas y límites de rutas. `validate_offline.py` importa todos los módulos del paquete y comprueba ayudas, ejemplos, enlaces y dry-runs sin agentes reales. Los comandos de validación están en [SETUP.md](../SETUP.md#validación-local).
+Las pruebas en [tests](../tests) cubren estos límites: `test_multiworkspace.py` verifica selección, aislamiento, bootstrap, migración y parada; `test_runtime_infrastructure.py` configuración y procesos; `test_runtime_services.py` flota/despacho/estado; `test_codex_effort.py` traducción; `test_bmad_regressions.py` y pruebas de caracterización verifican gates y compatibilidad; `test_maintenance_contracts.py` comprueba configuración explícita durante init/migrate, opciones nativas y límites de rutas; `test_session_lifecycle.py` el plan de solo lectura, `test_session_maintenance.py` CLEAR/ROTATE, coordinación, fallos y recuperación, `test_agent_startup.py` PATH de paneles, diálogo de confianza, protocolo de ejecución e identidad determinista, `test_context_guard.py` presupuesto, loop guard, recuperación y contratos optimizados, y `test_guard_observability.py` uso headless, diagnóstico, calibración, texto del modo tras reinicio y contratos con los perfiles reales, `test_maintenance_recommendations.py` recomendaciones supervisadas, condiciones de bloqueo, duplicados y liberación de seguimientos, `test_tracker_integrity.py` cursor, cola, seguimiento activo, reinicios y reconciliación de merge-close, `test_stop_config.py` la `--config` de `stop_agents.py` y `test_delete_agents.py` la confirmación explícita de `utils/delete_agents.py`. `validate_offline.py` importa todos los módulos del paquete y comprueba ayudas, ejemplos, enlaces y dry-runs sin agentes reales. Los comandos de validación están en [SETUP.md](../SETUP.md#validación-local).
 
 ## Migración opcional
 

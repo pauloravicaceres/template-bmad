@@ -1,5 +1,6 @@
 """Native CLI strategies. No CLI-specific flags escape this module."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+import json
 from pathlib import Path
 import re
 from typing import Protocol
@@ -7,7 +8,14 @@ from typing import Protocol
 from .commands import Command, Result
 from .config import Selection
 from .errors import ConfigurationError, UnsupportedCapability
+from .guard import HEADLESS_METRICS, metric
 from .registry import ProviderRegistry
+
+
+def _usage(source, values, **qualities):
+    """Metrics of one structured result; a value the CLI did not report is unavailable, never zero."""
+    return {name: metric(values[name], qualities.get(name, 'measured'), source) if values.get(name) is not None
+            else metric(source=source) for name in HEADLESS_METRICS}
 
 
 @dataclass(frozen=True)
@@ -80,7 +88,15 @@ def _verified_skill(root, folder, operation, prefix):
 class ClaudeProvider:
     identifier = 'claude'
     herdr_kind = 'claude'
-    capabilities = Capabilities(True, True, True, True, False, True)
+    # clear_context: verified live in Herdr; the contract travels as system prompt (--append-system-prompt-file)
+    # and survives /clear. Only operator-confirmed maintenance uses it, never the watcher.
+    capabilities = Capabilities(True, True, True, True, True, True)
+    # Usage the runtime can read from interactive sessions (guard.USAGE_METRICS): the Herdr TUI shows none.
+    measured_usage = frozenset()
+    # Headless runs with guard.headless_usage: documented `-p --output-format json` result (verified on 2.1.296).
+    # Cost is computed by the CLI at list price (costBasis), not billing: an estimate.
+    headless_usage = frozenset({'input_tokens', 'cached_input_tokens', 'cache_write_tokens', 'output_tokens',
+                                'turns', 'context_window', 'cost_usd'})
 
     def __init__(self, executable='claude'):
         self.executable = executable
@@ -119,8 +135,9 @@ class ClaudeProvider:
         profile = _profile(profile)
         # Documented native file form avoids Windows argument-length limits and
         # injects the complete role without overwriting a global CLAUDE.md.
-        # Herdr-launched agents run unattended unless the selection sets a stricter permission_mode.
-        args = [self.executable, *self._options(selection, 'bypass'), '--add-dir', str(root),
+        # Default acceptEdits: file edits inside the allowed directories proceed, shell commands
+        # still ask a human. bypass (--dangerously-skip-permissions) only when configured explicitly.
+        args = [self.executable, *self._options(selection, 'acceptEdits'), '--add-dir', str(root),
                 '--append-system-prompt-file', str(profile)]
         return Command(tuple(args), profile.parent)
 
@@ -132,6 +149,53 @@ class ClaudeProvider:
             path = _profile(directive)
             args += ['--append-system-prompt-file', str(path)]
         return Command(tuple(args), root, stdin=prompt, env=env)
+
+    def structured_headless(self, command):
+        args = list(command.argv)
+        at = args.index('-p') + 1
+        return replace(command, argv=tuple(args[:at] + ['--output-format', 'json'] + args[at:]))
+
+    def read_headless_usage(self, result):
+        """(result whose stdout is the text answer, metrics) of a JSON result; (result, None) for any other output."""
+        try:
+            data = json.loads(result.stdout or '')
+        except ValueError:
+            return result, None
+        if not isinstance(data, dict) or data.get('type') != 'result':
+            return result, None
+        source = 'claude --output-format json'
+        models = [item for item in (data.get('modelUsage') or {}).values() if isinstance(item, dict)]
+        usage = data.get('usage') if isinstance(data.get('usage'), dict) else {}
+        values = {'turns': data.get('num_turns') if type(data.get('num_turns')) is int else None}
+        # Seen live: a run stopped by --max-budget-usd reports `usage` all zero; only modelUsage holds the counts.
+        if models:
+            total = lambda key: sum(int(item.get(key) or 0) for item in models)
+            counts = (total('inputTokens'), total('cacheReadInputTokens'), total('cacheCreationInputTokens'),
+                      total('outputTokens'))
+            values['context_window'] = max(int(item.get('contextWindow') or 0) for item in models) or None
+            source += ' modelUsage'
+        elif not data.get('is_error'):
+            counts = tuple(int(usage.get(key) or 0) for key in ('input_tokens', 'cache_read_input_tokens',
+                                                                'cache_creation_input_tokens', 'output_tokens'))
+        else:
+            counts = None
+        if counts:
+            fresh, cached, written, output = counts
+            values.update(input_tokens=fresh + cached + written, cached_input_tokens=cached,
+                          cache_write_tokens=written, output_tokens=output)
+        cost = data.get('total_cost_usd')
+        if type(cost) in (int, float) and models:
+            values['cost_usd'] = round(cost, 6)
+        metrics = _usage(source, values, cost_usd='estimated')
+        if 'cost_usd' in values:
+            basis = next((item.get('costBasis') for item in models if item.get('costBasis')), 'unknown')
+            metrics['cost_usd']['source'] = f'{source} total_cost_usd (costBasis={basis}; not billing)'
+        text = data.get('result') if isinstance(data.get('result'), str) else ''
+        stderr = result.stderr or ''
+        if data.get('is_error'):
+            # classify() keeps reading limits from the error the CLI reported.
+            stderr = (stderr + f'\n{data.get("subtype")}: {text or data.get("terminal_reason") or ""}').strip()
+        return replace(result, stdout=text, stderr=stderr), metrics
 
     def skill(self, root, operation):
         return _verified_skill(root, '.claude', operation, '/')
@@ -149,13 +213,32 @@ class ClaudeProvider:
         return 'success' if result.returncode == 0 else 'cli_error'
 
     def clear_instruction(self):
-        raise UnsupportedCapability('Context clearing and profile reload have not been verified together; rotate the session manually.')
+        return '/clear'
+
+    def interaction_blocker(self, screen):
+        """'trust_dialog' while Claude asks whether to trust the workspace folder.
+
+        Herdr reports the CLI idle and ready during this dialog, and the Enter of a prompt picks the
+        highlighted option (observed: 'No, exit'). Never answered automatically.
+        """
+        text = ' '.join((screen or '').split()).lower()
+        if re.search(r'trust (this|the files in this) folder|do you trust', text) and \
+                re.search(r'no, exit|enter to confirm|yes, i trust', text):
+            return 'trust_dialog'
+        return None
 
 
 class CodexProvider:
     identifier = 'codex'
     herdr_kind = 'codex'
     capabilities = Capabilities(True, True, True, True, False, True)
+    # The interactive TUI exposes no usage to the runtime.
+    measured_usage = frozenset()
+    # Headless runs with guard.headless_usage: documented `exec --json` events (verified on 0.162.0). No cost.
+    headless_usage = frozenset({'input_tokens', 'cached_input_tokens', 'cache_write_tokens', 'output_tokens', 'turns'})
+    # The Windows sandbox (restricted token) cannot start the Store pwsh alias: the pane shell must
+    # resolve pwsh to an installed (MSI) executable before Codex starts in it.
+    requires_native_pwsh = True
     # Verified against the installed Codex catalog and official model docs.
     # Extend only with evidence; an unspecified CLI model cannot certify max.
     _max_effort_models = frozenset({'gpt-6-astra'})
@@ -200,8 +283,11 @@ class CodexProvider:
         prompt = f'Lee y sigue íntegramente {profile.as_posix()}, incluso si excede el límite de autodescubrimiento. Proyecto: {root.as_posix()}. Espera un handoff del tracker.'
         # Herdr-launched agents never wait for approval unless the selection sets approval=on-request.
         args = [self.executable, *self._options(selection),
-                '--ask-for-approval', selection.options.get('approval', 'never'),
-                '--cd', str(profile.parent), '--add-dir', str(root), prompt]
+                '--ask-for-approval', selection.options.get('approval', 'never'), '--cd', str(profile.parent)]
+        # A read-only sandbox admits no extra writable roots: Codex exits if --add-dir is present.
+        if selection.options.get('sandbox', 'workspace-write') != 'read-only':
+            args += ['--add-dir', str(root)]
+        args.append(prompt)
         return Command(tuple(args), profile.parent, sensitive=frozenset({len(args) - 1}))
 
     def headless(self, selection, root, prompt, directive, env):
@@ -210,6 +296,38 @@ class CodexProvider:
             prompt += f'\nAntes de actuar, lee y aplica íntegramente la directiva {path.as_posix()}.'
         return Command(tuple([self.executable, 'exec', *self._options(selection), '--cd', str(root), '--ephemeral', '-']),
                        root, stdin=prompt, env=env)
+
+    def structured_headless(self, command):
+        args = list(command.argv)
+        at = args.index('exec') + 1
+        return replace(command, argv=tuple(args[:at] + ['--json'] + args[at:]))
+
+    def read_headless_usage(self, result):
+        """(result whose stdout is the last agent message, metrics) of `exec --json`; (result, None) otherwise."""
+        events = []
+        for line in (result.stdout or '').splitlines():
+            try:
+                event = json.loads(line) if line.lstrip().startswith('{') else None
+            except ValueError:
+                event = None
+            if isinstance(event, dict) and isinstance(event.get('type'), str):
+                events.append(event)
+        if not any(event['type'].startswith(('thread.', 'turn.')) for event in events):
+            return result, None
+        items = [event.get('item') for event in events if event['type'] == 'item.completed']
+        messages = [item.get('text') or '' for item in items if isinstance(item, dict) and item.get('type') == 'agent_message']
+        errors = [str(event.get('message') or (event.get('error') or {}).get('message') or event['type'])
+                  for event in events if event['type'] in ('error', 'turn.failed')]
+        turns = [event.get('usage') or {} for event in events if event['type'] == 'turn.completed']
+        values = {'turns': len(turns)}
+        if turns:
+            total = lambda key: sum(int(usage.get(key) or 0) for usage in turns)
+            # OpenAI usage: input_tokens already includes the cached share.
+            values.update(input_tokens=total('input_tokens'), cached_input_tokens=total('cached_input_tokens'),
+                          cache_write_tokens=total('cache_write_input_tokens'), output_tokens=total('output_tokens'))
+        stderr = '\n'.join([result.stderr or '', *errors]).strip()
+        return (replace(result, stdout=messages[-1] if messages else '', stderr=stderr),
+                _usage('codex exec --json turn.completed.usage', values))
 
     def skill(self, root, operation):
         return _verified_skill(root, '.agents', operation, '$')
@@ -225,7 +343,15 @@ class CodexProvider:
         return 'success' if result.returncode == 0 else 'cli_error'
 
     def clear_instruction(self):
-        raise UnsupportedCapability('Codex context rotation in Herdr is pending verification; rotate manually.')
+        # /clear drops the role: Codex receives its contract as the first message, not as system prompt.
+        raise UnsupportedCapability('Codex loses its role on /clear; use --rotate.')
+
+    def interaction_blocker(self, screen):
+        """'trust_dialog' if Codex asks to trust the working directory; never answered automatically."""
+        text = ' '.join((screen or '').split()).lower()
+        if re.search(r'trust the (contents of this|files in this) (directory|folder)|do you trust', text):
+            return 'trust_dialog'
+        return None
 
 
 class GeminiProvider:
@@ -233,6 +359,7 @@ class GeminiProvider:
     identifier = 'gemini'
     herdr_kind = 'gemini'
     capabilities = Capabilities()
+    measured_usage = headless_usage = frozenset()
 
     def __init__(self, executable='gemini'):
         self.executable = executable

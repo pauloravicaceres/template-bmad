@@ -9,7 +9,7 @@ from bmad_runtime.config import AGENT_PHASES
 from bmad_runtime.context import ProjectContext
 from bmad_runtime.errors import ConfigurationError
 from bmad_runtime.runtime import Runtime
-from bmad_runtime.services import interactive_command
+from bmad_runtime.services import agent_contract, contract_path, interactive_command
 from bmad_runtime.technical_context import assemble, discover, document_index, MAX_PROMPT
 from test_multiworkspace import engine, new_project
 
@@ -85,8 +85,11 @@ def test_real_preparation_and_effort_are_provider_independent(engine, provider):
     selection, adapter = rt.factory.resolve(agent='dev-backend')
     command = interactive_command(rt.config, adapter, selection, 'dev-backend')
     assert command.cwd == ctx.workspace_root
-    assert 'CONTEXTO BMAD' in ' '.join(command.argv)
-    assert '.specify/memory/constitution.md' in ' '.join(command.argv)
+    # The full contract travels as a file referenced by a single-line argument (Herdr on Windows).
+    contract = agent_contract(ctx, 'dev-backend')
+    assert 'CONTEXTO BMAD' in contract
+    assert '.specify/memory/constitution.md' in contract
+    assert contract_path(ctx, 'dev-backend').as_posix() in ' '.join(arg.replace('\\', '/') for arg in command.argv)
     assert selection.options['effort'] == 'high'
     _, _, spec = rt.spec.prepare('implement', 'tarea específica')
     assert 'Python' in spec.stdin and 'tarea específica' in spec.stdin
@@ -104,11 +107,13 @@ def test_dispatch_refreshes_decisions_and_stays_local(engine):
                                           'pane_id': 'p', 'state': 'ready'})
         gateway.list_agents.return_value = [{'name': ctx.session_name('dev-backend'), 'pane_id': 'p', 'agent_status': 'idle'}]
         assert rt.dispatcher.dispatch('dev-backend', 'p', 'implementar HU', 'first')
-        prompt = gateway.prompt.call_args.args[1]
-        assert 'Python' in prompt and prompt.endswith('implementar HU')
+        # The terminal receives a short reference; the full handoff is in the task file.
+        task = ctx.output(rt.state.get('dispatch:first')['task_file']).read_text(encoding='utf-8')
+        assert 'Python' in task and task.endswith('implementar HU\n')
+        assert rt.state.get('dispatch:first')['task_file'] in gateway.prompt.call_args.args[1]
         write(ctx, '.specify/memory/constitution.md', '# Enmienda aprobada local\nNuevo requisito técnico.\n')
         rt.dispatcher.dispatch('dev-backend', 'p', 'revisar HU', 'second')
-        assert 'Nuevo requisito técnico' in gateway.prompt.call_args.args[1]
+        assert 'Nuevo requisito técnico' in ctx.output(rt.state.get('dispatch:second')['task_file']).read_text(encoding='utf-8')
     finally:
         rt.close()
 

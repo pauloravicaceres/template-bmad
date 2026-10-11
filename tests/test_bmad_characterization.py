@@ -52,7 +52,11 @@ class CharacterizationTests(unittest.TestCase):
         self.assertIn('app/backend/README.md', text)
 
     def test_exact_feature_folder(self):
-        self.assertEqual(watcher.carpeta_spec_para_hu('docs/business-analyst/016-HU_ficha.md'), 'specs/016-HU_ficha')
+        self.assertEqual(watcher.carpeta_spec_para_hu('docs/business-analyst/003-gestion-sprint-dos-semanas.md'),
+                         'specs/003-gestion-sprint-dos-semanas')
+        self.assertIsNone(watcher.carpeta_spec_para_hu('docs/business-analyst/016-HU_ficha.md'))
+        self.assertIsNone(watcher.carpeta_spec_para_hu('docs/business-analyst/016-ficha_corta.md'))
+        self.assertIsNone(watcher.carpeta_spec_para_hu('docs/business-analyst/hu_ficha.md'))
 
 
 if __name__ == '__main__':

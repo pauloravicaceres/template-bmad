@@ -213,7 +213,9 @@ def source_directory(context, layer):
     raise ConfigurationError(f'Brownfield layout for {layer} is ambiguous; configure project.json.config.code_dirs without moving source files.')
 
 
-def assemble(context, *, role=None, operation=None, compact=False):
+def assemble(context, *, role=None, operation=None, compact=False, policy_in_contract=None):
+    """`policy_in_contract`: the agent's contract that embeds the complete global policy; the policy text is then
+    referenced instead of copied again (task files of agents with a contract). Headless runs keep the copy."""
     policy = context.engine_root / 'constitution.md'
     if policy.exists() and policy.resolve() != policy.absolute():
         raise ConfigurationError('Framework policy cannot follow links.')
@@ -227,7 +229,11 @@ def assemble(context, *, role=None, operation=None, compact=False):
                      'Su existencia no prueba Brownfield ni aprobación. Nunca edites la política global.')
     if policy.is_file():
         parts.append('POLÍTICA GLOBAL: ' + policy.as_posix())
-        if not compact:
+        if policy_in_contract:
+            parts.append(f'Su texto íntegro y vigente está en la sección POLÍTICA GLOBAL de tu contrato '
+                         f'{policy_in_contract}; aplícala completa. Si no la tienes presente, relee esa sección '
+                         'antes de actuar.')
+        elif not compact:
             if policy.stat().st_size > MAX_FILE:
                 raise ConfigurationError('Framework policy exceeds context limit.')
             text = policy.read_text(encoding='utf-8-sig')

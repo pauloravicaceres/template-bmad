@@ -224,7 +224,7 @@ def test_mock_fleet_ownership_and_stop_only_active_project(engine):
     runner.run.return_value = Result(0, '--model --sandbox --cd --add-dir --config --ask-for-approval')
     rt = Runtime(engine, context=a, gateway=gateway, runner=runner)
     try:
-        assert FleetOrchestrator(rt).launch() == 13
+        assert FleetOrchestrator(rt).launch(verify=False) == 13
         for call in gateway.start.call_args_list:
             assert call.args[0].startswith('alpha-')
             assert call.args[3].cwd == a.workspace_root
@@ -232,7 +232,9 @@ def test_mock_fleet_ownership_and_stop_only_active_project(engine):
         gateway.list_agents.return_value = [{'name': a.session_name('business-analyst'), 'pane_id': owned['pane_id'], 'agent_status': 'idle'}]
         assert rt.dispatcher.info('business-analyst')[0] == owned['pane_id']
         assert rt.dispatcher.dispatch('business-analyst', owned['pane_id'], 'write', 'one')
-        assert str(a.tracker_path) in gateway.prompt.call_args.args[1]
+        task = rt.state.get('dispatch:one')['task_file']
+        assert str(a.tracker_path) in a.output(task).read_text(encoding='utf-8')
+        assert task in gateway.prompt.call_args.args[1]
         gateway.list_tabs.return_value = [{'tab_id': owned['tab_id']}, {'tab_id': 'foreign-tab'}]
         gateway.list_panes.return_value = [{'pane_id': owned['pane_id'], 'tab_id': owned['tab_id']}]
         assert close_owned_tabs(rt) == 1

@@ -75,7 +75,9 @@ flowchart TB
         WSV["watcher_service.py<br/>cursor y cola"]
         WF["workflow.py<br/>reglas BMAD/SDD y bucle"]
         GO["gitops.py<br/>GitService"]
-        MNT["maintenance.py"]
+        MNT["maintenance.py<br/>SessionMaintenance, Coordination"]
+        GRD["guard.py<br/>Guard, recomendaciones"]
+        HN["hu_naming.py<br/>contrato de nombres HU"]
     end
     UXR["ux_routing.py"]
     subgraph Dash["bmad-control-center"]
@@ -110,10 +112,18 @@ flowchart TB
     WF --> UXR
     HG --> CMD
     REG --> CMD
+    RUN --> GRD
+    MNT --> SVC
+    MNT --> HG
+    FLEET -->|"VERIFY inicial"| MNT
+    WF --> GRD
+    WF --> HN
+    HUMAN --> HN
     UI -->|"HTTP y WebSocket"| API
     API --> CTX
     API --> CFG
     API --> TC
+    API --> HN
 ```
 
 | Componente | Módulos | Responsabilidad |
@@ -125,11 +135,13 @@ flowchart TB
 | Ejecución de procesos | `commands.py` | argv sin shell, timeout, límite de salida y de concurrencia por runner |
 | Composición | `runtime.py` | Construye config, fábrica, runner, gateway, estado y servicios de un contexto |
 | Flota interactiva | `cli.py`, `fleet.py`, `herdr.py` | 3 tabs y 13 paneles (12 sin UX); propiedad registrada en SQLite |
-| Servicios | `services.py` | Spec Kit headless, despacho a paneles propios, rotación de contexto (deshabilitada) |
+| Servicios | `services.py` | Spec Kit headless, despacho a paneles propios, resúmenes y plan de sesiones, verificación de mantenimiento |
 | Contexto técnico | `technical_context.py` | Índice por rol/operación, descubrimiento acotado del stack y ensamblado del prompt |
 | Estado | `state.py`, `watcher_service.py` | Registros JSON en SQLite, claims idempotentes, locks de SO, cursor y cola del tracker |
 | Flujo BMAD/SDD | `workflow.py`, `ux_routing.py`, `gitops.py` | Interpretación del tracker, compuertas, fases SDD, retrabajo y macros GitOps |
-| Parada | `maintenance.py` | Cierre de tabs propios en estado idle/done |
+| Nombres de HU | `hu_naming.py` | Contrato único `NNN-nombre-en-kebab-case.md` para watcher, GitOps, `approve_step.py` y dashboard; rechaza sin renombrar |
+| Mantenimiento | `maintenance.py` | Cierre de tabs propios idle/done; VERIFY de identidad; CLEAR (Claude) y ROTATE confirmados por el operador, coordinados con el watcher |
+| Presupuesto y bucles | `guard.py` | Eventos de progreso con calidad de métrica, presupuesto y loop guard; alertas `WARNING`/`PAUSE`/`REQUIRES_INTERVENTION`; en `enforce` retiene nuevos despachos; nunca limpia, rota ni reintenta |
 | Dashboard | `bmad-control-center/` | Proyección de un workspace por proceso API: tracker, artefactos, gates, Git y eventos |
 
 `watcher_bmad.py` reexporta `workflow` mediante `sys.modules`, por compatibilidad de imports.
@@ -153,7 +165,7 @@ flowchart LR
         W2["AGENTS.md<br/>contrato de rutas"]
         W3["docs/rol/<br/>docs/architecture/"]
         W4["app/ o code_dirs"]
-        W5["specs/README.md<br/>specs/XXX-HU_nombre/"]
+        W5["specs/README.md<br/>specs/XXX-nombre/"]
         W6[".specify/memory/constitution.md<br/>.specify/feature.json"]
         W7["handoffs/tracker_bmad.md"]
         W8["state/state.sqlite3<br/>state/*.lock<br/>state/config_bmad.json"]
@@ -199,10 +211,11 @@ flowchart LR
 | Almacén | Contenido | Escritor |
 |---|---|---|
 | `handoffs/tracker_bmad.md` | Bus de handoffs: bloques `### [fecha] Autor` con artefacto, estado y línea `Handoff` | Agentes, watcher, scripts humanos, dashboard |
-| `state/state.sqlite3`, tabla `records(id, data)` | `agent:`, `tab:`, `run:`, `dispatch:`, `event:`, `queued:`, `tracker_cursor`, `followup` | Flota, servicios, watcher, parada |
-| `state/*.lock` | Locks de SO `bootstrap`, `fleet`, `watcher`, `speckit` | `project_lock()` |
+| `state/state.sqlite3`, tabla `records(id, data)` | `agent:`, `tab:`, `run:`, `dispatch:`, `event:`, `queued:`, `tracker_cursor`, `followup`, `session:`, `maintenance:`, `watcher`, `progress:`, `guard_alert:`, `guard_ack:`, `guard_artifacts` | Flota, servicios, watcher, mantenimiento, guard |
+| `state/*.lock` | Locks de SO `bootstrap`, `fleet`, `watcher`, `speckit`, `maintenance`, `sessions` (el watcher lo toma en cada ciclo) | `project_lock()`, `ProjectLock` |
 | `.specify/memory/` | Constitución local, `rework_state.json`, `rework_last_classification.md` | Spec Kit, QT, watcher |
 | `docs/`, `specs/`, `app/` | Entregables por rol, especificaciones y código | Agentes y CLIs headless |
+| `logs/guard.log` | Alertas del guard (JSONL) cuando suben de nivel | `guard.py` |
 
 SQLite guarda metadatos, no prompts ni credenciales. La cola persiste la referencia (línea,
 hash y offsets) a la instrucción del tracker; al reanudar no se vuelve a extraer la línea, para
@@ -220,7 +233,7 @@ flowchart TD
     C --> D["Dry-runs de flota y watcher<br/>sin procesos ni SQLite"]
     D --> E{"¿pending o rutas incorrectas?"}
     E -->|"Sí"| C
-    E -->|"No"| F["start_agents.py: paneles en Herdr<br/>agent: starting a ready"]
+    E -->|"No"| F["start_agents.py: paneles en Herdr<br/>agent: starting, VERIFY y ready"]
     F --> G["watcher_bmad.py: lock watcher,<br/>verificación headless, cursor y cola"]
     G --> H["Idea en Business Storyteller"]
     H --> I["Ciclo BMAD/SDD por HU"]
@@ -243,10 +256,10 @@ mediante siete operaciones Spec Kit (`specify`, `clarify`, `plan`, `tasks`, `ana
 
 ```mermaid
 flowchart TD
-    BS["B · Business Storyteller<br/>idea_*.md"] --> PA["B · Product Analyst<br/>pb_*.md"]
+    BS["B · Business Storyteller<br/>idea-*.md"] --> PA["B · Product Analyst<br/>pb-*.md"]
     PA --> H1{{"HUMANO: aprueba<br/>Product Brief"}}
-    H1 --> PM["M · Product Manager<br/>mvp_*.md, selección HU,<br/>GITOPS-BRANCH-CREATE"]
-    PM --> BA["M · Business Analyst<br/>XXX-HU_nombre.md"]
+    H1 --> PM["M · Product Manager<br/>mvp-*.md, selección HU,<br/>GITOPS-BRANCH-CREATE"]
+    PM --> BA["M · Business Analyst<br/>XXX-nombre.md"]
     BA --> QA{"M · QA Documental"}
     QA -->|"Feedback"| BA
     QA -->|"Aprobado"| SC["Watcher: specify y clarify"]
@@ -277,9 +290,12 @@ flowchart TD
 Reglas de gobierno implementadas o exigidas por perfiles y watcher:
 
 - **Vertical slicing:** una HU recorre el flujo completo antes de abrir la siguiente.
-- **Identificador universal:** `XXX-HU_nombre_en_snake_case` se conserva en HU, carpeta
-  `specs/XXX-HU_nombre/`, rama `feat/XXX-HU_nombre` y handoffs. El watcher fija
+- **Identificador universal:** `XXX-nombre-en-kebab-case` se conserva en HU, carpeta
+  `specs/XXX-nombre/`, rama `feat/XXX-nombre` y handoffs. El watcher fija
   `SPECIFY_FEATURE_DIRECTORY` y verifica `.specify/feature.json`; una divergencia detiene la fase.
+  `bmad_runtime/hu_naming.py` valida el nombre en todos los consumidores (watcher, GitOps,
+  `approve_step.py` y dashboard); un nombre inválido detiene solo el paso de esa HU, sin
+  renombrar, sin carpeta elegida por Spec Kit y sin rama genérica.
 - **Ledger:** `specs/README.md` con columnas `N° | Épica Origen | Nombre spec / HU | Qué aporta | Estado | Rama`.
 - **UX:** `project_type=headless` o `ux_phase=off` omiten UX; `on` lo fuerza; `auto` lee
   `Requiere interfaz: Sí|No` en la HU y, si falta, diseña.
@@ -298,59 +314,182 @@ Reglas de gobierno implementadas o exigidas por perfiles y watcher:
 ```mermaid
 stateDiagram-v2
     [*] --> starting: fleet.launch registra panel
-    starting --> ready: rename y herdr agent start
+    starting --> ready: VERIFY inicial COMPLETED
+    starting --> awaiting_trust: diálogo en pantalla al arrancar
+    starting --> unverified: VERIFY inicial fallido o interrumpido
     starting --> uncertain: excepción al arrancar
+    ready --> awaiting_trust: diálogo detectado antes de despachar
+    ready --> maintenance: CLEAR o ROTATE QUIESCED
+    ready --> unverified: --verify fallido
+    maintenance --> ready: COMPLETED con generación + 1
+    maintenance --> ready: FAILED, nada llegó al agente
+    maintenance --> awaiting_trust: diálogo durante la operación
+    awaiting_trust --> ready: --reconcile tras responder el humano
+    unverified --> ready: --reconcile verificado
+    maintenance --> ready: --reconcile de REQUIRES_INTERVENTION
     ready --> closed: stop_agents con tab idle/done
     uncertain --> [*]: reconciliación manual
     closed --> [*]
 ```
 
-`AgentDispatcher` solo despacha a registros `ready` cuyo panel, proveedor y modelo coinciden con
-la selección vigente y cuyo `agent_status` en Herdr es `idle` o `done`.
+`HOLD_STATES` (`starting`, `awaiting_trust`, `unverified`, `maintenance`) retienen las tareas:
+solo un registro `ready` recibe despachos, y solo si su panel, proveedor y modelo coinciden con
+la selección vigente y su `agent_status` en Herdr es `idle` o `done`. VERIFY comprueba la
+identidad de forma determinista (nombre de sesión, proveedor y modelo, panel, `cwd`, proceso y
+contrato cargado) y después la respuesta del agente a una sonda `BMAD-VERIFICACION` (rol,
+proyecto, workspace, digest del contrato y memoria). Ningún diálogo se responde de forma automática.
 
-### Operaciones idempotentes (`event:`, `dispatch:`, `run:`, `queued:`)
+### Operaciones idempotentes (`event:`, `dispatch:`, `run:`)
 
 ```mermaid
 stateDiagram-v2
     [*] --> in_flight: StateStore.claim
-    in_flight --> done: éxito
-    in_flight --> uncertain: excepción o interrupción
+    in_flight --> done: éxito o entrega aceptada
+    in_flight --> not_delivered: rechazo antes de enviar (dispatch)
+    in_flight --> uncertain: excepción tras un posible envío
     in_flight --> fallo: run con quota, cli_error u otro error del runner
-    uncertain --> done: acknowledge confirmado tras inspección
+    not_delivered --> in_flight: nuevo claim, attempt + 1
+    uncertain --> done: --acknowledge (event, dispatch) tras inspección
+    in_flight --> done: --acknowledge (event, dispatch) si el proceso murió
     done --> [*]
     note right of in_flight
-        Un nuevo claim sobre un registro no done
-        lanza ReconciliationRequired
+        Un claim sobre in_flight o uncertain
+        lanza ReconciliationRequired: nunca se reintenta
     end note
-    state "queued (cola del tracker)" as queued
-    [*] --> queued: WatcherService.enqueue
-    queued --> done: WatcherService.dispatched
 ```
 
 `fallo` agrupa los valores de `provider.classify()` y del runner (`quota`, `cli_error`,
 `cli_missing`, `native_executable_required`, `process_limit`, `spawn_failed`, entre otros).
 No hay reintento automático: el workflow registra el error en el tracker y se detiene o pausa.
+`--acknowledge` (`python -m bmad_runtime.state`) marca el registro como atendido y nunca lo repite.
+
+### Handoff en cola (`queued:`) y confirmación
+
+```mermaid
+stateDiagram-v2
+    [*] --> detectado: WatcherService.enqueue (state queued)
+    detectado --> detectado: retenido (pausa, hold, seguimiento activo, agente ocupado)
+    detectado --> reservado: agente ready e idle, sin seguimiento activo
+    reservado --> despachado: entrega aceptada (state done)
+    reservado --> fallido: diálogo antes de enviar o agente ausente
+    fallido --> reservado: tras --reconcile o reinicio, sigue en cola
+    reservado --> requiere_intervencion: entrega incierta
+    despachado --> confirmado: bloque del agente en el tracker
+    despachado --> requiere_intervencion: vigilante escala tras MAX_RECORDATORIOS
+    confirmado --> [*]
+    requiere_intervencion --> [*]: --acknowledge (y --release-followup)
+```
+
+El campo canónico `state` (`queued` o `done`) decide si la tarea sigue en cola; `stage` es
+trazabilidad. Un despacho abre un seguimiento (`followup`) para el agente: mientras no aparezca
+su bloque, ni la escalada del vigilante, el mismo agente no recibe otra tarea aunque Herdr lo
+muestre `idle`, y la siguiente queda en `detectado`. El bloque confirmado registra el resumen
+`session:<rol>`; un bloque de agente sin despacho es `protocol_violation:` y detiene los despachos.
 
 ### Watcher
 
 ```mermaid
 stateDiagram-v2
     [*] --> Preparando: main y lock watcher
-    Preparando --> Escuchando: ayuda headless verificada, cursor y cola restaurados
+    Preparando --> Escuchando: ayuda headless verificada, cursor, cola y seguimientos restaurados
     Preparando --> Detenido: BMADRuntimeError
+    Escuchando --> PausaMantenimiento: lock sessions tomado por maintenance
+    PausaMantenimiento --> Escuchando: operación terminada
     Escuchando --> PausaHumana: último bloque con HUMANO pendiente
     PausaHumana --> Escuchando: bloque HUMANO o macro de cierre
+    Escuchando --> Retenido: violación de protocolo sin reconciliar
+    Retenido --> Escuchando: --acknowledge protocol_violation
     Escuchando --> EjecutandoSDD: aprobación QA, SDD-FREEZE, gatillo de implementación o rechazo
     EjecutandoSDD --> Escuchando: fase completada con handoff
     EjecutandoSDD --> Detenido: fase fallida
-    Escuchando --> Detenido: Ctrl+C, tracker truncado o agente sin propiedad
+    Escuchando --> Detenido: Ctrl+C, tracker reescrito, agente sin propiedad, entrega incierta o conflicto de merge
     PausaHumana --> Detenido: Ctrl+C
     Detenido --> [*]
 ```
 
-La pausa humana no se persiste: `is_tracker_paused_for_human()` la recalcula leyendo el último
-bloque con handoff. Una detención por `ReconciliationRequired` sale con código 1 y exige
-inspección antes de reanudar.
+En cada ciclo (~2 s) el watcher toma el lock `sessions`, publica su latido (`watcher`, protocolo
+`sessions-lock/1`) y lee solo líneas completas coherentes con el cursor. Además de las pausas
+globales, cada tarea se retiene por agente: mantenimiento sin reconciliar, `HOLD_STATES`, alerta
+del guard en modo `enforce`, seguimiento activo o agente ocupado en Herdr. La pausa humana no se
+persiste: `is_tracker_paused_for_human()` la recalcula leyendo el último bloque con handoff. Una
+detención por `ReconciliationRequired` sale con código 1 y exige inspección antes de reanudar.
+
+### Mantenimiento supervisado (CLEAR, ROTATE y VERIFY)
+
+```mermaid
+stateDiagram-v2
+    [*] --> REQUESTED: --clear, --rotate o --verify con --confirm, ELIGIBLE bajo Coordination
+    REQUESTED --> QUIESCED: resumen y contrato fijados, agent en maintenance
+    QUIESCED --> CLEARING: CLEAR (solo Claude Code), envía /clear
+    QUIESCED --> STOPPING: ROTATE, envía /exit
+    STOPPING --> STARTING: panel de vuelta en su shell
+    CLEARING --> VERIFYING: mismo proceso listo e identidad determinista
+    STARTING --> VERIFYING: relanzado en el mismo panel e identidad determinista
+    REQUESTED --> VERIFYING: VERIFY
+    VERIFYING --> COMPLETED: sonda verificada
+    REQUESTED --> FAILED: interrumpido antes de enviar nada
+    QUIESCED --> FAILED: interrumpido antes de enviar nada
+    CLEARING --> FAILED: /clear rechazado antes de enviar
+    STOPPING --> FAILED: /exit rechazado antes de enviar
+    CLEARING --> REQUIRES_INTERVENTION: entrega incierta, diálogo o timeout
+    STOPPING --> REQUIRES_INTERVENTION: /exit no confirmado
+    STARTING --> REQUIRES_INTERVENTION: relanzamiento fallido o diálogo
+    VERIFYING --> REQUIRES_INTERVENTION: sonda ausente o distinta
+    REQUIRES_INTERVENTION --> Resuelta: --reconcile verifica el agente vivo
+    COMPLETED --> [*]
+    FAILED --> [*]
+    Resuelta --> [*]
+```
+
+`Coordination` toma los locks `maintenance`, `watcher` (o exige un watcher con latido reciente),
+`fleet` y `sessions`, y vuelve a evaluar la elegibilidad bajo exclusión. Una operación no final
+bloquea al agente (`maintenance_blocks`) hasta `--reconcile`, que verifica el agente vivo, deja
+`resolution` en la operación (que conserva su estado como evidencia) y nunca relanza ni reintenta.
+`FAILED` significa verificado que nada llegó al agente: vuelve a `ready`. `--plan-clear` es de
+solo lectura.
+
+### Generaciones de sesión
+
+```mermaid
+stateDiagram-v2
+    state "Lanzamiento (run_id nuevo)" as L
+    [*] --> L: start_agents
+    L --> G1: generación 1
+    G1 --> Gn: CLEAR o ROTATE COMPLETED (+1)
+    Gn --> Gn: CLEAR o ROTATE COMPLETED (+1)
+    G1 --> G1: VERIFY o --reconcile con contexto previo
+    Gn --> Gn: VERIFY o --reconcile con contexto previo
+    Gn --> L: nueva flota tras stop_agents
+```
+
+Una sesión es la pareja `run_id` + `generation` del registro `agent:<rol>`. Cada despacho guarda
+la sesión que lo recibió; el plan considera una sesión ya renovada si un CLEAR o ROTATE terminó
+después de su último handoff confirmado (`session_already_fresh`). `--reconcile` de un CLEAR o
+ROTATE interrumpido solo suma una generación cuando la sonda demuestra contexto vacío.
+
+### Context Budget y Loop Guard
+
+```mermaid
+flowchart LR
+    EV["Eventos del watcher<br/>dispatched, handoff_confirmed,<br/>artifacts_changed, no_progress,<br/>errores, permission_blocked,<br/>delivery_uncertain, headless_run"] --> L[("progress: en SQLite<br/>retención retention_days")]
+    L --> E["Guard.evaluate con eventos nuevos o cada 30 s<br/>ventana window_seconds"]
+    E --> R1["Bucles: instrucción repetida,<br/>ciclo de handoffs, error repetido,<br/>sin avance, aclaración repetida"]
+    E --> R2["Presupuesto: intentos, duración,<br/>operaciones seguidas y por sesión,<br/>uso medido por el proveedor"]
+    R1 & R2 --> A["guard_alert:regla:agente<br/>WARNING, PAUSE, REQUIRES_INTERVENTION"]
+    A --> LOG["Consola y logs/guard.log<br/>solo cuando sube de nivel"]
+    A --> M{"modo"}
+    M -->|"observe (por defecto)"| NADA["Solo informa"]
+    M -->|"enforce y PAUSE o superior"| HOLD["Retiene nuevos despachos<br/>a los agentes implicados"]
+    A --> ACK["guard --acknowledge regla:agente --confirm<br/>guard_ack: la evidencia previa deja de contar"]
+    R2 --> REC{"operations_per_session alcanzado<br/>y agente ELIGIBLE en el plan"}
+    REC -->|"Sí"| ANN["guard_recommendation: anuncia una vez<br/>el comando CLEAR o ROTATE exacto"]
+    ANN --> OPR(["Operador decide y ejecuta<br/>maintenance --confirm"])
+```
+
+Cada métrica lleva su calidad: `measured`, `estimated` o `unavailable`. Las sesiones
+interactivas no reportan tokens: el uso nunca dispara recomendaciones, y un límite de uso solo se
+acepta si el proveedor mide esa métrica. El guard nunca limpia, rota, reintenta, responde diálogos
+ni interrumpe una operación activa; `guard --status` y `--calibrate` son de solo lectura.
 
 ## 8. Secuencias
 
@@ -373,8 +512,10 @@ sequenceDiagram
     OP->>L: misma selección
     L->>RT: Runtime persistente
     RT->>RT: validar selecciones de 15 roles y 7 operaciones
-    L->>H: create_tab, split, rename, agent start
-    L->>S: agent: ready y tab:
+    L->>S: tab: y agent: starting
+    L->>H: create_tab, split, rename, sonda pwsh, agent start
+    L->>H: VERIFY: identidad y sonda BMAD-VERIFICACION
+    L->>S: agent: ready (o awaiting_trust / unverified)
     OP->>W: misma selección en otra terminal
     W->>SK: verificar ayuda headless por proveedor
     W->>S: restaurar cursor y cola
@@ -383,8 +524,8 @@ sequenceDiagram
     loop cada ~2 s
         W->>T: leer líneas nuevas
         W->>S: claim event: y enqueue queued:
-        W->>H: agent prompt al panel propio idle
-        W->>S: dispatch: done y queued: done
+        W->>H: agent prompt al panel propio idle sin seguimiento activo
+        W->>S: dispatch: done, queued: done y followup
     end
     W->>SK: operación Spec Kit según la fase
     SK->>S: run: done o estado de fallo
@@ -417,6 +558,68 @@ Un único token de destinatario por derivación. En un handoff al humano, los de
 nombran sin `@TOKEN:` para no disparar despachos. Las macros `@WATCHER: GITOPS-BRANCH-CREATE`,
 `@WATCHER: SDD-FREEZE` y `@WATCHER: GITOPS-MERGE-CLOSE` van en líneas independientes antes del
 handoff. El cierre de rama pide además escribir el nombre de la rama en la consola del watcher.
+
+### Mantenimiento supervisado de una sesión
+
+```mermaid
+sequenceDiagram
+    actor OP as Operador
+    participant G as Guard (watcher)
+    participant M as maintenance
+    participant W as Watcher
+    participant S as SQLite
+    participant H as Herdr
+    participant A as Agente
+    G-->>OP: recomendación CLEAR o ROTATE con el comando exacto
+    OP->>M: --plan-clear (solo lectura)
+    M->>S: plan: ELIGIBLE o motivos
+    OP->>M: --clear ROL o --rotate ROL con --confirm
+    M->>M: locks maintenance, watcher o latido, fleet
+    M->>S: espera el lock sessions
+    Note over W: el ciclo queda en pausa sin leer ni despachar
+    M->>S: replanifica bajo exclusión, maintenance: REQUESTED y QUIESCED
+    alt CLEAR (solo Claude Code)
+        M->>A: /clear
+    else ROTATE
+        M->>A: /exit y espera la shell del panel
+        M->>H: agent start en el mismo panel
+    end
+    M->>H: identidad determinista
+    M->>A: [BMAD-MANT id] sonda de verificación
+    A-->>M: BMAD-VERIFICACION rol, proyecto, workspace, fuentes, memoria
+    M->>S: COMPLETED, agent: ready y generación + 1 en una transacción
+    M->>S: libera locks
+    Note over W: el siguiente ciclo continúa
+```
+
+Cualquier fallo antes de enviar deja `FAILED` y el agente `ready`; tras un envío deja
+`REQUIRES_INTERVENTION`, retiene al agente y exige `--reconcile ROL --confirm`.
+
+### Recuperación tras fallos
+
+```mermaid
+flowchart TD
+    F{"Síntoma"} --> T["Tracker reescrito o truncado<br/>tracker_integrity"]
+    F --> D["Entrega incierta o evento in_flight<br/>dispatch: o event:"]
+    F --> P["Bloque sin despacho<br/>protocol_violation:"]
+    F --> Q["Tarea sin bloque tras escalar<br/>queued: requiere_intervencion"]
+    F --> MT["Mantenimiento no final<br/>o agente retenido"]
+    F --> GA["Alerta del guard"]
+    F --> CR["Caída del proceso watcher"]
+    T --> T1["Restaurar el tracker o<br/>state --rebaseline-tracker --confirm"]
+    D --> D1["Inspeccionar panel y artefactos,<br/>state --acknowledge ID --confirm"]
+    P --> P1["state --acknowledge protocol_violation:N --confirm"]
+    Q --> Q1["state --acknowledge queued:ID --confirm<br/>y --release-followup ROL --confirm"]
+    MT --> M1["maintenance --reconcile ROL --confirm"]
+    GA --> G1["guard --acknowledge regla:agente --confirm"]
+    CR --> C1["Los locks de SO se liberan solos,<br/>al reiniciar se restauran cursor, cola y seguimientos"]
+    T1 & D1 & P1 & Q1 & M1 & G1 & C1 --> R["Reiniciar el watcher<br/>(con la misma --config)"]
+```
+
+Ningún comando de recuperación repite una operación: marcan la evidencia como atendida o
+verifican el estado vivo. Los comandos `state` exigen el watcher detenido (toman su lock). Un
+conflicto en `GITOPS-MERGE-CLOSE` aborta el merge, escribe en el tracker el comando exacto para
+reconciliar su evento y detiene el watcher; reiniciar sin reconciliar vuelve a detenerlo.
 
 ### Consulta del dashboard
 
@@ -508,6 +711,10 @@ flowchart LR
     H --> P2["Paneles SA, DA, API, QT"]
     H --> P3["Paneles QA-AUTO, CODE-REVIEW, DEVOPS"]
     W -->|"despacho"| H
+    W -->|"recomendaciones"| OP
+    OP -->|"maintenance --confirm"| MNT["maintenance<br/>--project agenda-citas"]
+    MNT -->|"lock sessions: pausa el ciclo"| W
+    MNT -->|"/clear, /exit, agent start"| H
     W -->|"Spec Kit headless"| SK["CLI headless"]
     P1 & P2 & P3 --> T[("Agenda/handoffs/tracker_bmad.md")]
     T --> W
@@ -524,8 +731,8 @@ Nombres ficticios: `agenda-citas` y `inventario`, registrados en el mismo motor.
 ```mermaid
 flowchart TB
     subgraph Motor["ENGINE_ROOT compartido: código, perfiles, skills, config global"]
-        RA["Proceso launcher A<br/>Proceso watcher A"]
-        RB["Proceso launcher B<br/>Proceso watcher B"]
+        RA["Proceso launcher A<br/>Proceso watcher A<br/>maintenance A bajo demanda"]
+        RB["Proceso launcher B<br/>Proceso watcher B<br/>maintenance B bajo demanda"]
         DA["Backend :8001<br/>BMAD_PROJECT=agenda-citas"]
         DB["Backend :8002<br/>BMAD_PROJECT=inventario"]
     end
@@ -535,14 +742,14 @@ flowchart TB
     end
     subgraph WA["Workspace A"]
         TA[("tracker A")]
-        SA[("state A: SQLite y locks")]
-        AA[("docs, specs, app, logs A")]
+        SA[("state A: SQLite, locks,<br/>agent:, maintenance:, guard_*")]
+        AA[("docs, specs, app, logs A<br/>logs/guard.log")]
         GA[("Git A")]
     end
     subgraph WB["Workspace B"]
         TB[("tracker B")]
-        SB[("state B: SQLite y locks")]
-        AB[("docs, specs, app, logs B")]
+        SB[("state B: SQLite, locks,<br/>agent:, maintenance:, guard_*")]
+        AB[("docs, specs, app, logs B<br/>logs/guard.log")]
         GB[("Git B")]
     end
     RA --> HA
@@ -567,6 +774,11 @@ Mecanismos contra la contaminación cruzada:
 - **Estado:** SQLite, cursor, cola y locks viven en `state/` de cada workspace. Un segundo
   watcher sobre el mismo workspace falla al tomar el lock; sobre otro workspace no compite.
 - **Git:** `GitService` exige `.git` local en el workspace y rechaza un repositorio padre.
+- **Sesiones y guard:** generaciones, operaciones de mantenimiento, alertas y recomendaciones viven
+  en el SQLite del workspace; los locks `maintenance` y `sessions` coordinan solo procesos del
+  mismo proyecto. Los comandos recomendados incluyen `--workspace`, `--project` y la `--config`
+  del watcher; `stop_agents.py --config` resuelve el proyecto con ese mismo archivo y rechaza un
+  `project.json` que no coincida.
 - **Dashboard:** cada backend fija un proyecto al importarse; HTTP, WebSocket, observadores y
   cachés pertenecen a ese proceso.
 
@@ -591,7 +803,29 @@ Limitaciones actuales:
   ausente producen errores explícitos; no hay fallback de proveedor.
 - `idle`/`done` en Herdr o la aceptación de un prompt no prueban que el agente terminó: cuentan
   el artefacto y el handoff.
-- La rotación automática de contexto y `/clear` están deshabilitados en los adaptadores.
+- No hay limpieza ni rotación automática de contexto: `/clear` (solo Claude Code) y la rotación
+  son operaciones confirmadas por el operador ([SETUP.md](SETUP.md#ciclo-de-vida-de-sesiones)).
+- Un agente solo recibe tareas en estado `ready`, tras una verificación (arranque, recuperación,
+  CLEAR, ROTATE). El watcher es el único despachador: un bloque de agente sin despacho detiene los
+  despachos hasta reconciliar. Los diálogos de confianza nunca se responden automáticamente
+  ([SETUP.md](SETUP.md#arranque-y-entrega-en-herdr)).
 - `ai.git.auto_commit=false` desactiva el autosave; el freeze y las macros GitOps siguen creando
   commits, ramas y merges. El freeze exige staging vacío y añade solo `specs/` y `.specify/`.
 - `Runtime` cachea la configuración: un cambio requiere reiniciar los procesos afectados.
+- Un despacho abre un seguimiento por agente: hasta su bloque en el tracker (o la escalada del
+  vigilante) ese agente no recibe otra tarea, aunque Herdr lo muestre `idle`.
+
+### Deuda técnica conocida
+
+- **Ventana entre consulta y despacho:** el watcher lee el estado del agente en Herdr
+  (`obtener_info_agente`) y `AgentDispatcher.dispatch` lo vuelve a consultar antes de enviar. Si
+  el agente cambia de estado entre ambas lecturas, el despacho lanza `ReconciliationRequired` y el
+  watcher se detiene sin enviar nada (fallo seguro, sin duplicados); la tarea sigue en cola al
+  reiniciar. No hay bloqueo atómico con Herdr.
+- **Harness de pruebas:** `tests/run_isolated.py` conserva a propósito cada directorio temporal
+  bajo `.test-tmp/` (ignorado por Git) para sortear las ACL heredadas de Windows; crece con cada
+  ejecución y se limpia a mano. Las pruebas que usan el modo legacy emiten `FutureWarning` por no
+  seleccionar workspace, y el backend arrastra un aviso de deprecación de `httpx` en
+  `starlette.testclient`.
+- **Fin de línea:** el repositorio no tiene `.gitattributes`; con `core.autocrlf=true`, Git avisa
+  de conversiones LF a CRLF en archivos editados con LF.

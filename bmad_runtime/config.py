@@ -81,6 +81,73 @@ AGENT_PHASES = {
 }
 
 
+# Context budget and loop guard (guard.py). Starts in observation: alerts only, no dispatch is held.
+# Usage limits (tokens, cost) stay null unless the provider reports that metric (Guard checks it).
+GUARD_MODES = ('off', 'observe', 'enforce')
+GUARD_LEVELS = ('warning', 'pause', 'intervention')
+GUARD_BUDGET = {'max_operation_seconds': 3600, 'max_attempts': 2, 'max_consecutive_operations': 8,
+                'max_operations_per_session': 15, 'max_input_tokens': None, 'max_output_tokens': None,
+                'max_cost_usd': None}
+GUARD_LOOP = {'repeated_instruction': {'warning': 2, 'pause': 3, 'intervention': 4},
+              'handoff_cycle': {'warning': 3, 'pause': 4, 'intervention': 5},
+              'repeated_error': {'warning': 2, 'pause': 3, 'intervention': 5},
+              'no_progress': {'warning': 2, 'pause': 3, 'intervention': 4},
+              'repeated_clarification': {'warning': 2, 'pause': 3, 'intervention': 4}}
+
+
+def _budget(value, name):
+    _object(value, name)
+    if set(value) - set(GUARD_BUDGET):
+        raise ConfigurationError(f'Unknown {name} fields: {set(value) - set(GUARD_BUDGET)}')
+    for key, item in value.items():
+        if key == 'max_cost_usd':
+            if item is not None and (type(item) not in {int, float} or not 0 < item <= 10_000):
+                raise ConfigurationError(f'{name}.{key} must be null or a positive amount up to 10000.')
+        elif key.endswith('_tokens'):
+            if item is not None and (type(item) is not int or not 1 <= item <= 100_000_000):
+                raise ConfigurationError(f'{name}.{key} must be null or a positive integer.')
+        elif type(item) is not int or not 1 <= item <= (86400 if key == 'max_operation_seconds' else 1000):
+            raise ConfigurationError(f'{name}.{key} must be a positive integer within its bound.')
+    return dict(value)
+
+
+def _guard(value, providers):
+    _object(value, 'guard')
+    if set(value) - {'mode', 'window_seconds', 'retention_days', 'budget', 'providers', 'agents', 'loop',
+                     'headless_usage'}:
+        raise ConfigurationError('Unknown guard field.')
+    # headless_usage: Spec Kit runs ask the CLI for its documented structured result (usage, turns, cost).
+    # Opt-in: it changes the headless output format; the text answer is extracted back from it.
+    result = {'mode': value.get('mode', 'observe'), 'window_seconds': value.get('window_seconds', 21600),
+              'retention_days': value.get('retention_days', 14), 'headless_usage': value.get('headless_usage', False),
+              'budget': {**GUARD_BUDGET, **_budget(value.get('budget', {}), 'guard.budget')},
+              'providers': {}, 'agents': {}, 'loop': copy.deepcopy(GUARD_LOOP)}
+    if result['mode'] not in GUARD_MODES:
+        raise ConfigurationError('guard.mode must be off, observe or enforce.')
+    if type(result['headless_usage']) is not bool:
+        raise ConfigurationError('guard.headless_usage must be true or false.')
+    for key, top in (('window_seconds', 7 * 86400), ('retention_days', 365)):
+        if type(result[key]) is not int or not 1 <= result[key] <= top:
+            raise ConfigurationError(f'guard.{key} must be an integer between 1 and {top}.')
+    for section, allowed in (('providers', set(providers)), ('agents', set(AGENT_PHASES))):
+        entries = _object(value.get(section, {}), f'guard.{section}')
+        if set(entries) - allowed:
+            raise ConfigurationError(f'Unknown guard.{section} identifiers: {set(entries) - allowed}')
+        result[section] = {name: _budget(item, f'guard.{section}.{name}') for name, item in entries.items()}
+    loop = _object(value.get('loop', {}), 'guard.loop')
+    if set(loop) - set(GUARD_LOOP):
+        raise ConfigurationError(f'Unknown guard.loop rules: {set(loop) - set(GUARD_LOOP)}')
+    for rule, levels in loop.items():
+        if set(_object(levels, f'guard.loop.{rule}')) - set(GUARD_LEVELS):
+            raise ConfigurationError(f'guard.loop.{rule} accepts only warning, pause and intervention.')
+        merged = {**result['loop'][rule], **levels}
+        if any(type(merged[level]) is not int or not 1 <= merged[level] <= 1000 for level in GUARD_LEVELS) or \
+                not merged['warning'] <= merged['pause'] <= merged['intervention']:
+            raise ConfigurationError(f'guard.loop.{rule} needs integers with warning <= pause <= intervention.')
+        result['loop'][rule] = merged
+    return result
+
+
 @dataclass(frozen=True)
 class Selection:
     provider: str
@@ -112,6 +179,7 @@ class RuntimeConfig:
     data: dict
     context: object = None
     raw: dict = field(default_factory=dict)
+    source: Path | None = None
 
     @classmethod
     def load(cls, root, path=None, context=None):
@@ -122,7 +190,8 @@ class RuntimeConfig:
             raise ConfigurationError('Cannot read config_bmad.json.') from exc
         _object(raw, 'configuration')
         ai = _object(raw.get('ai', {}), 'ai')
-        if set(ai) - {'schema_version', 'defaults', 'providers', 'phases', 'agents', 'speckit', 'limits', 'git'}:
+        if set(ai) - {'schema_version', 'defaults', 'providers', 'phases', 'agents', 'speckit', 'limits', 'git', 'tracker',
+                      'guard'}:
             raise ConfigurationError('Unknown ai configuration field.')
         if type(ai.get('schema_version', 1)) is not int or ai.get('schema_version', 1) != 1:
             raise ConfigurationError('Only schema_version=1 is supported.')
@@ -131,10 +200,13 @@ class RuntimeConfig:
                               'gemini': {'executable': 'gemini'}},
                 'phases': {}, 'agents': {}, 'speckit': {},
                 'limits': {'command_timeout': 120, 'headless_timeout': 1800,
-                           'max_output_bytes': 1_048_576, 'max_processes': 1},
-                'git': {'auto_commit': False}}
+                           'max_output_bytes': 1_048_576, 'max_processes': 1,
+                           'operation_timeouts': {}},
+                'git': {'auto_commit': False},
+                # Watcher reading policy: wait for unterminated lines and tolerate transient rewrites.
+                'tracker': {'settle_seconds': 4, 'rewrite_grace_seconds': 10}}
         for key, value in ai.items():
-            if key in {'defaults', 'providers', 'limits', 'git'}:
+            if key in {'defaults', 'providers', 'limits', 'git', 'tracker'}:
                 data[key].update(_object(value, key))
             else:
                 data[key] = value
@@ -153,16 +225,35 @@ class RuntimeConfig:
             if '/' in settings['executable'] or '\\' in settings['executable']:
                 settings['executable'] = str(absolute_path(settings['executable'], context.engine_root if context else root))
         limits = data['limits']
-        if set(limits) != {'command_timeout', 'headless_timeout', 'max_output_bytes', 'max_processes'}:
+        if set(limits) != {'command_timeout', 'headless_timeout', 'max_output_bytes', 'max_processes', 'operation_timeouts'}:
             raise ConfigurationError('Unknown resource limit.')
+        # Optional per-operation headless timeouts; missing operations keep headless_timeout.
+        operation_timeouts = _object(limits['operation_timeouts'], 'operation_timeouts')
+        if set(operation_timeouts) - set(OPERATIONS):
+            raise ConfigurationError(f'Unknown operation_timeouts identifiers: {set(operation_timeouts) - set(OPERATIONS)}')
+        for name, value in operation_timeouts.items():
+            if type(value) is not int or not 1 <= value <= 86400:
+                raise ConfigurationError(f'operation_timeouts.{name} must be an integer between 1 and 86400.')
         for name, value in limits.items():
-            if type(value) is not int or value < 1:
+            if name != 'operation_timeouts' and (type(value) is not int or value < 1):
                 raise ConfigurationError(f'{name} must be a positive integer.')
         if limits['max_processes'] > 8 or limits['headless_timeout'] > 86400 or limits['command_timeout'] > 600 or limits['max_output_bytes'] > 16_777_216:
             raise ConfigurationError('Resource limit exceeds the supported bound.')
         if set(data['git']) != {'auto_commit'} or type(data['git']['auto_commit']) is not bool:
             raise ConfigurationError('git accepts only auto_commit (boolean).')
-        return cls(root, data, context, raw)
+        if set(data['tracker']) != {'settle_seconds', 'rewrite_grace_seconds'}:
+            raise ConfigurationError('tracker accepts only settle_seconds and rewrite_grace_seconds.')
+        for name, value in data['tracker'].items():
+            if type(value) is not int or not 0 <= value <= 3600:
+                raise ConfigurationError(f'tracker.{name} must be an integer between 0 and 3600.')
+        data['guard'] = _guard(ai.get('guard', {}), data['providers'])
+        # Explicit --config file (absolute); None means the engine default config_bmad.json.
+        source = absolute_path(path, context.engine_root if context else root) if path else None
+        return cls(root, data, context, raw, source)
+
+    def operation_timeout(self, operation):
+        limits = self.data['limits']
+        return limits['operation_timeouts'].get(operation, limits['headless_timeout'])
 
     def resolve(self, *, agent=None, operation=None):
         if (agent is None) == (operation is None):

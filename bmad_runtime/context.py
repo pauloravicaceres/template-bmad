@@ -9,6 +9,15 @@ import warnings
 
 from .errors import ConfigurationError
 
+HERDR_NAME_LIMIT = 32
+# Short role aliases (tracker tokens) keep Herdr agent names within the limit.
+ROLE_ALIASES = {
+    'business-storyteller': 'bs', 'product-analyst': 'pa', 'product-manager': 'pm', 'business-analyst': 'ba',
+    'qa-documental': 'qa', 'designer-ux': 'ux', 'solutions-architect': 'sa', 'data-architect': 'da',
+    'api-architect': 'api', 'qa-tech': 'qt', 'dev-backend': 'dev-back', 'dev-frontend': 'dev-front',
+    'qa-auto': 'qa-auto', 'code-review': 'cr', 'devops': 'devops',
+}
+
 
 def read_json(path):
     try:
@@ -75,11 +84,25 @@ class ProjectContext:
     @property
     def temp_dir(self): return self.output('temp')
 
+    def _workspace_digest(self, size):
+        return hashlib.sha256(os.path.normcase(str(self.workspace_root)).encode()).hexdigest()[:size]
+
     def session_name(self, role):
+        """Herdr agent name: unique per workspace and within Herdr's [a-z][a-z0-9_-]{0,31} limit."""
         if self.legacy:
             return role
-        digest = hashlib.sha256(os.path.normcase(str(self.workspace_root)).encode()).hexdigest()[:12]
-        return f'{self.project_id}-{digest}-{role}'
+        if role not in ROLE_ALIASES:
+            raise ConfigurationError(f'Unknown agent role: {role}')
+        digest, alias = self._workspace_digest(8), ROLE_ALIASES[role]
+        prefix = re.sub(r'[^a-z0-9_-]', '-', self.project_id.lower())
+        if not prefix[:1].isalpha():
+            prefix = 'p' + prefix
+        prefix = prefix[:HERDR_NAME_LIMIT - len(digest) - len(alias) - 2].rstrip('-_') or 'p'
+        return f'{prefix}-{digest}-{alias}'
+
+    def tab_label(self, label):
+        # Tab labels are display text for Herdr, not agent names.
+        return label if self.legacy else f'{self.project_id}-{self._workspace_digest(12)}-{label}'
 
     def environment(self):
         return {key: str(value) for key, value in {
