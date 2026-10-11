@@ -7,7 +7,7 @@ CICLO_1_COMPLETO = """
 ### [03-10-2026] HUMANO
 - **Hora:** 09:10:00
 - **Estado:** APPROVE
-- **Handoff:** @WATCHER: GITOPS-BRANCH-CREATE feat/001-HU_a
+- **Handoff:** @WATCHER: GITOPS-BRANCH-CREATE feat/001-a
 @BA: arranca
 ### [03-10-2026] Business Analyst
 - **Hora:** 09:20:00
@@ -49,7 +49,7 @@ PM_ABRE_CICLO_2 = """
 ### [03-10-2026] Product Manager
 - **Hora:** 11:10:00
 - **Estado:** Ledger actualizado.
-@WATCHER: GITOPS-BRANCH-CREATE feat/002-HU_b
+@WATCHER: GITOPS-BRANCH-CREATE feat/002-b
 - **Handoff:** @BA: Iniciar el análisis de la épica 002.
 """
 
@@ -106,7 +106,7 @@ HU_SIN_PM_TRAS_CIERRE = """
 ### [05-10-2026] HUMANO
 - **Hora:** 08:00:00
 - **Estado:** APPROVE
-- **Handoff:** @WATCHER: GITOPS-BRANCH-CREATE feat/035-HU_ui
+- **Handoff:** @WATCHER: GITOPS-BRANCH-CREATE feat/035-ui
 @BA: deuda técnica
 ### [05-10-2026] Business Analyst
 - **Hora:** 08:31:00
@@ -147,7 +147,7 @@ CIERRE_CON_AVISO_A_HUMANO = """
 ### [04-10-2026] Code Review
 - **Hora:** 00:05:00
 - **Estado:** APROBADO. HU certificada y rama consolidada.
-@WATCHER: GITOPS-MERGE-CLOSE feat/001-HU_a
+@WATCHER: GITOPS-MERGE-CLOSE feat/001-a
 - **Handoff:** @HUMANO: HU certificada; aviso informativo de cierre.
 """
 
@@ -177,7 +177,7 @@ def test_una_consulta_real_al_humano_sigue_marcando_por_aprobar(tmp_path):
 
 def test_la_macro_de_cierre_citada_en_prosa_no_cuenta_como_cierre(tmp_path):
     prosa = CONSULTA_REAL_AL_HUMANO.replace(
-        "APROBADO CON RESERVAS.", "Confirmar si se emite `@WATCHER: GITOPS-MERGE-CLOSE feat/001-HU_a` luego.")
+        "APROBADO CON RESERVAS.", "Confirmar si se emite `@WATCHER: GITOPS-MERGE-CLOSE feat/001-a` luego.")
     resp, _ = _stages(tmp_path, CICLO_1_COMPLETO + prosa)
 
     assert resp.active_agent_role and "HUMANO" in resp.active_agent_role
@@ -197,7 +197,7 @@ AVISO_VIGILANTE = """
 ERROR_DEL_WATCHER = """
 ### [04-10-2026] WATCHER
 - **Hora:** 02:47:20
-- **Mensaje:** 🚨 ERROR [SDD Negocio]: Spec Kit no respetó la carpeta fijada 'specs/003-HU_x'.
+- **Mensaje:** 🚨 ERROR [SDD Negocio]: Spec Kit no respetó la carpeta fijada 'specs/003-x'.
 """
 
 

@@ -91,6 +91,8 @@ async def get_gate_status():
 
 
 _REVISOR_TOKEN = {"Code Review": "@CODE-REVIEW:", "QA Automation": "@QA-AUTO:"}
+# Valores de 'Artefacto generado' que no nombran ningún entregable.
+_SIN_ARTEFACTO = {"", "ninguno", "ninguna", "n/a", "na", "no", "-", "—", "pendiente", "no aplica"}
 
 
 def _handoff_a_revisor(payload: DecisionPayload) -> Optional[str]:
@@ -137,37 +139,51 @@ async def make_decision(gate_id: str, payload: DecisionPayload):
             last_block = blocks[-1]
             author = last_block.get("author_role")
             art = last_block.get("generated_artifact") or ""
-            filename = art.split("/")[-1] if art else "artefacto.md"
-            
+            nombre_artefacto = re.split(r"[\\/]", art.strip())[-1] if art.strip() else ""
+
+            def artefacto_declarado():
+                # Un handoff que cita el entregable aprobado necesita uno real: nunca un nombre genérico.
+                if art.lower().strip(" .`") in _SIN_ARTEFACTO or not nombre_artefacto:
+                    raise HTTPException(422, f"El último bloque de {author} no declara un 'Artefacto generado' "
+                                             "válido; no se registra la aprobación ni el handoff.")
+                return nombre_artefacto
+
             if author in ["Product Analyst", "PA"]:
-                handoff_text = f"@PM: El Product Brief ha sido auditado y aprobado formalmente en el archivo {filename}. Procede con el análisis estratégico y la creación del Backlog del MVP."
+                handoff_text = f"@PM: El Product Brief ha sido auditado y aprobado formalmente en el archivo {artefacto_declarado()}. Procede con el análisis estratégico y la creación del Backlog del MVP."
             elif author in ["Business Storyteller", "BS"]:
-                handoff_text = f"@PA: La idea de usuario ha sido auditada y aprobada por negocio en el archivo {filename}. Procede con la creación del PRODUCT BRIEF."
+                handoff_text = f"@PA: La idea de usuario ha sido auditada y aprobada por negocio en el archivo {artefacto_declarado()}. Procede con la creación del PRODUCT BRIEF."
             elif author in ["Product Manager", "PM"]:
-                import re
                 handoff_str = last_block.get("handoff_directive") or ""
                 # Determinar si es cierre de inicio de épica o cierre final
                 if "100% concluido" in handoff_str or "no hay más épicas" in handoff_str.lower():
                     handoff_text = "@HUMANO: Proyecto completado exitosamente. No hay más acciones requeridas por el enjambre."
                 else:
+                    from bmad_runtime.hu_naming import hu_id_from_delegation, hu_name_error
                     epic = payload.epic_id.strip() if payload.epic_id and payload.epic_id.strip() else None
-                    if not epic:
-                        match = re.search(r"delegar es\s+(\d{3}-HU_[\w_]+)", handoff_str)
-                        if match:
-                            epic = match.group(1)
-                        else:
-                            epic = "001-HU_epic_generica"
-                    handoff_text = f"@WATCHER: GITOPS-BRANCH-CREATE feat/{epic}\n@BA: El MVP y Backlog han sido aprobados en el archivo {filename}. La rama feat/{epic} ha sido creada. Procede con el análisis de negocio y redacción de Historias de Usuario para la épica {epic}. Usa el identificador universal estricto para crear el archivo físico en docs/business-analyst."
+                    epic = epic or hu_id_from_delegation(handoff_str)
+                    # Sin identificador válido no se registra la aprobación: nunca una rama genérica ni inventada.
+                    error = hu_name_error(f"{epic}.md") if epic else (
+                        "el handoff del PM no contiene 'delegar es NNN-nombre-en-kebab-case' y no se indicó epic_id")
+                    if error:
+                        raise HTTPException(422, f"Identificador de HU inválido: {error}")
+                    handoff_text = f"@WATCHER: GITOPS-BRANCH-CREATE feat/{epic}\n@BA: El MVP y Backlog han sido aprobados en el archivo {artefacto_declarado()}. La rama feat/{epic} ha sido creada. Procede con el análisis de negocio y redacción de Historias de Usuario para la épica {epic}. Usa el identificador universal estricto para crear el archivo físico en docs/business-analyst."
             elif author in ["Business Analyst", "BA"]:
-                handoff_text = f"@QA: La Historia de Usuario ha sido revisada en el archivo {filename}. Procede con la auditoría documental."
+                from bmad_runtime.hu_naming import hu_name_error
+                # La HU llega a QA solo con un archivo que cumple el contrato: nunca un nombre genérico ni inventado.
+                hu = nombre_artefacto
+                error = hu_name_error(hu) if hu else ("el último bloque del BA no declara 'Artefacto generado'; "
+                                                         "se espera NNN-nombre-en-kebab-case.md")
+                if error:
+                    raise HTTPException(422, f"Historia de usuario inválida: {error}. No se registra la aprobación.")
+                handoff_text = f"@QA: La Historia de Usuario ha sido revisada en el archivo {hu}. Procede con la auditoría documental."
             elif author in ["QA Documental", "QA"]:
-                handoff_text = f"@UX: El ciclo SDD ha concluido con éxito en {filename}. Procede con el diseño visual y wireframes."
+                handoff_text = f"@UX: El ciclo SDD ha concluido con éxito en {artefacto_declarado()}. Procede con el diseño visual y wireframes."
             elif author in ["Designer UX", "UX"]:
-                handoff_text = f"@SA: El diseño visual ha sido aprobado en {filename}. Define el stack tecnológico y reglas arquitectónicas."
+                handoff_text = f"@SA: El diseño visual ha sido aprobado en {artefacto_declarado()}. Define el stack tecnológico y reglas arquitectónicas."
             elif author in ["Solutions Architect", "SA"]:
-                handoff_text = f"@DA: Las directrices de arquitectura técnica han sido aprobadas en {filename}. Procede con el MER."
+                handoff_text = f"@DA: Las directrices de arquitectura técnica han sido aprobadas en {artefacto_declarado()}. Procede con el MER."
             elif author in ["QA-Tech Senior", "QA-Tech", "QT"]:
-                handoff_text = f"@DEV-BACK: La arquitectura técnica ha sido verificada en {filename}. Procede con la implementación del Backend."
+                handoff_text = f"@DEV-BACK: La arquitectura técnica ha sido verificada en {artefacto_declarado()}. Procede con la implementación del Backend."
     
     lines = [f"\n### [{dt_str}] HUMANO"]
     lines.append(f"- **Hora:** {hr_str}")

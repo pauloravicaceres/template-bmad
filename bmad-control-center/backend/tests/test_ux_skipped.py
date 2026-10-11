@@ -4,7 +4,7 @@ CICLO_SIN_UX = """
 ### [03-10-2026] HUMANO
 - **Hora:** 09:10:00
 - **Estado:** APPROVE
-- **Handoff:** @WATCHER: GITOPS-BRANCH-CREATE feat/005-HU_api_pura
+- **Handoff:** @WATCHER: GITOPS-BRANCH-CREATE feat/005-api-pura
 @BA: arranca
 ### [03-10-2026] Business Analyst
 - **Hora:** 09:20:00

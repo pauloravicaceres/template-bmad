@@ -35,10 +35,10 @@ describe('ArtifactTreeExplorer Component', () => {
             last_modified: '2026-09-30T23:14:00Z',
             children: [
               {
-                node_id: 'docs/business-analyst/002-HU_monitoreo.md',
-                name: '002-HU_monitoreo.md',
+                node_id: 'docs/business-analyst/002-monitoreo.md',
+                name: '002-monitoreo.md',
                 node_type: 'FILE',
-                relative_path: 'docs/business-analyst/002-HU_monitoreo.md',
+                relative_path: 'docs/business-analyst/002-monitoreo.md',
                 parent_path: 'docs/business-analyst',
                 child_file_count: 0,
                 is_empty: false,
@@ -90,10 +90,10 @@ describe('ArtifactTreeExplorer Component', () => {
     })
 
     const input = wrapper.find('input[type="text"]')
-    await input.setValue('002-HU')
+    await input.setValue('002-monitoreo')
 
     // Assert
-    expect(wrapper.text()).toContain('002-HU_monitoreo.md')
+    expect(wrapper.text()).toContain('002-monitoreo.md')
     expect(wrapper.text()).not.toContain('empty-agent')
   })
 
@@ -115,7 +115,7 @@ describe('ArtifactTreeExplorer Component', () => {
 
   it('AlRecibirPathEnNewPaths_DebeRenderizarBadgeNuevo', async () => {
     // Act
-    const newPaths = new Set(['docs/business-analyst/002-HU_monitoreo.md'])
+    const newPaths = new Set(['docs/business-analyst/002-monitoreo.md'])
     const wrapper = mount(ArtifactTreeExplorer, {
       props: {
         rootNode: mockTree,

@@ -26,7 +26,7 @@ def qa_isolated_environment(tmp_path):
     # Entregable de BA con Markdown y bloques Mermaid (SC-01)
     ba_dir = docs_dir / "business-analyst"
     ba_dir.mkdir()
-    hu_doc = ba_dir / "002-HU_monitoreo.md"
+    hu_doc = ba_dir / "002-monitoreo.md"
     hu_doc.write_text(
         "# Monitoreo en Vivo\n\n```mermaid\nsequenceDiagram\nTL->>API: GET status\n```\nFin de spec.",
         encoding="utf-8"
@@ -68,7 +68,7 @@ def qa_isolated_environment(tmp_path):
 
 ### [30-09-2026] Business Analyst
 - **Hora:** 23:14:00
-- **Artefacto generado:** `docs/business-analyst/002-HU_monitoreo.md`
+- **Artefacto generado:** `docs/business-analyst/002-monitoreo.md`
 - **Estado:** BDD completado
 - **⚠️ Puntos Abiertos:** Ninguno
 - **Handoff:** @QA: Auditoría documental
@@ -190,7 +190,7 @@ class TestHU002ArtifactContentAndSecurityCertification:
     def test_GetArtifactContent_ConMarkdownYDiagramaMermaid_DebeRetornarContenidoCompletoYTipoMarkdown(self, qa_isolated_environment):
         # Arrange
         client, _ = qa_isolated_environment
-        doc_path = "docs/business-analyst/002-HU_monitoreo.md"
+        doc_path = "docs/business-analyst/002-monitoreo.md"
 
         # Act
         response = client.get(f"/api/v1/artifacts/content?path={doc_path}")
@@ -198,8 +198,8 @@ class TestHU002ArtifactContentAndSecurityCertification:
         # Assert
         assert response.status_code == 200
         payload = response.json()
-        assert payload["relative_path"] == "docs/business-analyst/002-HU_monitoreo.md"
-        assert payload["filename"] == "002-HU_monitoreo.md"
+        assert payload["relative_path"] == "docs/business-analyst/002-monitoreo.md"
+        assert payload["filename"] == "002-monitoreo.md"
         assert payload["detected_format"] == "MARKDOWN"
         assert payload["encoding"] == "utf-8"
         assert "sequenceDiagram" in payload["raw_content"]
@@ -326,7 +326,7 @@ class TestHU002WebSocketCommunicationCertification:
         with client.websocket_connect("/ws/v1/events") as websocket:
             websocket.send_text(json.dumps({
                 "event": "SUBSCRIBE_ARTIFACT",
-                "path": "docs/business-analyst/002-HU_monitoreo.md"
+                "path": "docs/business-analyst/002-monitoreo.md"
             }))
             # Latido PING de confirmación
             websocket.send_text(json.dumps({"event": "PING"}))

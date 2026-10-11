@@ -18,7 +18,7 @@ describe('GitCommitTimeline Component', () => {
       deletions: 0,
       files: [
         {
-          relative_path: 'docs/business-analyst/004-HU_panel.md',
+          relative_path: 'docs/business-analyst/004-panel.md',
           change_type: 'added',
           is_binary: false,
           is_diff_omitted: false,
@@ -42,7 +42,7 @@ describe('GitCommitTimeline Component', () => {
       author_name: 'Watcher BMAD',
       author_email: 'watcher@bmad.local',
       committed_at: '2026-10-01T07:59:45Z',
-      message: 'merge: close branch feat/003-HU_observabilidad',
+      message: 'merge: close branch feat/003-observabilidad',
       agent_role: 'Watcher BMAD',
       files_changed_count: 1,
       insertions: 10,
@@ -86,7 +86,7 @@ describe('GitCommitTimeline Component', () => {
     expect(wrapper.text()).toContain('a7c4e91d830b8ef29e92d77cb31940918ef83921')
     expect(wrapper.text()).toContain('ba@bmad.local')
     expect(wrapper.text()).toContain('+239')
-    expect(wrapper.text()).toContain('docs/business-analyst/004-HU_panel.md')
+    expect(wrapper.text()).toContain('docs/business-analyst/004-panel.md')
     // Elisión de diff binario
     expect(wrapper.text()).toContain('[ ARCHIVO BINARIO - DIFF TEXTUAL OMITIDO ]')
   })

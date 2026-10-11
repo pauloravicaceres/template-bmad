@@ -7,7 +7,7 @@ describe('GitWorkingTreeClassifier Component', () => {
   const mockTree: GitWorkingTree = {
     staged: [
       {
-        relative_path: 'docs/business-analyst/004-HU_panel_telemetria.md',
+        relative_path: 'docs/business-analyst/004-panel-telemetria.md',
         category: 'staged',
         status_code: '+',
         lines_added: 144,
@@ -58,7 +58,7 @@ describe('GitWorkingTreeClassifier Component', () => {
     expect(wrapper.text()).toContain('STAGED CHANGES (1)')
     expect(wrapper.text()).toContain('UNSTAGED CHANGES (1)')
     expect(wrapper.text()).toContain('UNTRACKED FILES (1)')
-    expect(wrapper.text()).toContain('004-HU_panel_telemetria.md')
+    expect(wrapper.text()).toContain('004-panel-telemetria.md')
     expect(wrapper.text()).toContain('+144')
     expect(wrapper.text()).toContain('tracker_bmad.md')
     expect(wrapper.text()).toContain('aprobado_qa.md')
@@ -95,14 +95,14 @@ describe('GitWorkingTreeClassifier Component', () => {
     })
 
     const stagedHeader = wrapper.findAll('button').find((b) => b.text().includes('STAGED CHANGES'))
-    expect(wrapper.text()).toContain('004-HU_panel_telemetria.md')
+    expect(wrapper.text()).toContain('004-panel-telemetria.md')
 
     // Click to collapse
     await stagedHeader?.trigger('click')
-    expect(wrapper.text()).not.toContain('004-HU_panel_telemetria.md')
+    expect(wrapper.text()).not.toContain('004-panel-telemetria.md')
 
     // Click to expand again
     await stagedHeader?.trigger('click')
-    expect(wrapper.text()).toContain('004-HU_panel_telemetria.md')
+    expect(wrapper.text()).toContain('004-panel-telemetria.md')
   })
 })

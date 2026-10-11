@@ -24,6 +24,7 @@
           Rechazar
         </button>
       </div>
+      <p v-if="error" role="alert" class="text-red-600 text-sm">{{ error }}</p>
     </div>
     <div v-else>
       <p>Todo en orden, sin compuertas pendientes.</p>
@@ -38,6 +39,17 @@ import { DEFAULT_API_BASE } from '../services/api_client'
 const status = ref('UNKNOWN')
 const gateId = '123'
 const feedback = ref('')
+const error = ref('')
+
+// El backend rechaza la decisión (p. ej. identificador de HU inválido) con 4xx y su motivo en `detail`.
+const decisionError = async (res) => {
+  if (!res || res.ok !== false) return ''
+  try {
+    return (await res.json()).detail || `Error ${res.status}`
+  } catch (e) {
+    return `Error ${res.status}`
+  }
+}
 
 const fetchStatus = async () => {
   try {
@@ -51,11 +63,12 @@ const fetchStatus = async () => {
 
 const approve = async () => {
   try {
-    await fetch(`${DEFAULT_API_BASE}/gates/${gateId}/decision`, {
+    const res = await fetch(`${DEFAULT_API_BASE}/gates/${gateId}/decision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'APPROVE', feedback: feedback.value })
     })
+    error.value = await decisionError(res)
     fetchStatus()
   } catch (e) {
     console.error(e)
@@ -64,11 +77,12 @@ const approve = async () => {
 
 const reject = async () => {
   try {
-    await fetch(`${DEFAULT_API_BASE}/gates/${gateId}/decision`, {
+    const res = await fetch(`${DEFAULT_API_BASE}/gates/${gateId}/decision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'REJECT', feedback: feedback.value })
     })
+    error.value = await decisionError(res)
     feedback.value = ''
     fetchStatus()
   } catch (e) {

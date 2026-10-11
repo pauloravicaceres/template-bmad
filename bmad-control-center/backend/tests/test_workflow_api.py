@@ -108,7 +108,7 @@ class TestWorkflowApi:
 - **Artefacto generado:** `docs/qa-tech/tech-design_002.md`
 - **Estado:** Auditoría Adversarial Exitosa
 - **⚠️ Puntos Abiertos:** Ninguno
-- **Handoff:** @WATCHER: GITOPS-MERGE-CLOSE feat/001-HU_prueba
+- **Handoff:** @WATCHER: GITOPS-MERGE-CLOSE feat/001-prueba
 """
         temp_tracker.write_text(tracker_text.strip(), encoding="utf-8")
 

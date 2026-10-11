@@ -15,7 +15,7 @@ vi.mock('../services/api_client', async () => {
 
 describe('useGitTelemetry Composable', () => {
   const mockStatus: GitStatusResponse = {
-    current_branch: 'feat/004-HU_panel_telemetria_control_versiones_git',
+    current_branch: 'feat/004-panel-telemetria-control-versiones-git',
     head_commit_hash: 'a7c4e91d830b8ef29e92d77cb31940918ef83921',
     head_commit_short: 'a7c4e91',
     head_commit_message: 'feat(git): add spec for telemetry panel',
@@ -94,7 +94,7 @@ describe('useGitTelemetry Composable', () => {
 
     // Assert
     expect(gitStatus.value).toEqual(mockStatus)
-    expect(currentBranch.value).toBe('feat/004-HU_panel_telemetria_control_versiones_git')
+    expect(currentBranch.value).toBe('feat/004-panel-telemetria-control-versiones-git')
     expect(totalModifiedFiles.value).toBe(4)
     expect(isSyncing.value).toBe(false)
   })

@@ -80,7 +80,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
         # Act
         await mgr.broadcast_artifact_changed(
             action="CREATED",
-            path="docs/business-analyst/003-HU_observabilidad.md",
+            path="docs/business-analyst/003-observabilidad.md",
             size_bytes=10240,
             is_large_file=False,
             metadata_only=False,
@@ -92,7 +92,7 @@ class TestHU003WorkflowAndArtifactNotificationCertification:
         assert len(received_messages) == 1
         msg = received_messages[0]
         assert msg["event_type"] == "ARTIFACT_CHANGED"
-        assert msg["resource_path"] == "docs/business-analyst/003-HU_observabilidad.md"
+        assert msg["resource_path"] == "docs/business-analyst/003-observabilidad.md"
         assert msg["coalesced_count"] == 1
         assert msg["payload"]["change_type"] == "created"
         assert msg["payload"]["is_new_tag"] is True

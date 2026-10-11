@@ -35,7 +35,7 @@ Los endpoints REST usan `/api/v1`: `/project`, `/projects`, `/project/context`, 
 
 El canal canónico es `/ws/v1/events`; los alias `/api/v1/ws/monitor`, `/ws/hitl` y `/ws` comparten el mismo manejador. Envía frames JSON; PING recibe PONG y los frames inválidos cierran con WS 1008.
 
-Las raíces documentales son `docs`, `specs`, `.specify` y, en multiworkspace, `handoffs`. El observador compara la ruta completa del tracker. Las compuertas escriben decisiones en ese tracker; sockets, cachés y observadores pertenecen al proceso seleccionado. Los eventos de archivos mayores de 5 MiB llevan metadatos; la ventana de debounce es 200 ms.
+Las raíces documentales son `docs`, `specs`, `.specify` y, en multiworkspace, `handoffs`. El observador compara la ruta completa del tracker. Las compuertas escriben decisiones en ese tracker; sockets, cachés y observadores pertenecen al proceso seleccionado. Una aprobación cuyo handoff cita el entregable exige un `Artefacto generado` real en el último bloque (la HU del BA, además, `NNN-nombre-en-kebab-case.md`); si falta o es inválido responde 422 sin escribir en el tracker ni emitir handoff o rama. El rechazo y el cierre final del PM no lo requieren. Los eventos de archivos mayores de 5 MiB llevan metadatos; la ventana de debounce es 200 ms.
 
 ## Pruebas
 
