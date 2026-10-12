@@ -105,7 +105,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     if metadata:
         content["metadata"] = metadata
 
-    return JSONResponse(status_code=exc.status_code, content=content)
+    return JSONResponse(status_code=exc.status_code, content=content, headers=getattr(exc, "headers", None))
 
 
 @app.exception_handler(Exception)

@@ -1,6 +1,7 @@
 import os
 import pytest
-from filelock import FileLock, Timeout
+from bmad_runtime.state import ProjectLock
+from bmad_runtime.tracker_io import TrackerBusy
 from services.tracker_service import TrackerService
 
 
@@ -72,21 +73,17 @@ class TestTrackerService:
         assert result == new_text
         assert initial_text not in result
 
-    def test_TrackerService_ConBloqueoConcurrenteExpirado_DebeLanzarTimeoutException(self, tmp_path):
-        # Arrange
+    def test_TrackerService_ConBloqueoConcurrenteExpirado_DebeLanzarTrackerBusySinEscribir(self, tmp_path):
+        # Arrange: el lock del proyecto (state/tracker.lock del motor) lo retiene otro escritor
         tracker_file = tmp_path / "tracker_locked.md"
-        lock_file = f"{str(tracker_file)}.lock"
-        # Servicio configurado con timeout muy corto para la prueba de contención
-        service = TrackerService(str(tracker_file))
-        service.lock = FileLock(lock_file, timeout=0.1)
-
-        # Bloqueamos el archivo deliberadamente con otro cerrojo externo
-        external_lock = FileLock(lock_file, timeout=1)
-        external_lock.acquire()
+        service = TrackerService(str(tracker_file), timeout=0.1)
+        external_lock = ProjectLock.at(service.writer.state_dir / "tracker.lock")
+        assert external_lock.acquire()
 
         try:
             # Act & Assert
-            with pytest.raises(Timeout):
+            with pytest.raises(TrackerBusy):
                 service.append_decision("DECISION [999]: REJECT")
         finally:
             external_lock.release()
+        assert not tracker_file.exists()
