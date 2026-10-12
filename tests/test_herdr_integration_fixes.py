@@ -17,6 +17,7 @@ from bmad_runtime.runtime import Runtime
 from bmad_runtime.services import agent_contract, contract_path, interactive_command, write_contract
 from bmad_runtime.watcher_service import WatcherService
 from test_multiworkspace import engine, new_project  # noqa: F401  (pytest fixture)
+from tests.pane_doubles import ready_pane
 
 HERDR_NAME = re.compile(r'[a-z][a-z0-9_-]{0,31}')
 CLI_HELP = ('--model --effort --permission-mode --append-system-prompt --sandbox --cd --add-dir --config '
@@ -38,6 +39,7 @@ def owned_runtime(engine, project='alpha'):
     rt.state.put('agent:business-analyst', {'provider': selection.provider, 'model': selection.model,
                                             'pane_id': 'p1', 'state': 'ready', 'session_name': name})
     gateway.list_agents.return_value = [{'name': name, 'pane_id': 'p1', 'agent_status': 'idle'}]
+    ready_pane(gateway, rt.factory.resolve(agent='business-analyst')[1])
     return ctx, rt, gateway
 
 

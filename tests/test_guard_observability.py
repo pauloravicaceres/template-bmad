@@ -19,6 +19,7 @@ from tests.test_context_guard import BA, SA, GuardCase, Steps
 from tests.test_session_lifecycle import registry
 from tests.test_session_maintenance import MaintenanceCase
 from test_multiworkspace import engine, new_project  # noqa: F401  (pytest fixture)
+from tests.pane_doubles import ready_pane
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -503,7 +504,7 @@ def dispatched_task(engine):
         rt.state.put('agent:' + BA, {'provider': selection.provider, 'model': selection.model, 'pane_id': 'p1',
                                      'state': 'ready', 'session_name': session})
         gateway.list_agents.return_value = [{'name': session, 'pane_id': 'p1', 'agent_status': 'idle'}]
-        gateway.read.return_value = ''
+        ready_pane(gateway, rt.factory.resolve(agent=BA)[1])
         assert rt.dispatcher.dispatch(BA, 'p1', '@BA: Redacta la HU 001.', 'ev-4d1')
         return ctx, ctx.output(rt.state.get('dispatch:ev-4d1')['task_file']).read_text(encoding='utf-8')
     finally:

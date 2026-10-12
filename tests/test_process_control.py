@@ -43,6 +43,7 @@ def assert_stopped(test, heartbeat):
 class FakeProvider:
     identifier = 'fake'
     herdr_kind = 'fake'
+    screen_profile = 'claude'   # pane_state: idle Claude-like composer
     capabilities = Capabilities(True, True, True, True)
 
     def __init__(self, executable):

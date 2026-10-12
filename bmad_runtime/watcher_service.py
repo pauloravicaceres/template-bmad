@@ -1,6 +1,7 @@
 """Persistence and provider-neutral boundaries used by the legacy BMAD workflow."""
 import json
 import os
+import re
 import time
 from typing import NamedTuple
 
@@ -46,7 +47,10 @@ def authorized_block(state, agent, index, followups):
     event = follow.get('event_id')
     if event and follow.get('bloques_al_despachar', float('inf')) <= index:
         dispatch = state.get('dispatch:' + event) or {}
-        if dispatch.get('state') == 'done' and dispatch.get('agent_id') == agent:
+        # An outbox dispatch (Fase 4F-E5) is answered only by the block the watcher ingested (confirmed_block
+        # below); a block the agent wrote straight into the tracker is a protocol violation.
+        if dispatch.get('state') == 'done' and dispatch.get('agent_id') == agent and \
+                dispatch.get('channel', 'direct') == 'direct':
             return 'dispatch:' + event
     for key, raw in state.db.execute("SELECT id,data FROM records WHERE id LIKE 'queued:%'"):
         data = json.loads(raw)
@@ -169,6 +173,24 @@ def tracker_verified(context, state):
     return 'tracker_unprocessed_lines' if pending else None
 
 
+def paused_for_human(content):
+    """True when the last block with a handoff asks the human (`@HUMANO:`) and was not written by the human.
+
+    Single rule of the watcher pause (workflow.is_tracker_paused_for_human) and of the read-only inspection: a
+    technically confirmed handoff never lifts it; only a later human block does."""
+    from .hu_lifecycle import gitops_macro
+    blocks = [block.strip() for block in content.split('### [') if block.strip()]
+    for last_block in reversed(blocks):
+        if '@HUMANO:' not in last_block and '**Handoff:**' not in last_block and \
+                not re.search(r'^@[A-Z-]+:', last_block, re.M):
+            continue
+        header_line = last_block.split('\n')[0]
+        if any(gitops_macro(line, 'MERGE-CLOSE') for line in last_block.splitlines()):
+            return False
+        return 'HUMANO' not in header_line and '@HUMANO:' in last_block
+    return False
+
+
 def mark_handoff(state, event_id, stage, **details):
     if stage not in HANDOFF_STAGES:
         raise ValueError(f'Unknown handoff stage: {stage}')
@@ -266,9 +288,9 @@ class WatcherService:
                 raise ReconciliationRequired('Tracker kept changing during startup; retry when writers are idle.')
             sleep(0.25)
 
-    def begin_line(self, number, line):
+    def begin_line(self, number, line, metadata=None):
         key = 'event:' + StateStore.fingerprint(number, line)
-        return key, self.runtime.state.claim(key)
+        return key, self.runtime.state.claim(key, metadata)
 
     def complete_line(self, key):
         self.runtime.state.finish(key, 'done')

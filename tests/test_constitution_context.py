@@ -12,6 +12,7 @@ from bmad_runtime.runtime import Runtime
 from bmad_runtime.services import agent_contract, contract_path, interactive_command
 from bmad_runtime.technical_context import assemble, discover, document_index, MAX_PROMPT
 from test_multiworkspace import engine, new_project
+from tests.pane_doubles import ready_pane
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -106,6 +107,7 @@ def test_dispatch_refreshes_decisions_and_stays_local(engine):
         rt.state.put('agent:dev-backend', {'provider': 'codex', 'model': 'gpt-6-astra',
                                           'pane_id': 'p', 'state': 'ready'})
         gateway.list_agents.return_value = [{'name': ctx.session_name('dev-backend'), 'pane_id': 'p', 'agent_status': 'idle'}]
+        ready_pane(gateway, rt.factory.resolve(agent='dev-backend')[1])
         assert rt.dispatcher.dispatch('dev-backend', 'p', 'implementar HU', 'first')
         # The terminal receives a short reference; the full handoff is in the task file.
         task = ctx.output(rt.state.get('dispatch:first')['task_file']).read_text(encoding='utf-8')

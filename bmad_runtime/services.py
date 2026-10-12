@@ -3,12 +3,14 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import time
 import uuid
 from dataclasses import replace
 
+from . import outbox, pane_state
 from .commands import Result
 from .config import AGENT_PHASES, OPERATIONS
-from .errors import (AgentBlocked, BMADRuntimeError, ConfigurationError, DeliveryRejected, ReconciliationRequired,
+from .errors import (BMADRuntimeError, ConfigurationError, DeliveryRejected, DeliveryUncertain, ReconciliationRequired,
                      UnsupportedCapability)
 from .state import project_lock
 from .technical_context import assemble
@@ -253,8 +255,12 @@ class SpecKitExecutor:
 
 
 class AgentDispatcher:
+    # Consecutive busy/ambiguous screens of an agent Herdr reports idle before it is held for a human.
+    unready_limit = 30
+
     def __init__(self, config, factory, gateway, state):
         self.config, self.factory, self.gateway, self.state = config, factory, gateway, state
+        self.gate = pane_state.PaneGate(gateway, config.context or config.root)
 
     def info(self, name):
         owned = self.state.get('agent:' + name)
@@ -274,32 +280,67 @@ class AgentDispatcher:
         return selection, provider
 
     def blocker(self, provider, pane):
-        """Dialog on the agent's current screen that only a human may answer (e.g. 'trust_dialog')."""
-        detect = getattr(provider, 'interaction_blocker', None)
-        if detect is None:
-            return None
-        screen = self.gateway.read(pane, 60, source='visible')
-        return detect(screen) if isinstance(screen, str) else None
+        """Dialog on the agent's current screen that only a human may answer (e.g. 'trust_dialog'), else None.
 
-    def dispatch(self, name, pane, message, event_id):
+        None does not mean ready: writers require pane_ready() (pane_state READY_VERIFIED)."""
+        return self.gate.blocker(provider, pane)
+
+    def pane_ready(self, name, provider, pane, status, *, reads=2):
+        """READY_VERIFIED observation of the agent's pane, or an error with nothing written (Fase 4F-E5.2.1).
+
+        Herdr reports an agent idle while its CLI shows a dialog, and an Enter or a digit answers it. Dialogs and an
+        exited CLI hold the agent ('awaiting_trust'/'unverified') until maintenance --reconcile verifies it; a busy or
+        ambiguous screen only defers the delivery, and is held as well after `unready_limit` consecutive checks.
+        """
+        observation = self.gate.observe(provider, pane, herdr_status=status, reads=reads)
+        owned = self.state.get('agent:' + name) or {}
+        if observation.ready:
+            if 'screen_unready' in owned:
+                self.state.put('agent:' + name, {k: v for k, v in owned.items() if k != 'screen_unready'})
+            return observation
+        streak = int(owned.get('screen_unready') or 0) + 1
+        hold = observation.state in (*pane_state.HUMAN_STATES, pane_state.EXITED) or streak >= self.unready_limit
+        record = {**{k: v for k, v in owned.items() if k != 'screen_unready'},
+                  'screen_check': {**observation.as_dict(), 'at': time.time()}}
+        if hold:
+            record.update(state=pane_state.held_state(observation),
+                          blocker=observation.blocker or observation.state.lower())
+        else:
+            record['screen_unready'] = streak
+        self.state.put('agent:' + name, record)
+        raise pane_state.refuse(name, pane, observation, hold=hold)
+
+    def dispatch(self, name, pane, message, event_id, reminder=False, outbox_record=None):
+        """`reminder=True`: a vigilante reminder of an earlier dispatch; it keeps that dispatch's channel (the outbox
+        record of `outbox_record`, or the tracker) and never opens a new expected delivery."""
         selection, provider = self.provider(name)
         actual, status = self.info(name)
         if actual != pane or status not in {'idle', 'done'}:
             raise ReconciliationRequired(f'{name}: target is not an owned idle agent.')
-        blocker = self.blocker(provider, pane)
-        if blocker:
-            # Herdr reports this agent idle, but an Enter would answer the dialog: nothing is sent.
-            self.state.put('agent:' + name, {**self.state.get('agent:' + name), 'state': 'awaiting_trust',
-                                              'blocker': blocker})
-            raise AgentBlocked(f'{name}: {blocker} on screen; answer it manually in pane {pane}, then run '
-                               f'python -m bmad_runtime.maintenance --reconcile {name} --confirm.')
+        # Before anything is claimed or written: a pane that is not provably ready receives nothing.
+        self.pane_ready(name, provider, pane, status, reads=1)
         key = 'dispatch:' + event_id
         if not self.state.claim(key, {'agent_id': name, 'provider': selection.provider,
                                      'model': selection.model, 'pane_id': pane, 'phase': AGENT_PHASES[name]}):
             return False
         context = self.config.context
+        expected = None
         try:
             if context:
+                rule = TRACKER_RULE
+                policy = self.config.data.get('outbox') or {}
+                if reminder:
+                    rule = outbox.task_rule(outbox_record) if outbox_record else TRACKER_RULE
+                elif policy.get('mode', 'direct') != 'direct':
+                    # Fase 4F-E5: the channel is fixed (and persisted) per dispatch before anything is sent.
+                    channel = outbox.channel_for(policy, name)
+                    if channel == 'outbox':
+                        expected = outbox.expect(self.state, context, event_id=event_id,
+                                                 attempt=self.state.get(key).get('attempt', 1), agent=name,
+                                                 policy=policy)
+                        rule = outbox.task_rule(expected)
+                    self.state.put(key, {**self.state.get(key), 'channel': channel,
+                                         **({'outbox': expected['key']} if expected else {})})
                 # Refresh the contract if profile/policy changed; running agents compare the source digests.
                 contract = write_contract(context, name).relative_to(context.workspace_root).as_posix()
                 digests = ','.join(f'{k}:{v}' for k, v in source_digests(context, name).items())
@@ -309,23 +350,51 @@ class AgentDispatcher:
                 # Workspace paths, local constitution, observations and tracker rule stay in every task.
                 path = self._write_task(name, event_id, self.state.get(key).get('attempt', 1),
                                         context.instructions() + assemble(context, role=name, policy_in_contract=contract)
-                                        + TRACKER_RULE + reference + message)
+                                        + rule + reference + message)
                 text = task_message(message, path.relative_to(context.workspace_root).as_posix(), event_id)
             else:
                 text = message
         except BaseException:
             # Nothing was sent to the agent.
             self.state.finish(key, 'not_delivered')
+            if expected:
+                outbox.abandon(self.state, expected['key'])
             raise
+        sent = False
         try:
-            self.gateway.prompt(pane, text)
+            with self.gate.exclusive(pane):
+                # Final check under the pane lock, right before writing: the screen may have changed meanwhile.
+                actual, status = self.info(name)
+                if actual != pane or status not in {'idle', 'done'}:
+                    raise pane_state.PaneNotReady(f'{name}: agent left the idle state before the delivery.',
+                                                  pane_state.Observation(pane_state.BUSY, f'herdr_{status}'))
+                self.pane_ready(name, provider, pane, status)
+                sent = True
+                self.gateway.prompt(pane, text)
+                after = self.gate.observe(provider, pane, reads=1)
         except DeliveryRejected:
             self.state.finish(key, 'not_delivered')
+            if expected:
+                outbox.abandon(self.state, expected['key'])
             raise
         except BaseException:
+            if not sent:
+                # Refused before writing: nothing reached the agent.
+                self.state.finish(key, 'not_delivered')
+                if expected:
+                    outbox.abandon(self.state, expected['key'])
+                raise
             # The text may have reached the agent: never retried automatically.
             self.state.finish(key, 'uncertain')
             raise
+        if after.state in (pane_state.AWAITING_TRUST, pane_state.EXITED):
+            # A dialog that appeared after the last read may have taken the keystrokes (e.g. a menu choice).
+            self.state.put(key, {**self.state.get(key), 'state': 'uncertain', 'screen_after': after.as_dict(),
+                                 'updated': time.time()})
+            self.state.put('agent:' + name, {**self.state.get('agent:' + name), 'state': pane_state.held_state(after),
+                                              'blocker': after.blocker or after.state.lower()})
+            raise DeliveryUncertain(f'{name}: pane {pane} shows {after.state} ({after.reason}) right after the delivery; '
+                                    'the text may have answered a dialog. Inspect the pane; never retried automatically.')
         self.state.put(key, {**self.state.get(key), 'delivery': 'accepted'})
         self.state.finish(key, 'done')
         return True
@@ -472,6 +541,8 @@ class SessionManager:
         reasons += ['maintenance_pending:' + agent for agent in maintenance_blocks(store)]
         if protocol_violations(store):
             reasons.append('protocol_violation')
+        if outbox.incidents(store):
+            reasons.append('outbox_incident')
         return sorted(set(reasons))
 
     def _agent_row(self, name, store, herdr_agents, workspace_reasons):

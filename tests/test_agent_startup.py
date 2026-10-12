@@ -207,8 +207,9 @@ class TrustDialogTests(StartupCase):
         # The watcher keeps the task queued instead of stopping or sending it.
         self.run_watcher([lambda: self.append('- **Handoff:** @BA: Redacta la HU.\n'), lambda: None])
         self.assertEqual(self.prompts('p-' + BA), [])
-        # The human answers the dialog in the pane; reconcile re-verifies identity before any dispatch.
-        self.gateway.screen['p-' + BA] = ''
+        # The human answers the dialog in the pane (the CLI shows its idle composer again); reconcile re-verifies
+        # the screen and the identity before any dispatch.
+        del self.gateway.screen['p-' + BA]
         op = self.maintenance().reconcile(BA)
         self.assertEqual((op['kind'], op['state']), ('VERIFY', 'COMPLETED'))
         self.assertEqual(self.rt.state.get('agent:' + BA)['state'], 'ready')

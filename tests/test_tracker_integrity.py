@@ -15,11 +15,13 @@ from bmad_runtime.providers import Capabilities, default_registry
 from bmad_runtime.runtime import Runtime
 from bmad_runtime.state import StateStore
 from bmad_runtime.watcher_service import WatcherService, read_tracker
+from tests.pane_doubles import ready_pane
 
 
 class FakeProvider:
     identifier = 'fake'
     herdr_kind = 'fake'
+    screen_profile = 'claude'   # pane_state: idle Claude-like composer
     capabilities = Capabilities(True, True, True, True)
 
     def __init__(self, executable):
@@ -65,6 +67,7 @@ def make_runtime(root, tracker=None):
     runner = Mock()
     runner.run.return_value = Result(0, '')
     rt = Runtime(root, registry=registry, gateway=Mock(), runner=runner)
+    ready_pane(rt.gateway)
     rt.context.tracker_path.parent.mkdir(parents=True, exist_ok=True)
     return rt
 

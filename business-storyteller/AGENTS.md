@@ -268,6 +268,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 
 ## Workflow & Reglas de Escritura
 - **Append, no Overwrite:** Nunca borres ni sobreescribas el historial previo del tracker. Siempre anexa tu reporte al final del documento.
+- **Canal outbox (solo si tu tarea lo declara):** si el archivo de tu tarea indica `CANAL DE SALIDA: OUTBOX`, no escribas en el tracker: publica este mismo bloque, una sola vez, en el archivo que la tarea asigna y entre sus marcas `BMAD-OUTBOX` exactas. El Watcher lo valida y lo incorpora al tracker.
 - **Espaciado:** Asegúrate de dejar al menos una línea en blanco (salto de línea) antes de abrir tu encabezado ### para mantener el documento legible.
 - **Determinismo del Handoff:** La línea del viñeta - **Handoff:** no debe contener saltos de línea internos. Debe ser una cadena de texto continuo para que la expresión regular del orquestador la capture correctamente.
 - **Regla Estricta para Handoffs hacia el @HUMANO: (Aislamiento de Tokens / Anti-Disparo Accidental):**
@@ -278,6 +279,6 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 - **Preguntas al Humano (Obligatoriedad de Inclusión):**
   Si el handoff al `@HUMANO:` solicita responder un cuestionario, preguntas de arquitectura o decisiones estratégicas, **ESTÁ ESTRICTAMENTE PROHIBIDO** pedir respuestas sin proporcionar las preguntas. El agente debe listar obligatoriamente las preguntas de forma explícita, clara y numerada inmediatamente debajo de la línea del handoff.
 - **Orquestación Automática de Git (GitOps Macros):**
-  Ciertos agentes (ej. `product-manager` y `qa-tech`) poseen directivas explícitas para comandar el flujo del repositorio. Cuando sea el caso, las macros `@WATCHER: GITOPS-BRANCH-CREATE [rama]` y `@WATCHER: GITOPS-MERGE-CLOSE [rama]` son comandos transaccionales válidos.
+  Solo dos roles comandan el flujo del repositorio: `product-manager` abre la rama de la HU (macro de apertura `GITOPS-BRANCH-CREATE`) y `code-review` la cierra tras certificar la implementación (macro de cierre `GITOPS-MERGE-CLOSE`). Cualquier otro rol tiene prohibido emitirlas o citarlas; en canal outbox el Watcher rechaza la entrega que lo haga.
   - **Uso estricto:** Estas macros deben inyectarse en el texto como una **línea independiente** ubicada siempre justo antes del Handoff final de derivación, asegurando que el *watcher* ejecute la mutación del entorno (`checkout`, `merge`) *antes* de despachar la instrucción al siguiente agente.
 

@@ -15,6 +15,7 @@ from bmad_runtime.providers import Capabilities, default_registry
 from bmad_runtime.runtime import Runtime
 from bmad_runtime.state import StateStore
 from bmad_runtime.watcher_service import WatcherService, read_tracker
+from tests.pane_doubles import ready_pane
 
 ARTIFACT = 'docs/business-analyst/001-demo.md'
 
@@ -23,6 +24,7 @@ class FakeProvider:
     identifier = 'fake'
     herdr_kind = 'fake'
     capabilities = Capabilities(True, True, True, True)
+    screen_profile = 'claude'   # pane_state: the fake pane renders an idle Claude-like composer
 
     def __init__(self, executable):
         self.executable = executable
@@ -80,6 +82,7 @@ class SessionCase(unittest.TestCase):
         # Legacy context: the Herdr session name is the role itself.
         self.gateway.list_agents.side_effect = lambda: [
             {'name': name, 'pane_id': 'p-' + name, 'agent_status': status} for name, status in self.herdr.items()]
+        self.screens = ready_pane(self.gateway)
         self.rt = None
         self.start()
         artifact = self.root / ARTIFACT

@@ -21,6 +21,7 @@ from bmad_runtime.state import ProjectLock, StateStore
 from bmad_runtime.watcher_service import (SESSION_PROTOCOL, WatcherService, maintenance_blocks, read_tracker,
                                           watcher_heartbeat)
 from bmad_runtime.workspace import bootstrap
+from tests.pane_doubles import READY, SHELL
 from tests.test_session_lifecycle import FakeProvider, SessionCase, block, registry as base_registry
 
 BA, SA = 'business-analyst', 'solutions-architect'
@@ -44,6 +45,7 @@ class FakeCodex(FakeProvider):
     identifier = 'codex'
     herdr_kind = 'codex'
     requires_native_pwsh = True
+    screen_profile = 'codex'
 
     def interactive(self, selection, root, profile):
         return Command((self.executable, 'initial prompt'), profile.parent)
@@ -74,7 +76,7 @@ class FakeHerdr:
         self.argv, self.screen, self.pane_pwsh = {}, {}, {}
         self.good_pwsh = r'C:\Program Files\PowerShell\7\pwsh.exe'
         self.repaired_pwsh = self.good_pwsh
-        self.screen_after_start = ''
+        self.screen_after_start = None   # None: the started CLI shows its idle composer
 
     def add(self, name, pane, kind, cwd=None):
         self.agents[pane] = {'name': name, 'pane_id': pane, 'agent_status': 'idle', 'agent': kind}
@@ -110,7 +112,10 @@ class FakeHerdr:
         self.agents[pane] = {'name': name, 'pane_id': pane, 'agent_status': self.status_after_start,
                              'agent': provider.herdr_kind}
         self.argv[pane] = (provider.herdr_kind, *native.argv[1:])
-        self.screen[pane] = self.screen_after_start
+        if self.screen_after_start is None:
+            self.screen.pop(pane, None)
+        else:
+            self.screen[pane] = self.screen_after_start
         self.memory[pane] = None
 
     def prompt(self, pane, text, timeout_ms=None):
@@ -141,7 +146,11 @@ class FakeHerdr:
 
     def read(self, pane, lines=40, source='recent'):
         if source == 'visible':
-            return self.screen.get(pane, '')
+            if pane in self.screen:
+                return self.screen[pane]
+            agent = self.agents.get(pane)
+            # Without an override a live CLI shows its idle composer; a pane without agent shows its shell.
+            return READY.get(agent['agent'], READY['claude']) if agent else SHELL
         return self.output.get(pane, '')
 
     def run_in_pane(self, pane, command):

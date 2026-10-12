@@ -49,8 +49,11 @@ def effective_config(context, path=None):
     if not isinstance(override, dict) or set(override) - {'ai', 'project_name', 'project_type', 'ux_phase', 'code_dirs'}:
         raise ConfigurationError('Project overrides accept only ai, project_name, project_type, ux_phase and code_dirs.')
     ai = override.get('ai', {})
-    if not isinstance(ai, dict) or set(ai) - {'defaults', 'phases', 'agents', 'speckit'}:
-        raise ConfigurationError('Project ai overrides accept only defaults, phases, agents and speckit.')
+    # hu_lifecycle: un proyecto aislado puede optar por enforce (Fase 4F-E4) sin activarlo para todo el motor.
+    # outbox: igual para el canal de salida de agentes (Fase 4F-E5); el modo por defecto sigue siendo direct.
+    if not isinstance(ai, dict) or set(ai) - {'defaults', 'phases', 'agents', 'speckit', 'hu_lifecycle', 'outbox'}:
+        raise ConfigurationError('Project ai overrides accept only defaults, phases, agents, speckit, hu_lifecycle '
+                                 'and outbox.')
     result = merge_config(raw, override)
     result['project_name'] = override.get('project_name', context.project_id)
     for key in ('tracker', 'context', 'routes_bmad', 'projects'):
@@ -78,6 +81,16 @@ AGENT_PHASES = {
     'solutions-architect': 'A', 'data-architect': 'A', 'api-architect': 'A',
     'qa-tech': 'A', 'dev-backend': 'D', 'dev-frontend': 'D', 'qa-auto': 'D',
     'code-review': 'D', 'devops': 'D',
+}
+# Tracker block authors of each interactive agent (header `### [fecha] <autor>`); a block is the agent's when its
+# author starts with one of these names. Headless Spec Kit sessions (dev-backend/dev-frontend) have none.
+TRACKER_AUTHORS = {
+    'business-storyteller': ('Business Storyteller',), 'product-analyst': ('Product Analyst',),
+    'product-manager': ('Product Manager',), 'business-analyst': ('Business Analyst',),
+    'qa-documental': ('QA Documental',), 'designer-ux': ('Designer UX',),
+    'solutions-architect': ('Solutions Architect',), 'data-architect': ('Data Architect',),
+    'api-architect': ('API Architect',), 'qa-tech': ('QA Tech', 'QA-Tech'), 'qa-auto': ('QA Automation',),
+    'code-review': ('Code Review', 'SecOps'), 'devops': ('DevOps', 'SRE'),
 }
 
 
@@ -191,7 +204,7 @@ class RuntimeConfig:
         _object(raw, 'configuration')
         ai = _object(raw.get('ai', {}), 'ai')
         if set(ai) - {'schema_version', 'defaults', 'providers', 'phases', 'agents', 'speckit', 'limits', 'git', 'tracker',
-                      'guard'}:
+                      'guard', 'artifacts', 'hu_lifecycle', 'outbox'}:
             raise ConfigurationError('Unknown ai configuration field.')
         if type(ai.get('schema_version', 1)) is not int or ai.get('schema_version', 1) != 1:
             raise ConfigurationError('Only schema_version=1 is supported.')
@@ -241,12 +254,22 @@ class RuntimeConfig:
             raise ConfigurationError('Resource limit exceeds the supported bound.')
         if set(data['git']) != {'auto_commit'} or type(data['git']['auto_commit']) is not bool:
             raise ConfigurationError('git accepts only auto_commit (boolean).')
-        if set(data['tracker']) != {'settle_seconds', 'rewrite_grace_seconds'}:
-            raise ConfigurationError('tracker accepts only settle_seconds and rewrite_grace_seconds.')
+        # lock_timeout_seconds is optional: TrackerWriter waits that long for the tracker lock (default 5).
+        if set(data['tracker']) - {'settle_seconds', 'rewrite_grace_seconds', 'lock_timeout_seconds'}:
+            raise ConfigurationError('tracker accepts only settle_seconds, rewrite_grace_seconds and lock_timeout_seconds.')
         for name, value in data['tracker'].items():
             if type(value) is not int or not 0 <= value <= 3600:
                 raise ConfigurationError(f'tracker.{name} must be an integer between 0 and 3600.')
         data['guard'] = _guard(ai.get('guard', {}), data['providers'])
+        # Gate artifact classification (artifacts.py): code defaults are warn + Figma hosts for designer-ux only.
+        from .artifacts import policy_from_config
+        data['artifacts'] = policy_from_config(ai.get('artifacts'))
+        # HU lifecycle (hu_lifecycle.py): observe by default; enforce (hu_enforcement.py) only when set explicitly.
+        from .hu_lifecycle import policy_from_config as hu_lifecycle_policy
+        data['hu_lifecycle'] = hu_lifecycle_policy(ai.get('hu_lifecycle'))
+        # Agent output channel (outbox.py): direct by default; both/outbox only when set explicitly.
+        from .outbox import policy_from_config as outbox_policy
+        data['outbox'] = outbox_policy(ai.get('outbox'))
         # Explicit --config file (absolute); None means the engine default config_bmad.json.
         source = absolute_path(path, context.engine_root if context else root) if path else None
         return cls(root, data, context, raw, source)

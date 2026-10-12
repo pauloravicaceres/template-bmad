@@ -15,6 +15,7 @@ from bmad_runtime.services import (TRACKER_RULE, agent_contract, contract_path, 
                                    source_digests, write_contract)
 from bmad_runtime.watcher_service import WatcherService
 from test_multiworkspace import engine, new_project  # noqa: F401  (pytest fixture)
+from tests.pane_doubles import ready_pane
 
 PROFILE_TEXT = 'Shared role: write legacy ../docs here.'
 
@@ -32,6 +33,7 @@ def owned_runtime(engine, project='alpha'):
     rt.state.put('agent:business-analyst', {'provider': selection.provider, 'model': selection.model,
                                             'pane_id': 'p1', 'state': 'ready', 'session_name': name})
     gateway.list_agents.return_value = [{'name': name, 'pane_id': 'p1', 'agent_status': 'idle'}]
+    ready_pane(gateway, rt.factory.resolve(agent='business-analyst')[1])
     return ctx, rt, gateway
 
 

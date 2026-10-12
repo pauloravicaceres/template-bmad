@@ -21,12 +21,23 @@ class StateStore:
     def __init__(self, root):
         self.root = root.workspace_root if isinstance(root, ProjectContext) else Path(root).resolve()
         directory = state_directory(root)
-        directory.mkdir(parents=True, exist_ok=True)
         if isinstance(root, ProjectContext):
             root.output(str((directory / 'state.sqlite3').relative_to(root.workspace_root)))
+        self._connect(directory)
+
+    def _connect(self, directory):
+        directory.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(directory / 'state.sqlite3', timeout=5)
         self.db.execute('CREATE TABLE IF NOT EXISTS records (id TEXT PRIMARY KEY, data TEXT NOT NULL)')
         self.db.commit()
+
+    @classmethod
+    def in_directory(cls, directory):
+        """Store whose state directory is already resolved (e.g. ProjectContext.state_dir of a tracker)."""
+        store = cls.__new__(cls)
+        store.root = Path(directory).resolve().parent
+        store._connect(Path(directory))
+        return store
 
     @classmethod
     def open_readonly(cls, root):
@@ -95,6 +106,13 @@ class ProjectLock:
         self.path = path
         self.handle = None
 
+    @classmethod
+    def at(cls, path):
+        """Lock on an explicit file (already validated by its caller)."""
+        lock = cls.__new__(cls)
+        lock.name, lock.path, lock.handle = Path(path).stem, Path(path), None
+        return lock
+
     def acquire(self):
         """True when this handle now owns the lock; False when another handle (any process) owns it."""
         if self.handle:
@@ -153,7 +171,14 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description='Inspect/reconcile metadata without replaying model operations.')
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1], help='Engine root (legacy alias).')
     add_project_arguments(parser)
-    parser.add_argument('--acknowledge', help='Mark an inspected uncertain event as handled; does not retry it.')
+    parser.add_argument('--acknowledge', help='Mark an inspected uncertain event as handled; does not retry it. For '
+                        'tracker_append IDs it only records the review: the delivery state and the blocking remain.')
+    parser.add_argument('--reconcile', metavar='tracker_append:ID',
+                        help='Re-check the tracker evidence of a lost/uncertain engine append; never writes the tracker.')
+    parser.add_argument('--authorize-reissue', metavar='tracker_append:ID',
+                        help='Acknowledged, lost and verified absent: let its producer write it once more.')
+    parser.add_argument('--accept-loss', metavar='tracker_append:ID',
+                        help='Acknowledged, lost and verified absent: close the incident without writing it again.')
     parser.add_argument('--rebaseline-tracker', action='store_true',
                         help='After inspecting a rewritten tracker, treat its complete lines as processed; never replays them.')
     parser.add_argument('--release-followup', metavar='ROL',
@@ -167,15 +192,38 @@ def main(argv=None):
     except (AttributeError, ValueError):
         pass
     context = resolve_context(args.root, workspace=args.workspace, project=args.project)
-    with project_lock(context, 'watcher'), project_lock(context, 'fleet'), project_lock(context, 'speckit'):
+    # 'tracker' excludes the engine's own appends (tracker_io) while a rebaseline or acknowledgement runs.
+    with project_lock(context, 'watcher'), project_lock(context, 'fleet'), project_lock(context, 'speckit'), \
+            project_lock(context, 'tracker'):
         store = StateStore(context)
         try:
-            if args.acknowledge:
+            journal_actions = [(name, getattr(args, name)) for name in ('reconcile', 'authorize_reissue', 'accept_loss')
+                               if getattr(args, name)]
+            if args.acknowledge and args.acknowledge.startswith('tracker_append:'):
+                journal_actions.insert(0, ('acknowledge', args.acknowledge))
+            elif args.acknowledge:
                 if not args.confirm or not args.acknowledge.startswith(('event:', 'dispatch:', 'queued:', 'protocol_violation:')):
-                    parser.error('Acknowledgement requires --confirm and an event/dispatch/queued/protocol_violation ID.')
+                    parser.error('Acknowledgement requires --confirm and an event/dispatch/queued/protocol_violation/'
+                                 'tracker_append ID.')
+                previous = (store.get(args.acknowledge) or {}).get('state')
                 store.finish(args.acknowledge, 'done')
                 # Lets session planning treat the inspected event as resolved; never as confirmed.
-                store.put(args.acknowledge, {**store.get(args.acknowledge), 'acknowledged': time.time()})
+                store.put(args.acknowledge, {**store.get(args.acknowledge), 'acknowledged': time.time(),
+                                             'acknowledged_state': previous})
+            if journal_actions:
+                from .tracker_io import TrackerWriter
+                writer = TrackerWriter.for_context(context)
+                for name, key in journal_actions:
+                    if not args.confirm or not key.startswith('tracker_append:'):
+                        parser.error(f'--{name.replace("_", "-")} requires --confirm and a tracker_append ID.')
+                    try:     # this process already holds the tracker lock: pass the store
+                        result = getattr(writer, name)(key, store=store)
+                    except ReconciliationRequired as exc:
+                        parser.error(str(exc))
+                    if name != 'reconcile':
+                        result = {'op': key, 'state': result['state'], 'acknowledged': bool(result.get('acknowledged')),
+                                  'resolution': (result.get('resolution') or {}).get('kind')}
+                    print(json.dumps({'action': name, **result}, ensure_ascii=False))
             if args.release_followup:
                 followup = store.get('followup') or {}
                 entry = followup.get(args.release_followup)

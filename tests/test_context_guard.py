@@ -15,6 +15,7 @@ from bmad_runtime.technical_context import assemble
 from tests.test_session_lifecycle import ARTIFACT, FakeProvider, SessionCase, block, registry
 from tests.test_session_maintenance import MaintenanceCase
 from test_multiworkspace import engine, new_project  # noqa: F401  (pytest fixture)
+from tests.pane_doubles import ready_pane
 
 BA, SA = 'business-analyst', 'solutions-architect'
 
@@ -442,6 +443,7 @@ def test_task_references_policy_in_contract_without_losing_instructions(engine):
         rt.state.put('agent:' + BA, {'provider': selection.provider, 'model': selection.model, 'pane_id': 'p1',
                                      'state': 'ready', 'session_name': name})
         gateway.list_agents.return_value = [{'name': name, 'pane_id': 'p1', 'agent_status': 'idle'}]
+        ready_pane(gateway, rt.factory.resolve(agent=BA)[1])
         before = ctx.instructions() + assemble(ctx, role=BA) + TRACKER_RULE
         assert rt.dispatcher.dispatch(BA, 'p1', '@BA: Redacta la HU 001.', 'ev-4c')
         task = ctx.output(rt.state.get('dispatch:ev-4c')['task_file']).read_text(encoding='utf-8')

@@ -25,6 +25,7 @@ from bmad_runtime.services import interactive_command
 from bmad_runtime.state import project_lock
 from bmad_runtime.watcher_service import WatcherService
 from bmad_runtime.workspace import bootstrap, migrate
+from tests.pane_doubles import ready_pane
 
 
 @pytest.fixture
@@ -231,6 +232,7 @@ def test_mock_fleet_ownership_and_stop_only_active_project(engine):
         owned = rt.state.get('agent:business-analyst')
         gateway.list_agents.return_value = [{'name': a.session_name('business-analyst'), 'pane_id': owned['pane_id'], 'agent_status': 'idle'}]
         assert rt.dispatcher.info('business-analyst')[0] == owned['pane_id']
+        ready_pane(gateway, rt.factory.resolve(agent='business-analyst')[1])
         assert rt.dispatcher.dispatch('business-analyst', owned['pane_id'], 'write', 'one')
         task = rt.state.get('dispatch:one')['task_file']
         assert str(a.tracker_path) in a.output(task).read_text(encoding='utf-8')

@@ -12,11 +12,13 @@ from bmad_runtime.providers import Capabilities, default_registry
 from bmad_runtime.runtime import Runtime
 from bmad_runtime.state import StateStore, project_lock
 from bmad_runtime.watcher_service import WatcherService
+from tests.pane_doubles import ready_pane
 
 
 class FakeProvider:
     identifier = 'fake'
     herdr_kind = 'fake'
+    screen_profile = 'claude'   # pane_state: idle Claude-like composer
     capabilities = Capabilities(True, True, True, True)
 
     def __init__(self, executable):
@@ -53,6 +55,7 @@ class ServiceTests(unittest.TestCase):
         self.gateway.list_agents.return_value = []
         self.gateway.create_tab.side_effect = [('t1', 'p1'), ('t2', 'p2'), ('t3', 'p3')]
         self.gateway.split.side_effect = [f'split{i}' for i in range(10)]
+        ready_pane(self.gateway)
         self.runner = Mock()
         self.runner.run.return_value = Result(0, 'done')
         self.rt = Runtime(self.root, registry=registry, gateway=self.gateway, runner=self.runner)

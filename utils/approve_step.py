@@ -163,6 +163,9 @@ def main(argv=None):
     context = resolve_context(Path(__file__).resolve().parent.parent, workspace=args.workspace, project=args.project)
     global DIRECTORIO_RAIZ, TRACKER_PATH
     DIRECTORIO_RAIZ, TRACKER_PATH = context.workspace_root, context.tracker_path
+    # Lo que el humano revisa es el tracker hasta aquí: si otra decisión humana llega antes de registrar la suya,
+    # la aprobación se rechaza en lugar de duplicar el handoff (sin retener el lock durante la revisión).
+    revisado_hasta = TRACKER_PATH.stat().st_size if TRACKER_PATH.exists() else 0
     print("\n" + "="*60)
     print(" 🛡️  SISTEMA DE APROBACIÓN MANUAL (HITL) - FRAMEWORK BMAD ")
     print("="*60)
@@ -221,27 +224,20 @@ def main(argv=None):
     else:
         print(f"\n📄 Archivo detectado en el tracker: {archivo_detectado}")
         
-    # 2. APERTURA AUTOMÁTICA DEL ARCHIVO (Búsqueda multi-ruta resiliente)
-    candidatos_ruta = [
-        DIRECTORIO_RAIZ / "docs" / config["folder"] / archivo_detectado,
-        DIRECTORIO_RAIZ / ".specify" / archivo_detectado,
-        DIRECTORIO_RAIZ / "specs" / archivo_detectado,
-        DIRECTORIO_RAIZ / "docs" / "business-analyst" / archivo_detectado,
-        DIRECTORIO_RAIZ / archivo_detectado
-    ]
-    ruta_fisica = None
-    for cand in candidatos_ruta:
-        if cand.exists():
-            ruta_fisica = cand
-            break
-            
-    if ruta_fisica:
-        print(f"🔍 Abriendo archivo para revisión humana ({ruta_fisica.name})...")
-        abrir_archivo_en_so(ruta_fisica)
-    else:
-        ruta_defecto = DIRECTORIO_RAIZ / "docs" / config["folder"] / archivo_detectado
-        print(f"⚠️ El archivo está referenciado en el tracker pero no existe físicamente en:\n{ruta_defecto}")
-        
+    # 2. Ubicación del entregable con el clasificador compartido (bmad_runtime.artifacts): solo el workspace
+    # seleccionado y los directorios de la compuerta; nunca la primera coincidencia ni otro proyecto.
+    clasificacion = clasificar_artefacto(context, config["folder"], archivo_detectado)
+    if clasificacion is None:
+        sys.exit(1)
+    if clasificacion.path and clasificacion.status == "PRESENT":
+        print(f"🔍 Abriendo archivo para revisión humana ({clasificacion.path})...")
+        abrir_archivo_en_so(DIRECTORIO_RAIZ / clasificacion.path)
+    elif clasificacion.status == "EXTERNAL_ALLOWED":
+        print(f"🔗 Referencia externa autorizada (no se abre automáticamente): {clasificacion.url}")
+    for aviso in clasificacion.warnings():
+        print(f"⚠️ [{aviso['code']}] {aviso['detail']}")
+    artefacto_registrado = clasificacion.path or clasificacion.url or archivo_detectado
+
     # 3. Confirmación humana
     confirmacion = input(f"\n❓ ¿Deseas autorizar formalmente el avance hacia la siguiente fase? (s/n): ").strip().lower()
     
@@ -249,8 +245,13 @@ def main(argv=None):
         # 4. Formatear y despachar el mensaje de delegación
         mensaje_final = config['message'].format(file=archivo_detectado)
         
-        registrar_aprobacion(mensaje_final, archivo_detectado)
-            
+        from bmad_runtime.errors import BMADRuntimeError
+        try:
+            registrar_aprobacion(mensaje_final, artefacto_registrado, revisado_hasta)
+        except BMADRuntimeError as exc:
+            print(f"\n❌ No se registró la aprobación: {exc}")
+            sys.exit(1)
+
         print("\n✅ Aprobación registrada con éxito en el tracker.")
         print(f"📝 Se ha añadido al bus de eventos:\n>> {mensaje_final}\n")
         
@@ -259,20 +260,48 @@ def main(argv=None):
     else:
         print("\n🛑 Aprobación cancelada. El flujo permanece en pausa HITL segura.")
 
-def registrar_aprobacion(mensaje, artefacto):
-    """A human approval starts its own block and releases the preceding HITL gate."""
+def clasificar_artefacto(context, folder, referencia, preguntar=None):
+    """Clasificación aceptable del entregable de la opción `folder`, o None si se rechaza (nada se escribe).
+
+    OUTSIDE y OTHER_PROJECT se rechazan; AMBIGUOUS lista los candidatos y pide al humano la ruta exacta (nunca se
+    elige uno); MISSING/FUTURE continúan con advertencia (modo warn), como antes la apertura fallida."""
+    from bmad_runtime.artifacts import AMBIGUOUS, ArtifactClassifier, load_policy, rule_for_folder
+    policy = load_policy(context.engine_root)
+    rule = rule_for_folder(folder, policy)
+    clasificador = ArtifactClassifier.for_context(context)
+    clasificacion = clasificador.classify(referencia, rule)
+    if clasificacion.status == AMBIGUOUS:
+        print(f"\n⚠️ {clasificacion.detail}")
+        exacta = (preguntar or input)("✍️ Ingrese la ruta relativa exacta del entregable (vacío para cancelar): ").strip()
+        if not exacta:
+            print("Operación cancelada.")
+            return None
+        clasificacion = clasificador.classify(exacta, rule)
+    if clasificacion.rejected:
+        print(f"❌ Artefacto rechazado ({clasificacion.status}): {clasificacion.detail} No se registra la aprobación.")
+        return None
+    return clasificacion
+
+
+def registrar_aprobacion(mensaje, artefacto, revisado_hasta=None):
+    """A human approval starts its own block and releases the preceding HITL gate.
+
+    `revisado_hasta`: tracker size when the human started reviewing; a human decision recorded after it
+    (e.g. from the Control Center) aborts this one without writing (tracker_io.TrackerConflict)."""
     from datetime import datetime
+    from bmad_runtime.tracker_io import TrackerWriter, no_human_block_since
     now = datetime.now()
     lines = mensaje.splitlines()
     macros = [line for line in lines if line.startswith('@WATCHER: GITOPS-')]
     handoff = ' '.join(line for line in lines if line not in macros)
-    with open(TRACKER_PATH, 'a', encoding='utf-8') as handle:
-        handle.write(f"\n### [{now:%d-%m-%Y}] HUMANO\n- **Hora:** {now:%H:%M:%S}\n"
-                     f"- **Artefacto generado:** `{artefacto}`\n- **Estado:** APPROVE\n"
-                     "- **⚠️ Puntos Abiertos:** Ninguno.\n")
-        for macro in macros:
-            handle.write(macro + '\n')
-        handle.write(f'- **Handoff:** {handoff}\n')
+    bloque = (f"\n### [{now:%d-%m-%Y}] HUMANO\n- **Hora:** {now:%H:%M:%S}\n"
+              f"- **Artefacto generado:** `{artefacto}`\n- **Estado:** APPROVE\n"
+              "- **⚠️ Puntos Abiertos:** Ninguno.\n"
+              + ''.join(macro + '\n' for macro in macros)
+              + f'- **Handoff:** {handoff}\n')
+    TrackerWriter(TRACKER_PATH).append(
+        bloque, source='approve_step',
+        precondition=no_human_block_since(revisado_hasta) if revisado_hasta is not None else None)
 
 
 if __name__ == "__main__":

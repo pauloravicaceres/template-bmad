@@ -197,7 +197,8 @@ class ApproveStepTests(unittest.TestCase):
         self.temp.cleanup()
 
     def _main(self, respuestas):
-        contexto = SimpleNamespace(workspace_root=self.root, tracker_path=self.tracker)
+        contexto = SimpleNamespace(workspace_root=self.root, tracker_path=self.tracker, project_id='legacy',
+                                   engine_root=Path(self.approve.__file__).resolve().parents[1])
         config = {clave: dict(valor) for clave, valor in self.approve.APPROVAL_CONFIG.items()}
         with patch('bmad_runtime.context.resolve_context', return_value=contexto), \
                 patch.object(self.approve, 'APPROVAL_CONFIG', config), \

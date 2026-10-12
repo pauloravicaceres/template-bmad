@@ -10,6 +10,7 @@ import sys
 import time
 import uuid
 
+from . import pane_state
 from .config import AGENT_PHASES
 from .context import ROLE_ALIASES, absolute_path, add_project_arguments, resolve_context
 from .errors import (AgentBlocked, BMADRuntimeError, ConfigurationError, DeliveryRejected, ReconciliationRequired,
@@ -160,6 +161,11 @@ def _same_path(left, right):
     return os.path.normcase(str(Path(left).resolve())).rstrip('\\/') == os.path.normcase(str(Path(right).resolve())).rstrip('\\/')
 
 
+def probe_nonce():
+    """Maintenance probe id without digits: typed into a menu by mistake, a digit selects an option (E5.2)."""
+    return uuid.uuid4().hex[:12].translate(str.maketrans('0123456789', 'ghijklmnop'))
+
+
 def _iso(stamp=None):
     return datetime.fromtimestamp(stamp if stamp is not None else time.time()).astimezone().isoformat(timespec='seconds')
 
@@ -175,6 +181,8 @@ class SessionMaintenance:
     def __init__(self, runtime, *, clock=time.monotonic, sleep=time.sleep, now=time.time):
         self.rt, self.clock, self.sleep, self.now = runtime, clock, sleep, now
         self.state, self.context, self.gateway = runtime.state, runtime.context, runtime.gateway
+        # Same per-pane locks as the dispatcher (they live in the workspace state directory).
+        self.gate = pane_state.PaneGate(self.gateway, self.context, sleep=sleep, clock=clock)
 
     # Persistence -------------------------------------------------------------------------------
     def _put(self, op, *extra):
@@ -273,16 +281,45 @@ class SessionMaintenance:
 
     def _check_blocker(self, op, provider):
         """H10: Herdr reports the CLI ready while it waits for a dialog; nothing is answered automatically."""
-        blocker = self.rt.dispatcher.blocker(provider, op['pane_id'])
+        blocker = self.gate.blocker(provider, op['pane_id'])
         if blocker:
             self._evidence(op, 'blocker', blocker=blocker)
             self._fail(op, 'REQUIRES_INTERVENTION',
                        f'{blocker} on screen; answer it manually in pane {op["pane_id"]} (never automated)',
                        uncertain=False, hold='awaiting_trust')
 
+    def _require_ready(self, op, provider, *, status=None, wait=False):
+        """Fase 4F-E5.2.1: nothing is written to the pane unless it is READY_VERIFIED (pane_state).
+
+        A dialog holds the agent as 'awaiting_trust'; an exited CLI, a running turn or an ambiguous screen as
+        'unverified'. Either way only maintenance --reconcile releases it, after a new verification.
+        wait=True (after a launch, /clear or a human decision): a busy or still-rendering screen is read again
+        until ready_timeout_s; a dialog or an exited CLI ends the wait at once. Nothing is written meanwhile.
+        """
+        last = {}
+
+        def settled():
+            last['observation'] = self.gate.observe(provider, op['pane_id'], herdr_status=status)
+            observation = last['observation']
+            done = observation.ready or observation.state in (*pane_state.HUMAN_STATES, pane_state.EXITED)
+            return observation if done or not wait else None
+        observation = self._poll(self.ready_timeout_s, settled) or last['observation']
+        self._evidence(op, 'screen', **observation.as_dict())
+        if observation.ready:
+            return observation
+        if observation.state in pane_state.HUMAN_STATES:
+            self._evidence(op, 'blocker', blocker=observation.blocker)
+            self._fail(op, 'REQUIRES_INTERVENTION',
+                       f'{observation.blocker} on screen; answer it manually in pane {op["pane_id"]} (never automated)',
+                       uncertain=False, hold='awaiting_trust')
+        self._fail(op, 'REQUIRES_INTERVENTION',
+                   f'pane {op["pane_id"]} is not verified ready ({observation.state}: {observation.reason}); '
+                   'nothing was written', uncertain=False, hold='unverified')
+
     # Pane shell (H8) ---------------------------------------------------------------------------
     def _probe_pwsh(self, pane):
         nonce = uuid.uuid4().hex[:8]
+        pane_state.require_shell(self.gateway, pane)
         self.gateway.run_in_pane(pane, pane_pwsh_probe(nonce))
         found = self._poll(self.shell_timeout_s,
                            lambda: parse_pwsh_probe(self.gateway.read(pane, 40, source='recent-unwrapped'), nonce))
@@ -302,6 +339,7 @@ class SessionMaintenance:
         observed = self._probe_pwsh(pane)
         evidence = {'checked': True, 'pane_pwsh': observed or None, 'repaired': False}
         if store_alias(observed):
+            pane_state.require_shell(self.gateway, pane)
             self.gateway.run_in_pane(pane, PANE_PATH_REPAIR)
             observed = self._probe_pwsh(pane)
             evidence.update(repaired=True, pane_pwsh_after=observed or None)
@@ -315,10 +353,12 @@ class SessionMaintenance:
     def start_agent(self, session, pane, provider, native):
         """herdr agent start; when it fails because the CLI shows a dialog (Herdr 0.8.2 may report it 'blocked'
         and time out, or 'idle'), the failure is diagnosed as AgentBlocked instead of an uncertain launch."""
+        # `herdr agent start` types the launch command into the pane: only into its shell.
+        pane_state.require_shell(self.gateway, pane)
         try:
             self.gateway.start(session, pane, provider, native)
         except BMADRuntimeError as exc:
-            blocker = self.rt.dispatcher.blocker(provider, pane)
+            blocker = self.gate.blocker(provider, pane)
             if blocker:
                 raise AgentBlocked(f'{blocker} on screen in pane {pane}; answer it manually (never automated), then run '
                                    'maintenance --reconcile ROL --confirm.') from exc
@@ -403,8 +443,13 @@ class SessionMaintenance:
         problems, _ = self.identity(name, owned, provider, selection)
         if problems:
             raise ReconciliationRequired(f'{name}: Herdr identity changed since the eligibility check ({", ".join(problems)}).')
-        if self.rt.dispatcher.blocker(provider, owned['pane_id']):
-            raise ReconciliationRequired(f'{name}: a dialog waits for a human answer in pane {owned["pane_id"]}.')
+        observation = self.gate.observe(provider, owned['pane_id'], herdr_status=row['herdr_status'])
+        if observation.state in pane_state.HUMAN_STATES:
+            raise ReconciliationRequired(f'{name}: a dialog waits for a human answer in pane {owned["pane_id"]} '
+                                         f'({observation.blocker}).')
+        if not observation.ready:
+            raise ReconciliationRequired(f'{name}: pane {owned["pane_id"]} is not verified ready '
+                                         f'({observation.state}: {observation.reason}); nothing was sent.')
         return selection, provider, owned, row
 
     # Operations --------------------------------------------------------------------------------
@@ -449,32 +494,37 @@ class SessionMaintenance:
                                 'sources': source_digests(self.context, name)})
 
     def _clear(self, op, provider, selection):
-        self._advance(op, 'CLEARING')
-        try:
-            self.gateway.submit(op['pane_id'], provider.clear_instruction())
-        except DeliveryRejected as exc:
-            self._fail(op, 'FAILED', f'/clear rejected before sending ({exc})', uncertain=False)
-        except BMADRuntimeError as exc:
-            self._fail(op, 'REQUIRES_INTERVENTION', f'/clear delivery uncertain ({exc})', uncertain=True)
+        with self.gate.exclusive(op['pane_id']):
+            # An Enter typed into a dialog answers it: /clear goes only to a verified idle composer.
+            self._require_ready(op, provider)
+            self._advance(op, 'CLEARING')
+            try:
+                self.gateway.submit(op['pane_id'], provider.clear_instruction())
+            except DeliveryRejected as exc:
+                self._fail(op, 'FAILED', f'/clear rejected before sending ({exc})', uncertain=False)
+            except BMADRuntimeError as exc:
+                self._fail(op, 'REQUIRES_INTERVENTION', f'/clear delivery uncertain ({exc})', uncertain=True)
         self._evidence(op, 'clear_submitted', command='/clear')
         self.sleep(self.poll_s)
         # /clear keeps the same CLI process: the agent must still be ours, in the same pane.
-        self._wait_ready(op, provider)
-        self._check_blocker(op, provider)
+        entry = self._wait_ready(op, provider)
+        self._require_ready(op, provider, status=entry.get('agent_status'), wait=True)
         self._require_identity(op, provider, selection)
         self._advance(op, 'VERIFYING')
-        self._verify(op)
+        self._verify(op, provider)
         self._complete(op)
 
     def _rotate(self, op, provider, selection):
-        self._advance(op, 'STOPPING')
-        try:
-            self.gateway.submit(op['pane_id'], '/exit')
-        except DeliveryRejected as exc:
-            self._fail(op, 'FAILED', f'/exit rejected before sending ({exc})', uncertain=False)
-        except BMADRuntimeError as exc:
-            # The command may still have arrived; the observed process state decides.
-            self._evidence(op, 'exit_delivery_uncertain', error=str(exc)[:300])
+        with self.gate.exclusive(op['pane_id']):
+            self._require_ready(op, provider)
+            self._advance(op, 'STOPPING')
+            try:
+                self.gateway.submit(op['pane_id'], '/exit')
+            except DeliveryRejected as exc:
+                self._fail(op, 'FAILED', f'/exit rejected before sending ({exc})', uncertain=False)
+            except BMADRuntimeError as exc:
+                # The command may still have arrived; the observed process state decides.
+                self._evidence(op, 'exit_delivery_uncertain', error=str(exc)[:300])
 
         def exited():
             entry = self._entry(op['session_name'])
@@ -503,10 +553,10 @@ class SessionMaintenance:
             self._fail(op, 'REQUIRES_INTERVENTION', f'relaunch failed ({exc})', uncertain=True)
         entry = self._wait_ready(op, provider)
         self._evidence(op, 'relaunched', herdr_status=entry.get('agent_status'))
-        self._check_blocker(op, provider)
+        self._require_ready(op, provider, status=entry.get('agent_status'), wait=True)
         self._require_identity(op, provider, selection)
         self._advance(op, 'VERIFYING')
-        self._verify(op)
+        self._verify(op, provider)
         self._complete(op)
 
     def verify(self, name, *, initial=False, coordinated=True):
@@ -540,12 +590,12 @@ class SessionMaintenance:
 
     def _run_verify(self, op, provider, selection, *, fresh_required):
         try:
-            self._wait_ready(op, provider)
-            self._check_blocker(op, provider)
+            entry = self._wait_ready(op, provider)
+            self._require_ready(op, provider, status=entry.get('agent_status'), wait=True)
             self._require_identity(op, provider, selection)
             self._advance(op, 'VERIFYING')
             write_contract(self.context, op['agent'])
-            self._verify(op, allow_previous_context=not fresh_required)
+            self._verify(op, provider, allow_previous_context=not fresh_required)
         except ReconciliationRequired:
             owned = self.state.get('agent:' + op['agent']) or {}
             if owned.get('state') == 'ready':
@@ -554,18 +604,21 @@ class SessionMaintenance:
             raise
         return self._complete(op)
 
-    def _verify(self, op, *, allow_previous_context=False):
+    def _verify(self, op, provider, *, allow_previous_context=False):
         """Ask the agent to reload its current contract and prove role, project, workspace, profile and memory."""
-        name, nonce = op['agent'], uuid.uuid4().hex[:12]
+        name, nonce = op['agent'], probe_nonce()
         path = self.context.state_dir / 'maintenance' / f'{nonce}.md'
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open('x', encoding='utf-8', newline='\n') as handle:
             handle.write(probe_text(self.context, name, nonce))
         relative = path.relative_to(self.context.workspace_root).as_posix()
-        try:
-            self.gateway.prompt(op['pane_id'], f'[BMAD-MANT {nonce}] Lee y ejecuta íntegramente {relative}')
-        except BMADRuntimeError as exc:
-            self._fail(op, 'REQUIRES_INTERVENTION', f'verification request not delivered ({exc})', uncertain=True)
+        with self.gate.exclusive(op['pane_id']):
+            # Final check right before writing (E5.2: the probe was typed into a Codex trust menu).
+            self._require_ready(op, provider)
+            try:
+                self.gateway.prompt(op['pane_id'], f'[BMAD-MANT {nonce}] Lee y ejecuta íntegramente {relative}')
+            except BMADRuntimeError as exc:
+                self._fail(op, 'REQUIRES_INTERVENTION', f'verification request not delivered ({exc})', uncertain=True)
         expected = {'nonce': nonce, 'role': name, 'project_id': self.context.project_id,
                     'workspace': str(self.context.workspace_root),
                     'digests': list(source_digests(self.context, name).values())}
@@ -650,10 +703,11 @@ class SessionMaintenance:
                                              f'relaunch it manually with: {command} ; then run --reconcile again.{shell}')
             if entry.get('agent_status') not in READY:
                 raise ReconciliationRequired(f'{name} is {entry.get("agent_status")}; wait or inspect before reconciling.')
-            self._check_blocker(op, provider)
+            # A human decision (e.g. trust granted by hand) only enables this new check; it never implies ready.
+            self._require_ready(op, provider, status=entry.get('agent_status'), wait=True)
             self._require_identity(op, provider, selection)
             write_contract(self.context, name)
-            fresh = self._verify(op, allow_previous_context=True)
+            fresh = self._verify(op, provider, allow_previous_context=True)
             return self._complete(op, fresh=fresh, resolution={
                 'at': _iso(self.now()), 'by': 'operator',
                 'outcome': 'fresh_context_verified' if fresh else 'previous_context_verified'})

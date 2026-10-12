@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 from typing import Protocol
 
+from . import pane_state
 from .commands import Command, Result
 from .config import Selection
 from .errors import ConfigurationError, UnsupportedCapability
@@ -215,17 +216,17 @@ class ClaudeProvider:
     def clear_instruction(self):
         return '/clear'
 
-    def interaction_blocker(self, screen):
-        """'trust_dialog' while Claude asks whether to trust the workspace folder.
+    # pane_state.PROFILES: positive evidence of an idle composer; the runtime writes to the pane only then.
+    screen_profile = 'claude'
 
-        Herdr reports the CLI idle and ready during this dialog, and the Enter of a prompt picks the
-        highlighted option (observed: 'No, exit'). Never answered automatically.
+    def interaction_blocker(self, screen):
+        """'trust_dialog', 'permission_dialog' or 'selection_menu' when Claude waits for a human answer, else None.
+
+        Herdr reports the CLI idle and ready during these dialogs, and the Enter of a prompt picks the
+        highlighted option (observed: 'No, exit'). Never answered automatically. None does not mean ready:
+        writers require pane_state READY_VERIFIED.
         """
-        text = ' '.join((screen or '').split()).lower()
-        if re.search(r'trust (this|the files in this) folder|do you trust', text) and \
-                re.search(r'no, exit|enter to confirm|yes, i trust', text):
-            return 'trust_dialog'
-        return None
+        return pane_state.classify(self.screen_profile, screen).blocker
 
 
 class CodexProvider:
@@ -346,12 +347,15 @@ class CodexProvider:
         # /clear drops the role: Codex receives its contract as the first message, not as system prompt.
         raise UnsupportedCapability('Codex loses its role on /clear; use --rotate.')
 
+    screen_profile = 'codex'
+
     def interaction_blocker(self, screen):
-        """'trust_dialog' if Codex asks to trust the working directory; never answered automatically."""
-        text = ' '.join((screen or '').split()).lower()
-        if re.search(r'trust the (contents of this|files in this) (directory|folder)|do you trust', text):
-            return 'trust_dialog'
-        return None
+        """Name of a dialog only a human may answer, else None (which does not mean ready).
+
+        Codex 0.162 asks per Git repository: "Folder access … Trust this folder? › 1. Trust and continue / 2. Quit";
+        a digit selects an option and Enter accepts the highlighted one. Never answered automatically.
+        """
+        return pane_state.classify(self.screen_profile, screen).blocker
 
 
 class GeminiProvider:

@@ -108,13 +108,14 @@ applyTo: '**'
 ---
 
 ## 8. ORDEN DE DELEGACIÓN PARA EL TRACKER
-*(Instrucción para cerrar la rama GitOps y gatillar Spec Kit Implement hacia la Fase D)*
+*(Instrucción para gatillar la Fase D. QA Tech nunca fusiona ni cierra la rama de la HU: el cierre corresponde exclusivamente a Code Review, después de certificar la implementación.)*
 
-Obligatorio inyectar la macro de cierre de rama antes de gatillar Spec Kit, en líneas separadas:
+Según el alcance de la HU, anexa en tu bloque del tracker, en líneas separadas, solo las órdenes que correspondan (Full-Stack: ambas; Headless: solo backend; estrictamente visual: solo frontend):
 ```markdown
-@WATCHER: GITOPS-MERGE-CLOSE feat/{{XXX}}-{{nombre_corto}}
-@SPEC-KIT: La arquitectura técnica consolidada ha sido verificada y aprobada en tech-design_{{nombre_corto}}.md. Gatillar /speckit.implement para despacho de tareas a la Fase D (@DEV-BACK, @DEV-FRONT, @DEVOPS).
+@DEV-BACK: La arquitectura técnica ha sido validada en tech-design_{{nombre_corto}}.md. Inicia la implementación del Backend.
+@DEV-FRONT: La arquitectura técnica ha sido validada en tech-design_{{nombre_corto}}.md. Inicia la implementación del Frontend.
 ```
+No escribas macros del Watcher (apertura o cierre de rama, congelamiento), no invoques a Spec Kit ni al humano y no las cites en tu texto: el Watcher detecta estas órdenes y ejecuta la Fase D.
 
 ---
 
