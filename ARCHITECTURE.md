@@ -211,8 +211,8 @@ flowchart LR
 | Almacén | Contenido | Escritor |
 |---|---|---|
 | `handoffs/tracker_bmad.md` | Bus de handoffs: bloques `### [fecha] Autor` con artefacto, estado y línea `Handoff` | Agentes, watcher, scripts humanos, dashboard |
-| `state/state.sqlite3`, tabla `records(id, data)` | `agent:`, `tab:`, `run:`, `dispatch:`, `event:`, `queued:`, `tracker_cursor`, `followup`, `session:`, `maintenance:`, `watcher`, `progress:`, `guard_alert:`, `guard_ack:`, `guard_artifacts` | Flota, servicios, watcher, mantenimiento, guard |
-| `state/*.lock` | Locks de SO `bootstrap`, `fleet`, `watcher`, `speckit`, `maintenance`, `sessions` (el watcher lo toma en cada ciclo) | `project_lock()`, `ProjectLock` |
+| `state/state.sqlite3`, tabla `records(id, data)` | `agent:`, `tab:`, `run:`, `dispatch:`, `event:`, `queued:`, `tracker_cursor`, `followup`, `session:`, `maintenance:`, `watcher`, `progress:`, `guard_alert:`, `guard_ack:`, `guard_artifacts`, `hu_lifecycle`, `hu_lifecycle:` (observación de HU, no autoritativa), `hu_authority`, `hu_op:`, `hu_resolution:` (Fase 4F-E4, solo con `enforce`) | Flota, servicios, watcher, mantenimiento, guard |
+| `state/*.lock` | Locks de SO `bootstrap`, `fleet`, `watcher`, `speckit`, `maintenance`, `sessions` (el watcher lo toma en cada ciclo), `hu` (E4: apertura/cierre de HU, por proyecto) | `project_lock()`, `ProjectLock` |
 | `.specify/memory/` | Constitución local, `rework_state.json`, `rework_last_classification.md` | Spec Kit, QT, watcher |
 | `docs/`, `specs/`, `app/` | Entregables por rol, especificaciones y código | Agentes y CLIs headless |
 | `logs/guard.log` | Alertas del guard (JSONL) cuando suben de nivel | `guard.py` |
@@ -413,6 +413,104 @@ globales, cada tarea se retiene por agente: mantenimiento sin reconciliar, `HOLD
 del guard en modo `enforce`, seguimiento activo o agente ocupado en Herdr. La pausa humana no se
 persiste: `is_tracker_paused_for_human()` la recalcula leyendo el último bloque con handoff. Una
 detención por `ReconciliationRequired` sale con código 1 y exige inspección antes de reanudar.
+
+### Una HU abierta por proyecto (Fase 4F-E4, `ai.hu_lifecycle.mode = enforce`)
+
+Política: cada proyecto mantiene como máximo una HU abierta desde su `GITOPS-BRANCH-CREATE` autorizado
+hasta que su `GITOPS-MERGE-CLOSE` se completa y Git lo verifica. Varios agentes trabajan sobre la HU
+abierta; proyectos con repositorios independientes avanzan en paralelo (el lock `hu` está en el
+directorio de estado de cada proyecto; no existe un bloqueo global). `observe` (por defecto) y `off`
+conservan el comportamiento anterior. `enforce` solo se activa explícitamente: `ai.hu_lifecycle` del
+motor o, para un proyecto aislado, `config.ai.hu_lifecycle` en su `project.json`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> free
+    free --> opening: BRANCH-CREATE autorizado (reserva persistida antes de Git)
+    opening --> active: rama verificada (existe y HEAD en ella)
+    opening --> free: Git sin cambios (fallo o caída antes de Git)
+    opening --> reconcile_required: Git cambió pero no se verifica
+    active --> closing: MERGE-CLOSE autorizado tras la confirmación humana
+    closing --> free: punta reservada integrada en la base (merge-base --is-ancestor)
+    closing --> active: Git sin cambios (fallo o caída antes del merge)
+    closing --> reconcile_required: conflicto, merge sin confirmar o evidencia dudosa
+    reconcile_required --> free: reconciliación humana closed/abandoned con evidencia
+    reconcile_required --> active: reconciliación humana active con evidencia
+```
+
+| Vista del proyecto | BRANCH-CREATE misma HU | BRANCH-CREATE otra HU |
+| --- | --- | --- |
+| `no_open_hu` | permitir (`HU_OPEN_ALLOWED`) | permitir |
+| `one_open_hu` | reanudar sin abrir otra (`HU_OPEN_RESUME`) | rechazar (`HU_ANOTHER_OPEN`) |
+| `opening` | reanudar | rechazar (`HU_OPENING_IN_PROGRESS`) |
+| `closing` | rechazar (`HU_CLOSING_IN_PROGRESS`) | rechazar |
+| `reconcile_required` / `unknown` | rechazar (`HU_RECONCILE_REQUIRED` / `HU_STATE_UNKNOWN`) | rechazar |
+
+La vista combina la reserva `hu_authority` con la observación E3 en vivo; una reserva `active` que
+Git no corrobora es `reconcile_required` y un fallo de observación es `unknown`, nunca "libre". El
+watcher decide cada macro con el historial anterior a su línea. Secuencia autoritativa: lock `hu` →
+revalidar Git, tracker y SQLite → reservar (`hu_op:<id>` estable por evento + `hu_authority`) →
+ejecutar la macro → verificar Git → confirmar → liberar. La confirmación humana del cierre (`input`)
+corre fuera del lock y la estrategia `--no-ff` no cambia.
+
+Rechazo (corrección D5): la macro rechazada no ejecuta Git ni checkout, su evento termina `done` con
+`outcome: rejected`, las tareas aún en cola de líneas anteriores del bloque se retiran y ninguna
+línea posterior del mismo bloque se despacha (`outcome: suppressed`). Se emite un bloque `WATCHER`
+con `@HUMANO:` (op_id `hu-notice-<id>`, idempotente), que además pausa el flujo. Las dependencias de
+un bloque solo se despachan si su operación está `confirmed`: reconocer el evento (`state
+--acknowledge`), reiniciar o una caída no las autorizan. Tras reiniciar, `recover()` resuelve una
+reserva `opening`/`closing` interrumpida con evidencia Git (o la deja en `reconcile_required`), se
+reemiten los avisos pendientes y la hidratación solo reactiva la HU abierta demostrada.
+
+Repositorios compartidos (worktree enlazado o principal con worktrees enlazados, mismo
+`git-common-dir`): sus ramas no se pueden atribuir a un proyecto y se rechaza con
+`HU_SHARED_REPOSITORY`. Reconciliación humana: `python -m bmad_runtime.hu_enforcement --inspect` y
+`--reconcile <HU> --as active|closed|abandoned --reason ... --confirm` (watcher detenido); se registra
+en `hu_resolution:<HU>` ligada a la evidencia que resolvió, con autor, fecha e historial.
+
+### Outbox de respuestas de agentes (Fase 4F-E5, `ai.outbox.mode`)
+
+`direct` (por defecto) conserva el comportamiento anterior: el agente anexa su bloque al tracker.
+`both` y `outbox` son opt-in (motor o `config.ai.outbox` del `project.json` de un proyecto aislado):
+el despacho fija y persiste su canal; en canal outbox el agente publica un único archivo en
+`<BMAD_HANDOFFS>/outbox/<event24>-<attempt>.md` entre marcas con la identidad del despacho y un
+nonce, y el watcher es el único que lo escribe en el tracker con TrackerWriter (op_id
+`outbox:<event_id>:<attempt>`). El canal pertenece al despacho: cambiar de modo y reiniciar no
+reinterpreta despachos existentes, y un mismo despacho nunca acepta dos entregas.
+
+```mermaid
+stateDiagram-v2
+    [*] --> expected: despacho persistido antes de enviar la tarea
+    expected --> writing: archivo sin marca final
+    writing --> ready: marca final con el nonce
+    expected --> ready: publicación completa o rename atómico
+    ready --> validating: contenido idéntico tras settle_seconds
+    validating --> ingesting: identidad, rol, formato y macros válidos (intención persistida)
+    ingesting --> confirmed: TrackerWriter done y bytes presentes; queued confirmado en la misma transacción
+    validating --> rejected: inválido, rol o proyecto ajeno, macro no autorizada
+    validating --> reconcile_required: despacho incierto, handoff reconocido o escalado, bloque directo
+    ingesting --> reconcile_required: append incierto o perdido (nunca se repara solo)
+    rejected --> [*]: reconocido por un humano (no entregado)
+    reconcile_required --> rejected: --reject con el bloque ausente del tracker
+```
+
+Cada ciclo del watcher ingiere antes de leer el tracker: el bloque incorporado sigue el camino de
+siempre (macros, enforce E4, extracción de handoffs, auditoría de protocolo). `audit_blocks` solo
+acepta para un despacho outbox el bloque ingerido (`confirmed_block`); un bloque directo del agente
+es una violación de protocolo. Rechazos e incertidumbres marcan el handoff `requiere_intervencion`,
+emiten un bloque `WATCHER` con `@HUMANO:` y retienen los despachos hasta `python -m
+bmad_runtime.outbox --acknowledge|--reject KEY --confirm`. El vigilante no confirma un despacho
+outbox por un bloque del tracker: recuerda la ruta asignada y escala sin inventar respuesta.
+
+Handoff humano (E5.1, ambos canales): bloque producido → incorporado y verificado → handoff confirmado
+(técnico) → intervención humana pendiente → decisión humana recibida. La confirmación corre aunque el flujo
+esté en pausa, pero la pausa solo la levanta un bloque humano posterior (`paused_for_human`); nada que
+requiera aprobación se despacha antes. `python -m bmad_runtime.outbox --inspect` muestra los hitos, la
+evidencia de cada entrega, los motivos de bloqueo y el procedimiento de recuperación.
+
+Consistencia de configuración: el watcher persiste sus políticas efectivas (`watcher_policy`) y avisa
+si su `--config` difiere de la configuración por defecto; `python -m bmad_runtime.outbox --status`
+muestra las diferencias y el Control Center aplica `enforce` de HU si el watcher en ejecución lo usa.
 
 ### Mantenimiento supervisado (CLEAR, ROTATE y VERIFY)
 
@@ -816,6 +914,15 @@ Limitaciones actuales:
   vigilante) ese agente no recibe otra tarea, aunque Herdr lo muestre `idle`.
 
 ### Deuda técnica conocida
+
+- **Outbox (E5/E5.1) sin piloto real:** el protocolo está verificado con dobles de Claude, Codex y Herdr;
+  falta comprobar en vivo que cada CLI publica el archivo con sus herramientas de edición y respeta las
+  marcas. Las sesiones headless de Spec Kit siguen sin canal outbox: un bloque suyo (`DEV-BACK`/`DEV-FRONT`)
+  se audita (`blocked_write:`) y no ejecuta ni despacha nada; con una macro, además, pausa con `@HUMANO:`.
+  Un bloque con autor del motor (`WATCHER`, `Senior … Developer`) cuya cabecera no está en el journal de
+  TrackerWriter se trata igual. Las líneas sin cabecera anexadas a un bloque ajeno siguen sin atribución.
+  En modo `direct`, un agente interactivo aún puede emitir una macro que su contrato no le asigna: los
+  contratos ya no la ordenan (prueba de contratos), pero solo el canal outbox lo rechaza.
 
 - **Ventana entre consulta y despacho:** el watcher lee el estado del agente en Herdr
   (`obtener_info_agente`) y `AgentDispatcher.dispatch` lo vuelve a consultar antes de enviar. Si

@@ -128,7 +128,7 @@ Ejemplo de overrides para el objeto `config` de `project.json`:
 | `ai.git.auto_commit` | Solo global | `false` | Desactiva el autosave; freeze y macros GitOps siguen escribiendo |
 | `ai.limits` | Solo global | `{"command_timeout":120,"headless_timeout":1800,"max_output_bytes":1048576,"max_processes":1}` | Límites por `CommandRunner` |
 | `ai.limits.operation_timeouts` | Solo global | `{"implement":3600}` | Timeout en segundos (1–86400) por operación Spec Kit (`specify`, `clarify`, `plan`, `tasks`, `analyze`, `converge`, `implement`); las omitidas usan `headless_timeout`. Al vencer se termina el árbol de procesos y la operación queda `timeout` |
-| `ai.tracker` | Solo global | `{"settle_seconds":4,"rewrite_grace_seconds":10}` | Lectura segura del tracker (enteros 0–3600). `settle_seconds`: espera antes de aceptar una última línea sin salto final que ya no cambia. `rewrite_grace_seconds`: tolerancia ante reescrituras o truncamientos transitorios antes de suspender. Con `0` se procesa la línea y se suspende de inmediato, como antes |
+| `ai.tracker` | Solo global | `{"settle_seconds":4,"rewrite_grace_seconds":10}` | Lectura segura del tracker (enteros 0–3600). `settle_seconds`: espera antes de aceptar una última línea sin salto final que ya no cambia. `rewrite_grace_seconds`: tolerancia ante reescrituras o truncamientos transitorios antes de suspender. Con `0` se procesa la línea y se suspende de inmediato, como antes. Opcional `lock_timeout_seconds` (por defecto 5): espera máxima del lock de escritura del tracker (`tracker_io`) antes de fallar sin escribir |
 | `ai.guard` | Solo global | `{"mode":"observe"}` | Presupuesto de contexto y loop guard (ver [Presupuesto de contexto y bucles](#presupuesto-de-contexto-y-bucles)). Omitido = `observe` con valores conservadores |
 | `projects` | Raíz global | `{"proyecto-a":"../Proyecto A"}` | Selección por ID; rutas relativas al archivo |
 
@@ -255,11 +255,16 @@ Recuperación, con el watcher detenido:
   [Ciclo de vida de sesiones](#ciclo-de-vida-de-sesiones)). El watcher retiene, sin despachar, las
   tareas de agentes en `starting`, `awaiting_trust`, `unverified` o `maintenance`.
 - Diálogo de confianza: la primera vez en un workspace, Claude Code pregunta si confiar en la
-  carpeta. Herdr puede darlo por listo (`idle`) o `blocked`, y un Enter elegiría una opción. El
-  runtime lee la pantalla visible antes de verificar o despachar; si ve el diálogo no escribe nada,
-  deja el agente en `awaiting_trust` y pide intervención. El runtime nunca lo responde ni modifica
-  la configuración de Claude: respóndelo tú en el panel y ejecuta `--reconcile ROL --confirm`,
-  que vuelve a verificar identidad, rol y workspace antes de liberar el despacho.
+  carpeta, y Codex 0.162 lo hace por repositorio Git («Folder access … Trust this folder? › 1. Trust
+  and continue / 2. Quit»). Herdr puede darlo por listo (`idle`) o `blocked`; un Enter o un dígito
+  elegiría una opción. Antes de cada escritura (tarea, recordatorio, sonda de VERIFY, `/clear`,
+  `/exit`, `--reconcile`) el runtime clasifica la pantalla visible y el proceso del panel
+  (`bmad_runtime/pane_state.py`) y escribe solo si ve el compositor vacío del CLI esperado
+  (`READY_VERIFIED`), bajo un lock por panel. Un diálogo deja el agente en `awaiting_trust`; un CLI
+  terminado o una pantalla ambigua persistente, en `unverified`; una pantalla ocupada solo aplaza
+  la tarea. El runtime nunca responde diálogos ni modifica la configuración de Claude o Codex:
+  respóndelo tú en el panel y ejecuta `--reconcile ROL --confirm`, que vuelve a comprobar pantalla,
+  proceso, identidad, rol y workspace antes de liberar el despacho.
 - Protocolo de ejecución: el watcher es el único despachador y el tracker no es una cola. El
   contrato y la orden de arranque lo indican, y el watcher lo comprueba de forma determinista:
   cada bloque cuyo autor corresponde a un agente debe responder a un despacho (`followup` activo o
