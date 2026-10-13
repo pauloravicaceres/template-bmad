@@ -64,10 +64,17 @@
         },
         "speckit": {
             "clarify": {
-                "provider": "claude"
+                "provider": "claude",
+                "options": {
+                    "effort": "medium"
+                }
             },
             "implement": {
-                "provider": "codex"
+                "provider": "codex",
+                "options": {
+                    "sandbox": "workspace-write",
+                    "effort": "medium"
+                }
             }
         },
         "git": {
