@@ -9,8 +9,8 @@ Desde la raíz del motor, tras [instalar las dependencias](../../SETUP.md):
 ```powershell
 $Engine = (Get-Location).Path
 $Python = Join-Path $Engine 'bmad-control-center/backend/.venv/Scripts/python.exe'
-$env:BMAD_WORKSPACE = Join-Path (Split-Path $Engine -Parent) 'Proyecto A'
-$env:BMAD_PROJECT = 'proyecto-a'
+$env:BMAD_WORKSPACE = 'D:\Paulo\Proyectos\lead-board'
+$env:BMAD_PROJECT = 'lead-board'
 & $Python -m uvicorn main:app --app-dir (Join-Path $Engine 'bmad-control-center/backend') --host 127.0.0.1 --port 8001
 ```
 

@@ -50,7 +50,8 @@
             "business-analyst": {
                 "provider": "claude",
                 "options": {
-                    "effort": "medium"
+                    "effort": "medium",
+                    "permission_mode": "bypass"
                 }
             },
             "solutions-architect": {
@@ -66,7 +67,8 @@
             "clarify": {
                 "provider": "claude",
                 "options": {
-                    "effort": "medium"
+                    "effort": "medium",
+                    "permission_mode": "bypass"
                 }
             },
             "implement": {
@@ -81,5 +83,8 @@
             "auto_commit": false
         }
     },
-    "projects": {}
+    "projects": {
+        "lead-board": "D:/Paulo/Proyectos/lead-board"
+    }
 }
+
