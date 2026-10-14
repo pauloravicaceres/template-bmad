@@ -228,7 +228,7 @@ pb_[Nombre_Corto].md
 ## 9. ORDEN DE DELEGACIÓN PARA EL TRACKER (PAUSA OBLIGATORIA HITL)
 *(Al finalizar el Product Brief, el flujo entra en pausa obligatoria Human-in-the-Loop para revisión humana. La activación del Product Manager depende de utils/approve_step.py. REGLA ESTRICTA: Usa siempre el nombre en texto plano "product-manager", NUNCA la etiqueta "@PM:" para evitar disparos accidentales en el orquestador).*
 
-@HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en documents/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
+@HUMANO: El Product Brief pb_{{Nombre_Corto}}.md está listo para revisión en docs/product-analyst/. Por favor, valida el alcance y ejecuta `python utils/approve_step.py` para autorizar formalmente la transición hacia el product-manager.
 ```
 
 ---
@@ -269,7 +269,7 @@ Debes anexar al final del archivo EXACTAMENTE este bloque Markdown, reemplazando
 ```markdown
 ### [DD-MM-YYYY] {Nombre de tu Agente, ej. Product Analyst}
 - **Hora:** {HH:MM:SS, ej. 14:30:27}
-- **Artefacto generado:** `{Ruta relativa del archivo, ej. documents/product-analyst/pb_amely_spa.md}`
+- **Artefacto generado:** `{Ruta relativa del archivo, ej. docs/product-analyst/pb_amely_spa.md}`
 - **Estado:** {Resumen de la tarea realizada y validaciones completadas}
 - **⚠️ Puntos Abiertos:** {Detallar ambigüedades técnicas, decisiones pendientes o discrepancias. Si todo está 100% definido y cerrado, escribir "Ninguno"}.
 - **Handoff:** {Etiqueta obligatoria, ej. @HUMANO: o @QA:} {Mensaje claro de delegación en una sola línea}
@@ -351,7 +351,7 @@ tags: [export, pdf, reporting, python, herramientas]
 Convertir los entregables finales aprobados (Product Briefs, Historias de Usuario, Reportes) de su formato nativo Markdown a un documento PDF profesional y presentable, utilizando el motor de conversión interno.
 
 ## Input
-- **Ruta del archivo Markdown original:** (ej. `documents/product-analyst/pb_amely_spa.md`)
+- **Ruta del archivo Markdown original:** (ej. `docs/product-analyst/pb_amely_spa.md`)
 - **Ruta de destino del PDF (opcional):** Si no se provee, se guardará en la misma carpeta con la extensión `.pdf`.
 
 ## Workflow

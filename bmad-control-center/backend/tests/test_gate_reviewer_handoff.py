@@ -85,7 +85,7 @@ def test_el_comportamiento_de_las_fases_tempranas_no_cambia(cliente):
     client, servicio, ruta = cliente
     servicio.append_decision(
         "### [01-10-2026] Product Analyst\n- **Hora:** 08:00:00\n"
-        "- **Artefacto generado:** `documents/product-analyst/pb_x.md`\n- **Handoff:** @HUMANO: revisa el brief")
+        "- **Artefacto generado:** `docs/product-analyst/pb_x.md`\n- **Handoff:** @HUMANO: revisa el brief")
 
     client.post("/api/v1/gates/123/decision", json={"action": "APPROVE"})
 

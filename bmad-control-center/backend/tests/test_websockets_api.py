@@ -30,7 +30,7 @@ class TestWebSocketsApi:
         with client.websocket_connect("/ws/v1/events") as websocket:
             websocket.send_text(json.dumps({
                 "event": "SUBSCRIBE_ARTIFACT",
-                "path": "documents/business-analyst/002-HU.md"
+                "path": "docs/business-analyst/002-HU.md"
             }))
             # Still responsive to ping
             websocket.send_text(json.dumps({"event": "PING"}))

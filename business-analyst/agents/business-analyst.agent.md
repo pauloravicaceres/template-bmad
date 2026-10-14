@@ -15,8 +15,8 @@ argument-hint: 'Instrucción del @PM: o @QA: leída desde el tracker_bmad.md'
 | Variable | Descripción |
 |---|---|
 | `RUTA_CONFIGURACION` | Ruta absoluta al `config_bmad.json` del proyecto activo |
-| `CARPETA_SALIDA` | `business-analyst` — clave en `routes_bmad` donde se guardan las HUs Técnicas (`documents/business-analyst/`) |
-| `CARPETA_SALIDA_STAKEHOLDERS` | Subcarpeta `documents/business-analyst/HUs-stakeholders/` donde se guardan las HUs de Stakeholders |
+| `CARPETA_SALIDA` | `business-analyst` — clave en `routes_bmad` donde se guardan las HUs Técnicas (`docs/business-analyst/`) |
+| `CARPETA_SALIDA_STAKEHOLDERS` | Subcarpeta `docs/business-analyst/HUs-stakeholders/` donde se guardan las HUs de Stakeholders |
 | `CARPETA_ENTRADA_PB` | `product-analyst` — clave donde reside el Product Brief |
 | `CARPETA_ENTRADA_MVP` | `product-manager` — clave donde reside el Plan de Gestión |
 | `CARPETA_ENTRADA_QA` | `qa-documental` — clave donde reside el feedback de rechazo |

@@ -6,9 +6,9 @@ from datetime import datetime
 def init_project(nombre_proyecto):
     # Definición de rutas relativas al script
     DIRECTORIO_RAIZ = Path(__file__).resolve().parent
-    DIR_documents = DIRECTORIO_RAIZ / "documents"
+    DIR_docs = DIRECTORIO_RAIZ / "docs"
     CONFIG_PATH = DIRECTORIO_RAIZ / "config_bmad.json"
-    TRACKER_PATH = DIR_documents / "tracker_bmad.md"
+    TRACKER_PATH = DIR_docs / "tracker_bmad.md"
     
     # Ecosistema de carpetas (Microservicios de Agentes)
     carpetas_agentes = [
@@ -35,14 +35,14 @@ def init_project(nombre_proyecto):
     # 1. Scaffolding: Crear estructura física inmutable
     rutas_absolutas = {}
     for carpeta in carpetas_agentes:
-        ruta = DIR_documents / carpeta
+        ruta = DIR_docs / carpeta
         ruta.mkdir(parents=True, exist_ok=True)
         # Se guardan las rutas como strings absolutos para evitar fallos de lectura en los LLMs
         rutas_absolutas[carpeta] = str(ruta.resolve())
-        print(f"📁 Estructura verificada: documents/{carpeta}/")
+        print(f"📁 Estructura verificada: docs/{carpeta}/")
         
     # Subcarpeta obligatoria para estrategia Dual-Output de HUs
-    (DIR_documents / "business-analyst" / "HUs-stakeholders").mkdir(parents=True, exist_ok=True)
+    (DIR_docs / "business-analyst" / "HUs-stakeholders").mkdir(parents=True, exist_ok=True)
 
     # Asegurar carpeta de contexto para la constitución del sistema (Gobernanza)
     dir_context = DIRECTORIO_RAIZ / ".specify" / "memory"

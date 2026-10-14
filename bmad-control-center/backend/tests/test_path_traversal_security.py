@@ -9,10 +9,10 @@ import api.artifacts as artifacts_module
 @pytest.fixture
 def sandbox_client(tmp_path):
     """Fixture providing isolated workspace and client for security audit."""
-    documents_dir = tmp_path / "documents"
+    docs_dir = tmp_path / "docs"
     specs_dir = tmp_path / "specs"
     specify_dir = tmp_path / ".specify"
-    documents_dir.mkdir()
+    docs_dir.mkdir()
     specs_dir.mkdir()
     specify_dir.mkdir()
 
@@ -21,7 +21,7 @@ def sandbox_client(tmp_path):
     secret_env.write_text("SUPER_SECRET_KEY=12345", encoding="utf-8")
 
     # Valid file inside sandbox
-    valid_file = documents_dir / "valid.md"
+    valid_file = docs_dir / "valid.md"
     valid_file.write_text("# Valid File", encoding="utf-8")
 
     service = ArtifactService(workspace_root=tmp_path)
@@ -35,7 +35,7 @@ class TestPathTraversalSecurity:
 
     def test_validate_sandbox_path_direct_unit_rejects_parent_escape(self, sandbox_client):
         _, ws_root = sandbox_client
-        allowed = ["documents", "specs", ".specify"]
+        allowed = ["docs", "specs", ".specify"]
 
         with pytest.raises(PathTraversalError):
             validate_sandbox_path("../.env", allowed_roots=allowed, workspace_root=ws_root)
@@ -48,7 +48,7 @@ class TestPathTraversalSecurity:
 
     def test_validate_sandbox_path_direct_unit_rejects_double_url_encoding(self, sandbox_client):
         _, ws_root = sandbox_client
-        allowed = ["documents", "specs", ".specify"]
+        allowed = ["docs", "specs", ".specify"]
 
         # Double URL encoded ../
         double_encoded = "%252e%252e%252f.env"
@@ -57,10 +57,10 @@ class TestPathTraversalSecurity:
 
     def test_validate_sandbox_path_direct_unit_rejects_null_bytes(self, sandbox_client):
         _, ws_root = sandbox_client
-        allowed = ["documents", "specs", ".specify"]
+        allowed = ["docs", "specs", ".specify"]
 
         with pytest.raises(PathTraversalError):
-            validate_sandbox_path("documents/valid.md\x00.exe", allowed_roots=allowed, workspace_root=ws_root)
+            validate_sandbox_path("docs/valid.md\x00.exe", allowed_roots=allowed, workspace_root=ws_root)
 
     def test_get_artifacts_content_with_relative_escape_returns_403_path_traversal(self, sandbox_client):
         client, _ = sandbox_client
@@ -75,7 +75,7 @@ class TestPathTraversalSecurity:
     def test_get_artifacts_content_with_deep_escape_returns_403(self, sandbox_client):
         client, _ = sandbox_client
 
-        response = client.get("/api/v1/artifacts/content?path=documents/../../../../etc/shadow")
+        response = client.get("/api/v1/artifacts/content?path=docs/../../../../etc/shadow")
 
         assert response.status_code == 403
         data = response.json()

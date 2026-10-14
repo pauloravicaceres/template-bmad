@@ -24,7 +24,7 @@ Esto significa que el humano solo debe resolver el conflicto en Git manualmente 
 Para asegurar una trazabilidad absoluta entre el modelo de negocio, el control de versiones y los artefactos físicos (crítico en escenarios Brownfield), el ecosistema emplea la convención estricta `XXX-HU_[nombre_corto]`, donde `XXX` es un correlativo numérico de 3 dígitos (ej. `001`, `002`).
 Esta nomenclatura nace obligatoriamente en el **Product State Ledger** (`specs/README.md`) calculado por el `@PM`, y debe permear simétricamente en:
 1. El nombre de la rama GitOps (`feat/XXX-HU_[nombre]`).
-2. El nombre del archivo físico de la Historia de Usuario en el disco (`documents/business-analyst/XXX-HU_[nombre].md`).
+2. El nombre del archivo físico de la Historia de Usuario en el disco (`docs/business-analyst/XXX-HU_[nombre].md`).
 3. Los Hand-offs y registros en el Tracker.
 4. La carpeta de especificación de Spec Kit (`specs/XXX-HU_[nombre]/`): el Watcher la fija de forma explícita (`SPECIFY_FEATURE_DIRECTORY`) al ejecutar `/speckit-specify`, de modo que Spec Kit no genere su propio nombre ni su propio correlativo, y verifica al terminar que `.specify/feature.json` apunte a ella; si no, detiene la fase.
 

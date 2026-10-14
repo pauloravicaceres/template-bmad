@@ -11,7 +11,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
       // Arrange
       const mockStatus: PerimeterStatusResponse = {
         perimeter_active: true,
-        allowed_roots: ['documents', 'specs', '.specify'],
+        allowed_roots: ['docs', 'specs', '.specify'],
         ignored_external_events_count: 14,
         policy: 'STRICT_FSaaDB_SANDBOX',
         monitored_paths_count: 3,
@@ -27,7 +27,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
       // Assert
       expect(wrapper.text()).toContain('Perímetro de Seguridad (Sandbox FSaaDB)')
       expect(wrapper.text()).toContain('0 Fugas (Criterio SC-004)')
-      expect(wrapper.text()).toContain('[✓] documents')
+      expect(wrapper.text()).toContain('[✓] docs')
       expect(wrapper.text()).toContain('[✓] specs')
       expect(wrapper.text()).toContain('[✓] .specify')
       expect(wrapper.text()).toContain('14 eventos')
@@ -41,7 +41,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
 
       // Assert
       expect(wrapper.text()).toContain('Perímetro de Seguridad')
-      expect(wrapper.text()).toContain('[✓] documents')
+      expect(wrapper.text()).toContain('[✓] docs')
       expect(wrapper.text()).toContain('0 eventos')
     })
   })
@@ -50,7 +50,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
     it('Render_ConMetadatosDeArchivoExtenso_DebeMostrarAdvertenciaDe5MBYTamanoFormateado', () => {
       // Arrange
       const mockMetadata: FileMetadataRecord = {
-        relative_path: 'documents/data-architect/huge_database_dump.sql',
+        relative_path: 'docs/data-architect/huge_database_dump.sql',
         filename: 'huge_database_dump.sql',
         size_bytes: 8388608, // 8 MB
         mime_type: 'application/sql',
@@ -68,7 +68,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
 
       // Assert
       expect(wrapper.text()).toContain('Artefacto Extenso Detectado (Política Metadata-Only)')
-      expect(wrapper.text()).toContain('documents/data-architect/huge_database_dump.sql')
+      expect(wrapper.text()).toContain('docs/data-architect/huge_database_dump.sql')
       expect(wrapper.text()).toContain('8 MB')
       expect(wrapper.text()).toContain('application/sql')
       expect(wrapper.text()).toContain('excede el umbral máximo de previsualización web (5 MB)')
@@ -79,7 +79,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
       // Arrange
       const wrapper = mount(LargeFileMetadataCard, {
         props: {
-          requestedPath: 'documents/test.log',
+          requestedPath: 'docs/test.log',
         },
       })
 
@@ -115,7 +115,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
         {
           event_id: 'ev-1',
           event_type: 'WORKFLOW_UPDATED',
-          resource_path: 'documents/tracker_bmad.md',
+          resource_path: 'docs/tracker_bmad.md',
           timestamp: '2026-10-01T02:35:00Z',
           coalesced_count: 1,
           payload: {
@@ -126,7 +126,7 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
         {
           event_id: 'ev-2',
           event_type: 'ARTIFACT_CHANGED',
-          resource_path: 'documents/business-analyst/003-HU.md',
+          resource_path: 'docs/business-analyst/003-HU.md',
           timestamp: '2026-10-01T02:36:00Z',
           coalesced_count: 5, // Coalescencia múltiple (SC-04 / CB-02)
           payload: {
@@ -145,10 +145,10 @@ describe('Observability & Notification Components (HU-003 QA Certification)', ()
       // Assert
       expect(wrapper.text()).toContain('2 eventos')
       expect(wrapper.text()).toContain('WORKFLOW_UPDATED')
-      expect(wrapper.text()).toContain('documents/tracker_bmad.md')
+      expect(wrapper.text()).toContain('docs/tracker_bmad.md')
       expect(wrapper.text()).toContain('QA Documental')
       expect(wrapper.text()).toContain('ARTIFACT_CHANGED')
-      expect(wrapper.text()).toContain('documents/business-analyst/003-HU.md')
+      expect(wrapper.text()).toContain('docs/business-analyst/003-HU.md')
       expect(wrapper.text()).toContain('⚡ Coalescencia: 5 mutaciones')
     })
   })

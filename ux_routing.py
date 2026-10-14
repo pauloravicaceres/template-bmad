@@ -36,7 +36,7 @@ def hu_desde_feature_json(raiz: RutaLike) -> Optional[Path]:
     except (OSError, ValueError):
         return None
     nombre = Path(str(feature.get("feature_directory", "")).replace("\\", "/")).name
-    ruta = raiz / "documents" / "business-analyst" / f"{nombre}.md"
+    ruta = raiz / "docs" / "business-analyst" / f"{nombre}.md"
     return ruta if nombre and ruta.exists() else None
 
 

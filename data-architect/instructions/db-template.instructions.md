@@ -82,7 +82,7 @@ erDiagram
 ---
 
 ### ⚠️ DIRECTIVA OBLIGATORIA DE TRAZABILIDAD UI / SPEC KIT -> DATA
-1. **Inspección Visual y Contractual de Datos:** El Data Architect audita `spec.md`, `tasks.md` y `documents/designer-ux/ux_*.md` (si existe diseño visual) antes de cerrar el MER.
+1. **Inspección Visual y Contractual de Datos:** El Data Architect audita `spec.md`, `tasks.md` y `docs/designer-ux/ux_*.md` (si existe diseño visual) antes de cerrar el MER.
 2. **Cero Campos Huérfanos:** Cada elemento de interfaz o entidad de contrato que requiera persistencia o cálculo debe tener su columna y tipo correspondiente en el Diccionario de Datos.
 3. **Excepción Headless:** Si el proyecto proviene de un Bypass Headless (sin `ux_*.md`), el modelo se deriva exclusivamente de los contratos de `spec.md`, `tasks.md` y `hu_*.md`.
 

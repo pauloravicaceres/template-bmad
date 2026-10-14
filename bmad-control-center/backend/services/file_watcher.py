@@ -158,7 +158,7 @@ class MultiDirectoryWatcherHandler(FileSystemEventHandler):
                 except Exception:
                     pass
 
-            debouncer.submit_event("documents/tracker_bmad.md", "WORKFLOW_UPDATED", _dispatch_workflow)
+            debouncer.submit_event("docs/tracker_bmad.md", "WORKFLOW_UPDATED", _dispatch_workflow)
         elif not event.is_directory:
             # 2. Artifact modified
             size_bytes, is_large_file, metadata_only, mime_type = self._get_file_info(event.src_path)
@@ -280,7 +280,7 @@ class FileWatcher:
         """Schedules observers for all allowed roots and tracker file."""
         handler = MultiDirectoryWatcherHandler(loop, callback)
 
-        # Watch each allowed root (documents, specs, .specify)
+        # Watch each allowed root (docs, specs, .specify)
         for root_name in self.watched_roots:
             dir_path = (self.workspace_root / root_name).resolve()
             if dir_path.exists() and dir_path.is_dir():

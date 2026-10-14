@@ -28,7 +28,7 @@ flowchart TB
         CLI_EXEC[["CLI Terminal<br><i>execute_command</i>"]]
     end
 
-    subgraph Almacenamiento ["documents/ - Aislamiento Físico de Entregables"]
+    subgraph Almacenamiento ["docs/ - Aislamiento Físico de Entregables"]
         DIR_CTX["📁 .specify/memory<br><i>constitution.md (Brownfield)</i>"]
         DIR_BS["📁 business-storyteller"]
         DIR_PA["📁 product-analyst"]
@@ -144,16 +144,16 @@ BMAD no utiliza bases de datos para su estado; el sistema de archivos local es l
 |---|---|---|---|
 | Rutas Absolutas | `config_bmad.json` | `init_bmad.py` | Todos vía `read_file` |
 | Contexto Invariante | `.specify/memory/constitution.md` | Operador / `@QT` | Arquitectos (Lex Superior) |
-| Bus de Handoffs | `documents/tracker_bmad.md` | Todos | `watcher_bmad.py` y agentes |
-| Product Briefs (PRD) | `documents/product-analyst/pb_*.md` | `@PA` | `@PM`, `@BA`, `@QA`, `@SA` |
-| Planes MVP | `documents/product-manager/mvp_*.md` | `@PM` | `@BA`, `@UX`, `@SA` |
-| HUs Técnicas BDD | `documents/business-analyst/hu_*.md` | `@BA` | Spec Kit, `@QA`, `@QA-AUTO` |
-| Certificados QA | `documents/qa-documental/qa_*.md` | `@QA` | Orquestador Python |
-| Wireframes | `documents/designer-ux/ux_*.md` | `@UX` | `@DEV-FRONT`, `@SA` |
-| Gobernanza Técnica | `documents/solutions-architect/tech_guidelines.md` | `@SA` | `@DA`, `@API`, `@QT`, Developers |
-| Diseño de Datos (MER) | `documents/data-architect/db_*.md` | `@DA` | `@API`, `@QT`, `@DEV-BACK` |
-| Contratos REST/GraphQL | `documents/api-architect/api_*.md` | `@API` | `@QT`, Developers |
-| TDD Maestro | `documents/qa-tech/tech-design_*.md` | `@QT` | Developers, `@DEVOPS` |
+| Bus de Handoffs | `docs/tracker_bmad.md` | Todos | `watcher_bmad.py` y agentes |
+| Product Briefs (PRD) | `docs/product-analyst/pb_*.md` | `@PA` | `@PM`, `@BA`, `@QA`, `@SA` |
+| Planes MVP | `docs/product-manager/mvp_*.md` | `@PM` | `@BA`, `@UX`, `@SA` |
+| HUs Técnicas BDD | `docs/business-analyst/hu_*.md` | `@BA` | Spec Kit, `@QA`, `@QA-AUTO` |
+| Certificados QA | `docs/qa-documental/qa_*.md` | `@QA` | Orquestador Python |
+| Wireframes | `docs/designer-ux/ux_*.md` | `@UX` | `@DEV-FRONT`, `@SA` |
+| Gobernanza Técnica | `docs/solutions-architect/tech_guidelines.md` | `@SA` | `@DA`, `@API`, `@QT`, Developers |
+| Diseño de Datos (MER) | `docs/data-architect/db_*.md` | `@DA` | `@API`, `@QT`, `@DEV-BACK` |
+| Contratos REST/GraphQL | `docs/api-architect/api_*.md` | `@API` | `@QT`, Developers |
+| TDD Maestro | `docs/qa-tech/tech-design_*.md` | `@QT` | Developers, `@DEVOPS` |
 | Código Fuente & Tests | Repositorio Raíz (Git) | Fase D | `@CODE-REVIEW`, CI/CD |
 
 ---

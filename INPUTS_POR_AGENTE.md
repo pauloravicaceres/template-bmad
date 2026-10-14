@@ -71,7 +71,7 @@ Entregables: `mvp_[nombre_corto].md`, filas del ledger y macro `GITOPS-BRANCH-CR
 | `.specify/memory/constitution.md` | Escenarios y DoD de no regresión | Condicional (Brownfield) | `CARPETA_CONTEXTO` |
 | `instructions/hu-template`, `hu-stakeholders-template`, `business-analysis-standards`, `anti-hallucination-policy` | Plantilla técnica (incluye `Requiere interfaz: Sí\|No`), plantilla para stakeholders, INVEST | Obligatoria | `instructions/` |
 
-Entregables: `documents/business-analyst/NNN-HU_nombre.md` y `.../HUs-stakeholders/NNN-HU_nombre.md` → handoff `@QA:`.
+Entregables: `docs/business-analyst/NNN-HU_nombre.md` y `.../HUs-stakeholders/NNN-HU_nombre.md` → handoff `@QA:`.
 
 ## 5. QA Documental (`@QA:`)
 
@@ -94,7 +94,7 @@ Solo interviene si el Watcher decide la ruta `@UX:` (ver `SETUP.md`: `project_ty
 | `.specify/feature.json` | Saber cuál es la carpeta de la HU en curso | Obligatoria | Tabla MCP paso 2 |
 | `specs/NNN-HU_nombre/spec.md` | Fuente primaria de la especificación | Bloqueante si falta | `CARPETA_SPECS` |
 | `specs/NNN-HU_nombre/checklists/requirements.md` | Requisitos verificables | Obligatoria | `CARPETA_SPECS` |
-| `documents/business-analyst/NNN-HU_*.md` | Historia técnica (campo `Requiere interfaz`) | Obligatoria | `CARPETA_ENTRADA_HU` |
+| `docs/business-analyst/NNN-HU_*.md` | Historia técnica (campo `Requiere interfaz`) | Obligatoria | `CARPETA_ENTRADA_HU` |
 | `tracker_bmad.md` | Instrucción recibida y registro del handoff al `@SA:` | Obligatoria | `TRACKER` |
 | `instructions/ux-design-standards`, `ux-deliverable-template`, `anti-hallucination-policy` | Reglas de diseño y formato del entregable | Obligatoria | `instructions/` |
 
@@ -163,7 +163,7 @@ DEV-BACK y DEV-FRONT no son paneles: el Watcher los ejecuta de forma headless co
 
 | Paso del Watcher | Entrada | Para qué | Tipo |
 |---|---|---|---|
-| Fase de negocio (`specify` + `clarify`) | `documents/business-analyst/NNN-HU_*.md` (ruta extraída del mensaje de aprobación QA) | Generar `spec.md` de la HU | Obligatoria (sin ruta, se detiene) |
+| Fase de negocio (`specify` + `clarify`) | `docs/business-analyst/NNN-HU_*.md` (ruta extraída del mensaje de aprobación QA) | Generar `spec.md` de la HU | Obligatoria (sin ruta, se detiene) |
 | Fase de negocio | Respuesta humana a la ambigüedad | Resolver `clarify` | Condicional: solo si Spec Kit detecta ambigüedad |
 | `SDD-FREEZE` (plan, tasks, analyze) | `tech_guidelines.md` + `spec.md` + constitución | Congelar la arquitectura y generar `plan.md`/`tasks.md` | Obligatoria |
 | Fase de implementación | Mensaje `@DEV-BACK:`/`@DEV-FRONT:` con "arquitectura" | Disparar `implement` con alcance (backend/frontend) | Obligatoria |
@@ -179,7 +179,7 @@ DEV-BACK y DEV-FRONT no son paneles: el Watcher los ejecuta de forma headless co
 | `.specify/memory/constitution.md` | Reglas inmutables (VSA, PostgreSQL, Carter, Mapster…) | Obligatoria | Misión |
 | `Shared/Contracts` (código existente) | Clases base antes de programar | Obligatoria | Algoritmo paso 2 |
 | `tasks.md`, `plan.md`, `spec.md` de la HU | Tareas a implementar (vía Spec Kit) | Obligatoria | Pipeline Spec Kit |
-| `templates/backend-architecture-template.md` | Estructura de `documents/dev-backend/backend-architecture.md` | Obligatoria al terminar la HU | Regla de arquitectura viva |
+| `templates/backend-architecture-template.md` | Estructura de `docs/dev-backend/backend-architecture.md` | Obligatoria al terminar la HU | Regla de arquitectura viva |
 | `README.md` de la capa | Actualizar si hubo cambios significativos | Condicional (gatillo de actualización) | Regla de documentación viva |
 | `instructions/zero-hallucination-policy` | Cero placeholders, mocks ni librerías fantasma | Obligatoria | `instructions/` |
 
@@ -191,7 +191,7 @@ DEV-BACK y DEV-FRONT no son paneles: el Watcher los ejecuta de forma headless co
 | `ux_*.md` (wireframes) | Esqueleto visual a calcar | Condicional: solo si hubo diseño UX | Algoritmo paso 1 |
 | `.specify/memory/constitution.md` | Directivas visuales (Skeleton vs Theme) | Obligatoria | Misión |
 | `tasks.md`, `plan.md`, `spec.md` de la HU | Tareas a implementar (vía Spec Kit) | Obligatoria | Pipeline Spec Kit |
-| `templates/frontend-architecture-template.md` | Estructura de `documents/dev-frontend/frontend-architecture.md` | Obligatoria al terminar la HU | Regla de arquitectura viva |
+| `templates/frontend-architecture-template.md` | Estructura de `docs/dev-frontend/frontend-architecture.md` | Obligatoria al terminar la HU | Regla de arquitectura viva |
 | `README.md` de la capa | Actualizar si hubo cambios significativos | Condicional | Regla de documentación viva |
 | `instructions/zero-hallucination-policy` | Sin `any`, sin legacy Angular, sin CSS de maquetación | Obligatoria | `instructions/` |
 
@@ -216,8 +216,8 @@ DEV-BACK y DEV-FRONT no son paneles: el Watcher los ejecuta de forma headless co
 | Todos los archivos generados durante el ciclo de la HU (`.cs`, `.ts`, `.html`, `.spec.ts`) | Lectura física obligatoria, sin aprobar por el resumen del DEV | Obligatoria (skill `code-review-gatekeeper`) | Algoritmo paso 1 |
 | `.specify/memory/constitution.md` | Árbitro de las violaciones | Obligatoria | Algoritmo paso 2 |
 | Pruebas del QA-AUTO | Detectar pruebas tautológicas | Obligatoria | Gatekeeper §3 |
-| `documents/code-review/impact-analysis-report.md` | Actualización con renderizado selectivo | Obligatoria antes de aprobar o emitir el cierre | Regla de impacto |
-| `specs/README.md` y `documents/product-manager/mvp_*.md` | Decidir si entrega el turno al `@PM:` (épicas con alcance pendiente) | Obligatoria al aprobar | `rework-layer-labeling` regla 9 |
+| `docs/code-review/impact-analysis-report.md` | Actualización con renderizado selectivo | Obligatoria antes de aprobar o emitir el cierre | Regla de impacto |
+| `specs/README.md` y `docs/product-manager/mvp_*.md` | Decidir si entrega el turno al `@PM:` (épicas con alcance pendiente) | Obligatoria al aprobar | `rework-layer-labeling` regla 9 |
 | `instructions/secops-strict-audit`, `code-review-template`, `rework-layer-labeling` | Auditoría SecOps/rendimiento, formato del reporte, etiquetas de capa | Obligatoria | `instructions/` |
 
 Si aprueba: macro de cierre de rama (como línea propia) + handoff `@PM:`. Si rechaza: hallazgos etiquetados `[CAPA:*]` al agente responsable.

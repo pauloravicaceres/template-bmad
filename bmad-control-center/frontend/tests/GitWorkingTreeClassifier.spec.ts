@@ -7,7 +7,7 @@ describe('GitWorkingTreeClassifier Component', () => {
   const mockTree: GitWorkingTree = {
     staged: [
       {
-        relative_path: 'documents/business-analyst/004-HU_panel_telemetria.md',
+        relative_path: 'docs/business-analyst/004-HU_panel_telemetria.md',
         category: 'staged',
         status_code: '+',
         lines_added: 144,
@@ -16,14 +16,14 @@ describe('GitWorkingTreeClassifier Component', () => {
     ],
     unstaged: [
       {
-        relative_path: 'documents/tracker_bmad.md',
+        relative_path: 'docs/tracker_bmad.md',
         category: 'unstaged',
         status_code: 'M',
       },
     ],
     untracked: [
       {
-        relative_path: 'documents/qa-documental/aprobado_qa.md',
+        relative_path: 'docs/qa-documental/aprobado_qa.md',
         category: 'untracked',
         status_code: '??',
       },

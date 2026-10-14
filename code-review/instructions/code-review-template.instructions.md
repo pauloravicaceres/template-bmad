@@ -5,7 +5,7 @@ description: 'Plantilla maestra para la generación del Reporte de Impacto y Cod
 # 🏗️ PLANTILLA MAESTRA: REPORTE DE IMPACTO Y CODE REVIEW VIVO (`impact-analysis-report.md`)
 
 ## 🎯 OBJETIVO Y REGLA CRÍTICA DE RENDERIZADO SELECTIVO
-Este documento dicta la estructura obligatoria del archivo `impact-analysis-report.md` que debes crear o actualizar en `documents/code-review/` (ruta obligatoria: `documents/code-review/impact-analysis-report.md`) tras auditar el código de una Historia de Usuario (HU).
+Este documento dicta la estructura obligatoria del archivo `impact-analysis-report.md` que debes crear o actualizar en `docs/code-review/` (ruta obligatoria: `docs/code-review/impact-analysis-report.md`) tras auditar el código de una Historia de Usuario (HU).
 
 **🚨 REGLA CRÍTICA DE RENDERIZADO SELECTIVO:** 
 NO debes mapear la arquitectura de todo el repositorio desde cero en cada iteración. Al auditar una HU, debes mantener la estructura global del documento intacta y **SOLO modificar o generar los diagramas Mermaid y reportes correspondientes a los archivos, APIs y componentes alterados en la iteración/HU actual**. Las zonas del código no impactadas se ignoran o se declaran explícitamente como "Sin impacto en este PR/HU".

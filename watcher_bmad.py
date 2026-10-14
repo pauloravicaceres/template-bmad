@@ -25,7 +25,7 @@ if sys.platform.startswith('win'):
 # RUTAS Y DIRECTORIOS DINÁMICOS
 # ==========================================
 DIRECTORIO_RAIZ = Path(__file__).resolve().parent
-TRACKER_PATH = str(DIRECTORIO_RAIZ / "documents" / "tracker_bmad.md")
+TRACKER_PATH = str(DIRECTORIO_RAIZ / "docs" / "tracker_bmad.md")
 
 last_implement_trigger = 0
 
@@ -97,7 +97,7 @@ def sin_tokens(texto):
     return re.sub(r"@(?=[A-Za-z])", "", texto or "").replace("  ", " ").strip()
 
 NO_TOCAR_TRACKER = (
-    "NO escribas en documents/tracker_bmad.md ni emitas handoffs (@AGENTE:): el Watcher registra tu bloque y "
+    "NO escribas en docs/tracker_bmad.md ni emitas handoffs (@AGENTE:): el Watcher registra tu bloque y "
     "decide el siguiente agente. Un bloque propio despacharía a QA antes de tiempo."
 )
 
@@ -450,7 +450,7 @@ def registrar_seguimiento(agente, pane_id, ahora=None):
 
 def texto_recordatorio(agente):
     return (
-        "[WATCHER] Tu turno terminó pero NO hay un bloque tuyo nuevo en documents/tracker_bmad.md, y el flujo no puede "
+        "[WATCHER] Tu turno terminó pero NO hay un bloque tuyo nuevo en docs/tracker_bmad.md, y el flujo no puede "
         "avanzar sin él. Registra ahora tu resultado con la skill tracker-logger (formato estándar: Hora, Artefacto generado, "
         "Estado, Puntos Abiertos y Handoff con el token del siguiente agente). Si tu dictamen es RECHAZADO, etiqueta cada "
         "hallazgo con [CAPA:SPEC|PLAN|TASKS|CODE] y asigna DEV-BACK, DEV-FRONT o QA-AUTO en el Handoff. Si necesitas una "
@@ -636,7 +636,7 @@ def registrar_traspaso_fase_a(ruta_hu=None, resuelta_por_humano=False):
 def carpeta_spec_para_hu(ruta_hu):
     """
     Carpeta de Spec Kit para una HU: specs/<identificador universal>, derivada del nombre del archivo del BA
-    (documents/business-analyst/012-HU_nombre.md -> specs/012-HU_nombre). Así la carpeta lleva el mismo número y
+    (docs/business-analyst/012-HU_nombre.md -> specs/012-HU_nombre). Así la carpeta lleva el mismo número y
     nombre que el ledger y la rama, en lugar del "NNN-nombre-corto" que Spec Kit inventaría por su cuenta.
     Devuelve None si el nombre no lleva el correlativo (formato heredado sin número).
     """
@@ -839,7 +839,7 @@ def ejecutar_sdd_fase_implementacion(retrabajo=None):
         # existe, se omite. Si no, SpecKit no tocaría backend-architecture.md y el post-check abortaría la
         # fase antes de llegar al frontend. Sin frontend que ejecutar nunca se omite (no habría handoff).
         if involucra_backend and involucra_frontend and backend_sin_tareas_pendientes():
-            doc_back = DIRECTORIO_RAIZ / "documents" / "dev-backend" / "backend-architecture.md"
+            doc_back = DIRECTORIO_RAIZ / "docs" / "dev-backend" / "backend-architecture.md"
             readme_back = DIRECTORIO_RAIZ / ruta_readme_codigo("backend")
             if doc_back.exists() and doc_back.stat().st_size > 0 and readme_back.exists() and readme_back.stat().st_size > 0:
                 involucra_backend = False
@@ -853,10 +853,10 @@ def ejecutar_sdd_fase_implementacion(retrabajo=None):
             if agent_backend_path.exists():
                 alma_backend = agent_backend_path.read_text(encoding="utf-8")
                 
-                # TAREA FANTASMA PARA BACKEND (Ruta estricta en documents/)
+                # TAREA FANTASMA PARA BACKEND (Ruta estricta en docs/)
                 tarea_fantasma_back = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
-Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'documents/dev-backend/backend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar. AÚN SI NO HICISTE CAMBIOS EN EL CÓDIGO, DEBES CREAR O TOCAR EL ARCHIVO indicando que la arquitectura actual está vigente.
+Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'docs/dev-backend/backend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar. AÚN SI NO HICISTE CAMBIOS EN EL CÓDIGO, DEBES CREAR O TOCAR EL ARCHIVO indicando que la arquitectura actual está vigente.
 """
                 tarea_fantasma_back += "\n" + instruccion_readme(ruta_readme_codigo("backend")) + "\n"
                 active_directive_path.write_text(alma_backend + tarea_fantasma_back, encoding="utf-8")
@@ -866,11 +866,11 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
                 print("🏃 [SpecKit] Ejecutando implementación de Backend...")
                 write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Backend (/speckit.implement)...")
                 
-                doc_back_path = DIRECTORIO_RAIZ / "documents" / "dev-backend" / "backend-architecture.md"
+                doc_back_path = DIRECTORIO_RAIZ / "docs" / "dev-backend" / "backend-architecture.md"
                 doc_back_path.parent.mkdir(parents=True, exist_ok=True)
                 res_back = ejecutar_speckit(
                     "implement",
-                    instruccion_doc_viva("documents/dev-backend/backend-architecture.md", alcance="backend",
+                    instruccion_doc_viva("docs/dev-backend/backend-architecture.md", alcance="backend",
                                          ruta_readme=ruta_readme_codigo("backend")) + arg_retrabajo("backend"),
                     directiva=active_directive_path,
                 )
@@ -881,7 +881,7 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
                 # POST-CHECK DE VALIDACIÓN: Backend Architecture Doc
                 if not doc_back_path.exists() or doc_back_path.stat().st_mtime < (ts_inicio_back - 2):
                     salida = (res_back.stdout or "").strip()[-300:].replace("\n", " ")
-                    msg_err = f"@WATCHER: 🚨 ERROR: SpecKit omitió la documentación viva de Backend en 'documents/dev-backend/backend-architecture.md'. Salida de Claude: {salida}"
+                    msg_err = f"@WATCHER: 🚨 ERROR: SpecKit omitió la documentación viva de Backend en 'docs/dev-backend/backend-architecture.md'. Salida de Claude: {salida}"
                     print(f"❌ {msg_err}")
                     write_watcher_log(msg_err)
                     return False
@@ -903,7 +903,7 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
                 block = f"""
 ### [{dt_str}] Senior Backend Developer
 - **Hora:** {hr_str}
-- **Artefacto generado:** `documents/dev-backend/backend-architecture.md`
+- **Artefacto generado:** `docs/dev-backend/backend-architecture.md`
 - **Estado:** Implementación backend finalizada exitosamente mediante SDD SpecKit.
 - **Handoff:** {handoff_target} {handoff_text}
 """
@@ -921,10 +921,10 @@ Lee obligatoriamente la plantilla maestra en dev-backend/templates/backend-archi
             if agent_frontend_path.exists():
                 alma_frontend = agent_frontend_path.read_text(encoding="utf-8")
                 
-                # TAREA FANTASMA PARA FRONTEND (Ruta estricta en documents/)
+                # TAREA FANTASMA PARA FRONTEND (Ruta estricta en docs/)
                 tarea_fantasma_front = """
 \n\n# TASK-FINAL: Generación de Documentación Viva
-Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'documents/dev-frontend/frontend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar. AÚN SI NO HICISTE CAMBIOS EN EL CÓDIGO, DEBES CREAR O TOCAR EL ARCHIVO indicando que la arquitectura actual está vigente.
+Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-architecture-template.md (si existe) o básate en tus reglas. Luego, crea o edita obligatoriamente el archivo 'docs/dev-frontend/frontend-architecture.md'. APLICA RENDERIZADO SELECTIVO: No regeneres la arquitectura base; únicamente documenta y genera los diagramas Mermaid para las rutas, esquemas o componentes que alteraste en las tareas anteriores. Este paso es un requisito crítico arquitectónico para finalizar. AÚN SI NO HICISTE CAMBIOS EN EL CÓDIGO, DEBES CREAR O TOCAR EL ARCHIVO indicando que la arquitectura actual está vigente.
 """
                 tarea_fantasma_front += "\n" + instruccion_readme(ruta_readme_codigo("frontend")) + "\n"
                 active_directive_path.write_text(alma_frontend + tarea_fantasma_front, encoding="utf-8")
@@ -934,11 +934,11 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
                 print("🏃 [SpecKit] Ejecutando implementación de Frontend...")
                 write_watcher_log("⚡ [SDD Auto-Runner] Ejecutando implementación Frontend (/speckit.implement)...")
                 
-                doc_front_path = DIRECTORIO_RAIZ / "documents" / "dev-frontend" / "frontend-architecture.md"
+                doc_front_path = DIRECTORIO_RAIZ / "docs" / "dev-frontend" / "frontend-architecture.md"
                 doc_front_path.parent.mkdir(parents=True, exist_ok=True)
                 res_front = ejecutar_speckit(
                     "implement",
-                    instruccion_doc_viva("documents/dev-frontend/frontend-architecture.md", alcance="frontend",
+                    instruccion_doc_viva("docs/dev-frontend/frontend-architecture.md", alcance="frontend",
                                          ruta_readme=ruta_readme_codigo("frontend")) + arg_retrabajo("frontend"),
                     directiva=active_directive_path,
                 )
@@ -949,7 +949,7 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
                 # POST-CHECK DE VALIDACIÓN: Frontend Architecture Doc
                 if not doc_front_path.exists() or doc_front_path.stat().st_mtime < (ts_inicio_front - 2):
                     salida = (res_front.stdout or "").strip()[-300:].replace("\n", " ")
-                    msg_err = f"@WATCHER: 🚨 ERROR: SpecKit omitió la documentación viva de Frontend en 'documents/dev-frontend/frontend-architecture.md'. Salida de Claude: {salida}"
+                    msg_err = f"@WATCHER: 🚨 ERROR: SpecKit omitió la documentación viva de Frontend en 'docs/dev-frontend/frontend-architecture.md'. Salida de Claude: {salida}"
                     print(f"❌ {msg_err}")
                     write_watcher_log(msg_err)
                     return False
@@ -967,7 +967,7 @@ Lee obligatoriamente la plantilla maestra en dev-frontend/templates/frontend-arc
                 block = f"""
 ### [{dt_str}] Senior Frontend Developer
 - **Hora:** {hr_str}
-- **Artefacto generado:** `documents/dev-frontend/frontend-architecture.md`
+- **Artefacto generado:** `docs/dev-frontend/frontend-architecture.md`
 - **Estado:** Implementación frontend finalizada exitosamente mediante SDD SpecKit.
 - **Handoff:** @QA-AUTO: {texto_qa}
 """
@@ -1103,10 +1103,10 @@ def extraer_instrucciones(linea):
         print("=" * 80)
         
         # Buscar la ruta de la HU en el mensaje
-        match_hu = re.search(r'(?:documents[/\\]business-analyst[/\\])?((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
+        match_hu = re.search(r'(?:docs[/\\]business-analyst[/\\])?((?:[0-9]{3}-HU_|hu_)[a-zA-Z0-9_-]+\.md)', linea, re.IGNORECASE)
         if match_hu:
             nombre_hu = match_hu.group(1)
-            ruta_hu = f"documents/business-analyst/{nombre_hu}"
+            ruta_hu = f"docs/business-analyst/{nombre_hu}"
             print(f"Iniciando SDD Fase de Negocio para: {ruta_hu}\n")
             
             exito = ejecutar_sdd_fase_negocio(ruta_hu)

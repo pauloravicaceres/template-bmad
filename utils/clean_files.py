@@ -72,7 +72,7 @@ def seleccionar_carpetas():
 
 def main():
     raiz_proyecto = Path(__file__).resolve().parent.parent
-    documents_dir = raiz_proyecto / "documents"
+    docs_dir = raiz_proyecto / "docs"
     specs_dir = raiz_proyecto / "specs"
     
     carpetas_a_limpiar = seleccionar_carpetas()
@@ -83,7 +83,7 @@ def main():
         if nombre_carpeta == "specs":
             ruta_carpeta = specs_dir
         else:
-            ruta_carpeta = documents_dir / nombre_carpeta
+            ruta_carpeta = docs_dir / nombre_carpeta
 
         if not ruta_carpeta.exists():
             print(f"[OMITIDO] La carpeta no existe: {ruta_carpeta.name}")
